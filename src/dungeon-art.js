@@ -86,6 +86,41 @@
     hall2: () => sky('hs', '#2a2230', '#4a3a3a', '#5a4436') + hallRoom(1) + motes('#ffd890'),
     hall3: (o) => sky('hs', o && o.boss ? '#140f1c' : '#2a2230', '#3a2e32', '#4a3a30') + hallRoom(2) + motes('#ffd890'),
   };
+  /* ---- Dev 8: backdrops for the dungeons that used to share one generic sky, each with a boss-room version ---- */
+  const stars = (n, seed, c) => { const r = rnd(seed); return [...Array(n)].map(() => '<rect class="tw" x="' + Math.round(r() * 1000) + '" y="' + Math.round(r() * 200) + '" width="3" height="3" fill="' + (c || '#fff') + '" opacity="' + (0.3 + r() * 0.6).toFixed(2) + '"/>').join(''); };
+  const glowE = (cx, cy, rx, ry, c, op) => '<ellipse cx="' + cx + '" cy="' + cy + '" rx="' + rx + '" ry="' + ry + '" fill="' + c + '" opacity="' + (op || 0.35) + '"/>';
+  // the Overgrown Reliquary: a vault of mossy stacks and humming roots; boss room: the relic altar under a root dome
+  SCENES.vault = (o) => sky('vs', o.boss ? '#122a20' : '#1f3a34', o.boss ? '#2c5a3a' : '#3f7a5a', '#2c5a3a') +
+    [...Array(9)].map((_, i) => blk(40 + i * 110, 110 + (i % 3) * 26, 46, i % 2 ? '#5a6a52' : '#4f5f48', 330)).join('') +
+    [...Array(9)].map((_, i) => blk(36 + i * 110, 100 + (i % 3) * 26, 54, '#5fae55', 18)).join('') +
+    '<path d="M0 150Q240 60 500 130T1000 120" stroke="#4a3a24" stroke-width="14" fill="none"/><path d="M0 150Q240 60 500 130T1000 120" stroke="#7aff8a" stroke-width="2" fill="none" opacity=".35"/>' +
+    (o.boss ? '<path d="M200 330Q500 20 800 330" stroke="#4a3a24" stroke-width="30" fill="none"/><path d="M200 330Q500 20 800 330" stroke="#7aff8a" stroke-width="3" fill="none" opacity=".4"/>' + blk(380, 250, 240, '#7a8a6a', 50) + blk(420, 210, 160, '#8a9a7a', 40) + blk(470, 170, 60, '#d8a830', 40) + glowE(500, 190, 110, 40, '#ffe27a', 0.25) : '') +
+    '<rect y="380" width="1000" height="120" fill="#24402c"/>' + motes('#d8ffb0');
+  // the Drowned Steps: a sea cave mouth, stone steps going down into blue; boss room: a drowned arch and its treasure
+  SCENES.tide = (o) => sky('ts', o.boss ? '#0a1a34' : '#1a3a6a', o.boss ? '#1a4a7a' : '#3a8ac0', '#2a6a9a') + stars(o.boss ? 20 : 8, 31, '#bfefff') +
+    '<path d="M0 0H1000V130Q860 40 700 120T380 110 0 140z" fill="#14243a"/>' + [...Array(7)].map((_, i) => blk(460 - i * 8, 230 + i * 22, 80 + i * 16, i % 2 ? '#6a7a86' : '#5a6a76', 22)).join('') +
+    '<rect y="300" width="1000" height="200" fill="#2a7ab0" opacity=".85"/>' + [0, 1, 2, 3].map((i) => '<rect x="' + (80 + i * 240) + '" y="' + (318 + (i % 2) * 18) + '" width="120" height="4" fill="#bfefff" opacity=".4"/>').join('') +
+    (o.boss ? blk(300, 120, 50, '#4f6f7a', 200) + blk(650, 120, 50, '#4f6f7a', 200) + blk(290, 100, 410, '#5a7a86', 40) + blk(470, 260, 60, '#c8b8d8', 30) + glowE(500, 270, 60, 26, '#ffffff', 0.35) +
+      [0, 1, 2, 3, 4].map((i) => blk(400 + i * 44, 292, 16, '#ffd86b', 8)).join('') : blk(140, 180, 40, '#4f6f7a', 140) + blk(820, 170, 44, '#4f6f7a', 150)) + motes('#bfefff');
+  // the Cold Kiln: brick walls and a chimney against a smoky dusk; boss room: the kiln mouth burning again
+  SCENES.kiln = (o) => sky('ks', o.boss ? '#1a0a08' : '#2a1a1a', o.boss ? '#5a2a18' : '#6a3a2a', '#4a2a20') +
+    [...Array(12)].map((_, i) => [...Array(5)].map((__, j) => blk(i * 86 + (j % 2) * 43 - 20, 140 + j * 40, 84, (i + j) % 2 ? '#7a3a28' : '#6a3222', 38)).join('')).join('') +
+    blk(120, 20, 90, '#4a2218', 160) + '<rect x="130" y="0" width="70" height="30" fill="#6a6a6a" opacity=".5"/>' +
+    (o.boss ? blk(330, 160, 340, '#4a2218', 200) + '<path d="M390 360V250Q500 170 610 250V360z" fill="#2a0c06"/><path d="M410 360V260Q500 196 590 260V360z" fill="#ff7a2a" class="pz-glow"/>' + glowE(500, 330, 220, 60, '#ff8a3a', 0.35) +
+      [0, 1, 2].map((i) => blk(220 + i * 40, 330 - i * 30, 34, '#d8a050', 30 + i * 30)).join('') + [0, 1].map((i) => blk(700 + i * 50, 320 - i * 20, 38, '#c08040', 40 + i * 20)).join('') : '') +
+    '<rect y="380" width="1000" height="120" fill="#3a2018"/>' + motes('#ffb070');
+  // the Lantern Orchard: rows of lantern-trees going off into the dusk; boss room: the oldest, brightest tree
+  SCENES.orchard = (o) => sky('os', '#1e1838', '#5a4a7a', '#8a6a7a') + stars(18, 41, '#ffe9a0') +
+    [0, 1, 2].map((row) => [...Array(8)].map((_, i) => { const x = 40 + i * 128 + row * 40, y = 210 - row * 30, s = 1 - row * 0.25; return blk(x + 18 * s, y + 40 * s, 12 * s, '#4a3020', 80 * s) + blk(x, y, 48 * s, row ? '#2f5a3a' : '#3f7a4a', 46 * s) + blk(x + 14 * s, y + 36 * s, 8 * s, '#ffd070', 10 * s); }).join('')).join('') +
+    (o.boss ? blk(460, 140, 80, '#4a3020', 240) + blk(330, 60, 340, '#3f7a4a', 120) + blk(380, 20, 240, '#4f8a54', 60) + [...Array(12)].map((_, i) => blk(350 + (i % 6) * 56, 90 + Math.floor(i / 6) * 70, 14, '#ffd070', 18)).join('') + glowE(500, 160, 260, 120, '#ffd070', 0.22) : '') +
+    '<rect y="380" width="1000" height="120" fill="#3a5a34"/>' + motes('#ffe9a0');
+  // the Windworn Stair: cliffs and sky below the Spire; boss room: the tower of the Weathervane
+  SCENES.stair = (o) => sky('ws', o.boss ? '#3a5a8a' : '#7ec4ef', o.boss ? '#a8c8e8' : '#cfe9f4', '#e8f4f8') +
+    '<g fill="#fff" opacity=".8"><rect x="120" y="70" width="140" height="22"/><rect x="150" y="54" width="70" height="20"/><rect x="700" y="100" width="160" height="22"/><rect x="740" y="84" width="80" height="20"/></g>' +
+    [...Array(10)].map((_, i) => blk(i * 104, 260 - (i % 4) * 30, 104, i % 2 ? '#98a0aa' : '#a8b0b8', 260)).join('') + [...Array(6)].map((_, i) => blk(80 + i * 60, 330 - i * 26, 60, '#8e96a0', 24)).join('') +
+    (o.boss ? blk(560, 60, 90, '#a0a8b0', 300) + blk(580, 20, 50, '#8e96a0', 44) + '<rect x="603" y="-10" width="4" height="34" fill="#6a5a4a"/><path d="M560 -6h90l-14 10 14 10h-90z" fill="#ffd86b"/>' + glowE(605, 200, 120, 220, '#8fe6d6', 0.15) : '') +
+    '<rect y="400" width="1000" height="100" fill="#8e96a0"/>' + motes('#ffffff');
+  // the Hollow Veil and the Resonance Scar keep their v0.4 skies; their boss rooms get set dressing in front of them
   function hallRoom(stage) {
     let out = '';
     for (let x = 0; x < 1000; x += 50) for (let y = 40; y < 300; y += 50) out += '<rect x="' + x + '" y="' + y + '" width="49" height="49" fill="' + ((x + y) % 100 ? '#5a4a40' : '#54453c') + '"/>';

@@ -5,7 +5,7 @@
    everything a view creates is released in its dispose(). */
 import * as C from './creature3d.js';
 import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/loaders/GLTFLoader.js/+esm';
-import { buildArena } from './arenas.js';
+import { buildArena, kit, motes, tracker, rnd } from './arenas.js';
 const THREE = C.THREE;
 const A = window.A, D = A.Data;
 
@@ -164,11 +164,30 @@ class Bursts {
   dispose() { this.live.concat(this.pool).forEach((s) => { this.scene.remove(s); s.material.dispose(); }); this.live = []; this.pool = []; }
 }
 
+/* ------------------------------------------------------------------ living-pixel aura (Dev 8) */
+// One InstancedMesh of tiny cubes orbiting and rising around a point; colours shift for the Island Boss.
+function pixelAura(scene, at, scale, prismatic) {
+  const n = calm() ? 8 : 22, geo = new THREE.BoxGeometry(0.06, 0.06, 0.06), mat = new THREE.MeshBasicMaterial({ color: prismatic ? '#ffffff' : '#ffe9a0', transparent: true, opacity: 0.9, depthWrite: false, blending: THREE.AdditiveBlending });
+  const mesh = new THREE.InstancedMesh(geo, mat, n), m = new THREE.Matrix4(), q = new THREE.Quaternion(), v = new THREE.Vector3(), one = new THREE.Vector3(1, 1, 1), col = new THREE.Color();
+  const seed = Array.from({ length: n }, (_, i) => ({ a: (i / n) * Math.PI * 2, h: Math.random(), r: 0.55 + Math.random() * 0.5, sp: 0.25 + Math.random() * 0.3 }));
+  if (prismatic) for (let i = 0; i < n; i++) mesh.setColorAt(i, col.setHSL(i / n, 0.85, 0.65));
+  scene.add(mesh);
+  return {
+    update(t, dt) {
+      for (let i = 0; i < n; i++) { const s = seed[i]; s.h += (dt || 0.016) * s.sp; if (s.h > 1) s.h -= 1; const a = s.a + t * 0.6;
+        v.set(at.x + Math.cos(a) * s.r * scale * 0.7, 0.15 + s.h * 1.9 * scale / 1.3, at.z + Math.sin(a) * s.r * scale * 0.5); m.compose(v, q, one.setScalar(1 - s.h * 0.6)); mesh.setMatrixAt(i, m);
+        if (prismatic) mesh.setColorAt(i, col.setHSL((i / n + t * 0.1) % 1, 0.85, 0.65)); }
+      mesh.instanceMatrix.needsUpdate = true; if (prismatic && mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+    },
+    dispose() { scene.remove(mesh); geo.dispose(); mat.dispose(); mesh.dispose(); },
+  };
+}
+
 /* ------------------------------------------------------------------ battle stage */
 // createBattle(container, { dungeon, player: spId, enemy: spId, boss }) -> controller used by ui2.js
 export async function createBattle(container, o) {
   const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(36, 2, 0.1, 60);
-  const arena = buildArena(scene, o.dungeon || 'reliquary'); const lights = C.studioLights(scene, arena.def.mood);
+  const arena = buildArena(scene, o.dungeon || 'reliquary', { boss: !!o.boss, island: !!o.prismatic }); const lights = C.studioLights(scene, arena.def.mood);
   const bursts = new Bursts(scene);
   // both creatures turn three quarters towards the camera and partly towards each other, so faces stay readable
   const P = { pos: new THREE.Vector3(-1.45, 0, 0.9), yaw: 1.2 }, E = { pos: new THREE.Vector3(1.35, 0, -0.95), yaw: -0.85 };
@@ -190,12 +209,14 @@ export async function createBattle(container, o) {
   // barrier: a translucent dome over the enemy while a Stone Barrier stands
   const dome = new THREE.Mesh(new THREE.SphereGeometry(1.05 * eScale / 1.3, 18, 12, 0, Math.PI * 2, 0, Math.PI / 2), new THREE.MeshBasicMaterial({ color: '#c8d2e0', transparent: true, opacity: 0, depthWrite: false }));
   dome.position.copy(E.pos); scene.add(dome); let barrier = false;
+  // Dev 8 living pixel: a boss sheds small glowing cubes that rise around it (prismatic for the Island Boss)
+  const aura = o.boss ? pixelAura(scene, E.pos, eScale, !!o.prismatic) : null;
   let shake = 0, telegraph = false, t0 = 0;
   const camBase = new THREE.Vector3(-0.35, 1.7, 5.0), look = new THREE.Vector3(0.05, 0.62, -0.15);
   const view = {
     scene, camera,
     update(dt, t) {
-      t0 = t; slots.p.update(dt); slots.e.update(dt); arena.update(t); bursts.update(dt);
+      t0 = t; slots.p.update(dt); slots.e.update(dt); arena.update(t, dt); bursts.update(dt); if (aura) aura.update(t, dt);
       ring.material.opacity = telegraph ? 0.45 + Math.sin(t * 8) * 0.3 : Math.max(0, ring.material.opacity - dt * 2);
       if (bossRune) bossRune.rotation.z += dt * 0.25;
       if (prism && !calm()) { prism.material.color.setHSL((t * 0.12) % 1, 0.85, 0.62); prismUp.material.color.setHSL((t * 0.12 + 0.5) % 1, 0.85, 0.66); prism.rotation.z += dt * 0.4; prismUp.material.opacity = 0.24 + Math.sin(t * 2.2) * 0.1; }
@@ -232,6 +253,7 @@ export async function createBattle(container, o) {
       if (bossRune) { bossRune.geometry.dispose(); bossRune.material.dispose(); }
       if (prism) { [prism, prismUp].forEach((m) => { scene.remove(m); m.geometry.dispose(); m.material.dispose(); }); }
       scene.remove(dome); dome.geometry.dispose(); dome.material.dispose();
+      if (aura) aura.dispose();
       void t0;
     },
   };
@@ -265,6 +287,44 @@ export async function createViewer(container, spId, o) {
       if (active === view) { active = null; stop(); } if (el.parentNode === container) container.removeChild(el);
       act.dispose(); disc.geometry.dispose(); disc.material.dispose();
     },
+  };
+}
+
+/* ------------------------------------------------------------------ Dev 8: living-pixel test scene */
+// The reference scene for the art direction: a patch of block terrain, one building, a normal creature, a glowing
+// creature with a pixel aura, drifting motes, and a "moment" (burst) on demand. Same parts and budget as the game.
+export async function createTestScene(container, o) {
+  o = o || {};
+  const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(34, 2, 0.1, 60), T = tracker(), group = new THREE.Group(), r = rnd(4242);
+  const add = (mesh, p) => { p = p || {}; mesh.position.set(p.x || 0, p.y || 0, p.z || 0); mesh.rotation.set(p.rx || 0, p.ry || 0, p.rz || 0); if (p.sx || p.sy || p.sz) mesh.scale.set(p.sx || 1, p.sy || 1, p.sz || 1); group.add(mesh); return mesh; };
+  const K = kit(add, T, r);
+  // terrain: grass with a dirt path and a stone edge; a small cliff step at the back
+  K.floor((i, j, x, z) => (Math.abs(x - z * 0.4) < 0.7 ? (r() < 0.5 ? '#b08a5a' : '#a07a4a') : (r() < 0.5 ? '#62ad4c' : '#57a044')), { rx: 5.5, rz: 4.2, bump: 0.08 });
+  for (let x = -4.5; x <= 4.5; x += 0.5) K.box((x * 2) % 2 ? '#8a9098' : '#7a8088', x, 0, -3.6, 0.5, 0.5 + r() * 0.4, 0.5);
+  // building: a small smithy of blocks (walls, slate roof, chimney with a glowing window)
+  K.box('#b9a88a', -2.4, 0, -1.8, 1.8, 1.1, 1.4); K.box('#7a5a44', -2.4, 1.1, -1.8, 2.1, 0.22, 1.7); K.box('#5a6a80', -2.4, 1.32, -1.8, 1.7, 0.22, 1.3); K.box('#4a5a70', -2.4, 1.54, -1.8, 1.1, 0.2, 0.9);
+  K.box('#3a3028', -2.4, 0, -1.08, 0.42, 0.7, 0.04); K.box('#ffd27a', -1.85, 0.45, -1.08, 0.3, 0.26, 0.04, { e: '#ffb84a', ei: 1.6 });
+  K.box('#6a3222', -1.8, 1.3, -2.2, 0.36, 0.9, 0.36); K.box('#ff8a3a', -1.8, 2.2, -2.2, 0.2, 0.1, 0.2, { e: '#ff6a1a', ei: 2 });
+  K.tree(3.6, -2.4, 1.1, '#3f8a3a', '#4fa046'); for (let i = 0; i < 12; i++) K.tuft((r() - 0.5) * 8, (r() - 0.5) * 5 - 0.6, '#5fb04a');
+  scene.add(group); scene.fog = new THREE.Fog('#a8d8f0', 8, 18);
+  const lights = C.studioLights(scene, 'day');
+  const mt = motes(T, '#fffbe0', 30); group.add(mt);
+  // creatures: a normal one and a glowing one (emissive voxels + rising pixel cubes)
+  const [normal, glowing] = await Promise.all([actor(o.normal || 'acinus'), actor(o.glowing || 'lumi')]);
+  normal.group.position.set(-0.4, 0, 0.6); normal.group.rotation.y = 0.5; scene.add(normal.group);
+  glowing.group.position.set(1.4, 0, -0.2); glowing.group.rotation.y = -0.6; glowing.group.scale.setScalar(1.15); scene.add(glowing.group);
+  glowing.mats.forEach((m) => { m.emissive = new THREE.Color('#5fd8ff'); m.emissiveIntensity = 0.16; });
+  const aura = pixelAura(scene, glowing.group.position, 1.2, false);
+  const bursts = new Bursts(scene);
+  const view = { scene, camera,
+    update(dt, t) { normal.update(dt); glowing.update(dt); aura.update(t, dt); bursts.update(dt);
+      const u = mt.userData, p = u.pos; for (let i = 0; i < u.n; i++) { p[i * 3 + 1] += dt * (0.22 + (i % 5) * 0.05); if (p[i * 3 + 1] > 3.4) p[i * 3 + 1] = 0.05; } mt.geometry.attributes.position.needsUpdate = true;
+      camera.position.set(0.3, 3.0, 8.4); camera.lookAt(0.1, 0.55, -0.8); },
+    detach() { stop(); } };
+  attach(view, container);
+  return {
+    moment() { boost(2000); const p = glowing.group.position.clone(); p.y += 0.9; bursts.emit(p, '#8fe6d6', 26, 2.2, 0.9); bursts.emit(p, '#ffd86b', 14, 1.6, 0.8); glowing.play('victory'); },
+    dispose() { if (active === view) { active = null; stop(); } if (renderer && renderer.domElement.parentNode === container) container.removeChild(renderer.domElement); normal.dispose(); glowing.dispose(); aura.dispose(); bursts.dispose(); scene.remove(lights); scene.remove(group); T.dispose(); },
   };
 }
 

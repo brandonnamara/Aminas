@@ -472,10 +472,11 @@
   UI.act('verTap', () => { if (!D.DEV_TOOLS) return; verTaps++; clearTimeout(verT); verT = setTimeout(() => (verTaps = 0), 2000); if (verTaps >= 7) { verTaps = 0; UI.devPanel(); } });
   UI.devPanel = function () {
     if (!st().starter) return;
-    UI.modal(UI.sheet('Developer testing panel', '<p class="muted" style="font-size:.8rem">Testing shortcuts. Nothing here runs unless you tap it. Reset the save from Settings to clear their effects.</p><div class="row-actions"><button class="btn small" data-act="dev" data-k="res">+500 gold, +200 food, +20 gems</button><button class="btn small" data-act="dev" data-k="lv">Companion +1 level</button><button class="btn small" data-act="dev" data-k="egg">Finish egg now</button><button class="btn small" data-act="dev" data-k="rank">+1 rank</button><button class="btn small" data-act="dev" data-k="all">Befriend every Amina (Lv 5)</button><button class="btn small" data-act="dev" data-k="gold100k">+100,000 gold</button><button class="btn small" data-act="dev" data-k="timers">Finish all timers</button><button class="btn small" data-act="dev" data-k="prod">Fill all production</button><button class="btn small" data-act="dev" data-k="dboss">Next dungeon: go to its boss</button><button class="btn small" data-act="dev" data-k="dclear">Next dungeon: mark cleared</button></div>', '<button class="btn gold" data-act="close">Close</button>', 'narrow'));
+    UI.modal(UI.sheet('Developer testing panel', '<p class="muted" style="font-size:.8rem">Testing shortcuts. Nothing here runs unless you tap it. Reset the save from Settings to clear their effects.</p><div class="row-actions"><button class="btn small" data-act="dev" data-k="res">+500 gold, +200 food, +20 gems</button><button class="btn small" data-act="dev" data-k="ess">+50 of every essence</button><button class="btn small" data-act="lpScene">Living-pixel test scene</button><button class="btn small" data-act="dev" data-k="lv">Companion +1 level</button><button class="btn small" data-act="dev" data-k="egg">Finish egg now</button><button class="btn small" data-act="dev" data-k="rank">+1 rank</button><button class="btn small" data-act="dev" data-k="all">Befriend every Amina (Lv 5)</button><button class="btn small" data-act="dev" data-k="gold100k">+100,000 gold</button><button class="btn small" data-act="dev" data-k="timers">Finish all timers</button><button class="btn small" data-act="dev" data-k="prod">Fill all production</button><button class="btn small" data-act="dev" data-k="dboss">Next dungeon: go to its boss</button><button class="btn small" data-act="dev" data-k="dclear">Next dungeon: mark cleared</button></div>', '<button class="btn gold" data-act="close">Close</button>', 'narrow'));
   };
   UI.act('dev', (el) => {
     const s = st(), k = el.dataset.k;
+    if (k === 'ess' && R.Essence) { D.ESSENCES.forEach((e) => R.Essence.gain(s, e, 50, 'dev')); S.save(); UI.refresh(); UI.toast('+50 of every essence.', 'n'); return; }
     if (k === 'res') R.addRes(s, { gold: 500, food: 200, gems: 20 });
     if (k === 'lv') { const a = R.active(s); if (a && a.lv < D.MAX_LEVEL) R.addXp(s, a, R.xpNeed(a.lv) - a.xp); }
     if (k === 'egg') (s.eggs || []).forEach((e) => (e.readyAt = Date.now() - 1));
@@ -500,6 +501,7 @@
     const save = () => { if (st().starter) S.save(); };
     document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
     root.addEventListener('pagehide', save); root.addEventListener('beforeunload', save);
+    if (/[?&]scene=livingpixel/.test(root.location.search) && UI.livingPixelScene) { UI.livingPixelScene(); return; }
     UI.showTitle();
   };
 })(typeof window !== 'undefined' ? window : globalThis);

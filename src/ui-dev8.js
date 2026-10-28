@@ -196,4 +196,29 @@
   });
   // the old companion feed action (tutorial highlights) picks the shown Amina first instead of feeding blindly
   UI.act('feed', () => { const c = $('#comp'); if (!c) return; const uid = +c.dataset.uid; UI.selUid = uid; UI.selPicked = uid; UI.selRender(); });
+
+  /* ================================================================ living-pixel test scene */
+  // The reference scene for Dev 8's art direction (open with ?scene=livingpixel, or Settings > version x7 > Developer
+  // panel). Top: the 3D runtime with terrain, a building, a normal creature (Acinus), a glowing creature (Lumi) and
+  // pixel motes. Bottom: the 2D island building, the currency, essence and avatar sprites, and a "moment" button.
+  UI.livingPixelScene = function () {
+    UI.setScreen('lpscene'); UI.closeAll();
+    const IA = A.IsoArt, b = { type: 'forge', level: 2, rot: 0, state: 'built' };
+    const sprites = ['gold', 'food', 'gem'].concat(D.ESSENCES.map((e) => 'ess_' + e)).map((n) => '<span class="lp-sp" title="' + n + '">' + PX.sprite(n) + '</span>').join('');
+    $('#stage').innerHTML = '<div class="lpscene"><div class="lp-3d" id="lp-3d"><div class="lp-note">Loading the 3D scene…</div></div>' +
+      '<div class="lp-side panel"><h2>Living pixel · reference scene</h2><p class="muted small-t">Terrain, a building, a normal creature, a glowing creature and pixel effects, built with the same parts and budget as the game.</p>' +
+      '<div class="lp-bld">' + (IA && IA.building ? '<svg viewBox="-110 -150 220 200" class="lp-svg">' + IA.building(b, st() || S.fresh()) + '</svg>' : '') + '<div class="lp-av">' + PX.avatar(D.AVATAR_DEFAULT) + '</div></div>' +
+      '<div class="lp-sps">' + sprites + '</div><div class="lp-stats" id="lp-stats"></div>' +
+      '<div class="row-actions"><button class="btn gold" id="lp-go">' + I('spark') + 'Play a moment</button><button class="btn ghost" id="lp-back">' + I('back') + 'Back</button></div></div></div>';
+    let sc = null, dead = false;
+    const host = $('#lp-3d');
+    if (A.C3D && A.C3D.enabled()) A.C3D.load().then((mod) => (mod && !dead && mod.createTestScene ? mod.createTestScene(host) : null)).then((x) => { if (!x) { const n = $('.lp-note', host); if (n) n.textContent = '3D is off or unavailable here.'; return; } if (dead) { x.dispose(); return; } sc = x; const n = $('.lp-note', host); if (n) n.remove(); });
+    else { const n = $('.lp-note', host); if (n) n.textContent = '3D is off or unavailable here.'; }
+    const tick = setInterval(() => { const s3 = A.C3D && A.C3D.stats && A.C3D.stats(), el = $('#lp-stats'); if (!el) return; el.textContent = s3 ? 'fps ' + s3.c3dFps + ' (target ' + s3.targetFps + ') · draw calls ' + s3.drawCalls + ' · triangles ' + s3.triangles + ' · pixel ratio ' + s3.pixelRatio : ''; }, 1000);
+    UI.timers.lp = tick;
+    UI.cleanups.push(() => { dead = true; clearInterval(tick); if (sc) sc.dispose(); sc = null; });
+    $('#lp-go').onclick = () => { if (sc) sc.moment(); UI.pixelBurstAt($('.lp-bld svg'), { n: 24, big: true, colors: ['#ffd86b', '#fff', '#ff8a3a', '#8fe6d6'], rise: true }); Au.play('restore'); };
+    $('#lp-back').onclick = () => { if (st() && st().starter) UI.showIsland(); else UI.showTitle(); };
+  };
+  UI.act('lpScene', () => UI.livingPixelScene());
 })(typeof window !== 'undefined' ? window : globalThis);
