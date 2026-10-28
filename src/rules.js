@@ -332,7 +332,7 @@
   };
   // A party fighter for an owned Amina, with its equipment applied exactly once.
   R.partyFighter = function (st, inst, opts) {
-    return B.fighter(inst.sp, inst.lv, Object.assign({ uid: inst.uid, gear: R.gearBonus(st, inst) }, opts || {}));
+    return B.fighter(inst.sp, inst.lv, Object.assign({ uid: inst.uid, gear: R.gearBonus(st, inst), mvl: R.moveLevels ? R.moveLevels(inst) : null }, opts || {}));
   };
   R.statsWithGear = function (st, inst) {
     const b = R.statsAt(inst.sp, inst.lv), g = R.gearBonus(st, inst);
@@ -356,7 +356,7 @@
     const hpMax = Math.round(st.hp * (opts.hpMult || 1));
     const f = { sp: spId, uid: opts.uid || null, name: opts.name || s.name, lv, el: s.el, hpMax,
       hp: opts.hp != null ? Math.max(0, Math.min(hpMax, Math.round(opts.hp))) : hpMax,
-      atk: st.atk, def: st.def, spd: st.spd, abil: s.abil.slice(), cd: {}, weak: 0, guard: false, st: {}, boost: 1, gear: !!opts.gear };
+      atk: st.atk, def: st.def, spd: st.spd, abil: s.abil.slice(), cd: {}, weak: 0, guard: false, st: {}, boost: 1, gear: !!opts.gear, mvl: opts.mvl || {} };
     f.abil.forEach((a) => (f.cd[a] = 0));
     return f;
   };
@@ -390,7 +390,8 @@
     const A_ = att.atk * (att.boost || 1) * (1 - 0.2 * Math.min(3, att.weak));
     const base = ((2 * att.lv / 5 + 2) * ab.power * A_ / Math.max(1, def.def)) / DIV + 2;
     const rand = 0.92 + rng() * 0.16;
-    let dmg = Math.max(1, Math.round(base * stab * eff * rand * (def.guard ? (ab.boss ? 0.25 : 0.5) : 1)));
+    // a guard lets through half a hit (less with an upgraded guard move); a guardian move is three-quarters blocked
+    let dmg = Math.max(1, Math.round(base * stab * eff * rand * (def.guard ? (ab.boss ? 0.25 : (typeof def.guard === 'number' ? def.guard : 0.5)) : 1)));
     return { dmg, eff };
   };
   B.ready = (f, id) => f.cd[id] === 0;
@@ -416,13 +417,15 @@
   function doAbility(b, who, ev) {
     const att = who === 'p' ? B.cur(b) : b.enemy, def = who === 'p' ? b.enemy : B.cur(b), foe = who === 'p' ? 'e' : 'p';
     return function (id) {
-      const ab = D.ABILITIES[id];
+      const ab0 = D.ABILITIES[id], mlv = (att.mvl && att.mvl[id]) || 1, MV = D.MOVE_LEVELS;
+      // Dev 8: an upgraded move (levels 1-5) hits harder, guards better or heals more. Level 1 is the original move.
+      const ab = mlv > 1 && MV && ab0.power ? Object.assign({}, ab0, { power: Math.round(ab0.power * MV.power[mlv]) }) : ab0;
       att.cd[id] = ab.cd;
-      ev.push({ t: 'use', who, name: att.name, abil: id, abName: ab.name, el: ab.el, boss: !!ab.boss });
+      ev.push({ t: 'use', who, name: att.name, abil: id, abName: ab.name, el: ab.el, boss: !!ab.boss, lv: mlv });
       if (ab.boss) { att.charging = false; att.chargeIn = att.hp < att.hpMax * 0.5 ? 1 : 2; }
-      if (ab.type === 'guard') { att.guard = true; ev.push({ t: 'guard', who }); return; }
+      if (ab.type === 'guard') { att.guard = mlv > 1 && MV ? 1 - MV.guard[mlv] : true; ev.push({ t: 'guard', who, lv: mlv }); return; }
       if (ab.type === 'heal') {
-        const amt = Math.min(att.hpMax - att.hp, Math.round(att.hpMax * 0.25));
+        const amt = Math.min(att.hpMax - att.hp, Math.round(att.hpMax * (MV ? MV.heal[mlv] : 0.25)));
         att.hp += amt; ev.push({ t: 'heal', who, amt, hp: att.hp });
         if (ab.fx) applyFx(b, att, ab.fx, who, ev);
         return;

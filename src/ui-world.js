@@ -157,9 +157,9 @@
   function navBtn(act, icon, label, extra) { extra = extra || {}; return '<button class="nbtn ' + (extra.cls || '') + '" data-act="' + act + '" data-hl="' + (extra.hl || act) + '">' + I(icon) + '<span>' + label + '</span>' + (extra.badge ? '<span class="badge">' + extra.badge + '</span>' : '') + '</button>'; }
   UI.hudHtml = function () {
     const s = st(), a = R.active(s), cm = Q.current(s), ready = Q.claimable(s), need = D.RANK_NEED(s.rank), isl = D.ISLANDS[s.currentIsland];
-    let h = '<div class="hud-top"><div class="pill rank"><small>CARETAKER RANK ' + s.rank + '</small><div class="bar xp"><i style="width:' + pct(s.rankXp, need) + '%"></i></div></div>' +
+    let h = '<div class="hud-top">' + (UI.avatarBtn ? UI.avatarBtn(s) : '') + '<button class="pill rank" data-act="profile" aria-label="Player Rank ' + s.rank + ', open profile"><small>PLAYER RANK ' + s.rank + '</small><div class="bar xp"><i style="width:' + pct(s.rankXp, need) + '%"></i></div></button>' +
       '<button class="pill isle" data-act="map" data-hl="map" aria-label="Island map">' + I('map') + '<span>' + esc(isl.name) + '</span></button>' +
-      '<div class="pill res"><span class="gold" id="r-gold">' + I('gold') + '<b>' + fmt(s.res.gold) + '</b></span><span class="food" id="r-food">' + I('food') + '<b>' + fmt(s.res.food) + '</b></span><span class="gems" id="r-gems">' + I('gem') + '<b>' + fmt(s.res.gems) + '</b></span></div>' +
+      '<button class="pill res" data-act="wallet" aria-label="Wallet: currencies and essences"><span class="gold" id="r-gold">' + I('gold') + '<b>' + fmt(s.res.gold) + '</b></span><span class="food" id="r-food">' + I('food') + '<b>' + fmt(s.res.food) + '</b></span><span class="gems" id="r-gems">' + I('gem') + '<b>' + fmt(s.res.gems) + '</b></span></button>' +
       '<button class="round" data-act="ask" aria-label="Ask The Entity">' + I('chat') + '</button><button class="round" data-act="settings" aria-label="Settings">' + I('gear') + '</button></div>';
     if (UI.bm) return h + '<div class="bm-tag pill">' + I('hammer') + ' BUILD MODE</div>' + zoomBtns();
     const fest = A.Events ? A.Events.active()[0] : null;
@@ -236,6 +236,7 @@
     if (ptrs.size === 0) {
       const d = drag; drag = null; UI.dragging = false; const w = $('#world'); if (w) w.classList.remove('dragging');
       if (d && !d.moved && !d.cancelled && !wasPinch) tap(d.target, e.clientX, e.clientY);
+      else if (d && d.moved && d.mode === 'ghost' && !wasPinch && UI.ghostRelease) UI.ghostRelease();
       else if (d && d.moved && d.mode === 'pan' && !wasPinch && d.hist && d.hist.length > 1) { const a = d.hist[0], b = d.hist[d.hist.length - 1], dt = b.t - a.t; if (dt > 0 && performance.now() - b.t < 90) fling((b.x - a.x) / dt, (b.y - a.y) / dt); }
     }
   }
@@ -250,7 +251,7 @@
       if (UI.bm.ghost) {
         if (bl && bl.dataset.bid !== UI.bm.ghost.id && !UI.bm.ghost.isNew && !UI.bm.ghost.fromStorage) { UI.selectForMove(bl.dataset.bid); return; }
         const cell = Iso.cell(...toWorld(px, py)), sz = W.size(UI.bm.ghost.type, UI.bm.ghost.rot);
-        UI.ghostTo(cell[0] - Math.floor(sz.w / 2), cell[1] - Math.floor(sz.h / 2)); return;
+        UI.ghostTo(cell[0] - Math.floor(sz.w / 2), cell[1] - Math.floor(sz.h / 2)); if (UI.ghostRelease) UI.ghostRelease(); return;
       }
       if (bl) { UI.selectForMove(bl.dataset.bid); return; }
       if (ob) { UI.obstaclePanel(ob.dataset.oid); return; }
@@ -290,8 +291,10 @@
   UI.collectAt = function (id, px, py) {
     const r = W.collect(st(), id);
     if (!r.ok) return;
-    Au.play('ok'); floatAt(px, py, '+' + fmt(r.n) + ' ' + r.kind, r.kind === 'gold' ? '#ffd86b' : r.kind === 'food' ? '#ffb0a0' : '#9ae0ff');
-    bump('r-' + (r.kind === 'gems' ? 'gems' : r.kind));
+    const col = W.isEss(r.kind) ? D.ELEMENTS[r.kind.slice(4)].color : r.kind === 'gold' ? '#ffd86b' : r.kind === 'food' ? '#ffb0a0' : '#9ae0ff';
+    Au.play('ok'); floatAt(px, py, '+' + fmt(r.n) + ' ' + W.kindName(r.kind), col);
+    if (UI.pixelBurst) UI.pixelBurst(px, py, { color: col, n: 14 });
+    if (!W.isEss(r.kind)) bump('r-' + (r.kind === 'gems' ? 'gems' : r.kind));
     UI.afterAction();
   };
   function floatAt(px, py, text, color) { const app = $('#app').getBoundingClientRect(), f = document.createElement('div'); f.className = 'gainf'; f.textContent = text; f.style.cssText = 'left:' + (px - app.left - 30) + 'px;top:' + (py - app.top - 30) + 'px;color:' + color; $('#app').appendChild(f); setTimeout(() => f.remove(), 1200); }
@@ -315,7 +318,7 @@
     if (!W.canMove(b)) { UI.toast(W.def(b).name + ' cannot be moved.', 't'); return; }
     if (b.island !== s.currentIsland) return;
     UI.bm = UI.bm || { ghost: null };
-    UI.bm.ghost = { type: b.type, x: b.x, y: b.y, rot: b.rot, id, orig: { x: b.x, y: b.y, rot: b.rot } };
+    UI.bm.ghost = { type: b.type, x: b.x, y: b.y, rot: b.rot, id, orig: { x: b.x, y: b.y, rot: b.rot }, start: { x: b.x, y: b.y, rot: b.rot }, live: true };
     UI.refresh(); UI.focusBuilding(id);
   };
   UI.startPlace = function (type) {
@@ -357,10 +360,22 @@
     const g = UI.bm.ghost, s = st();
     let h = '';
     if (!g) {
-      h = '<div class="bbar panel"><span class="bb-msg">Tap a building to move it, or add something new.</span><button class="btn small gold" data-act="bmCatalog" data-hl="build">' + I('plus') + 'Catalog</button><button class="btn small" data-act="bmStorage" data-hl="storage">' + I('box') + 'Storage' + (W.stored(s).length ? ' (' + W.stored(s).length + ')' : '') + '</button><button class="btn small ghost" data-act="bmDone">' + I('check') + 'Done</button></div>';
+      h = '<div class="bbar panel"><span class="bb-msg">Tap a building to move it, or add something new.</span><button class="btn small gold" data-act="bmCatalog" data-hl="build">' + I('plus') + 'Catalog</button><button class="btn small" data-act="bmStorage" data-hl="storage">' + I('box') + 'Storage' + (W.stored(s).length ? ' (' + W.stored(s).length + ')' : '') + '</button><button class="btn small ghost" data-act="bmDone">' + I('close') + 'Exit build</button></div>';
     } else {
       const d = D.BUILDINGS[g.type], chk = UI.ghostCheck(), b = g.id && s.buildings[g.id];
       const changed = g.isNew || g.fromStorage || g.x !== g.orig.x || g.y !== g.orig.y || g.rot !== g.orig.rot;
+      if (g.live) {
+        // Dev 8: a placed building moves for real the moment it is dropped on a valid spot (no Done button)
+        const moved = g.start && (g.orig.x !== g.start.x || g.orig.y !== g.start.y || g.orig.rot !== g.start.rot);
+        const msg = UI.bm.note ? UI.bm.note : chk.ok ? (moved ? 'Moved. Drag again, or tap ✕ when you are happy.' : 'Drag the ' + esc(d.name) + ' to move it. It stays where you drop it.') : '<span class="bad">' + esc(W.REASON_TEXT[chk.reason] || 'Not here.') + '</span>';
+        h = '<div class="bbar panel sel live"><span class="bb-msg">' + msg + '</span>' +
+          (moved ? '<button class="btn small ghost" data-act="bmCancel" aria-label="Undo move">' + I('back') + 'Undo</button>' : '') +
+          (d.canRotate ? '<button class="btn small" data-act="bmRotate" aria-label="Rotate">' + I('rotate') + 'Rotate</button>' : '') +
+          (b && d.canStore && b.state === 'built' ? '<button class="btn small" data-act="bmStore" data-hl="store">' + I('box') + 'Store</button>' : '') +
+          (b ? '<button class="btn small ghost" data-act="bmInfo" aria-label="Details">' + I('info') + '</button>' : '') +
+          '<button class="round sm" data-act="bmDeselect" data-hl="move" aria-label="Finished moving">' + I('close') + '</button></div>';
+        r.innerHTML = h; UI.applyHl(); return;
+      }
       const msg = chk.ok ? (g.isNew ? 'Place the ' + esc(d.name) + ' (' + costHtml(d.levels[0].cost) + ')' : g.fromStorage ? 'Place the ' + esc(d.name) + ' from storage' : changed ? 'Looks good here.' : 'Drag the ' + esc(d.name) + ' to move it.') : '<span class="bad">' + esc(W.REASON_TEXT[chk.reason] || 'Not here.') + '</span>';
       h = '<div class="bbar panel sel"><span class="bb-msg">' + msg + '</span>' +
         '<button class="btn small ghost" data-act="bmCancel" aria-label="Cancel">' + I('close') + 'Cancel</button>' +
@@ -371,8 +386,33 @@
     }
     r.innerHTML = h; UI.applyHl();
   };
-  UI.act('bmCancel', () => { if (UI.bm) { UI.bm.ghost = null; UI.refresh(); } });
-  UI.act('bmRotate', () => { const g = UI.bm && UI.bm.ghost; if (!g) return; g.rot = g.rot ? 0 : 1; UI.renderGhost(); UI.renderBuildBar(); });
+  UI.act('bmCancel', () => {
+    const g = UI.bm && UI.bm.ghost; if (!g) return;
+    if (g.live && g.start && (g.orig.x !== g.start.x || g.orig.y !== g.start.y || g.orig.rot !== g.start.rot)) {
+      const r = W.move(st(), g.id, g.start.x, g.start.y, g.start.rot);
+      if (r.ok) { Object.assign(g, { x: g.start.x, y: g.start.y, rot: g.start.rot }); g.orig = Object.assign({}, g.start); UI.bm.note = 'Back where it started.'; Au.play('ok'); UI.afterAction(); UI.bm.note = null; return; }
+    }
+    UI.bm.ghost = null; UI.refresh();
+  });
+  UI.act('bmDeselect', () => { if (UI.bm) { UI.bm.ghost = null; UI.bm.note = null; UI.refresh(); } });
+  UI.act('bmRotate', () => { const g = UI.bm && UI.bm.ghost; if (!g) return; g.rot = g.rot ? 0 : 1; UI.renderGhost(); if (g.live) UI.ghostRelease(); else UI.renderBuildBar(); });
+  // Commits a live move when the ghost is released on a valid spot; an invalid drop snaps back to the last valid
+  // spot (the saved position never changes until a move succeeds, so the island can never end up overlapping).
+  UI.ghostRelease = function () {
+    const g = UI.bm && UI.bm.ghost; if (!g || !g.live || !g.id) return;
+    const s = st(), b = s.buildings[g.id]; if (!b) return;
+    if (g.x === b.x && g.y === b.y && g.rot === b.rot) { UI.bm.note = null; UI.renderBuildBar(); return; }
+    const r = W.move(s, g.id, g.x, g.y, g.rot);
+    if (!r.ok) {
+      Au.play('no'); const why = W.REASON_TEXT[r.reason] || 'Not there.';
+      Object.assign(g, { x: b.x, y: b.y, rot: b.rot }); UI.bm.note = '<span class="bad">' + esc(why) + '</span> It stays where it was.';
+      UI.renderGhost(); UI.renderBuildBar(); setTimeout(() => { if (UI.bm && UI.bm.ghost === g) { UI.bm.note = null; UI.renderBuildBar(); } }, 2600); return;
+    }
+    g.orig = { x: b.x, y: b.y, rot: b.rot }; UI.bm.note = null; Au.play('tap');
+    const sz = W.size(g.type, g.rot), [cx, cy] = Iso.center(g.x, g.y, sz.w, sz.h), [px, py] = toScreen(cx, cy - 10);
+    if (UI.pixelBurst) UI.pixelBurst(px, py, { n: 10, color: '#8fe6d6' });
+    UI.afterAction();
+  };
   UI.act('bmInfo', () => { const g = UI.bm && UI.bm.ghost; if (g && g.id) UI.buildingPanel(g.id); });
   UI.act('bmStore', () => {
     const g = UI.bm && UI.bm.ghost; if (!g || !g.id) return;
@@ -441,11 +481,18 @@
         foot += '<button class="btn small ' + (s.res.gems >= gems ? '' : 'off') + '" data-act="finishNow" data-kind="building" data-id="' + id + '">' + I('gem') + 'Finish now (' + gems + ')</button>';
       }
       if (d.produces && b.level >= 1) {
-        const per = W.perMin(s, b), cap = W.capOf(s, b), stock = W.stock(s, id);
-        body += '<div class="kv"><b>Produces:</b> ' + (per ? (per < 1 ? per.toFixed(2) : per.toFixed(1)) + ' ' + d.produces + ' / min' : '<span class="bad">nothing yet</span>' + (d.perResident ? ' — it needs a resident.' : '')) + '</div>';
-        body += '<div class="kv"><b>Ready:</b> ' + fmt(stock) + ' / ' + fmt(cap) + ' ' + d.produces + '<div class="bar"><i style="width:' + pct(stock, cap) + '%"></i></div></div>';
+        const per = W.perMin(s, b), cap = W.capOf(s, b), stock = W.stock(s, id), kind = W.prodKind(b), kn = esc(W.kindName(kind)), ic = I(kind === 'gems' ? 'gem' : kind), opts = W.prodOptions(b);
+        // Dev 8: habitats choose between basic gold and their element's essence
+        if (opts.length > 1) {
+          const ld = W.levelData(b), base = W.isEss(kind) ? per / W.essRate() : per;
+          body += '<div class="section-t">Production</div><div class="prodsel" role="radiogroup">' + opts.map((k) => { const on = k === kind, rate = W.isEss(k) ? base * W.essRate() : base;
+            return '<button class="prodopt' + (on ? ' on' : '') + '" role="radio" aria-checked="' + on + '" data-act="setProd" data-id="' + id + '" data-k="' + k + '">' + I(k) + '<b>' + esc(W.kindName(k) === 'gold' ? 'Gold' : W.kindName(k)) + '</b><small>' + (rate ? (rate < 1 ? rate.toFixed(2) : rate.toFixed(1)) + ' / min' : 'needs a resident') + ' · stores ' + ld.capMin + ' min</small>' + (on ? '<em>Active</em>' : '') + '</button>'; }).join('') + '</div>' +
+            '<p class="muted small-t">Switching collects whatever is stored first, in the resource it was made as. Nothing is lost or converted.</p>';
+        }
+        body += '<div class="kv"><b>Produces:</b> ' + (per ? (per < 1 ? per.toFixed(2) : per.toFixed(1)) + ' ' + kn + ' / min' : '<span class="bad">nothing yet</span>' + (d.perResident ? ' — it needs a resident.' : '')) + '</div>';
+        body += '<div class="kv"><b>Ready:</b> ' + fmt(stock) + ' / ' + fmt(cap) + ' ' + kn + '<div class="bar"><i style="width:' + pct(stock, cap) + '%"></i></div></div>';
         if (d.affinity && d.affinity.length && d.perResident) body += '<div class="kv muted">+50% for ' + d.affinity.map((e) => D.ELEMENTS[e].name).join(' or ') + ' residents.</div>';
-        foot += '<button class="btn gold ' + (stock >= 1 ? '' : 'off') + '" data-act="collectB" data-id="' + id + '" data-hl="collect">' + I(d.produces === 'gems' ? 'gem' : d.produces) + 'Collect ' + (stock >= 1 ? fmt(stock) : '') + '</button>';
+        foot += '<button class="btn gold ' + (stock >= 1 ? '' : 'off') + '" data-act="collectB" data-id="' + id + '" data-hl="collect">' + ic + 'Collect ' + (stock >= 1 ? fmt(stock) : '') + '</button>';
       }
       if (d.perResident && b.level >= 1) {
         const res = W.residents(s, b), cap = W.capacity(b);
@@ -478,6 +525,15 @@
     return ov;
   };
   const panelOf = (el) => el.closest('.overlay');
+  UI.act('setProd', (el) => {
+    const id = el.dataset.id, k = el.dataset.k, ov = panelOf(el), s = st(), b = s.buildings[id]; if (!b || W.prodKind(b) === k) return;
+    W.tickProduction(s);
+    const go = () => { const r = W.setProd(st(), id, k); if (!r.ok) { Au.play('no'); return; } Au.play('ok'); S.save();
+      if (r.settled) UI.toast('Collected ' + fmt(r.settled.n) + ' ' + W.kindName(r.settled.kind) + ' first. Now making ' + W.kindName(k) + '.', 'n'); else UI.toast('Now making ' + W.kindName(k) + '.', 'n');
+      R.drain(); UI.flush && UI.flush(); UI.refresh(); if (ov && ov.parentNode) UI.buildingPanel(id, ov); };
+    const n = W.stock(s, id);
+    if (n >= 1) UI.confirm('Switch to ' + W.kindName(k) + '?', 'The ' + fmt(n) + ' ' + W.kindName(W.prodKind(b)) + ' stored here is collected first. Then it starts making ' + W.kindName(k) + '.', 'Collect and switch', go); else go();
+  });
   UI.act('restore', (el) => {
     const id = el.dataset.id, r = W.restore(st(), id), ov = panelOf(el);
     if (!r.ok) { Au.play('no'); return; }
@@ -485,7 +541,7 @@
   });
   UI.act('collectB', (el) => {
     const id = el.dataset.id, r = W.collect(st(), id), ov = panelOf(el);
-    if (!r.ok) return; Au.play('ok'); const rc = el.getBoundingClientRect(); floatAt(rc.left + rc.width / 2, rc.top, '+' + fmt(r.n) + ' ' + r.kind, '#fff');
+    if (!r.ok) return; Au.play('ok'); const rc = el.getBoundingClientRect(); floatAt(rc.left + rc.width / 2, rc.top, '+' + fmt(r.n) + ' ' + W.kindName(r.kind), '#fff');
     S.save(); R.after(st()); UI.flush(); UI.renderHud(); UI.renderObjects(); UI.buildingPanel(id, ov);
   });
   UI.act('upgrade', (el) => {

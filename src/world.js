@@ -96,7 +96,7 @@
     if (req.flag === 'r1') out.push('Investigate the Resonance disturbance first.');
     if (req.flag === 'r2') out.push('Complete the Overgrown Reliquary first.');
     if (req.flag === 'hollowveil') out.push('Clear the Hollow Veil first.');
-    if (req.rank) out.push('Reach Caretaker Rank ' + req.rank + '.');
+    if (req.rank) out.push('Reach Player Rank ' + req.rank + '.');
     if (req.dungeon && D.DUNGEONS[req.dungeon]) out.push('Clear ' + D.DUNGEONS[req.dungeon].name.replace(/^The /, 'the ') + ' first.');
     if (req.islandBoss && D.ISLANDS[req.islandBoss]) out.push('Defeat the Island Boss of ' + D.ISLANDS[req.islandBoss].name + '.');
     return out.join(' ');
@@ -307,11 +307,18 @@
     return out.slice(0, W.capacity(b));
   };
   W.residentOf = (st, b) => W.residents(st, b)[0] || null;
+  /* Dev 8: a habitat can make basic gold or its own element's essence ("ess_<element>"). Other producers make
+     one thing. b.prod holds the choice; a missing or unknown value means the building's default (gold). */
+  W.prodOptions = (b) => { const d = W.def(b); if (!d.produces) return []; return d.cat === 'habitat' && d.el && D.ELEMENTS[d.el] ? [d.produces, 'ess_' + d.el] : [d.produces]; };
+  W.prodKind = (b) => { const o = W.prodOptions(b); return o.indexOf(b.prod) >= 0 ? b.prod : o[0] || null; };
+  W.isEss = (k) => typeof k === 'string' && k.indexOf('ess_') === 0;
+  W.kindName = (k) => (W.isEss(k) ? (D.ELEMENTS[k.slice(4)] ? D.ELEMENTS[k.slice(4)].name + ' Essence' : 'Essence') : k);
+  W.essRate = () => (D.ESS_SOURCES && D.ESS_SOURCES.habitatRate) || 0.1;
   W.perMin = function (st, b) {
     const d = W.def(b); if (!d.produces || !W.isActive(b)) return 0;
-    const ld = W.levelData(b);
-    if (!d.perResident) return ld.rate;
-    return W.residents(st, b).reduce((s, a) => s + ld.rate * (1 + a.lv * 0.08) * ((d.affinity || []).indexOf(D.SPECIES[a.sp].el) >= 0 ? 1.5 : 1), 0);
+    const ld = W.levelData(b), k = W.isEss(W.prodKind(b)) ? W.essRate() : 1;
+    if (!d.perResident) return ld.rate * k;
+    return k * W.residents(st, b).reduce((s, a) => s + ld.rate * (1 + a.lv * 0.08) * ((d.affinity || []).indexOf(D.SPECIES[a.sp].el) >= 0 ? 1.5 : 1), 0);
   };
   W.capOf = (st, b) => { const ld = b.level >= 1 ? W.levelData(b) : null; return ld && ld.capMin ? W.perMin(st, b) * ld.capMin : 0; };
   const TICK_MS = 60000;
@@ -332,9 +339,24 @@
     W.tickProduction(st);
     const b = st.buildings[id], n = W.stock(st, id);
     if (!b || !W.def(b).produces || n < 1) return { ok: false, reason: 'empty' };
-    const kind = W.def(b).produces; b.stock -= n; E.gain(st, { [kind]: n });
+    const kind = W.prodKind(b); b.stock -= n;
+    if (W.isEss(kind)) { if (A.Rules && A.Rules.Essence) A.Rules.Essence.gain(st, kind.slice(4), n, 'habitat'); }
+    else E.gain(st, { [kind]: n });
     emit('collected', { id, kind, n, type: b.type, island: b.island });
     return { ok: true, kind, n };
+  };
+  // Switch what a building makes. Whatever is already stored is collected first, in the resource it was made as, so
+  // switching can never turn stored gold into essence (or back), duplicate it, or delete it. Production of the
+  // new resource starts from now.
+  W.setProd = function (st, id, kind) {
+    const b = st.buildings[id]; if (!b) return { ok: false, reason: 'invalid' };
+    if (W.prodOptions(b).indexOf(kind) < 0) return { ok: false, reason: 'invalid' };
+    if (W.prodKind(b) === kind) return { ok: true, unchanged: true };
+    W.tickProduction(st);
+    const was = W.prodKind(b), got = W.stock(st, id) >= 1 ? W.collect(st, id) : null;
+    b.stock = 0; b.prod = kind; b.last = now();
+    emit('prodChanged', { id, from: was, to: kind });
+    return { ok: true, from: was, to: kind, settled: got && got.ok ? { kind: got.kind, n: got.n } : null };
   };
   // Total ready to collect on an island (HUD hint).
   W.readyOn = (st, iid) => W.buildingsOn(st, iid).filter((b) => W.def(b).produces && W.stock(st, b.id) >= 1);

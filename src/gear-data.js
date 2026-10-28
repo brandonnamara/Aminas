@@ -67,7 +67,7 @@
     ['feather', 'charm', 'feather', [null,
       ['feathertok', 'Feather Token', { spd: 0.10 }, 'A gold feather from a Zephyr that let you keep it.'],
       ['galeplume', 'Gale Plume', { spd: 0.13 }, 'It never quite settles.'],
-      ['skycrest', 'Sky Crest', { spd: 0.16 }, 'Worn by Stormbringers, given to almost nobody.']]],
+      ['skycrest', 'Sky Crest', { spd: 0.16 }, 'Worn by Zephyr III, given to almost nobody.']]],
   ];
   D.GEAR_FAMILIES = {};
   D.ITEMS = {};

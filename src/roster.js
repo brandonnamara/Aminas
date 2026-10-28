@@ -53,10 +53,10 @@
   /* Lines. names/titles per stage; design per stage ('card' | 'new'); src: how the base form is found. */
   const LINES = [
     { id: 'lumifern', el: 'light', role: 'balanced', ids: ['lumifern', 'solarbloom', 'aurelith'], names: ['Lumifern', 'Solarbloom', 'Aurelith'], titles: ['The Sprout of Light', 'The Sunlit Crown', 'The Dawn Bloom'], design: ['kept', 'kept', 'new'],
-      lore: ['A sprout-eared Amina whose leaves hold a little stored sunlight. It hums when the ruins are repaired, as if relieved.', 'Lumifern fully bloomed. A crown of petals turns to follow whoever it trusts most.', 'Solarbloom at the height of summer. Its petals open into a sun-wheel and its leaves have learned to fly.'],
+      lore: ['A sprout-eared Amina whose leaves hold a little stored sunlight. It hums when the ruins are repaired, as if relieved.', 'Lumifern fully bloomed. A crown of petals turns to follow whoever it trusts most.', 'Lumifern II at the height of summer. Its petals open into a sun-wheel and its leaves have learned to fly.'],
       pers: 'Gentle, curious, stubborn about naps.', ent: 'That one? A fine Kind Soul. Stubborn, mind you. But then, most of the good ones are.', src: [{ t: 'starter' }, { t: 'breed' }], find: 'Choose it as your starter. Also hatches from Light + Nature parents.' },
     { id: 'umbrit', el: 'dark', role: 'swift', ids: ['umbrit', 'duskmantle', 'eclipsar'], names: ['Umbrit', 'Duskmantle', 'Eclipsar'], titles: ['The Velvet Shadow', 'The Twilight Cloak', 'The Crescent Warden'], design: ['kept', 'kept', 'new'],
-      lore: ['A velvet-dark baby with a moon-pale crest. Shadows pool under it like a puddle it refuses to leave.', 'Umbrit grown into a cloak of living twilight. It stands between you and the dark, and keeps the dark company.', 'Duskmantle crowned by a crescent moon. Small lights drift around it like fireflies that never land.'],
+      lore: ['A velvet-dark baby with a moon-pale crest. Shadows pool under it like a puddle it refuses to leave.', 'Umbrit grown into a cloak of living twilight. It stands between you and the dark, and keeps the dark company.', 'Umbrit II crowned by a crescent moon. Small lights drift around it like fireflies that never land.'],
       pers: 'Shy, watchful, fiercely loyal once trusted.', ent: 'Umbrit. Small, dark, suspicious of everyone. We get along perfectly.', src: [{ t: 'starter' }, { t: 'breed' }], find: 'Choose it as your starter. Also hatches from Dark + Fire parents.' },
     { id: 'cannonis', el: 'water', role: 'tank', ids: ['cannonis', 'reefback', 'shellfin'], names: ['Cannonis', 'Reefback', 'Shellfin'], titles: ['The Living Artillery', 'The Coral Bastion', 'The Tidal Battery'], design: ['card', 'card', 'card'],
       lore: ['A hunched shell beast with a living cannon grown into its back. It fires pressurised water, and very rarely misses.', 'Coral crests and glowing vents mark a Cannonis that has spent years on the reef. The barrel hums before it fires.', 'Blade fins and shoulder guards. A Shellfin can hold a shoreline against a storm, and has.'],
@@ -118,8 +118,17 @@
   ];
   D.LINES = {};
   D.ROSTER = [];
+  // Dev 8 naming convention: every form keeps its line's name. Base form "Name", then "Name II" and "Name III".
+  // The line name is the base form's name, except for lines whose only supplied card is the final form
+  // (Pyro-Core, Pyro-Phoenix, Meta, Atem): there the card's name is the line's name.
+  const LINE_NAME = { pyrocell: 'Pyro-Core', pyrospark: 'Pyro-Phoenix', meta: 'Meta', atem: 'Atem' };
+  D.STAGE_SUFFIX = ['', ' II', ' III'];
+  D.V07_NAMES = {}; // the v0.7 display names, kept so old names can still be searched or shown in notes
   LINES.forEach((L) => {
-    D.LINES[L.id] = { id: L.id, el: L.el, ids: L.ids.slice(), legendary: !!L.legendary };
+    const base = LINE_NAME[L.id] || L.names[0];
+    L.ids.forEach((id, i) => { D.V07_NAMES[id] = L.names[i]; });
+    L.names = L.ids.map((id, i) => base + D.STAGE_SUFFIX[i]);
+    D.LINES[L.id] = { id: L.id, el: L.el, ids: L.ids.slice(), legendary: !!L.legendary, name: base };
     L.ids.forEach((id, i) => {
       const stg = i + 1, b = ROLE[L.role], m = STAGE_MULT[i] * (L.legendary ? 1.08 : 1), mv = MOVES[L.el];
       const next = L.ids[i + 1];

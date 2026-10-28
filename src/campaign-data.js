@@ -94,7 +94,7 @@
       battles: nine(['acinus', 'terraflora', 'gaiaroki', 'sylvaneer', 'acinus'], 3, 5).concat([{ sp: 'terraki', lv: 6, boss: true, title: 'Rootbound Sentinel', hpMult: 1.1, move: 'rootcrush' }]),
       sections: sec({ name: 'Mossy Threshold', first: { gold: 20, food: 6 } }, { name: 'The Whispering Stacks', first: { gold: 30, food: 8 } }, { name: 'The Root Halls', first: { gold: 30, food: 8 } }, { name: 'Heart of the Reliquary', first: { gems: 2 } }),
       clearReward: { gold: 150, food: 40, gems: 5 },
-      rewardText: '150 gold, 40 food, 5 gems on each clear. Terraki on your first clear, Sylvaneer II on your second.',
+      rewardText: '150 gold, 40 food, 5 gems on each clear. Gaiaroki II on your first clear, Sylvaneer II on your second.',
     },
     /* ===== Dungeons 4-5 ===== */
     drownedsteps: {
@@ -119,12 +119,12 @@
     hollowveil: {
       name: 'The Hollow Veil', island: 'starter', el: 'dark', playable: true, recommended: 12, legacy: true,
       theme: 'A Dark-themed ruin full of forgotten history: corridors that rearrange behind you and traces nobody wrote down.',
-      unlock: { rank: 6, struct: 'moonshrine' }, unlockText: 'Reach Caretaker Rank 6 and restore the Moon Shrine.', env: 'veil',
+      unlock: { rank: 6, struct: 'moonshrine' }, unlockText: 'Reach Player Rank 6 and restore the Moon Shrine.', env: 'veil',
       species: ['voltar', 'zeep', 'voltar2'],
       battles: nine(['voltar', 'zeep', 'voltar2', 'duskmantle', 'zeep'], 9, 12).concat([{ sp: 'zeep2', lv: 13, boss: true, title: 'Keeper of Unsaid Things', hpMult: 1.2, move: 'unsaidverdict' }]),
       sections: sec({ name: 'The Unwritten Hall', first: { gold: 60, food: 15 } }, { name: 'Margins of Memory', first: { gold: 80, food: 20 } }, { name: 'The Folded Corridor', first: { gold: 80, food: 20 } }, { name: 'The Hollow Warden', first: { gems: 4 } }),
       clearReward: { gold: 420, food: 100, gems: 12 },
-      rewardText: '420 gold, 100 food, 12 gems on each clear, plus Meta-01 on your first clear.',
+      rewardText: '420 gold, 100 food, 12 gems on each clear, plus Meta on your first clear.',
     },
     /* ===== Dungeons 7-8 ===== */
     lanternorchard: {
@@ -149,18 +149,18 @@
     resonancescar: {
       name: 'The Resonance Scar', island: 'starter', el: 'resonance', playable: true, recommended: 18, legacy: true,
       theme: 'A wound in the island where gravity, weather and time argue. Encounters change as you walk.',
-      unlock: { rank: 9 }, unlockText: 'Reach Caretaker Rank 9.', env: 'scar',
+      unlock: { rank: 9 }, unlockText: 'Reach Player Rank 9.', env: 'scar',
       species: ['aimza', 'voltar2', 'zeep2', 'aimza2'],
       battles: nine(['aimza', 'voltar2', 'zeep2', 'aimza', 'aimza2'], 15, 18).concat([{ sp: 'aimza2', lv: 20, boss: true, title: 'The Echo at the Centre', hpMult: 1.25, move: 'resonantcollapse' }]),
       sections: sec({ name: 'Where the Sky Is Floor', first: { gold: 120, food: 30 } }, { name: 'The Long Moment', first: { gold: 160, food: 40 } }, { name: 'The Sideways Hour', first: { gold: 160, food: 40 } }, { name: 'The Quiet Centre', first: { gems: 6 } }),
       clearReward: { gold: 900, food: 220, gems: 25 },
-      rewardText: '900 gold, 220 food, 25 gems on each clear, plus Atem-01 on your first clear.',
+      rewardText: '900 gold, 220 food, 25 gems on each clear, plus Atem on your first clear.',
     },
     /* ===== Dungeon 10: the Island Boss ===== */
     heartwood: {
       name: 'The Heartwood', island: 'starter', el: 'nature', playable: true, recommended: 20,
       theme: 'The roots under the whole island meet here. Something has been guarding the place where they meet.',
-      unlock: { rank: 10 }, unlockText: 'Reach Caretaker Rank 10.', env: 'heart', scene: 'heartwood',
+      unlock: { rank: 10 }, unlockText: 'Reach Player Rank 10.', env: 'heart', scene: 'heartwood',
       battles: nine(['sylvaneer2', 'terraki', 'solarbloom', 'duskmantle', 'aimza2', 'reefback'], 17, 20).concat([{ sp: 'sylvaneer2', lv: 24, boss: true, islandBoss: true, title: 'The Heartwood Stag', hpMult: 2.2, scale: 1.75,
         move: 'prismfall', mech: { type: 'prism', every: 3, els: ['nature', 'light', 'water', 'earth', 'dark'] } }]),
       sections: sec({ name: 'The Root Gate', first: { gold: 200, food: 50 } }, { name: 'The Tangle', first: { gold: 220, food: 55 } }, { name: 'The Quiet Roots', first: { gold: 240, food: 60 } }, { name: 'The Heart', first: { gems: 15 } }),

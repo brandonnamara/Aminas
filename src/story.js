@@ -129,7 +129,7 @@
     levelup5: ['Level five. Hm. Almost ready, then. For something. For a first dungeon, perhaps.'],
     levelup10: ['Level ten. A stage I used to find impressive. Now I just find it expected. Congratulations, that’s sarcasm.'],
     rank: [
-      'Caretaker rank up. Your title is getting longer. Your workload will, I assure you, follow.',
+      'Player Rank up. Your title is getting longer. Your workload will, I assure you, follow.',
       'Rank improved. The paperwork multiplies accordingly.',
       'You’re getting better at this. Marvellous. Don’t tell the island.',
     ],

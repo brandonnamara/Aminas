@@ -1131,7 +1131,8 @@
       if (b.state === 'constructing' || b.state === 'upgrading') { const tot = Math.max(1, b.endAt - (b.startAt || b.endAt - 1000)), left = Math.max(0, b.endAt - now); g += '<g transform="translate(0 ' + (-hgt - 16) + ')">' + Art.timerBar(1 - left / tot, Art.fmtTime(Math.ceil(left / 1000))) + '</g>'; }
       else if (d.produces && b.level >= 1) {
         const stock = W.stock(st, b.id), cap = W.capOf(st, b);
-        if (stock >= Math.max(1, Math.min(cap * 0.1, d.produces === 'gems' ? 1 : 5))) g += '<g class="collect-b" data-collect="' + b.id + '" data-hl="collect:' + b.id + '" transform="translate(0 ' + (-hgt - 6) + ')">' + Art.bubble(d.produces, stock >= cap - 0.5) + circ(0, -20, 26, 'transparent') + '</g>';
+        const pk = W.prodKind ? W.prodKind(b) : d.produces;
+        if (stock >= Math.max(1, Math.min(cap * 0.1, pk === 'gems' || W.isEss(pk) ? 1 : 5))) g += '<g class="collect-b" data-collect="' + b.id + '" data-hl="collect:' + b.id + '" transform="translate(0 ' + (-hgt - 6) + ')">' + Art.bubble(pk, stock >= cap - 0.5) + circ(0, -20, 26, 'transparent') + '</g>';
       }
       items.push({ id: 'b' + b.id, k: b.x + b.y + s.w + s.h, svg: g + '</g>' });
       // creatures: the companion in front of the hollow, residents beside their homes
@@ -1166,6 +1167,8 @@
   Art.bubble = function (kind, full) {
     const c = ICON[kind] || '#fff';
     let i = '';
+    const pk = kind === 'gems' ? 'gem' : kind;
+    if (A.Pixel && A.Pixel.has(pk)) i = A.Pixel.inline(pk, -12, -12, 24); else
     if (kind === 'gold') i = circ(0, 0, 9, c, ' stroke="#a87a10" stroke-width="2"') + '<text y="4" text-anchor="middle" font-size="11" font-weight="900" fill="#a87a10">$</text>';
     else if (kind === 'food') i = path('M0 -4c-4 -3 -10 0 -10 6 0 5 4 8 10 8s10 -3 10 -8c0 -6 -6 -9 -10 -6z', c, ' stroke="#9a2a20" stroke-width="1.6"') + stroke('M0 -4q0 -4 4 -6', '#3f8a3a', 2);
     else i = path('M-8 -4h16l4 5 -12 10 -12 -10z', c, ' stroke="#2a7aa0" stroke-width="1.6"');

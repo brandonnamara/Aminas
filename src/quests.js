@@ -173,7 +173,7 @@
     if (req.dungeon) return Nav.resolve(st, { id: 'p', type: 'dungeon_clear', dungeon: req.dungeon, count: 1 });
     if (req.island) return Nav.resolve(st, { id: 'p', type: 'unlock_island', island: req.island });
     if (req.flag === 'hollowveil') return Nav.resolve(st, { id: 'p', type: 'dungeon_clear', dungeon: 'hollowveil', count: 1 });
-    if (req.rank) return plan('quests', { message: 'Reach Caretaker Rank ' + req.rank + ' (you are rank ' + st.rank + '). Tasks, battles, restoring and clearing obstacles all give rank xp.', highlight: ['quests'] });
+    if (req.rank) return plan('quests', { message: 'Reach Player Rank ' + req.rank + ' (you are rank ' + st.rank + '). Tasks, battles, restoring and clearing obstacles all give rank xp.', highlight: ['quests'] });
     return null;
   }
   // Island access: locked island -> map with the island highlighted; another unlocked island -> caller adds a travel step.
@@ -255,7 +255,7 @@
       case 'creature_level': return plan('screen', { screen: 'feed', highlight: ['feed'], message: hint || 'Feed your Aminas to level them up. Battles give experience too.' });
       case 'collect': {
         const kind = ob.resource;
-        const prod = blds(st).filter((b) => W.def(b).produces === kind && b.level >= 1 && b.island && W.islandUnlocked(st, b.island) && b.state !== 'stored' && b.state !== 'ruined');
+        const prod = blds(st).filter((b) => (W.prodKind ? W.prodKind(b) : W.def(b).produces) === kind && b.level >= 1 && b.island && W.islandUnlocked(st, b.island) && b.state !== 'stored' && b.state !== 'ruined');
         if (!prod.length) {
           const make = kind === 'gold' ? 'mine' : kind === 'food' ? 'farm' : null;
           if (make) return locked('no_producer', 'Nothing is producing ' + kind + ' yet. Build a ' + D.BUILDINGS[make].name + '.', Nav.resolve(st, { id: 'p', type: 'build', building: make, count: 1 }));

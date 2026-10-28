@@ -142,7 +142,9 @@
         case 'missionReady': Au.play('ok'); break;
         case 'resonance': Au.play('hum'); break;
         case 'dungeonWin': Au.play('win'); break;
-        case 'rankUp': UI.banner('RANK ' + d.rank, 'Caretaker rank increased'); Au.play('level'); break;
+        case 'rankUp': UI.banner('RANK ' + d.rank, 'Player Rank increased'); Au.play('level'); break;
+        case 'achievement': if (UI.achToast) UI.achToast(d.id); break;
+        case 'moveUp': break;
         case 'discover': if (s.starter && d.sp !== s.starter) { Au.play('discover'); UI.queue.push({ type: 'reveal', sp: d.sp }); } break;
         case 'hatched': Au.play('hatch'); if (!batchDisc[d.sp]) UI.queue.push({ type: 'reveal', sp: d.sp }); break;
         case 'evolve': UI.queue.push({ type: 'fn', fn: (done) => UI.evolveFx(d.from, d.to, done) }); break;
@@ -217,7 +219,8 @@
     Au.setMode('light');
   };
   UI.act('continue', () => { if (S.load() && st().starter) { UI.showIsland(true); if (UI.bootNote) { UI.toast(UI.bootNote, 'n'); UI.bootNote = null; } } else UI.act_newgame(); });
-  UI.act_newgame = function () { S.newGame(); UI.playIntro(); };
+  // Dev 8: a new player makes their avatar first (after the title screen, before the story begins)
+  UI.act_newgame = function () { S.newGame(); if (UI.avatarCreator) UI.avatarCreator({ first: true, done: () => UI.playIntro() }); else UI.playIntro(); };
   UI.act('newgame', () => { if (S.hasSave()) UI.confirm('Start a new game?', 'This will erase your current save on this device.', 'Erase and begin', () => UI.act_newgame(), true); else UI.act_newgame(); });
   UI.act('howto', () => UI.modal(UI.sheet('How to Play',
     '<div class="section-t">The loop</div><ol class="steps"><li>Follow <b>The Entity’s</b> tasks (top-left). Tap <b>Go</b> and the game takes you to exactly where the task happens; tap <b>Claim</b> when it is done.</li><li><b>Restore ruins</b> and <b>build</b> farms, mines, habitats and decorations with <b>Build</b>. Drag to place, rotate, move or store them. Tap a building for its upgrades and actions.</li><li><b>Clear</b> trees, bushes and rocks to make room. Each costs a little gold, takes a little time and gives something back.</li><li>Buildings with residents produce gold, food or gems. Tap the bubble to collect.</li><li><b>Feed</b> your companion to level it up. Starters evolve at level 12. <b>Explore</b> to befriend new Aminas.</li><li>Enter the <b>Overgrown Reliquary</b> with up to three Aminas. Fire&gt;Nature&gt;Water&gt;Fire; Light and Dark counter each other.</li><li>Open the <b>Map</b> to unlock the Verdant Wilds (100,000 gold), Obsidian Reach (200,000) and Celestial Crown (400,000). Each island has its own layout.</li></ol><p class="muted">Your progress saves automatically on this device. Settings has a backup code.</p>', '<button class="btn gold" data-act="close">Got it</button>', 'narrow')));
@@ -335,11 +338,12 @@
       const breedHtml = recipes.length ? '<div class="kv"><b>Hatches from:</b> ' + recipes.map((k) => (s.recipes && s.recipes[k] ? k.split('+').map((e) => chip(e)).join(' + ') : '<span class="muted">an undiscovered pairing</span>')).join(' · ') + '</div>' : '';
       const homeType = 'hab_' + sp.el, home = D.BUILDINGS[homeType];
       const homeHtml = home ? '<div class="kv"><b>Best home:</b> ' + esc(home.name) + ' <span class="muted">(' + esc(D.ELEMENTS[sp.el].name) + ' residents earn 50% more)</span></div>' : '';
-      const tabs = '<div class="dtabs" role="tablist">' + [['about', 'About'], ['battle', 'Battle'], ['gear', 'Gear'], ['growth', 'Growth']].map(([k, t]) => '<button class="dtab ' + (tab === k ? 'on' : '') + '" role="tab" aria-selected="' + (tab === k) + '" data-act="dTab" data-tab="' + k + '">' + t + '</button>').join('') + '</div>';
+      const tabs = '<div class="dtabs" role="tablist">' + [['about', 'About'], ['battle', 'Battle'], ['moves', 'Moves'], ['gear', 'Gear'], ['growth', 'Growth']].map(([k, t]) => '<button class="dtab ' + (tab === k ? 'on' : '') + '" role="tab" aria-selected="' + (tab === k) + '" data-act="dTab" data-tab="' + k + '">' + t + '</button>').join('') + '</div>';
       const about = '<div class="dpanel" data-panel="about"' + (tab === 'about' ? '' : ' hidden') + '><div class="kv"><b>Personality:</b> ' + esc(sp.pers) + '</div><div class="kv">' + esc(sp.lore) + '</div><div class="kv"><b>Found:</b> ' + esc(sp.find) + '</div><div class="entnote"><div class="ep">' + Art.entity('n') + '</div><div>“' + esc(sp.ent) + '”</div></div></div>';
       const battle = '<div class="dpanel" data-panel="battle"' + (tab === 'battle' ? '' : ' hidden') + '><div class="stats">' + [['HP', 'hp'], ['ATK', 'atk'], ['DEF', 'def'], ['SPD', 'spd']].map((k) => '<div class="stat">' + k[0] + '<b>' + stt[k[1]] + '</b>' + (lv < D.MAX_LEVEL ? '<em>+' + (next[k[1]] - stt[k[1]]) + '</em>' : '') + '</div>').join('') + '</div>' + UI.effLines(sp.el) +
-        sp.abil.map((id) => { const ab = D.ABILITIES[id]; return '<div class="abil"><b>' + ab.name + '</b> ' + chip(ab.el) + ' <span class="muted">' + (ab.power ? 'Power ' + ab.power : 'Utility') + (ab.cd ? ' · every ' + (ab.cd + 1) + ' turns' : '') + '</span><br>' + esc(ab.desc) + '</div>'; }).join('') + '</div>';
-      const gearP = '<div class="dpanel" data-panel="gear"' + (tab === 'gear' ? '' : ' hidden') + '>' + UI.gearHtml(s, inst) + '</div>';
+        sp.abil.map((id) => { const ab = D.ABILITIES[id], mlv = (R.moveLevels ? R.moveLevels(inst)[id] : 1) || 1; return '<div class="abil"><b>' + ab.name + '</b> ' + chip(ab.el) + ' <span class="muted">Lv ' + mlv + ' · ' + (R.moveEffect ? esc(R.moveEffect(id, mlv).text) : ab.power ? 'Power ' + ab.power : 'Utility') + (ab.cd ? ' · every ' + (ab.cd + 1) + ' turns' : '') + '</span><br>' + esc(ab.desc) + '</div>'; }).join('') + '<button class="btn small" data-act="dTabGo" data-tab="moves">' + I('up') + 'Upgrade moves</button></div>';
+      const gearP = '<div class="dpanel" data-panel="gear"' + (tab === 'gear' ? '' : ' hidden') + '>' + UI.gearHtml(s, inst) + '</div>' +
+        '<div class="dpanel" data-panel="moves"' + (tab === 'moves' ? '' : ' hidden') + '>' + (UI.movesHtml ? UI.movesHtml(s, inst) : '') + '</div>';
       const growth = '<div class="dpanel" data-panel="growth"' + (tab === 'growth' ? '' : ' hidden') + '>' + famHtml + '<div class="kv"><b>Evolution:</b> ' + evo + '</div>' + breedHtml + homeHtml + '</div>';
       const clips = A.C3D && A.C3D.enabled() ? '<div class="clipbar">' + ['move', 'attack', 'hit', 'victory'].map((c) => '<button class="fchip" data-act="vPlay" data-clip="' + c + '">' + CLIP_LABEL[c] + '</button>').join('') + '</div>' : '';
       body = '<div class="detail"><div><div class="big art viewer3d">' + Art.portrait(spId) + '</div>' + clips + '</div><div><h2>' + esc(sp.name) + ' ' + chip(sp.el) + '</h2>' + (sp.title ? '<div class="sp-title muted">' + esc(sp.title) + ' · Stage ' + sp.stage + '</div>' : '') + tabs + about + battle + gearP + growth + '</div></div>';
@@ -362,6 +366,7 @@
     return ov;
   };
   UI.act('dTab', (el) => { const ov = el.closest('.overlay'), k = el.dataset.tab; ov._tab = k; ov.querySelectorAll('.dtab').forEach((b) => { b.classList.toggle('on', b === el); b.setAttribute('aria-selected', b === el); }); ov.querySelectorAll('.dpanel').forEach((p) => (p.hidden = p.dataset.panel !== k)); });
+  UI.act('dTabGo', (el) => { const b = el.closest('.overlay') && el.closest('.overlay').querySelector('.dtab[data-tab="' + el.dataset.tab + '"]'); if (b) b.click(); });
   UI.act('vPlay', (el) => { const r = UI.viewOf(el.closest('.overlay')); if (r && r.v) r.v.play(el.dataset.clip); });
   UI.act('detail', (el) => UI.detail(el.dataset.sp));
   UI.act('detailFeed', (el) => {

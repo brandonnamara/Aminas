@@ -7,7 +7,7 @@
   const D = A.Data;
   const S = (A.State = {});
 
-  S.SCHEMA = 5;
+  S.SCHEMA = 6;
   // The key name is historical (v0.1 used it); keeping it means existing players keep their progress.
   const KEY = () => D.SAVE_KEY, BAK = () => D.SAVE_KEY + '-backup', BAD = () => D.SAVE_KEY + '-corrupt';
 
@@ -46,6 +46,10 @@
       items: [],                 // v0.7 equipment owned {iid, id, from, at}; worn items are referenced from aminas[].gear
       nextIid: 1,
       forge: { ops: [], stats: { crafted: 0, merged: 0, bought: 0 } }, // Dev 7: recent Forge operation ids (no double apply) and counts
+      // Dev 8
+      avatar: { made: false, name: '', look: null }, // the player's own avatar; made = finished the creator once
+      essence: {},               // element -> elemental essence (move upgrades)
+      ach: {},                   // achievement id -> time it was earned
       buildings: {},             // id -> {id,type,island,x,y,rot,level,state,residents[],last,stock,endAt,toLevel}
       islands: {},               // id -> {unlocked, obstacles:{oid:{state,endAt,paid,rewarded}}}
       currentIsland: 'starter',
@@ -154,6 +158,18 @@
     d.schema = 5;
     return d;
   };
+  // Dev 8 (schema 5 -> 6): avatar, essences, move levels, achievements, habitat production choice. Existing players
+  // get a default avatar look (marked not yet customised, so they are never forced through the creator), no essence,
+  // every move at Level 1 and every habitat still making gold. Achievements are worked out from real stats on load.
+  S.MIGRATIONS[5] = function (d) {
+    d.avatar = { made: false, name: '', look: null, legacy: true };
+    d.essence = {};
+    d.ach = {};
+    (d.aminas || []).forEach((a) => { if (a) a.mv = [1, 1]; });
+    Object.keys(d.buildings || {}).forEach((k) => { const b = d.buildings[k]; if (b && /^hab_/.test(b.type) && !b.prod) b.prod = 'gold'; });
+    d.schema = 6;
+    return d;
+  };
   S.migrate = function (d) {
     let v = d.schema | 0 || 1;
     const from = v;
@@ -196,7 +212,13 @@
     st.aminas = (st.aminas || []).filter((a) => a && D.SPECIES[a.sp]);
     const uids = {};
     st.aminas = st.aminas.filter((a) => { if (uids[a.uid]) return false; uids[a.uid] = true; return true; });
-    st.aminas.forEach((a) => { a.lv = Math.max(1, Math.min(D.MAX_LEVEL, a.lv | 0)); a.xp = Math.max(0, a.xp | 0); });
+    st.aminas.forEach((a) => { a.lv = Math.max(1, Math.min(D.MAX_LEVEL, a.lv | 0)); a.xp = Math.max(0, a.xp | 0); if (A.Rules && A.Rules.moveSlots) A.Rules.moveSlots(a); });
+    // Dev 8: essence balances, the avatar and achievements always have a valid shape
+    if (A.Rules && A.Rules.Essence) A.Rules.Essence.rec(st);
+    const av = (st.avatar = st.avatar && typeof st.avatar === 'object' ? st.avatar : { made: false, name: '', look: null });
+    av.made = !!av.made; av.name = String(av.name || '').replace(/[<>]/g, '').slice(0, 14);
+    if (A.Pixel && A.Pixel.avatarLook) av.look = A.Pixel.avatarLook(av.look);
+    st.ach = st.ach && typeof st.ach === 'object' ? st.ach : {};
     st.nextUid = Math.max(st.nextUid | 0, 1 + st.aminas.reduce((m, a) => Math.max(m, a.uid | 0), 0));
     if (!st.aminas.find((a) => a.uid === st.active)) st.active = st.aminas.length ? st.aminas[0].uid : null;
     ['gold', 'food', 'gems'].forEach((k) => { st.res[k] = Math.max(0, Math.floor(+st.res[k] || 0)); });
@@ -225,6 +247,7 @@
     if (['normal', 'quick'].indexOf(st.settings.timers) < 0) st.settings.timers = 'normal';
     if (A.World) A.World.validate(st);
     if (A.Quests) A.Quests.scan(st);
+    if (A.Rules && A.Rules.Ach) A.Rules.Ach.check(st, true); // already-earned achievements are recorded quietly
     if (A.Rules) A.Rules.drain();
   };
 
