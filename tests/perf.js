@@ -77,6 +77,12 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   await page.bringToFront(); await bg.close(); await sleep(1500);
   res.push(await window_('battle after returning', 5000, { visibility: await page.evaluate(() => document.visibilityState) }));
   }
+  // the Island Boss battle (Heartwood, battle 10): boss room, prismatic effects, pixel aura (Dev 8)
+  await page.evaluate(() => new Promise((r) => { A.UI.leaveBattle ? A.UI.leaveBattle(() => { A.UI.showIsland(); r(); }) : (A.UI.showIsland(), r()); }));
+  await sleep(600);
+  await page.evaluate(() => { const s = A.State.state; s.run = null; s.rank = 12; A.Rules.startRun(s, 'heartwood', [1, 2], { from: 9 }); if (s.run) s.run.battle = 9; else s.run = { d: 'heartwood', battle: 9, uids: [1, 2], hp: {}, gold: 0, food: 0, xp: {} }; A.UI.closeAll(); A.UI.startBattle(); });
+  await page.waitForSelector('.battle.is3d canvas', { timeout: 30000 }).catch(() => null); await sleep(3000);
+  res.push(await window_('Island Boss battle (Heartwood 10/10), waiting for input', 8000));
   // repeated battle enter / leave: memory and leaked GPU resources
   for (let i = 0; i < 8; i++) {
     await page.evaluate(() => new Promise((r) => { A.UI.leaveBattle ? A.UI.leaveBattle(() => { A.UI.showIsland(); r(); }) : (A.UI.showIsland(), r()); }));

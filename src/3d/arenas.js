@@ -28,19 +28,26 @@ export const rnd = (seed) => () => { seed = (seed * 16807) % 2147483647; return 
 // merge step can join every block of that colour into a single mesh.
 export function kit(add, T, r) {
   const geo = T.g(new THREE.BoxGeometry(1, 1, 1)), mats = new Map();
+  // plain (not glowing, not see-through) blocks all share one vertex-coloured material, so the merge step joins every
+  // one of them into a single mesh: one draw call for most of an arena
+  const vmat = T.m(new THREE.MeshStandardMaterial({ color: '#ffffff', vertexColors: true, roughness: 0.9, flatShading: true })); vmat.userData.vcol = true;
   const K = {
-    r,
+    r, vmat,
     mat(c, o) {
       o = o || {}; const k = c + '|' + (o.e || '') + '|' + (o.ei || 0) + '|' + (o.op || 1);
       if (!mats.has(k)) mats.set(k, T.m(new THREE.MeshStandardMaterial({ color: c, roughness: o.rough != null ? o.rough : 0.9, flatShading: true, emissive: o.e || '#000000', emissiveIntensity: o.ei || 0, transparent: (o.op || 1) < 1, opacity: o.op || 1, depthWrite: (o.op || 1) >= 1 })));
       return mats.get(k);
     },
-    box(c, x, y, z, w, h, d, o) { o = o || {}; return add(new THREE.Mesh(geo, K.mat(c, o)), { x, y: y + h / 2, z, sx: w, sy: h, sz: d, ry: o.ry || 0, rz: o.rz || 0, rx: o.rx || 0, spin: o.spin }); },
+    box(c, x, y, z, w, h, d, o) {
+      o = o || {}; const plain = !o.e && !o.ei && (o.op || 1) >= 1 && o.rough == null && !o.spin;
+      const m = add(new THREE.Mesh(geo, plain ? vmat : K.mat(c, o)), { x, y: y + h / 2, z, sx: w, sy: h, sz: d, ry: o.ry || 0, rz: o.rz || 0, rx: o.rx || 0, spin: o.spin });
+      if (plain) m.userData.col = c; return m;
+    },
     // a column of blocks with a little jitter, like stacked stone
     stack(c, c2, x, z, n, s, o) { for (let i = 0; i < n; i++) K.box(i % 2 ? c2 : c, x + (r() - 0.5) * 0.05, i * s, z + (r() - 0.5) * 0.05, s * (1 - (o && o.taper ? i * 0.04 : 0)), s, s * (1 - (o && o.taper ? i * 0.04 : 0))); },
     // tiled floor: one instanced mesh, colour per tile from fn(i, j, x, z) (null = no tile)
     floor(fn, o) {
-      o = o || {}; const step = o.step || 0.5, rx = o.rx || 6.8, rz = o.rz || 5.2, cells = [];
+      o = o || {}; const step = o.step || 0.6, rx = o.rx || 6.6, rz = o.rz || 5.0, cells = [];
       for (let x = -rx; x <= rx; x += step) for (let z = -rz - 1; z <= rz - 1; z += step) {
         const nx = x / rx, nz = (z + 1) / rz; if (nx * nx + nz * nz > 1) continue;
         const c = fn(Math.round(x / step), Math.round(z / step), x, z); if (c) cells.push([x, z, c]);
@@ -226,9 +233,12 @@ function mergeStatic(group, animated, T) {
   const byMat = new Map();
   group.children.forEach((m) => { if (!m.isMesh || m.isInstancedMesh || animated.has(m)) return; (byMat.get(m.material) || byMat.set(m.material, []).get(m.material)).push(m); });
   byMat.forEach((list, mat) => {
-    if (list.length < 2) return;
+    if (list.length < 2 && !(mat.userData && mat.userData.vcol)) return;
+    const vc = !!(mat.userData && mat.userData.vcol), tmp = new THREE.Color();
     const geos = list.map((m) => { m.updateMatrix(); let g = m.geometry.index ? m.geometry.toNonIndexed() : m.geometry.clone(); g.applyMatrix4(m.matrix);
-      Object.keys(g.attributes).forEach((k) => { if (k !== 'position' && k !== 'normal' && k !== 'uv') g.deleteAttribute(k); }); return g; });
+      Object.keys(g.attributes).forEach((k) => { if (k !== 'position' && k !== 'normal' && k !== 'uv') g.deleteAttribute(k); });
+      if (vc) { tmp.set(m.userData.col || '#ffffff'); const n = g.attributes.position.count, a = new Float32Array(n * 3); for (let i = 0; i < n; i++) { a[i * 3] = tmp.r; a[i * 3 + 1] = tmp.g; a[i * 3 + 2] = tmp.b; } g.setAttribute('color', new THREE.BufferAttribute(a, 3)); }
+      return g; });
     const merged = mergeGeometries(geos, false); geos.forEach((g) => g.dispose()); if (!merged) return;
     list.forEach((m) => group.remove(m));
     group.add(new THREE.Mesh(T.g(merged), mat));

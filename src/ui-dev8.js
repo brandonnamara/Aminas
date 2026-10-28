@@ -134,13 +134,17 @@
         '<div class="mv-cost">' + (m.max ? '<span class="muted">Fully upgraded.</span>' : '<span>' + Art.essIcon(m.el) + ' ' + fmt(m.have) + ' / ' + m.cost + ' ' + esc(PX.essName(m.el)) + '</span>' + (m.reason && m.reason !== 'max' ? ' <span class="bad">' + esc(R.MOVE_WHY[m.reason]) + '</span>' : '')) + btn + '</div></div>';
     }).join('') + '<p class="muted small-t">Move levels stay with ' + esc(sp.name) + ' when it evolves: its signature move grows into the next form’s move at the same level.</p></div>';
   };
+  const mvLast = {};
   UI.act('mvUp', (el) => {
     if (el.classList.contains('off') || el._busy) { Au.play('no'); return; }
     el._busy = true;
     const uid = +el.dataset.uid, slot = +el.dataset.slot, from = +el.dataset.lv, s = st();
+    // the panel redraws after an upgrade, so a fast double tap would land on the new button: ignore taps on the same
+    // move for a moment after an upgrade (a deliberate second upgrade a second later still works)
+    const key = uid + ':' + slot, now = Date.now(); if (now - (mvLast[key] || 0) < 700) return;
     const r = R.upgradeMove(s, uid, slot, from);
     if (!r.ok) { Au.play('no'); if (r.reason !== 'stale') UI.toast(R.MOVE_WHY[r.reason] || 'That did not work.', 't'); UI.refreshMoves(uid); return; }
-    S.save(); R.drain(); R.after(s); Au.play('level');
+    mvLast[key] = now; S.save(); R.drain(); R.after(s); Au.play('level');
     UI.pixelBurstAt(el, { n: 22, big: true, color: D.ELEMENTS[r.el].color, color2: '#ffffff', rise: true });
     UI.banner(D.ABILITIES[r.id].name + ' · Lv ' + r.lv, R.moveEffect(r.id, r.lv).text);
     UI.flush && UI.flush(); UI.refreshMoves(uid);
