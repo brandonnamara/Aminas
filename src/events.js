@@ -15,8 +15,8 @@
       quests: [
         { key: 'lanterns', title: 'Lanterns for the Lost', desc: 'The festival needs lantern oil and full bellies. Gather gold and share a few meals.',
           objectives: [o('collect', { resource: 'gold', amount: 300, hint: 'Collect gold from your mines and habitats.' }), o('feed', { id: 'o2', count: 3, fresh: true, hint: 'Feed any Amina three times during the festival.' })], reward: { food: 30, gems: 2 } },
-        { key: 'shadow', title: 'Into the Long Shadow', desc: 'The shadows are longest in the dungeons. Push through a few floors while the lanterns burn.', after: ['lanterns'],
-          objectives: [o('dungeon_stage', { dungeon: 'any', count: 3, hint: 'Clear any three dungeon floors.' })], reward: { gold: 250, gems: 3 } },
+        { key: 'shadow', title: 'Into the Long Shadow', desc: 'The shadows are longest in the dungeons. Push through a few dungeon sections while the lanterns burn.', after: ['lanterns'],
+          objectives: [o('dungeon_stage', { dungeon: 'any', count: 3, hint: 'Clear any three dungeon sections.' })], reward: { gold: 250, gems: 3 } },
         { key: 'home', title: 'Light the Way Home', desc: 'Hang a Duskfall Lantern on your island. Keep it: it will remember the way next year too.', after: ['shadow'],
           objectives: [o('place', { building: 'festlantern', count: 1, hint: 'Open Build, Decor, and place a Duskfall Lantern.' }), o('hatch', { id: 'o2', count: 1, fresh: true, optional: true, hint: 'Hatch an egg during the festival.' })],
           reward: { gold: 150, gems: 5 }, keep: 'festlantern' },

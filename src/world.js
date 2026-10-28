@@ -95,7 +95,10 @@
     if (req.struct) out.push('Restore the ' + D.BUILDINGS[req.struct].name + ' first.');
     if (req.flag === 'r1') out.push('Investigate the Resonance disturbance first.');
     if (req.flag === 'r2') out.push('Complete the Overgrown Reliquary first.');
+    if (req.flag === 'hollowveil') out.push('Clear the Hollow Veil first.');
     if (req.rank) out.push('Reach Caretaker Rank ' + req.rank + '.');
+    if (req.dungeon && D.DUNGEONS[req.dungeon]) out.push('Clear ' + D.DUNGEONS[req.dungeon].name.replace(/^The /, 'the ') + ' first.');
+    if (req.islandBoss && D.ISLANDS[req.islandBoss]) out.push('Defeat the Island Boss of ' + D.ISLANDS[req.islandBoss].name + '.');
     return out.join(' ');
   };
   const reqMet = (st, req) => (A.Rules ? A.Rules.reqMet(st, req) : true);
@@ -105,6 +108,7 @@
     if (req.struct && !st.struct[req.struct]) return { struct: req.struct };
     if (req.flag && !st.flags[req.flag]) return { flag: req.flag };
     if (req.rank && st.rank < req.rank) return { rank: req.rank };
+    if (req.dungeon && !(A.Rules && A.Rules.dungeonCleared(st, req.dungeon))) return { dungeon: req.dungeon };
     return null;
   };
   // Why a catalog building can/can't be built right now.
@@ -217,9 +221,27 @@
     return { ok: true, time: t };
   };
   W.islandPrice = (id) => D.ISLANDS[id].price;
+  // Islands are world fragments: each one opens when the Island Boss of the island before it is defeated
+  // (D.CAMPAIGN[id].unlockedBy). Islands a save already unlocked stay unlocked.
+  W.islandUnlockedBy = (id) => (D.CAMPAIGN && D.CAMPAIGN[id] && D.CAMPAIGN[id].unlockedBy) || null;
+  W.islandUnlockAllowed = function (st, id) {
+    const by = W.islandUnlockedBy(id);
+    return !by || !!(A.Rules && A.Rules.islandBossDefeated(st, by));
+  };
+  W.unlockByBoss = function (st, id) {
+    if (!D.ISLANDS[id]) return { ok: false, reason: 'invalid' };
+    if (W.islandUnlocked(st, id)) return { ok: false, reason: 'already' };
+    if (!W.islandUnlockAllowed(st, id)) return { ok: false, reason: 'boss' };
+    st.islands[id] = { unlocked: true, obstacles: (st.islands[id] && st.islands[id].obstacles) || {}, unlockedAt: now(), by: 'boss' };
+    if (A.Rules) A.Rules.gainRankXp(st, 40);
+    emit('islandUnlocked', { island: id, price: 0, by: 'boss' });
+    return { ok: true, price: 0 };
+  };
   W.unlockIsland = function (st, id) {
     const isl = D.ISLANDS[id]; if (!isl) return { ok: false, reason: 'invalid' };
     if (W.islandUnlocked(st, id)) return { ok: false, reason: 'already' };
+    if (!W.islandUnlockAllowed(st, id)) return { ok: false, reason: 'boss' };
+    if (!isl.price) return W.unlockByBoss(st, id);
     const sp = E.spend(st, { gold: isl.price }); if (!sp.ok) return { ok: false, reason: 'insufficient', short: sp.short };
     st.islands[id] = { unlocked: true, obstacles: (st.islands[id] && st.islands[id].obstacles) || {}, unlockedAt: now() };
     if (A.Rules) A.Rules.gainRankXp(st, 40);

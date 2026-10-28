@@ -1,4 +1,4 @@
-/* Aminas — UI part 2: dungeons, battle, hatchery. */
+/* Aminas — UI part 2: dungeons (island campaign), the battle screen (shared by every mode), hatchery. */
 (function (root) {
   'use strict';
   const A = root.A, D = A.Data, R = A.Rules, S = A.State, Art = A.Art, T = A.Story, Au = A.Audio, UI = A.UI;
@@ -7,89 +7,120 @@
   const st = () => S.state;
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   const B = R.Battle;
+  const rwInline = (r) => ['gold', 'food', 'gems'].filter((k) => r && r[k]).map((k) => '<span>' + I(k === 'gems' ? 'gem' : k) + r[k].toLocaleString('en-GB') + '</span>').join('');
+  UI.rwInline = rwInline;
+  const STATE_TAG = { locked: ['sealed', 'Locked', 'lock'], available: ['play', 'Available', 'arrow'], inprogress: ['prog', 'In progress', 'swords'], completed: ['done', 'Completed', 'check'] };
+  const stateTag = (k) => '<span class="tagp ' + STATE_TAG[k][0] + '">' + I(STATE_TAG[k][2]) + ' ' + STATE_TAG[k][1] + '</span>';
+  UI.stateTag = stateTag;
 
-  /* ---------- dungeons ---------- */
-  UI.dungeons = function (ovEx) {
+  /* ---------- dungeons: island → its ten dungeons → one dungeon's ten battles ---------- */
+  // UI.dungeons(ovEx, focusId): the island's dungeon list with the chosen (or current) dungeon open on the right.
+  UI.dungeons = function (ovEx, focusId) {
     const s = st();
-    const cards = D.DUNGEON_ORDER.map((id) => {
-      const d = D.DUNGEONS[id], unlocked = R.dungeonUnlocked(s, id), run = s.run && s.run.d === id;
-      const cl = (s.dungeon[id] || {}).clears || 0;
-      let right;
-      if (!unlocked) right = '<span class="tagp sealed">' + I('lock') + ' Locked</span>'; 
-      else right = '<span class="tagp play">Playable</span>';
-      let actions = '';
-      if (unlocked) actions = (run ? '<button class="btn gold" data-act="resumeRun" data-id="' + id + '" data-hl="enter:' + id + '">Resume run · floor ' + (s.run.floor + 1) + '</button> <button class="btn small ghost" data-act="dropRun">Abandon run</button>' : '<button class="btn gold" data-act="enterDungeon" data-id="' + id + '" data-hl="enter:' + id + '">Enter</button>');
-      const species = d.species ? '<div class="res-list">' + d.species.map((x) => '<div class="mini">' + silBox(x) + '???</div>').join('') + '</div>' : '';
-      return '<div class="dcard ' + (unlocked ? 'available' : 'sealed') + ' dungeon-' + id + '" data-hl="dungeon:' + id + '"><div><h3>' + esc(d.name) + ' ' + chip(d.el) + ' ' + right + '</h3><p>' + esc(d.theme) + '</p>' +
-        '<p><b>Floors:</b> ' + d.floors.length + ' &nbsp; <b>Recommended level:</b> ' + d.recommended + (cl ? ' &nbsp; <b>Cleared:</b> ' + cl + '×' : '') + '</p>' +
-        '<p><b>' + (d.playable && unlocked ? 'Status' : 'Unlock') + ':</b> ' + (d.playable ? (unlocked ? 'Open. ' : esc(d.unlockText)) : esc(d.unlockText)) + '</p>' +
-        '<p><b>Rewards:</b> ' + esc(d.rewardText) + '</p>' + (d.floors.every(f => Array.isArray(f.battles)) ? dungeonPath(s, id, unlocked) : species) + '</div><div style="align-self:center;display:flex;flex-direction:column;gap:.4rem">' + actions + '</div></div>';
+    let iid = UI.dIsland && D.CAMPAIGN[UI.dIsland] && D.CAMPAIGN[UI.dIsland].dungeons.length ? UI.dIsland : 'starter';
+    if (focusId && D.DUNGEONS[focusId]) iid = D.DUNGEONS[focusId].island;
+    const c = D.CAMPAIGN[iid], prog = R.islandProgress(s, iid);
+    const sel = focusId || UI.dSel && D.DUNGEONS[UI.dSel] && D.DUNGEONS[UI.dSel].island === iid && UI.dSel || (s.run && D.DUNGEONS[s.run.d].island === iid && s.run.d) || prog.current || c.dungeons[c.dungeons.length - 1];
+    UI.dIsland = iid; UI.dSel = sel;
+    const isles = D.ISLAND_ORDER.filter((i) => D.CAMPAIGN[i].dungeons.length && A.World.islandUnlocked(s, i));
+    const list = c.dungeons.map((id) => {
+      const d = D.DUNGEONS[id], k = R.dungeonState(s, id), rec = R.dungeonRec(s, id), done = k === 'completed' ? 10 : rec.next;
+      return '<button class="dl-row ' + k + (id === sel ? ' sel' : '') + (d.battles[9].islandBoss ? ' isboss' : '') + '" data-act="dSel" data-id="' + id + '" data-hl="dungeon:' + id + '"><span class="dl-n">' + (k === 'completed' ? I('check') : k === 'locked' ? I('lock') : d.index) + '</span><span class="dl-t"><b>' + esc(d.name) + '</b><small>' +
+        (k === 'locked' ? esc(R.dungeonLockText(s, id)) : (d.battles[9].islandBoss ? 'Island Boss · ' : '') + 'Battle ' + Math.min(10, done + (k === 'completed' ? 0 : 1)) + ' of 10' + (k === 'completed' ? ' · cleared ' + rec.clears + '×' : '')) + '</small></span><span class="dl-bar"><i style="width:' + done * 10 + '%"></i></span></button>';
     }).join('');
-    const html = UI.sheet('Dungeons', cards, '<span class="muted" style="margin-right:auto;font-size:.78rem">Battles are turn-based. Fire beats Nature beats Water beats Fire. Light and Dark counter each other.</span><button class="btn gold" data-act="close">Close</button>', 'wide');
-    if (ovEx && ovEx.parentNode) { ovEx.innerHTML = html; UI.applyHl(); return ovEx; }
-    const ov = UI.modal(html); UI.applyHl(); return ov;
+    const body = '<div class="dg"><div class="dg-side"><div class="dg-isle">' + (isles.length > 1 ? isles.map((i) => '<button class="chipbtn ' + (i === iid ? 'on' : '') + '" data-act="dIsle" data-id="' + i + '">' + esc(D.ISLANDS[i].short) + '</button>').join('') : '<b>' + esc(D.ISLANDS[iid].name) + '</b>') +
+      '<span class="muted">' + prog.cleared + ' / ' + prog.total + ' dungeons · ' + prog.battles + ' / ' + prog.battlesTotal + ' battles</span></div><div class="dl">' + list + '</div></div><div class="dg-main" id="dg-main">' + dungeonDetail(s, sel) + '</div></div>';
+    const html = UI.sheet(I('gate') + ' Dungeons · ' + esc(D.ISLANDS[iid].name), body, '<span class="muted" style="margin-right:auto;font-size:.76rem">Ten battles per dungeon, the tenth is the boss. Your progress is kept: a defeat sends you back to the battle you lost, never further.</span><button class="btn ghost" data-act="journal">' + I('scroll') + ' Journal</button><button class="btn gold" data-act="close">Close</button>', 'wide dsheet');
+    const ov = ovEx && ovEx.parentNode ? ((ovEx.innerHTML = html), ovEx) : UI.modal(html);
+    UI.applyHl(); const r = $('.dl-row.sel', ov); if (r && r.scrollIntoView) r.scrollIntoView({ block: 'nearest' });
+    return ov;
   };
-  // Progression path: one node per floor with its foes (portraits once seen), the guardian's telegraphed move,
-  // and the floor's first-clear reward (or a tick once claimed). The current run position is highlighted.
-  const rwInline = (r) => ['gold', 'food', 'gems'].filter((k) => r && r[k]).map((k) => '<span>' + I(k === 'gems' ? 'gem' : k) + r[k] + '</span>').join('');
-  function dungeonPath(s, id, unlocked) {
-    const d = D.DUNGEONS[id], run = s.run && s.run.d === id ? s.run : null, rec = R.dungeonRec(s, id);
-    return '<div class="floors dpath">' + d.floors.map((f, i) => {
-      const state = run ? (i < run.floor ? 'done' : i === run.floor ? 'next' : '') : (!unlocked ? 'lock' : i === 0 ? 'next' : '');
-      const foes = f.battles.map((x, j) => {
-        const seen = s.seen && s.seen[x.sp], beaten = run && (i < run.floor || (i === run.floor && j < run.battle));
-        return '<div class="dfoe' + (x.boss ? ' boss' : '') + (beaten ? ' beaten' : '') + (run && i === run.floor && j === run.battle ? ' here' : '') + '" title="' + esc(seen ? (x.title || D.SPECIES[x.sp].name) : 'Unknown Amina') + ' · Lv ' + x.lv + '">' + (seen ? artBox(x.sp) : silBox(x.sp)) + '<small>Lv ' + x.lv + '</small></div>';
-      }).join('');
-      const boss = f.battles.find((x) => x.boss), mv = boss && boss.move && D.ABILITIES[boss.move];
-      const rw = rec.floors[i] ? '<span class="dn-claimed">' + I('check') + ' First clear claimed</span>' : (f.first ? '<span class="dn-first">' + I('star') + ' First clear ' + rwInline(f.first) + '</span>' : '');
-      return (i ? '<i class="dn-link ' + (state === 'done' || (run && i <= run.floor) ? 'lit' : '') + '"></i>' : '') +
-        '<div class="floor dnode ' + state + (boss ? ' bossfloor' : '') + '" data-hl="stage:' + id + ':' + i + '"><div class="dn-top"><span class="dn-n">' + (state === 'done' ? I('check') : (i + 1)) + '</span><b>' + esc(f.name) + '</b></div><div class="dn-foes">' + foes + '</div>' +
-        (mv ? '<div class="dn-move">' + I('warn') + ' ' + esc(boss.title || 'Guardian') + ': <b>' + esc(mv.name) + '</b></div>' : '') + '<div class="dn-rw">' + rw + '</div></div>';
-    }).join('') + '</div>';
+  function dungeonDetail(s, id) {
+    const d = D.DUNGEONS[id], k = R.dungeonState(s, id), rec = R.dungeonRec(s, id), run = s.run && s.run.d === id ? s.run : null;
+    const at = run ? run.battle : k === 'completed' ? -1 : rec.next, boss = d.battles[9], mv = boss.move && D.ABILITIES[boss.move], mech = boss.mech && D.BOSS_MECHS[boss.mech.type];
+    const nodes = d.battles.map((x, i) => {
+      const seen = s.seen && s.seen[x.sp], beat = k === 'completed' || i < at, here = i === at && k !== 'locked';
+      return '<div class="bn' + (x.boss ? ' boss' : '') + (x.islandBoss ? ' island' : '') + (beat ? ' beat' : '') + (here ? ' here' : '') + '" data-hl="stage:' + id + ':' + R.sectionOf(d, i) + '" title="' + esc((seen ? x.title || D.SPECIES[x.sp].name : 'Unknown') + ' · Lv ' + x.lv) + '"><span class="bn-i">' + (seen ? Art.portrait(x.sp) : '<span class="sil">' + Art.portrait(x.sp) + '</span>') + '</span><small>' + (x.boss ? (x.islandBoss ? 'ISLAND BOSS' : 'BOSS') : i + 1) + '</small></div>';
+    }).join('');
+    const secs = d.sections.map((sc, i) => '<span class="sec ' + (rec.floors[i] ? 'claimed' : '') + '">' + (rec.floors[i] ? I('check') : I('star')) + esc(sc.name) + (rec.floors[i] ? '' : ' <em>' + rwInline(sc.first) + '</em>') + '</span>').join('');
+    let actions;
+    if (k === 'locked') actions = '<div class="lockmsg">' + I('lock') + ' ' + esc(R.dungeonLockText(s, id)) + '</div><button class="btn ghost" data-act="dWhy" data-id="' + id + '">' + I('arrow') + ' Show me</button>';
+    else if (run) actions = '<button class="btn gold" data-act="resumeRun" data-id="' + id + '" data-hl="enter:' + id + '">' + I('swords') + ' Continue · battle ' + (run.battle + 1) + '</button><button class="btn small ghost" data-act="dropRun">Leave the dungeon</button>';
+    else if (s.run) actions = '<div class="lockmsg">You are partway through ' + esc(D.DUNGEONS[s.run.d].name) + '. Continue or leave it first.</div><button class="btn" data-act="dSel" data-id="' + s.run.d + '">Go to it</button>';
+    else if (k === 'completed') actions = '<button class="btn gold" data-act="enterDungeon" data-id="' + id + '" data-from="0" data-hl="enter:' + id + '">' + I('swords') + ' Replay from battle 1</button><button class="btn small" data-act="enterDungeon" data-id="' + id + '" data-from="9">Fight the boss again</button>';
+    else actions = '<button class="btn gold" data-act="enterDungeon" data-id="' + id + '" data-hl="enter:' + id + '">' + I('swords') + ' ' + (at > 0 ? 'Continue · battle ' + (at + 1) : 'Enter · battle 1') + '</button>';
+    return '<div class="dd ' + k + ' d-' + id + '"><div class="dd-art">' + (Art.hasEnv(d.battles[Math.max(0, Math.min(9, at))].env || d.env) ? Art.envBg(d.battles[Math.max(0, Math.min(9, at))].env || d.env) : Art.battleBg('', id)) + '<span class="dd-num">' + (boss.islandBoss ? 'ISLAND BOSS · ' : '') + 'DUNGEON ' + d.index + '</span></div>' +
+      '<div class="dd-b"><h3>' + esc(d.name) + ' ' + chip(d.el) + ' ' + stateTag(k) + '</h3><div class="dd-a">' + actions + '</div><p>' + esc(d.theme) + '</p><p class="muted small-t"><b>Recommended level</b> ' + d.recommended + ' · <b>Rewards</b> ' + esc(d.rewardText) + '</p>' +
+      '<div class="bpath">' + nodes + '</div><div class="secs">' + secs + '</div>' +
+      (mv || mech ? '<div class="dn-move' + (boss.islandBoss ? ' prism-t' : '') + '">' + I('warn') + ' ' + esc(boss.title) + (mech ? ': <b>' + esc(mech.name) + '</b> (' + esc(mech.desc) + ')' : '') + (mv ? (mech ? ' and ' : ': ') + '<b>' + esc(mv.name) + '</b>' : '') + '</div>' : '') +
+      '</div></div>';
   }
   UI.act('dungeons', () => { UI.closeAll(); UI.dungeons(); });
-  UI.act('dropRun', (el) => { R.abandonRun(st()); S.save(); UI.dungeons(el.closest('.overlay')); });
+  UI.act('dSel', (el) => { UI.dSel = el.dataset.id; UI.dungeons(el.closest('.overlay'), el.dataset.id); });
+  UI.act('dIsle', (el) => { UI.dIsland = el.dataset.id; UI.dSel = null; UI.dungeons(el.closest('.overlay')); });
+  UI.act('dWhy', (el) => { const s = st(), id = el.dataset.id, bl = R.dungeonBlocker(s, id); if (!bl) return; if (bl.dungeon) { UI.dungeons(el.closest('.overlay'), bl.dungeon); return; } UI.go(A.Nav.resolve(s, { id: 'p', type: 'dungeon_clear', dungeon: id })); });
+  UI.act('dropRun', (el) => UI.confirm('Leave the dungeon?', 'Your progress is kept: next time you start at the same battle. Health resets when you come back.', 'Leave', () => { R.abandonRun(st()); S.save(); UI.dungeons(el.closest('.overlay')); }));
   UI.act('resumeRun', (el) => { UI.close(el.closest('.overlay')); UI.nextEncounter(); });
-  UI.act('enterDungeon', (el) => { const id = el.dataset.id; UI.partyPicker(id, el.closest('.overlay')); });
+  UI.act('enterDungeon', (el) => { const id = el.dataset.id, from = +(el.dataset.from || 0); UI.pickTeam({ size: 3, title: 'Choose your party · ' + D.DUNGEONS[id].name, dungeon: id, go: 'Enter the dungeon', onGo: (sel) => { const r = R.startRun(st(), id, sel, { from }); if (!r.ok) return false; S.save(); UI.closeAll(); UI.nextEncounter(); return true; } }); });
 
-  UI.partyPicker = function (id) {
-    const s = st(); let sel = (s.party && s.party.filter((u) => R.inst(s, u)).length ? s.party.filter((u) => R.inst(s, u)) : R.defaultParty(s)).slice(0, 3);
-    const d = D.DUNGEONS[id];
+  /* ---------- team picker (dungeons, survival, PvP roster, defence teams) ---------- */
+  // o: {size, exact?, title, go, initial?, dungeon?, note?, onGo(sel) -> true closes}
+  UI.pickTeam = function (o) {
+    const s = st(); const ok = (u) => R.inst(s, u);
+    let sel = (o.initial && o.initial.filter(ok).length ? o.initial.filter(ok) : (s.party && s.party.filter(ok).length ? s.party.filter(ok) : R.defaultParty(s))).slice(0, o.size);
+    if (o.size > 3) s.aminas.slice().sort((a, b) => b.lv - a.lv).forEach((a) => { if (sel.length < o.size && sel.indexOf(a.uid) < 0) sel.push(a.uid); });
+    const d = o.dungeon && D.DUNGEONS[o.dungeon];
     const ov = UI.modal('<div></div>');
     const draw = () => {
       const list = s.aminas.slice().sort((a, b) => b.lv - a.lv);
-      const slots = [0, 1, 2].map((i) => { const a = R.inst(s, sel[i]); return '<div class="slot">' + (a ? artBox(a.sp) + '<b>' + esc(D.SPECIES[a.sp].name) + '</b>Lv ' + a.lv : '<span class="muted">Empty</span>') + '</div>'; }).join('');
+      const slots = [...Array(o.size)].map((_, i) => { const a = R.inst(s, sel[i]); return '<div class="slot">' + (a ? artBox(a.sp) + '<b>' + esc(D.SPECIES[a.sp].name) + '</b>Lv ' + a.lv : '<span class="muted">Empty</span>') + '</div>'; }).join('');
       const avg = sel.length ? Math.round(sel.reduce((m, u) => m + R.inst(s, u).lv, 0) / sel.length) : 0;
-      const foeEls = [], counters = [];
-      d.floors.forEach((f) => f.battles.forEach((x) => { const e = D.SPECIES[x.sp].el; if (foeEls.indexOf(e) < 0) foeEls.push(e); }));
-      Object.keys(D.ELEMENTS).forEach((e) => { if (foeEls.some((f) => R.elMult(e, f) > 1.01) && counters.indexOf(e) < 0) counters.push(e); });
-      const names = (a) => a.map((e) => D.ELEMENTS[e].name).join(', ').replace(/, ([^,]*)$/, ' and $1');
+      let info = '';
+      if (d) {
+        const foeEls = [], counters = [];
+        d.battles.forEach((x) => { const e = D.SPECIES[x.sp].el; if (foeEls.indexOf(e) < 0) foeEls.push(e); });
+        Object.keys(D.ELEMENTS).forEach((e) => { if (foeEls.some((f) => R.elMult(e, f) > 1.01) && counters.indexOf(e) < 0) counters.push(e); });
+        const names = (a) => a.map((e) => D.ELEMENTS[e].name).join(', ').replace(/, ([^,]*)$/, ' and $1');
+        info = 'Recommended level ' + d.recommended + '. Your party average: <b class="' + (avg >= d.recommended ? 'good' : 'bad') + '">' + (avg || '–') + '</b>.<br>Foes here are ' + names(foeEls) + ' types.' + (counters.length ? ' ' + names(counters) + (counters.length === 1 ? ' hits' : ' hit') + ' hard.' : '');
+      } else info = o.note || '';
+      const need = o.exact ? o.size : 1;
       const syn = R.synergies(sel.map((u) => D.SPECIES[R.inst(s, u).sp].el));
-      const synHtml = '<div class="pp-syn">' + (syn.length ? syn.map((k) => '<div>' + UI.synChips([k]) + ' <span class="muted">' + esc(D.SYNERGIES[k].desc) + '</span></div>').join('') : '<span class="muted">No team synergy yet. Pair two of one element (Kindred), bring Light with Dark (Twilight Pact), or Fire, Water and Nature together (Elemental Triangle).</span>') + '</div>';
-      ov.innerHTML = UI.sheet('Choose your party · ' + esc(d.name),
-        '<div class="party-row">' + slots + '<div class="muted" style="font-size:.8rem;align-self:center">Pick up to 3. The first one fights first. Recommended level ' + d.recommended + '. Your party average: <b class="' + (avg >= d.recommended ? 'good' : 'bad') + '">' + (avg || '–') + '</b>.<br>Foes here are ' + names(foeEls) + ' types.' + (counters.length ? ' ' + names(counters) + (counters.length === 1 ? ' hits' : ' hit') + ' hard.' : '') + '</div></div>' + synHtml + '<div class="grid">' +
+      const synHtml = o.size <= 3 ? '<div class="pp-syn">' + (syn.length ? syn.map((k) => '<div>' + UI.synChips([k]) + ' <span class="muted">' + esc(D.SYNERGIES[k].desc) + '</span></div>').join('') : '<span class="muted">No team synergy yet. Pair two of one element (Kindred), bring Light with Dark (Twilight Pact), or Fire, Water and Nature together (Elemental Triangle).</span>') + '</div>' : '';
+      ov.innerHTML = UI.sheet(esc(o.title),
+        '<div class="party-row' + (o.size > 3 ? ' many' : '') + '">' + slots + '<div class="muted" style="font-size:.8rem;align-self:center">Pick ' + (o.exact ? 'exactly ' : 'up to ') + o.size + '. ' + (o.size <= 3 ? 'The first one fights first. ' : 'They fight in this order. ') + info + '</div></div>' + synHtml + '<div class="grid">' +
         list.map((a) => { const sp = D.SPECIES[a.sp], on = sel.indexOf(a.uid); return '<div class="card ' + (on >= 0 ? 'sel' : '') + '" data-pp="' + a.uid + '">' + artBox(a.sp) + (on >= 0 ? '<span class="cnt">#' + (on + 1) + '</span>' : '') + '<div class="nm">' + esc(sp.name) + '</div><div>' + chip(sp.el) + '</div><div class="lvl">Lv ' + a.lv + '</div></div>'; }).join('') + '</div>',
-        '<button class="btn ghost" data-act="close">Back</button><button class="btn gold ' + (sel.length ? '' : 'off') + '" id="pp-go">Enter the dungeon</button>', 'wide');
-      ov.querySelectorAll('[data-pp]').forEach((c) => (c.onclick = () => { Au.play('tap'); const u = +c.dataset.pp, i = sel.indexOf(u); if (i >= 0) sel.splice(i, 1); else if (sel.length < 3) sel.push(u); draw(); }));
-      const go = $('#pp-go', ov); if (go) go.onclick = () => { if (!sel.length) return; const r = R.startRun(s, id, sel); if (!r.ok) return; S.save(); UI.closeAll(); UI.nextEncounter(); };
+        '<button class="btn ghost" data-act="close">Back</button><button class="btn gold ' + (sel.length >= need ? '' : 'off') + '" id="pp-go">' + esc(o.go) + '</button>', 'wide');
+      ov.querySelectorAll('[data-pp]').forEach((c) => (c.onclick = () => { Au.play('tap'); const u = +c.dataset.pp, i = sel.indexOf(u); if (i >= 0) sel.splice(i, 1); else if (sel.length < o.size) sel.push(u); draw(); }));
+      const go = $('#pp-go', ov); if (go) go.onclick = () => { if (sel.length < need) { Au.play('no'); UI.toast(o.exact ? 'Choose ' + o.size + ' Aminas.' : 'Choose at least one Amina.', 't'); return; } if (o.onGo(sel.slice()) !== false && ov.parentNode && o.keepOpen !== true) UI.close(ov); };
     };
     draw();
+    return ov;
   };
+  UI.partyPicker = (id) => UI.act && UI.acts.enterDungeon({ dataset: { id }, closest: () => null });
 
+  /* ---------- encounter card (before each dungeon battle): where you are, and what the place shows ---------- */
   UI.nextEncounter = function () {
     const s = st(), enc = R.encounter(s);
     if (!enc) { UI.showIsland(); return; }
-    const sp = D.SPECIES[enc.spec.sp], boss = !!enc.spec.boss;
-    const ov = UI.modal('<div class="sheet panel narrow vcard" style="padding:1rem"><div class="muted" style="letter-spacing:.12em;font-size:.78rem">FLOOR ' + (enc.floor + 1) + ' OF ' + enc.floors + ' · ' + esc(enc.floorName.toUpperCase()) + '</div><h1 style="font-size:1.5rem">' + (boss ? 'A guardian blocks the way' : 'Battle ' + (enc.battle + 1) + ' of ' + enc.battles) + '</h1><div class="art" style="width:7rem;height:7rem;margin:.2rem auto">' + Art.portrait(enc.spec.sp) + '</div><h2>' + esc(enc.spec.title || sp.name) + ' · Lv ' + enc.spec.lv + '</h2><div>' + chip(sp.el) + '</div><p class="muted" style="font-size:.8rem;margin:.4rem 0">Strong against ' + (D.STRONG[sp.el].map((x) => D.ELEMENTS[x].name).join(', ') || 'nothing') + '.</p><div class="row-actions" style="justify-content:center"><button class="btn ghost" id="enc-retreat">Retreat</button><button class="btn gold" id="enc-go">Fight</button></div></div>', { dismiss: false });
+    const d = D.DUNGEONS[enc.dungeon], spec = enc.spec, sp = D.SPECIES[spec.sp], boss = !!spec.boss, envKey = spec.env || d.env;
+    const pips = d.battles.map((x, i) => '<i class="' + (i < enc.battle ? 'on' : i === enc.battle ? 'here' : '') + (x.boss ? ' b' : '') + '"></i>').join('');
+    const ov = UI.modal('<div class="sheet panel narrow vcard enc' + (spec.islandBoss ? ' prism-card' : boss ? ' boss-card' : '') + '" style="padding:0"><div class="enc-art">' + (Art.hasEnv(envKey) ? Art.envBg(envKey, { boss }) : Art.battleBg(boss ? 'boss' : '', enc.dungeon)) +
+      '<div class="enc-por' + (spec.islandBoss ? ' prism' : '') + '" style="--sc:' + (spec.scale || 1) + '">' + Art.portrait(spec.sp) + '</div></div><div style="padding:.6rem .9rem .9rem">' +
+      '<div class="muted enc-where">' + esc(d.name.toUpperCase()) + ' · ' + esc(enc.sectionName.toUpperCase()) + '</div><div class="pips">' + pips + '</div>' +
+      '<h1 style="font-size:1.35rem">' + (spec.islandBoss ? 'The Island Boss' : boss ? 'The guardian of ' + esc(d.name.replace(/^The /, 'the ')) : 'Battle ' + (enc.battle + 1) + ' of ' + enc.battles) + '</h1>' +
+      (spec.clue ? '<p class="clue">' + esc(spec.clue) + '</p>' : '') +
+      '<h2>' + esc(spec.title || sp.name) + ' · Lv ' + spec.lv + '</h2><div>' + chip(spec.mech && spec.mech.type === 'prism' ? spec.mech.els[0] : sp.el) + (spec.mech ? ' <span class="tagp prog">' + esc(D.BOSS_MECHS[spec.mech.type].name) + '</span>' : '') + '</div>' +
+      '<p class="muted" style="font-size:.78rem;margin:.35rem 0">' + (spec.mech ? esc(D.BOSS_MECHS[spec.mech.type].desc) : 'Strong against ' + (D.STRONG[sp.el].map((x) => D.ELEMENTS[x].name).join(', ') || 'nothing') + '.') + '</p>' +
+      '<div class="row-actions" style="justify-content:center"><button class="btn ghost" id="enc-retreat">Leave</button><button class="btn gold" id="enc-go">' + I('swords') + ' Fight</button></div></div></div>', { dismiss: false });
     $('#enc-go', ov).onclick = () => { UI.close(ov); UI.startBattle(); };
-    $('#enc-retreat', ov).onclick = () => UI.confirm('Retreat?', 'You return to the sanctuary. Nothing is lost, but this run ends.', 'Retreat', () => { UI.close(ov); R.abandonRun(st()); S.save(); UI.showIsland(); });
+    $('#enc-retreat', ov).onclick = () => UI.confirm('Leave the dungeon?', 'Your progress is kept: next time you start at battle ' + (enc.battle + 1) + '.', 'Leave', () => { UI.close(ov); R.abandonRun(st()); S.save(); UI.showIsland(); });
   };
 
   /* ---------- battle ---------- */
   function syncDisp() {
     const b = UI.B.b, p = B.cur(b), e = b.enemy;
     UI.B.disp = { pName: p.name, pSp: p.sp, pLv: p.lv, pHp: p.hp, pMax: p.hpMax, pEl: p.el, eName: e.name, eSp: e.sp, eLv: e.lv, eHp: e.hp, eMax: e.hpMax, eEl: e.el,
-      pSt: Object.assign({}, p.st), eSt: Object.assign({}, e.st), charging: !!e.charging };
+      pSt: Object.assign({}, p.st), eSt: Object.assign({}, e.st), charging: !!e.charging, eShield: e.shield || 0, eShieldMax: e.shieldMax || 0 };
   }
   const hpCls = (a, m) => (a / m < 0.25 ? 'low' : a / m < 0.5 ? 'mid' : '');
 
@@ -110,6 +141,8 @@
       faint(w) { const e = spr(w); if (e) e.classList.add('faint'); },
       swap(w, sp) { const e = spr(w); if (e) { e.classList.remove('faint'); e.innerHTML = Art.portrait(sp); cls(w, 'in', 500); } return Promise.resolve(); },
       setTelegraph(on) { const e = spr('e'); if (e) e.classList.toggle('charging', !!on); },
+      setBarrier(on) { const e = spr('e'); if (e) e.classList.toggle('barrier', !!on); },
+      setElement() {},
       dispose() {},
     };
   }
@@ -120,6 +153,7 @@
       if (typeof s3[k] !== 'function') { out[k] = s3[k]; return; }
       out[k] = function () { try { return s3[k].apply(s3, arguments); } catch (err) { if (root.console) console.warn('3D stage error, switching to 2D:', err && err.message); fallback2d(U); return null; } };
     });
+    ['setBarrier', 'setElement'].forEach((k) => { if (!out[k]) out[k] = () => {}; });
     return out;
   }
   function fallback2d(U) {
@@ -135,7 +169,7 @@
     if (!A.C3D || !A.C3D.enabled()) return Promise.resolve(false);
     const host = $('#b-3d'), b = U.b; let settled = false;
     const go = A.C3D.load()
-      .then((mod) => (mod && !U.dead && UI.B === U ? mod.createBattle(host, { dungeon: U.d, player: B.cur(b).sp, enemy: b.enemy.sp, boss: !!U.enc.spec.boss }) : null))
+      .then((mod) => (mod && !U.dead && UI.B === U ? mod.createBattle(host, { dungeon: U.d, player: B.cur(b).sp, enemy: b.enemy.sp, boss: !!b.enemy.boss, scale: b.enemy.scale || null, prismatic: !!b.enemy.islandBoss }) : null))
       .then((s3) => {
         if (!s3) return false;
         if (settled || U.dead || UI.B !== U || !$('#battle')) { s3.dispose(); return false; }
@@ -150,32 +184,44 @@
 
   const synChips = (syn) => (syn || []).map((k) => '<span class="syn" title="' + esc(D.SYNERGIES[k].desc) + '">' + I('spark') + esc(D.SYNERGIES[k].name) + '</span>').join('');
   UI.synChips = synChips;
-  UI.startBattle = function () {
-    const s = st(), enc = R.encounter(s);
+  // A dungeon battle (the default) or any other mode: ctx = {kind, b, d (arena), env, label, intro, finish(U), retreat}
+  UI.startBattle = function (ctx) {
+    const s = st();
+    if (!ctx) {
+      const enc = R.encounter(s); if (!enc) { UI.showIsland(); return; }
+      const d = D.DUNGEONS[enc.dungeon];
+      ctx = { kind: 'dungeon', b: R.createBattle(s), d: enc.dungeon, env: enc.spec.env || d.env, enc,
+        label: d.name.replace(/^The /, '') + ' · ' + (enc.battle + 1) + '/' + enc.battles,
+        retreat: { title: 'Leave the dungeon?', text: 'Your progress is kept: next time you start at battle ' + (enc.battle + 1) + '.', yes: 'Leave', fn: () => { R.abandonRun(st()); S.save(); } },
+        finish: dungeonFinish };
+    }
     UI.setScreen('battle');
     Au.setMode('battle');
-    const b = R.createBattle(s);
-    const U = (UI.B = { b, busy: true, log: '', over: false, enc, d: s.run.d, stage: null });
+    const b = ctx.b, e0 = b.enemy;
+    const U = (UI.B = { b, busy: true, log: '', over: false, enc: ctx.enc || { spec: { boss: !!e0.boss } }, d: ctx.d || 'reliquary', stage: null, ctx });
     syncDisp();
-    $('#stage').innerHTML = '<div class="battle d-' + U.d + (enc.spec.boss ? ' boss' : '') + '" id="battle">' + Art.battleBg(enc.spec.boss ? 'boss' : '', U.d) + '<div class="b-3d" id="b-3d"></div>' +
-      '<div class="b-field" id="b-field"><div class="b-spr e in" id="spr-e"></div><div class="b-spr p in" id="spr-p"></div></div>' +
-      '<div class="b-top"><div class="b-panel" id="pan-e"></div><div style="display:flex;gap:.5rem;align-items:center;pointer-events:auto"><span class="pill" style="font-size:.78rem">Floor ' + (enc.floor + 1) + '/' + enc.floors + ' · ' + (enc.battle + 1) + '/' + enc.battles + '</span><button class="round" data-act="bRetreat" aria-label="Retreat">' + I('close') + '</button></div></div>' +
+    const boss = !!e0.boss, isl = !!e0.islandBoss, envBg = ctx.env && Art.hasEnv(ctx.env) ? Art.envBg(ctx.env, { boss }) : '';
+    $('#stage').innerHTML = '<div class="battle d-' + U.d + (boss ? ' boss' : '') + (isl ? ' islandboss' : '') + (b.foes.length > 1 ? ' team' : '') + (b.party.length > 3 ? ' many' : '') + '" id="battle">' + (envBg || Art.battleBg(boss ? 'boss' : '', U.d)) + '<div class="b-3d" id="b-3d"></div>' +
+      '<div class="b-field" id="b-field"><div class="b-spr e in' + (isl ? ' prism' : '') + '" id="spr-e" style="--sc:' + (e0.scale || 1) + '"></div><div class="b-spr p in" id="spr-p"></div></div>' +
+      '<div class="b-top"><div class="b-panel" id="pan-e"></div><div style="display:flex;gap:.5rem;align-items:center;pointer-events:auto"><span class="pill b-label" style="font-size:.78rem">' + esc(ctx.label || '') + '</span>' + (ctx.retreat ? '<button class="round" data-act="bRetreat" aria-label="Leave the battle">' + I('close') + '</button>' : '') + '</div></div>' +
       '<div class="b-tele" id="b-tele" hidden role="status" aria-live="polite"></div>' +
       '<div class="b-log" id="b-log" aria-live="polite"></div><div class="b-panel pp" id="pan-p"></div><div class="b-party" id="b-party"></div><div class="b-actions" id="b-actions"></div></div>';
-    $('#spr-e').innerHTML = Art.portrait(b.enemy.sp); $('#spr-p').innerHTML = Art.portrait(B.cur(b).sp);
+    $('#spr-e').innerHTML = Art.portrait(e0.sp); $('#spr-p').innerHTML = Art.portrait(B.cur(b).sp);
     UI.cleanups.push(() => endStage(U));
-    bLog(enc.spec.title ? (/^The /.test(enc.spec.title) ? '' : 'The ') + enc.spec.title + ' rises!' : 'A wild ' + b.enemy.name + ' appears!');
+    bLog(ctx.intro || (e0.name !== D.SPECIES[e0.sp].name ? (/^The /.test(e0.name) ? '' : 'The ') + e0.name + (b.foes.length > 1 ? ' leads the other team!' : ' rises!') : 'A wild ' + e0.name + ' appears!'));
     bRender();
-    Promise.all([mountStage(U), sleep(700)]).then(() => { if (UI.B !== U || U.dead) return; U.busy = false; bRender(); });
+    Promise.all([mountStage(U), sleep(700)]).then(() => { if (UI.B !== U || U.dead) return; U.busy = false; bRender(); if (isl) setTele({ t: 'intro' }); });
   };
   function bLog(t) { const l = $('#b-log'); if (l) l.textContent = t; }
   const stBadges = (o) => Object.keys(o || {}).filter((k) => D.STATUS[k] && o[k] > 0).map((k) => '<span class="stx" style="--c:' + D.STATUS[k].color + '" title="' + esc(D.STATUS[k].name + ': ' + D.STATUS[k].desc) + '">' + I(k) + esc(D.STATUS[k].short) + (k === 'stun' ? '' : ' ' + o[k]) + '</span>').join('');
   const fxNote = (ab) => { const f = ab.fx; if (!f || f.self) return f && f.k === 'regen' ? ' +Regen' : ''; return ' · ' + D.STATUS[f.k].short + (f.p < 1 ? ' ' + Math.round(f.p * 100) + '%' : ''); };
   function bRender() {
     const U = UI.B; if (!U || !$('#battle')) return;
-    const b = U.b, d = U.disp, cur = B.cur(b);
-    const eSts = stBadges(d.eSt) + (b.enemy.boss ? '<span class="stx guardian" style="--c:#ffd86b" title="Guardian: telegraphs a powerful move and cannot be stunned except while charging.">' + I('star') + 'Guardian</span>' : '');
-    $('#pan-e').innerHTML = '<div class="nm">' + esc(d.eName) + ' ' + chip(d.eEl) + ' <span class="muted">Lv ' + d.eLv + '</span></div><div class="bar hp ' + hpCls(d.eHp, d.eMax) + '"><i style="width:' + pct(d.eHp, d.eMax) + '%"></i></div><div class="hpn">' + Math.max(0, d.eHp) + ' / ' + d.eMax + '</div>' + (eSts ? '<div class="sts">' + eSts + '</div>' : '');
+    const b = U.b, d = U.disp, en = b.enemy;
+    const eSts = stBadges(d.eSt) + (en.islandBoss ? '<span class="stx prism-t" title="Island Boss: shifts its element and telegraphs a powerful move.">' + I('star') + 'Island Boss</span>' : en.boss ? '<span class="stx guardian" style="--c:#ffd86b" title="Guardian: telegraphs a powerful move and cannot be stunned except while charging.">' + I('star') + 'Guardian</span>' : '');
+    const foes = b.foes.length > 1 ? '<div class="foedots">' + b.foes.map((f, i) => '<i class="' + (f.hp <= 0 ? 'ko' : i === b.ei ? 'cur' : '') + '"></i>').join('') + '</div>' : '';
+    const shield = d.eShield > 0 ? '<div class="bar shield"><i style="width:' + pct(d.eShield, d.eShieldMax) + '%"></i></div><div class="hpn">Barrier ' + d.eShield + '</div>' : '';
+    $('#pan-e').innerHTML = '<div class="nm">' + esc(d.eName) + ' ' + chip(d.eEl) + ' <span class="muted">Lv ' + d.eLv + '</span></div>' + shield + '<div class="bar hp ' + hpCls(d.eHp, d.eMax) + '"><i style="width:' + pct(d.eHp, d.eMax) + '%"></i></div><div class="hpn">' + Math.max(0, d.eHp) + ' / ' + d.eMax + '</div>' + (eSts ? '<div class="sts">' + eSts + '</div>' : '') + foes;
     const pSts = stBadges(d.pSt), syn = synChips(b.syn);
     $('#pan-p').innerHTML = '<div class="nm">' + esc(d.pName) + ' ' + chip(d.pEl) + ' <span class="muted">Lv ' + d.pLv + '</span></div><div class="bar hp ' + hpCls(d.pHp, d.pMax) + '"><i style="width:' + pct(d.pHp, d.pMax) + '%"></i></div><div class="hpn">' + Math.max(0, d.pHp) + ' / ' + d.pMax + '</div>' + (pSts || syn ? '<div class="sts">' + pSts + syn + '</div>' : '');
     $('#b-party').innerHTML = b.party.map((f, i) => '<button class="pm ' + (i === b.pi && !b.pending ? 'cur' : '') + (f.hp <= 0 ? ' ko' : '') + (b.pending && f.hp > 0 ? ' tapme' : '') + '" data-act="bSwitch" data-i="' + i + '"><div class="art">' + Art.portrait(f.sp) + '</div>' + esc(f.name.slice(0, 8)) + '<div class="bar hp ' + hpCls(f.hp, f.hpMax) + '"><i style="width:' + pct(f.hp, f.hpMax) + '%"></i></div></button>').join('');
@@ -184,9 +230,9 @@
     else {
       const el = (id) => D.ABILITIES[id];
       $('#b-actions').innerHTML = B.legal(b).map((a) => {
-        const ab = el(a.id), eff = ab.type === 'dmg' || ab.type === 'drain' || ab.type === 'weaken' ? R.elMult(ab.el, b.enemy.el) : 1;
-        const hint = d.charging && ab.type === 'guard' ? ' <span class="good">▲ blocks the charge</span>' : eff > 1.01 ? ' <span class="good">▲ strong</span>' : eff < 0.99 ? ' <span class="bad">▼ weak</span>' : '';
-        return '<button class="abtn ' + (off || !a.ready ? 'off' : '') + (a.silenced ? ' hushed' : '') + (d.charging && ab.type === 'guard' && a.ready ? ' suggest' : '') + '" data-act="bAbility" data-id="' + a.id + '"><b>' + ab.name + '</b><small>' + chip(ab.el) + (ab.power ? 'Pow ' + ab.power : ab.type === 'heal' ? 'Heal' : 'Guard') + esc(fxNote(ab)) + hint + '</small>' + (a.silenced ? '<span class="cd">' + I('silence') + '</span>' : a.cd ? '<span class="cd">' + (a.cd + 0) + '</span>' : '') + '</button>';
+        const ab = el(a.id), eff = ab.type === 'dmg' || ab.type === 'drain' || ab.type === 'weaken' ? (ab.neutral ? 1 : R.elMult(ab.el, en.el)) : 1;
+        const hint = d.charging && ab.type === 'guard' ? ' <span class="good">▲ blocks the charge</span>' : d.eShield > 0 && ab.cd > 0 && ab.power ? ' <span class="good">▲ cracks the barrier</span>' : eff > 1.01 ? ' <span class="good">▲ strong</span>' : eff < 0.99 ? ' <span class="bad">▼ weak</span>' : '';
+        return '<button class="abtn ' + (off || !a.ready ? 'off' : '') + (a.silenced ? ' hushed' : '') + ((d.charging && ab.type === 'guard' && a.ready) || (d.eShield > 0 && ab.cd > 0 && ab.power && a.ready) ? ' suggest' : '') + '" data-act="bAbility" data-id="' + a.id + '"><b>' + ab.name + '</b><small>' + chip(ab.el) + (ab.power ? 'Pow ' + ab.power : ab.type === 'heal' ? 'Heal' : 'Guard') + esc(fxNote(ab)) + hint + '</small>' + (a.silenced ? '<span class="cd">' + I('silence') + '</span>' : a.cd ? '<span class="cd">' + (a.cd + 0) + '</span>' : '') + '</button>';
       }).join('') + '<button class="abtn swap ' + (off || B.alive(b) < 2 ? 'off' : '') + '" data-act="bSwapOpen" style="grid-column:span 2;min-height:2.6rem"><b>' + I('swap') + ' Switch Amina</b><small>Uses your turn' + (pSts ? ' · clears status effects' : '') + '</small></button>';
     }
   }
@@ -208,8 +254,13 @@
   // Telegraph banner: what is coming and what the player can do about it, worked out from the real party.
   function setTele(ev) {
     const t = $('#b-tele'), U = UI.B; if (!t || !U) return;
-    if (!ev) { t.hidden = true; t.innerHTML = ''; if (U.stage) U.stage.setTelegraph(false); U.disp.charging = false; return; }
-    const mv = D.ABILITIES[ev.move], b = U.b, alive = b.party.filter((f) => f.hp > 0);
+    if (!ev) { t.hidden = true; t.innerHTML = ''; t.className = 'b-tele'; if (U.stage) U.stage.setTelegraph(false); U.disp.charging = false; return; }
+    const b = U.b, alive = b.party.filter((f) => f.hp > 0);
+    const show = (cl, title, tip) => { t.className = 'b-tele ' + cl; t.innerHTML = '<b>' + I('warn') + ' ' + esc(title) + '</b><span>' + esc(tip) + '</span>'; t.hidden = false; };
+    if (ev.t === 'intro') { show('prism', 'Island Boss: ' + b.enemy.name, 'Its element shifts every few turns and it charges Prismfall. Read the colour, change your approach, and guard the big one.'); return; }
+    if (ev.t === 'barrierTell') { const sp = alive.some((f) => f.abil.some((a) => D.ABILITIES[a].cd > 0 && D.ABILITIES[a].power)); show('barrier', ev.name + ' will raise a Stone Barrier', sp ? 'It soaks damage. Special abilities (the ones with a cooldown) crack it twice as fast.' : 'It soaks damage until it breaks. Keep hitting.'); return; }
+    if (ev.t === 'prismWarn') { const good = Object.keys(D.ELEMENTS).filter((x) => R.elMult(x, ev.el) > 1.01); show('prism', 'Its colours drift towards ' + D.ELEMENTS[ev.el].name, 'Next turn it becomes ' + D.ELEMENTS[ev.el].name + '.' + (good.length ? ' ' + good.map((x) => D.ELEMENTS[x].name).join(' and ') + ' will hit it hard.' : '')); return; }
+    const mv = D.ABILITIES[ev.move];
     const canGuard = alive.some((f) => f.abil.some((a) => D.ABILITIES[a].type === 'guard'));
     const canStun = alive.some((f) => f.abil.some((a) => D.ABILITIES[a].fx && D.ABILITIES[a].fx.k === 'stun'));
     const resist = mv.neutral ? [] : Object.keys(D.ELEMENTS).filter((x) => R.elMult(mv.el, x) < 0.99);
@@ -218,8 +269,8 @@
     if (resist.length) tips.push('switch to a ' + resist.map((x) => D.ELEMENTS[x].name).join(' or ') + ' Amina to resist it');
     if (canStun) tips.push('a stun breaks the charge');
     if (!tips.length) tips.push(mv.neutral ? 'It cannot be resisted: heal up or strike first' : 'Heal up or strike hard now');
-    t.innerHTML = '<b>' + I('warn') + ' ' + esc(mv.name) + ' next turn</b><span>' + esc(tips.join('; ').replace(/^./, (c) => c.toUpperCase())) + '.</span>';
-    t.hidden = false; if (U.stage) U.stage.setTelegraph(true); U.disp.charging = true;
+    show('', mv.name + ' next turn', tips.join('; ').replace(/^./, (c) => c.toUpperCase()) + '.');
+    if (U.stage) U.stage.setTelegraph(true); U.disp.charging = true;
   }
   const nameOf = (who) => (who === 'p' ? UI.B.disp.pName : UI.B.disp.eName);
   const STATUS_LOG = {
@@ -242,13 +293,16 @@
           if (e.boss) setTele(null);
           await sleep(e.boss ? 620 : 480); break;
         }
+        case 'shieldHit':
+          d.eShield = e.shield; floatAt('e', e.broke ? 'Barrier broken!' : '-' + e.absorbed + ' barrier', e.broke ? 'super' : 'status');
+          Au.play(e.broke ? 'super' : 'guard'); if (e.broke) { stg.setBarrier(false); bLog('The barrier shatters!'); } else bLog(e.special ? 'The special ability cracks the barrier hard!' : 'The barrier absorbs the blow.');
+          bRender(); await sleep(e.broke ? 700 : 420); break;
         case 'hit': {
-          const side = e.who; stg.hit(side, e.el, e.eff);
-          floatAt(side, '-' + e.dmg, e.eff + (e.big ? ' big' : ''));
+          const side = e.who; if (!e.blocked) { stg.hit(side, e.el, e.eff); floatAt(side, '-' + e.dmg, e.eff + (e.big ? ' big' : '')); }
           if (side === 'e') d.eHp = e.hp; else d.pHp = e.hp;
-          Au.play(e.eff === 'super' || e.big ? 'super' : e.eff === 'weak' ? 'weak' : 'hit');
-          bLog(e.eff === 'super' ? 'It’s super effective!' : e.eff === 'weak' ? 'It’s not very effective…' : (e.guarded ? (e.big ? 'The guard absorbed most of the blow!' : 'The guard softened the blow.') : ''));
-          bRender(); await sleep(e.eff === 'super' || e.big ? 800 : 620); break;
+          if (!e.blocked) Au.play(e.eff === 'super' || e.big ? 'super' : e.eff === 'weak' ? 'weak' : 'hit');
+          if (!e.blocked) bLog(e.eff === 'super' ? 'It’s super effective!' : e.eff === 'weak' ? 'It’s not very effective…' : (e.guarded ? (e.big ? 'The guard absorbed most of the blow!' : 'The guard softened the blow.') : ''));
+          bRender(); await sleep(e.blocked ? 120 : e.eff === 'super' || e.big ? 800 : 620); break;
         }
         case 'heal':
           if (e.who === 'p') d.pHp = e.hp; else d.eHp = e.hp;
@@ -277,9 +331,24 @@
           setTele(null); floatAt(e.who, 'Stagger!', 'super'); Au.play('super');
           bLog('Staggered! The charge is broken.'); bRender(); await sleep(760); break;
         case 'resist': bLog('Guardians shrug off stuns… unless you catch them charging.'); await sleep(560); break;
+        case 'barrierTell': setTele(e); floatAt('e', 'Bracing…', 'status'); Au.play('weak'); bLog(e.name + ' plants its feet. The road stones begin to rise.'); await sleep(900); break;
+        case 'barrier':
+          d.eShield = e.shield; d.eShieldMax = e.shield; stg.setBarrier(true); stg.guard('e'); Au.play('guard'); floatAt('e', 'Stone Barrier', 'status');
+          bLog(e.name + ' raises a Stone Barrier!'); bRender(); await sleep(900); setTele(null); break;
+        case 'prismWarn': setTele(e); bLog('The light around ' + d.eName + ' shifts colour…'); await sleep(700); break;
+        case 'prismShift':
+          d.eEl = e.el; stg.status('e', D.ELEMENTS[e.el].color); if (stg.setElement) stg.setElement(e.el); floatAt('e', D.ELEMENTS[e.el].name + '!', 'status'); Au.play('hum');
+          bLog(e.name + ' shifts to ' + D.ELEMENTS[e.el].name + '!'); setTele(null); bRender(); await sleep(800); break;
         case 'faint': {
-          const sd = e.who; stg.faint(sd); if (sd === 'e') setTele(null); Au.play('faint');
+          const sd = e.who; stg.faint(sd); if (sd === 'e') { setTele(null); stg.setBarrier(false); } Au.play('faint');
           bLog((sd === 'p' ? d.pName : d.eName) + ' was defeated!'); await sleep(900); break;
+        }
+        case 'foeIn': {
+          const f = U.b.foes[e.idx];
+          d.eName = f.name; d.eSp = f.sp; d.eLv = f.lv; d.eHp = e.hp; d.eMax = e.hpMax; d.eEl = f.el; d.eSt = {}; d.eShield = 0; d.charging = false;
+          const sp = $('#spr-e'); if (sp) { sp.classList.remove('faint'); sp.innerHTML = Art.portrait(f.sp); if (!stg.is3d) cls('e', 'in', 500); }
+          if (stg.is3d) { const p = stg.swap('e', f.sp); await Promise.race([p || Promise.resolve(), sleep(560)]); }
+          bLog(f.name + ' steps in! (' + B.foesLeft(U.b) + ' left)'); bRender(); await sleep(620); break;
         }
         case 'switch': {
           const f = U.b.party[e.idx];
@@ -293,7 +362,7 @@
       }
     }
     // the event list is complete for this action: line the display up with the real battle state
-    if (UI.B === U) { const b = U.b; d.pSt = Object.assign({}, B.cur(b).st); d.eSt = Object.assign({}, b.enemy.st); if (!b.enemy.charging && d.charging) setTele(null); }
+    if (UI.B === U) { const b = U.b; d.pSt = Object.assign({}, B.cur(b).st); d.eSt = Object.assign({}, b.enemy.st); d.eShield = b.enemy.shield || 0; d.eEl = b.enemy.el; if (!b.enemy.charging && d.charging) setTele(null); }
   }
   async function bAct(action) {
     const U = UI.B; if (!U || U.busy || U.over) return;
@@ -310,35 +379,54 @@
     if (!f || f.hp <= 0 || (i === U.b.pi && !U.b.pending)) return; bAct({ t: 'sw', to: i });
   });
   UI.act('bSwapOpen', () => { const U = UI.B; if (U && !U.busy) UI.toast('Tap one of your Aminas in the bottom-left to switch. It uses your turn.', 'n'); });
-  UI.act('bRetreat', () => { const U = UI.B; if (!U || U.busy) return; UI.confirm('Retreat from the dungeon?', 'You return to the sanctuary. Nothing is lost, but this run ends.', 'Retreat', () => { R.abandonRun(st()); S.save(); endStage(UI.B); UI.B = null; UI.showIsland(); }); });
+  UI.act('bRetreat', () => { const U = UI.B; if (!U || U.busy || !U.ctx.retreat) return; const r = U.ctx.retreat; UI.confirm(r.title, r.text, r.yes, () => { if (UI.B !== U) return; U.over = true; r.fn(); endStage(UI.B); UI.B = null; if (r.after) r.after(); else UI.showIsland(); }); });
+  UI.leaveBattle = function (next) { endStage(UI.B); UI.B = null; if (next) next(); else UI.showIsland(); };
 
   async function bFinish() {
-    const U = UI.B, s = st();
+    const U = UI.B;
     await sleep(U.b.result === 'win' && U.stage && U.stage.is3d && !UI.calm() ? 1100 : 500);
-    if (UI.B !== U || !s.run) return; // the player already left the battle
+    if (UI.B !== U) return; // the player already left the battle
+    U.ctx.finish(U);
+  }
+  function dungeonFinish(U) {
+    const s = st(); if (!s.run) return;
     const out = R.resolveBattle(s, U.b); R.after(s); S.save();
     if (out.win) { Au.play('win'); UI.victory(out); } else { Au.play('lose'); UI.defeat(out); }
   }
-  const rewardRow = (r) => ['gold', 'food', 'gems'].filter((k) => r[k]).map((k) => '<span>' + I(k === 'gems' ? 'gem' : k) + ' +' + r[k] + '</span>').join('');
+  const rewardRow = (r) => ['gold', 'food', 'gems'].filter((k) => r && r[k]).map((k) => '<span>' + I(k === 'gems' ? 'gem' : k) + ' +' + r[k].toLocaleString('en-GB') + '</span>').join('');
+  UI.rewardRow = rewardRow;
   UI.victory = function (out) {
-    const s = st(), dn = D.DUNGEONS[(UI.B && UI.B.d) || 'reliquary'];
+    const s = st(), dn = D.DUNGEONS[out.dungeon || (UI.B && UI.B.d) || 'reliquary'];
     const rows = out.xp.map((x) => {
       const lvl = x.levels.length ? '<div class="lvlup">LEVEL UP! Lv ' + x.levels[0].from + ' → ' + x.levels[x.levels.length - 1].to + '</div>' : '';
       const evo = x.evolved ? '<div class="lvlup">Evolved into ' + esc(D.SPECIES[x.evolved.to].name) + '!</div>' : '';
       return '<div class="xprow"><div class="art">' + Art.portrait(x.sp) + '</div><div class="grow"><b>' + esc(D.SPECIES[x.sp].name) + '</b> <span class="muted">+' + x.gained + ' xp' + (x.alive ? '' : ' (fainted: half)') + '</span>' + lvl + evo + '</div></div>';
     }).join('');
     const cleared = out.cleared;
-    const first = out.floorFirst ? '<div class="panel reward-first" style="padding:.45rem;margin:.4rem 0"><b>' + I('star') + ' First clear: ' + esc(out.floorFirst.name) + '</b><div class="rw" style="display:flex;justify-content:center;font-size:1rem">' + rewardRow(out.floorFirst.reward) + '</div></div>' : '';
-    const body = '<div class="vcard"><h1>' + (cleared ? 'Dungeon cleared!' : out.boss ? 'Guardian defeated!' : 'Victory!') + '</h1><div class="rw" style="justify-content:center;font-size:1rem;margin-bottom:.4rem"><span>' + I('gold') + ' +' + out.gold + '</span><span>' + I('food') + ' +' + out.food + '</span></div>' + first +
-      (cleared ? '<div class="panel" style="padding:.5rem;margin:.4rem 0"><b>' + esc(dn.name.replace(/^The /, '')) + ' reward</b><div class="rw" style="display:flex;justify-content:center;font-size:1rem">' + rewardRow(out.reward) + '</div>' + (out.newSp.length ? '<div class="good" style="margin-top:.3rem">' + out.newSp.map((x) => esc(D.SPECIES[x].name)).join(', ') + ' joined your sanctuary!</div>' : '') + '</div>' : (out.floorDone ? '<div class="muted">The party rests at a glowing spring and recovers some health.</div>' : '')) + rows + '</div>';
-    const ov = UI.modal(UI.sheet('Battle result', body, '<button class="btn gold" id="v-go">' + (cleared ? 'Return to the sanctuary' : 'Continue') + '</button>', 'narrow'), { dismiss: false });
+    const first = out.sectionFirst ? '<div class="panel reward-first" style="padding:.45rem;margin:.4rem 0"><b>' + I('star') + ' ' + esc(out.sectionFirst.name) + ' cleared for the first time</b><div class="rw" style="display:flex;justify-content:center;font-size:1rem">' + rewardRow(out.sectionFirst.reward) + '</div></div>' : '';
+    const lore = out.lore && out.lore.length ? '<div class="muted small-t" style="margin:.25rem 0">' + I('scroll') + ' New journal entr' + (out.lore.length > 1 ? 'ies' : 'y') + ': ' + out.lore.map((k) => '<b>' + esc(D.LORE[k].title) + '</b>').join(', ') + '</div>' : '';
+    const prog = '<div class="pips big">' + dn.battles.map((x, i) => '<i class="' + (i <= out.battle ? 'on' : '') + (x.boss ? ' b' : '') + '"></i>').join('') + '</div>';
+    const head = cleared ? (out.islandBoss ? 'Island Boss defeated!' : 'Dungeon cleared!') : out.boss ? 'Guardian defeated!' : 'Victory! · Battle ' + (out.battle + 1) + ' of 10';
+    const body = '<div class="vcard"><h1>' + head + '</h1>' + prog + '<div class="rw" style="justify-content:center;font-size:1rem;margin-bottom:.4rem"><span>' + I('gold') + ' +' + out.gold + '</span><span>' + I('food') + ' +' + out.food + '</span></div>' + first + lore +
+      (cleared ? '<div class="panel" style="padding:.5rem;margin:.4rem 0"><b>' + esc(dn.name.replace(/^The /, '')) + (out.first ? ' · first clear' : '') + '</b><div class="rw" style="display:flex;justify-content:center;font-size:1rem">' + rewardRow(out.reward) + '</div>' + (out.newSp.length ? '<div class="good" style="margin-top:.3rem">' + out.newSp.map((x) => esc(D.SPECIES[x].name)).join(', ') + ' joined your sanctuary!</div>' : '') +
+        (out.unlockedIsland ? '<div class="good unlock-note" style="margin-top:.3rem">' + I('map') + ' ' + esc(D.ISLANDS[out.unlockedIsland].name) + ' is now part of the sanctuary.</div>' : '') + '</div>' : (out.sectionDone ? '<div class="muted">The party rests at a glowing spring and recovers some health.</div>' : '')) + rows + '</div>';
+    const nextLbl = cleared ? (out.scene ? 'Continue' : 'Return to the sanctuary') : 'Next: battle ' + (out.battle + 2) + (out.battle + 1 === 9 ? ' · the boss' : '');
+    const ov = UI.modal(UI.sheet('Battle result', body, (cleared ? '' : '<button class="btn ghost" id="v-leave">Leave for now</button>') + '<button class="btn gold" id="v-go">' + nextLbl + '</button>', 'narrow'), { dismiss: false });
     $('.x', ov).remove();
-    UI.sparkles($('.vcard h1', ov), 20);
-    $('#v-go', ov).onclick = () => { UI.close(ov); endStage(UI.B); UI.B = null; if (cleared || !s.run) UI.showIsland(); else UI.nextEncounter(); };
+    UI.sparkles($('.vcard h1', ov), out.islandBoss ? 40 : 20, out.islandBoss ? ['#ff86d6', '#8fe6d6', '#ffd86b', '#9a78e6'] : null);
+    const lv = $('#v-leave', ov); if (lv) lv.onclick = () => { UI.close(ov); R.abandonRun(st()); S.save(); UI.leaveBattle(); };
+    $('#v-go', ov).onclick = () => {
+      UI.close(ov); endStage(UI.B); UI.B = null;
+      if (!cleared && s.run) { UI.nextEncounter(); return; }
+      const after = () => { UI.showIsland(); if (out.unlockedIsland) setTimeout(() => UI.islandUnlockedFx(out.unlockedIsland), 400); else if (!out.scene && out.first && A.Scenes.after[out.dungeon]) UI.toast(A.Scenes.after[out.dungeon], 'n'); };
+      if (out.scene) UI.playScene(out.scene, after); else after();
+    };
   };
   UI.defeat = function (out) {
-    const ov = UI.modal(UI.sheet('Defeated', '<div class="vcard"><h1 style="color:#c9b8ff">Your party was overwhelmed</h1><p class="muted">You retreat to the sanctuary. Nothing is lost. You keep every level you earned on the way, and a little food (+' + out.food + ') for the trouble.</p><p class="muted" style="font-size:.85rem">Tip: feed your Aminas, bring three, and use elements. Fire beats Nature. When a guardian starts charging, guard or switch.</p></div>', '<button class="btn gold" id="v-go">Return to the sanctuary</button>', 'narrow'), { dismiss: false });
-    $('.x', ov).remove(); $('#v-go', ov).onclick = () => { UI.close(ov); endStage(UI.B); UI.B = null; UI.showIsland(); };
+    const dn = D.DUNGEONS[out.dungeon];
+    const ov = UI.modal(UI.sheet('Defeated', '<div class="vcard"><h1 style="color:#c9b8ff">Your party was overwhelmed</h1><p class="muted">You retreat to the sanctuary. Your progress in ' + esc(dn.name) + ' is kept: next time you start at <b>battle ' + (out.battle + 1) + '</b>. You keep every level you earned, and a little food (+' + out.food + ') for the trouble.</p><p class="muted" style="font-size:.85rem">Tip: feed your Aminas, bring three, and use elements. Fire beats Nature. When a guardian starts charging, guard or switch. Barriers crack faster under special abilities.</p></div>', '<button class="btn ghost" id="v-home">Return to the sanctuary</button><button class="btn gold" id="v-retry">Try again</button>', 'narrow'), { dismiss: false });
+    $('.x', ov).remove(); $('#v-home', ov).onclick = () => { UI.close(ov); UI.leaveBattle(); };
+    $('#v-retry', ov).onclick = () => { UI.close(ov); UI.leaveBattle(() => { UI.showIsland(); setTimeout(() => UI.acts.enterDungeon({ dataset: { id: out.dungeon }, closest: () => null }), 200); }); };
   };
 
   /* ---------- hatchery ---------- */

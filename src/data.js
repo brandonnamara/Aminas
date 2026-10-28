@@ -4,7 +4,7 @@
   const A = (root.A = root.A || {});
   const D = (A.Data = {});
 
-  D.VERSION = '0.4.0-dev';
+  D.VERSION = '0.6.0-dev';
   // Hidden testing panel (Settings > tap the version line 7 times). MUST be false for an App Store / public release build.
   D.DEV_TOOLS = true;
   D.SAVE_KEY = 'aminas-light-shadow-save-v1';
@@ -348,49 +348,7 @@
   D.AREA_ORDER = ['meadow', 'tidepools', 'emberridge', 'duskgrove', 'windbluff', 'driftisle'];
   D.BEFRIEND_COST = 8; // food
 
-  /* ---------- Dungeons ---------- */
-  D.DUNGEONS = {
-    reliquary: {
-      name: 'The Overgrown Reliquary', playable: true, el: 'nature',
-      theme: 'Nature reclaiming a sanctuary vault. Mossy stairs, humming roots, and a staircase that remembers you.',
-      unlock: { struct: 'reliquarygate' }, unlockText: 'Restore the Reliquary Gate.',
-      recommended: 5,
-      floors: [
-        { name: 'Mossy Threshold', battles: [{ sp: 'mossbun', lv: 3 }, { sp: 'thornpup', lv: 3 }], first: { gold: 20, food: 6 } },
-        { name: 'The Whispering Stacks', battles: [{ sp: 'pebblop', lv: 4 }, { sp: 'puffcap', lv: 5 }], first: { gold: 30, food: 8 } },
-        { name: 'Heart of the Reliquary', battles: [{ sp: 'relicwarden', lv: 6, boss: true, title: 'Rootbound Sentinel', hpMult: 1.1, move: 'rootcrush' }], first: { gems: 2 } },
-      ],
-      rewardText: '150 gold, 40 food, 5 gems, Relicwarden (first clear), Briarstag (second clear).',
-      clearReward: { gold: 150, food: 40, gems: 5 },
-    },
-    hollowveil: {
-      name: 'The Hollow Veil', playable: true, el: 'dark',
-      theme: 'A Dark-themed ruin full of forgotten history: corridors that rearrange behind you and traces nobody wrote down.',
-      unlock: { rank: 6, struct: 'moonshrine' }, unlockText: 'Reach Caretaker Rank 6 and restore the Moon Shrine.',
-      recommended: 12, species: ['gloomole', 'veilfox', 'whisperhusk'],
-      floors: [
-        { name: 'The Unwritten Hall', battles: [{ sp: 'gloomole', lv: 9 }, { sp: 'veilfox', lv: 10 }], first: { gold: 60, food: 15 } },
-        { name: 'Margins of Memory', battles: [{ sp: 'whisperhusk', lv: 11 }, { sp: 'duskmantle', lv: 12 }], first: { gold: 80, food: 20 } },
-        { name: 'The Hollow Warden', battles: [{ sp: 'veilfox', lv: 12 }, { sp: 'whisperhusk', lv: 13, boss: true, title: 'Keeper of Unsaid Things', hpMult: 1.2, move: 'unsaidverdict' }], first: { gems: 4 } },
-      ],
-      clearReward: { gold: 420, food: 100, gems: 12 },
-      rewardText: '420 gold, 100 food, 12 gems on each clear, plus a Veilfox on your first clear.',
-    },
-    resonancescar: {
-      name: 'The Resonance Scar', playable: true, el: 'resonance',
-      theme: 'A wound in the island where gravity, weather and time argue. Encounters change as you walk.',
-      unlock: { rank: 9, flag: 'hollowveil' }, unlockText: 'Clear the Hollow Veil and reach Caretaker Rank 9.',
-      recommended: 18, species: ['resonyx', 'driftcub', 'chimerrow', 'echolyn'],
-      floors: [
-        { name: 'Where the Sky Is Floor', battles: [{ sp: 'resonyx', lv: 15 }, { sp: 'driftcub', lv: 16 }], first: { gold: 120, food: 30 } },
-        { name: 'The Long Moment', battles: [{ sp: 'chimerrow', lv: 17 }, { sp: 'echolyn', lv: 18 }], first: { gold: 160, food: 40 } },
-        { name: 'The Quiet Centre', battles: [{ sp: 'driftcub', lv: 18 }, { sp: 'echolyn', lv: 20, boss: true, title: 'The Echo at the Centre', hpMult: 1.25, move: 'resonantcollapse' }], first: { gems: 6 } },
-      ],
-      clearReward: { gold: 900, food: 220, gems: 25 },
-      rewardText: '900 gold, 220 food, 25 gems on each clear, plus an Echolyn on your first clear.',
-    },
-  };
-  D.DUNGEON_ORDER = ['reliquary', 'hollowveil', 'resonancescar'];
+  /* Dungeons, islands-as-campaign, ruins, survival and PvP settings live in campaign-data.js. */
   // Status effects (durations count end-of-turn ticks; a stun is used up by the next action it blocks).
   D.STATUS = {
     burn:    { name: 'Burn',     short: 'Burn',  color: '#ff8a4a', desc: 'Loses 6% health at the end of each turn.' },

@@ -33,7 +33,7 @@
     check: '<path d="M5 12.500l4.500 4.500L19 7.500"/>',
     plus: '<path d="M12 5v14M5 12h14"/>',
     back: '<path d="M15 5l-7 7 7 7"/>',
-    swords: '<path d="M4 4l9 9M20 4l-9 9M3 21l3-3M21 21l-3-3M13 13l4 4M11 13l-4 4"/>',
+    swords: '<path d="M20 4l-10.5 10.5M20 4h-3.2M20 4v3.2M6.2 12.8l5 5M8.6 15.4L4 20"/><path d="M4 4l10.5 10.5M4 4h3.2M4 4v3.2M17.8 12.8l-5 5M15.4 15.4L20 20"/>',
     spark: '<path d="M12 3l1.800 5.200L19 10l-5.200 1.800L12 17l-1.800-5.200L5 10l5.200-1.800z" fill="currentColor" fill-opacity=".3"/><path d="M12 3l1.800 5.200L19 10l-5.200 1.800L12 17l-1.800-5.200L5 10l5.200-1.800z"/>',
     swap: '<path d="M4 8h14l-3-3M20 16H6l3 3"/>',
     book: '<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z" fill="currentColor" fill-opacity=".2"/><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2zM4 21a2 2 0 0 1 2-2h13v2z"/>',

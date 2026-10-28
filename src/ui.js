@@ -469,7 +469,7 @@
   UI.act('verTap', () => { if (!D.DEV_TOOLS) return; verTaps++; clearTimeout(verT); verT = setTimeout(() => (verTaps = 0), 2000); if (verTaps >= 7) { verTaps = 0; UI.devPanel(); } });
   UI.devPanel = function () {
     if (!st().starter) return;
-    UI.modal(UI.sheet('Developer testing panel', '<p class="muted" style="font-size:.8rem">Testing shortcuts. Nothing here runs unless you tap it. Reset the save from Settings to clear their effects.</p><div class="row-actions"><button class="btn small" data-act="dev" data-k="res">+500 gold, +200 food, +20 gems</button><button class="btn small" data-act="dev" data-k="lv">Companion +1 level</button><button class="btn small" data-act="dev" data-k="egg">Finish egg now</button><button class="btn small" data-act="dev" data-k="rank">+1 rank</button><button class="btn small" data-act="dev" data-k="all">Befriend every Amina (Lv 5)</button><button class="btn small" data-act="dev" data-k="gold100k">+100,000 gold</button><button class="btn small" data-act="dev" data-k="timers">Finish all timers</button><button class="btn small" data-act="dev" data-k="prod">Fill all production</button></div>', '<button class="btn gold" data-act="close">Close</button>', 'narrow'));
+    UI.modal(UI.sheet('Developer testing panel', '<p class="muted" style="font-size:.8rem">Testing shortcuts. Nothing here runs unless you tap it. Reset the save from Settings to clear their effects.</p><div class="row-actions"><button class="btn small" data-act="dev" data-k="res">+500 gold, +200 food, +20 gems</button><button class="btn small" data-act="dev" data-k="lv">Companion +1 level</button><button class="btn small" data-act="dev" data-k="egg">Finish egg now</button><button class="btn small" data-act="dev" data-k="rank">+1 rank</button><button class="btn small" data-act="dev" data-k="all">Befriend every Amina (Lv 5)</button><button class="btn small" data-act="dev" data-k="gold100k">+100,000 gold</button><button class="btn small" data-act="dev" data-k="timers">Finish all timers</button><button class="btn small" data-act="dev" data-k="prod">Fill all production</button><button class="btn small" data-act="dev" data-k="dboss">Next dungeon: go to its boss</button><button class="btn small" data-act="dev" data-k="dclear">Next dungeon: mark cleared</button></div>', '<button class="btn gold" data-act="close">Close</button>', 'narrow'));
   };
   UI.act('dev', (el) => {
     const s = st(), k = el.dataset.k;
@@ -480,6 +480,10 @@
     if (k === 'all') D.ROSTER.forEach((sp) => { if (!s.owned[sp.id]) R.addAmina(s, sp.id, 5); });
     if (k === 'gold100k') R.addRes(s, { gold: 100000 });
     if (k === 'timers') { Object.values(s.buildings).forEach((b) => { if (b.endAt) b.endAt = Date.now() - 1; }); Object.values(s.islands).forEach((i) => Object.values(i.obstacles).forEach((o) => { if (o.endAt) o.endAt = Date.now() - 1; })); }
+    if (k === 'dboss' || k === 'dclear') {
+      const iid = D.CAMPAIGN[s.currentIsland] && D.CAMPAIGN[s.currentIsland].dungeons.length ? s.currentIsland : 'starter', nx = R.islandProgress(s, iid).current;
+      if (nx) { const rec = R.dungeonRec(s, nx); if (k === 'dboss') { rec.next = 9; if (s.run && s.run.d === nx) s.run.battle = 9; } else { rec.clears = 1; rec.next = 0; s.run = s.run && s.run.d === nx ? null : s.run; } UI.toast((k === 'dboss' ? 'Next fight in ' : 'Marked cleared: ') + D.DUNGEONS[nx].name + (k === 'dclear' ? ' (no rewards; the Island Boss must still be beaten for real)' : ''), 'n'); }
+    }
     if (k === 'prod') Object.values(s.buildings).forEach((b) => { if (A.World.def(b).produces && b.level >= 1 && b.state !== 'stored') b.stock = A.World.capOf(s, b); });
     s.flags.dev = true; Au.play('ok'); UI.afterAction();
   });

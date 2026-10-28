@@ -159,12 +159,21 @@ export async function createBattle(container, o) {
   const slots = { p: null, e: null };
   const place = (who, act, scale) => { const s = who === 'p' ? P : E; act.group.position.copy(s.pos); act.group.rotation.y = s.yaw; act.group.scale.setScalar(scale); scene.add(act.group); };
   const [pa, ea] = await Promise.all([actor(o.player), actor(o.enemy)]);
-  slots.p = pa; slots.e = ea; place('p', pa, 1.25); place('e', ea, o.boss ? 1.65 : 1.3);
+  // bosses stand larger; o.scale (from the battle spec) sets how much, capped so faces stay in frame
+  const eScale = o.scale ? Math.min(2.1, 1.3 * Math.max(1, o.scale)) : o.boss ? 1.65 : 1.3;
+  slots.p = pa; slots.e = ea; place('p', pa, 1.25); place('e', ea, eScale);
   // telegraph ring under the enemy (a charged attack is coming)
   const ring = new THREE.Mesh(new THREE.RingGeometry(0.75, 0.95, 40), new THREE.MeshBasicMaterial({ color: '#ff4a6a', transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide }));
   ring.rotation.x = -Math.PI / 2; ring.position.copy(E.pos).setY(0.03); scene.add(ring);
   const bossRune = o.boss ? new THREE.Mesh(new THREE.RingGeometry(1.0, 1.15, 6), new THREE.MeshBasicMaterial({ color: '#ffd86b', transparent: true, opacity: 0.55, depthWrite: false })) : null;
   if (bossRune) { bossRune.rotation.x = -Math.PI / 2; bossRune.position.copy(E.pos).setY(0.02); scene.add(bossRune); }
+  // Island Boss: a prismatic halo whose colour keeps shifting (one mesh, colour changed in place: no per-frame allocation)
+  const prism = o.prismatic ? new THREE.Mesh(new THREE.RingGeometry(1.15, 1.5, 48), new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.55, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending })) : null;
+  const prismUp = o.prismatic ? new THREE.Mesh(new THREE.RingGeometry(0.9, 1.05, 48), new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.32, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending })) : null;
+  if (prism) { prism.rotation.x = -Math.PI / 2; prism.position.copy(E.pos).setY(0.04); scene.add(prism); prismUp.position.copy(E.pos).setY(1.25 * eScale / 1.3); prismUp.rotation.y = E.yaw; scene.add(prismUp); }
+  // barrier: a translucent dome over the enemy while a Stone Barrier stands
+  const dome = new THREE.Mesh(new THREE.SphereGeometry(1.05 * eScale / 1.3, 18, 12, 0, Math.PI * 2, 0, Math.PI / 2), new THREE.MeshBasicMaterial({ color: '#c8d2e0', transparent: true, opacity: 0, depthWrite: false }));
+  dome.position.copy(E.pos); scene.add(dome); let barrier = false;
   let shake = 0, telegraph = false, t0 = 0;
   const camBase = new THREE.Vector3(-0.35, 1.7, 5.0), look = new THREE.Vector3(0.05, 0.62, -0.15);
   const view = {
@@ -173,6 +182,8 @@ export async function createBattle(container, o) {
       t0 = t; slots.p.update(dt); slots.e.update(dt); arena.update(t); bursts.update(dt);
       ring.material.opacity = telegraph ? 0.45 + Math.sin(t * 8) * 0.3 : Math.max(0, ring.material.opacity - dt * 2);
       if (bossRune) bossRune.rotation.z += dt * 0.25;
+      if (prism && !calm()) { prism.material.color.setHSL((t * 0.12) % 1, 0.85, 0.62); prismUp.material.color.setHSL((t * 0.12 + 0.5) % 1, 0.85, 0.66); prism.rotation.z += dt * 0.4; prismUp.material.opacity = 0.24 + Math.sin(t * 2.2) * 0.1; }
+      dome.material.opacity += ((barrier ? 0.28 : 0) - dome.material.opacity) * Math.min(1, dt * 6);
       camera.position.copy(camBase); if (shake > 0 && !calm()) { shake -= dt; camera.position.x += (Math.random() - 0.5) * shake * 0.25; camera.position.y += (Math.random() - 0.5) * shake * 0.2; }
       camera.lookAt(look);
     },
@@ -195,12 +206,16 @@ export async function createBattle(container, o) {
     status(who, color) { bursts.emit(head(who), color, 6, 0.7, 0.6); },
     faint(who) { return slots[who].play('defeat'); },
     victory(who) { return slots[who].play('victory', { loop: true }); },
-    async swap(who, spId) { const old = slots[who]; const n = await actor(spId); place(who, n, who === 'e' ? (o.boss ? 1.65 : 1.3) : 1.25); slots[who] = n; old.dispose(); n.play('move'); bursts.emit(head(who), '#ffffff', 10, 1.2, 0.5); },
+    async swap(who, spId) { const old = slots[who]; const n = await actor(spId); place(who, n, who === 'e' ? 1.3 : 1.25); slots[who] = n; old.dispose(); n.play('move'); bursts.emit(head(who), '#ffffff', 10, 1.2, 0.5); },
     setTelegraph(on) { telegraph = !!on; },
+    setBarrier(on) { barrier = !!on; },
+    setElement(el) { bursts.emit(head('e'), elCol(el), 14, 1.4, 0.7); },
     dispose() {
       if (active === view) { active = null; stop(); } if (renderer && renderer.domElement.parentNode === container) container.removeChild(renderer.domElement);
       slots.p.dispose(); slots.e.dispose(); bursts.dispose(); arena.dispose(); scene.remove(lights); ring.geometry.dispose(); ring.material.dispose();
       if (bossRune) { bossRune.geometry.dispose(); bossRune.material.dispose(); }
+      if (prism) { [prism, prismUp].forEach((m) => { scene.remove(m); m.geometry.dispose(); m.material.dispose(); }); }
+      scene.remove(dome); dome.geometry.dispose(); dome.material.dispose();
       void t0;
     },
   };

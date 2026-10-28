@@ -7,7 +7,7 @@
   const D = A.Data;
   const S = (A.State = {});
 
-  S.SCHEMA = 2;
+  S.SCHEMA = 3;
   // The key name is historical (v0.1 used it); keeping it means existing players keep their progress.
   const KEY = () => D.SAVE_KEY, BAK = () => D.SAVE_KEY + '-backup', BAD = () => D.SAVE_KEY + '-corrupt';
 
@@ -32,7 +32,14 @@
       counters: {},              // event counters for quests (obstacles removed, placed, collected...)
       qbase: {},                 // per-objective counter baselines recorded when a quest becomes available
       stats: { fed: 0, wins: 0, losses: 0, hatched: 0, evolved: 0, explores: {} },
-      dungeon: { reliquary: { clears: 0 } },
+      dungeon: { reliquary: { clears: 0 } }, // id -> {clears, floors[] (section first-clears), next (battle to resume)}
+      campaign: { bosses: {} },  // island id -> time its Island Boss was first defeated
+      lore: {},                  // journal entries found
+      ruins: {},                 // site id -> {searches, last, artefact}
+      survival: { best: 0, runs: 0, milestones: {}, run: null },
+      pvp: { roster: [], practice: { w: 0, l: 0 }, rewardDay: '', rewardsToday: 0 },
+      defence: { attack: [], defence: [], log: [] },
+      hideseek: { pref: 'hider', played: 0, won: 0, seekerCount: {} },
       pendingFind: null,         // {area, sp}
       pendingR2: false,
       egg: null,                 // {sp, parents:[spA,spB], readyAt, startedAt}
@@ -44,7 +51,7 @@
       run: null,                 // active dungeon run
       recipes: {},               // breeding recipes discovered
       settings: { music: true, sfx: true, eggSpeed: 'fast', textSpeed: 'normal', timers: 'normal', grid: true, reduceMotion: false, creatures3d: true, dayNight: true },
-      story: { used: {}, slips: {}, asked: {} },
+      story: { used: {}, slips: {}, asked: {}, scenes: {} },
       lastSaved: 0,
     };
     if (A.World) A.World.initWorld(st);
@@ -97,6 +104,29 @@
       return d;
     },
   };
+  // v0.5 (schema 2) -> v0.6 (schema 3): dungeons grow from three floors to ten battles in four sections.
+  // Clears and first-clear rewards carry over (nothing is paid twice); a run in progress resumes at the same point.
+  S.MIGRATIONS[2] = function (d) {
+    const old = { reliquary: [2, 2, 1], hollowveil: [2, 2, 2], resonancescar: [2, 2, 2] }; // battles per old floor
+    d.dungeon = d.dungeon || {};
+    Object.keys(old).forEach((id) => {
+      const r = d.dungeon[id]; if (!r) return;
+      const f = Array.isArray(r.floors) ? r.floors : [], c = (r.clears | 0) > 0;
+      // old floors 1, 2 and the boss floor become sections 1, 2 and 4; the new third section counts as claimed after a clear
+      r.floors = [!!f[0] || c, !!f[1] || c, c, !!f[2] || c];
+      r.next = 0;
+    });
+    if (d.run && old[d.run.d] && d.run.floor != null) {
+      const per = old[d.run.d], bi = per.slice(0, d.run.floor).reduce((a, n) => a + n, 0) + (d.run.battle | 0);
+      const map = [0, 1, 3, 4, 6, 9]; // old battle position -> new battle index (boss stays the boss)
+      const last = d.run.floor >= per.length - 1 && (d.run.battle | 0) >= per[per.length - 1] - 1;
+      d.run = { d: d.run.d, battle: last ? 9 : Math.min(8, map[bi] != null ? map[bi] : 0), start: 0, uids: d.run.uids, hp: d.run.hp || {}, gold: d.run.gold | 0, food: d.run.food | 0 };
+      if (d.dungeon[d.run.d] && !(d.dungeon[d.run.d].clears > 0)) d.dungeon[d.run.d].next = d.run.battle;
+    }
+    d.story = d.story || {}; d.story.scenes = d.story.scenes || {};
+    d.schema = 3;
+    return d;
+  };
   S.migrate = function (d) {
     let v = d.schema | 0 || 1;
     const from = v;
@@ -146,7 +176,11 @@
     st.rank = Math.max(1, Math.min(30, st.rank | 0)); st.rankXp = Math.max(0, st.rankXp | 0);
     Object.keys(st.missions || {}).forEach((k) => { if (st.missions[k] !== 'claimed') delete st.missions[k]; });
     if (st.egg && !(st.egg.readyAt > 0 && D.SPECIES[st.egg.sp])) st.egg = null;
-    if (st.run && !(D.DUNGEONS[st.run.d] && Array.isArray(st.run.uids) && st.run.uids.every((u) => uids[u]))) st.run = null;
+    if (st.run && !(D.DUNGEONS[st.run.d] && Array.isArray(st.run.uids) && st.run.uids.every((u) => uids[u]) && st.run.battle >= 0 && st.run.battle < D.DUNGEONS[st.run.d].battles.length)) st.run = null;
+    if (A.Rules) Object.keys(st.dungeon || {}).forEach((id) => { if (D.DUNGEONS[id]) A.Rules.dungeonRec(st, id); });
+    const sv = st.survival; if (sv && sv.run && !(Array.isArray(sv.run.uids) && sv.run.uids.some((u) => uids[u]))) sv.run = null;
+    ['roster'].forEach((k) => { if (st.pvp && Array.isArray(st.pvp[k])) st.pvp[k] = st.pvp[k].filter((u) => uids[u]); });
+    ['attack', 'defence'].forEach((k) => { if (st.defence && Array.isArray(st.defence[k])) st.defence[k] = st.defence[k].filter((u) => uids[u]); });
     if (['normal', 'quick'].indexOf(st.settings.timers) < 0) st.settings.timers = 'normal';
     if (A.World) A.World.validate(st);
     if (A.Quests) A.Quests.scan(st);

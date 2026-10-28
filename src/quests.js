@@ -141,7 +141,7 @@
       case 'collect': return 'Collect ' + ob.amount.toLocaleString('en-US') + ' ' + ob.resource;
       case 'unlock_island': return 'Unlock ' + isl(ob.island);
       case 'visit_island': return 'Visit ' + isl(ob.island);
-      case 'dungeon_stage': return 'Clear ' + n + ' dungeon floor' + s;
+      case 'dungeon_stage': return 'Clear ' + n + ' dungeon section' + s;
       case 'dungeon_clear': return 'Clear ' + D.DUNGEONS[ob.dungeon].name.replace(/^The /, 'the ');
       case 'creature_level': return 'Raise an Amina to level ' + ob.count;
       case 'own_aminas': return 'Have ' + ob.count + ' Aminas';
@@ -170,6 +170,9 @@
     if (req.struct) return Nav.resolve(st, { id: 'p', type: 'restore', target: req.struct });
     if (req.flag === 'r1') return Nav.resolve(st, { id: 'p', type: 'resonance', flag: 'r1' });
     if (req.flag === 'r2') return Nav.resolve(st, { id: 'p', type: 'dungeon_clear', dungeon: 'reliquary', count: 1 });
+    if (req.dungeon) return Nav.resolve(st, { id: 'p', type: 'dungeon_clear', dungeon: req.dungeon, count: 1 });
+    if (req.island) return Nav.resolve(st, { id: 'p', type: 'unlock_island', island: req.island });
+    if (req.flag === 'hollowveil') return Nav.resolve(st, { id: 'p', type: 'dungeon_clear', dungeon: 'hollowveil', count: 1 });
     if (req.rank) return plan('quests', { message: 'Reach Caretaker Rank ' + req.rank + ' (you are rank ' + st.rank + '). Tasks, battles, restoring and clearing obstacles all give rank xp.', highlight: ['quests'] });
     return null;
   }
@@ -264,8 +267,15 @@
       }
       case 'unlock_island': {
         const isl = D.ISLANDS[ob.island]; if (!isl) return locked('invalid', 'Unknown island.');
-        const short = Math.max(0, isl.price - st.res.gold);
-        return plan('island_map', { island: ob.island, highlight: ['island:' + ob.island, 'unlock:' + ob.island], message: W.islandUnlocked(st, ob.island) ? isl.name + ' is already unlocked.' : short ? 'Unlock ' + isl.name + ' for ' + isl.price.toLocaleString('en-US') + ' gold. You need ' + short.toLocaleString('en-US') + ' more: build and upgrade mines and habitats.' : 'Unlock ' + isl.name + ' for ' + isl.price.toLocaleString('en-US') + ' gold.' });
+        if (W.islandUnlocked(st, ob.island)) return plan('island_map', { island: ob.island, highlight: ['island:' + ob.island], message: isl.name + ' is already unlocked.' });
+        // islands open when the Island Boss of the island before is defeated (end of its tenth dungeon)
+        const by = W.islandUnlockedBy(ob.island), c = by && D.CAMPAIGN[by];
+        if (!by || !c || !c.dungeons.length) return locked('requirement', isl.name + ' cannot be reached yet.');
+        if (!W.islandUnlocked(st, by)) return Nav.resolve(st, { id: 'p', type: 'unlock_island', island: by });
+        const next = c.dungeons.find((id) => !R().dungeonCleared(st, id)) || c.islandBoss;
+        const pl = Nav.resolve(st, { id: 'p', type: 'dungeon_clear', dungeon: next, count: 1 });
+        if (pl.type !== 'locked') pl.message = 'Defeat the Island Boss of ' + D.ISLANDS[by].name + ' (Dungeon 10) to reach ' + isl.name + '. Next: ' + D.DUNGEONS[next].name + '.';
+        return pl;
       }
       case 'visit_island': {
         if (!W.islandUnlocked(st, ob.island)) return Nav.resolve(st, { id: 'p', type: 'unlock_island', island: ob.island });
@@ -275,9 +285,9 @@
         // 'any' dungeon: the one with a run in progress, else the furthest one that is open
         const any = ob.dungeon === 'any' ? (st.run && st.run.d) || D.DUNGEON_ORDER.slice().reverse().find((x) => R().dungeonUnlocked(st, x)) || 'reliquary' : null;
         const id = any || ob.dungeon || 'reliquary', d = D.DUNGEONS[id];
-        if (!R().dungeonUnlocked(st, id)) return locked('requirement', d.unlockText, prereqPlan(st, d.unlock));
-        const floor = st.run && st.run.d === id ? st.run.floor : 0;
-        return plan('screen', { screen: 'dungeons', dungeon: id, highlight: ['dungeon:' + id, 'stage:' + id + ':' + floor, 'enter:' + id], message: hint || 'Tap ' + (st.run ? 'Resume' : 'Enter') + ', choose up to three Aminas and fight through the floors.' });
+        if (!R().dungeonUnlocked(st, id)) return locked('requirement', R().dungeonLockText(st, id), prereqPlan(st, R().dungeonBlocker(st, id)));
+        const rec = R().dungeonRec(st, id), at = st.run && st.run.d === id ? st.run.battle : rec.next, sec = R().sectionOf(d, at);
+        return plan('screen', { screen: 'dungeons', dungeon: id, highlight: ['dungeon:' + id, 'stage:' + id + ':' + sec, 'enter:' + id], message: hint || 'Tap ' + (st.run && st.run.d === id ? 'Continue' : 'Enter') + ', choose up to three Aminas and fight through the ten battles.' });
       }
       case 'own_aminas': case 'species': {
         const area = D.AREA_ORDER.find((a) => R().areaUnlocked(st, a) && D.AREAS[a].steps.some((s) => s[0] === 'find' && !st.owned[s[1]])) || D.AREA_ORDER.find((a) => R().areaUnlocked(st, a)) || 'meadow';

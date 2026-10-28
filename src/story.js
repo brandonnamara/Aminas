@@ -62,7 +62,7 @@
     ],
     gateFirst: [
       L('n', 'The Reliquary. An old vault of the sanctuary. The disturbance is down there somewhere.'),
-      L('t', 'Three floors, a handful of overgrown guardians, and one very large staircase with opinions.'),
+      L('t', 'Ten rooms of overgrown guardians, and one very large staircase with opinions.'),
       L('n', 'Bring up to three Kind Souls. Mind the elements. Fire loves leaves. Water loves fire. Leaves love water. It’s a circle. Everything is.'),
       L('w', 'Don’t get cocky in my presence.'),
     ],
@@ -183,7 +183,7 @@
     dungeonLose: [
       'Well. That didn’t go according to plan. Rest, feed, return. I’ll pretend I wasn’t watching.',
       'A setback. Everyone has them. I have had several thousand.',
-      'Back to the sanctuary. The Reliquary isn’t going anywhere. Neither are the vines.',
+      'Back to the sanctuary. The dungeon isn’t going anywhere. It has had a lot of practice at that.',
     ],
     eggStart: ['An egg. Now we wait. Patience is a skill, apparently.', 'Warm it, keep it company, and don’t ask what’s in it. It doesn’t like being asked.'],
     hatched: ['Oh. Hello, small one. Well done. A new life, and you only had to pay for it with a little food.', 'There. That’s a Kind Soul. Look at it. Aren’t they ridiculous?'],
@@ -338,9 +338,12 @@
       case 'hatched': toast(T.pick(st, 'hatched') + ' ' + T.speciesNote(d.sp), 'w'); break;
       case 'evolve': script(T.scripts.evolve(D.SPECIES[d.to].name), 'evolve'); break;
       case 'dungeonWin':
-        if (d.first && once('dwin')) script(T.scripts.dungeonWinFirst, 'dwin');
-        else toast(T.pick(st, 'battleWin'), 'w');
+        // the Reliquary keeps its own first-clear scene; dungeons with a story scene play it from the result screen
+        if (d.d === 'reliquary' && d.first && once('dwin')) script(T.scripts.dungeonWinFirst, 'dwin');
+        else if (!(d.first && D.DUNGEONS[d.d] && (D.DUNGEONS[d.d].scene || (A.Scenes && A.Scenes.after[d.d])))) toast(T.pick(st, 'battleWin'), 'w');
         break;
+      case 'lore': break; // shown on the result screen and in the Journal
+      case 'islandBossDefeated': break; // the Island Boss scene covers it
       case 'dungeonLose': toast(T.pick(st, 'dungeonLose'), 't'); break;
       case 'resonance':
         if (d.id === 'r1') script(T.scripts.r1, 'r1');

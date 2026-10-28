@@ -111,6 +111,8 @@
     UI.timers.prod = setInterval(() => { if (UI.screen === 'island' && !UI.dragging) { W.tickProduction(st()); UI.renderObjects(); } }, 15000);
     if (s.pendingR2) R.awakenSpire(s);
     UI.afterAction();
+    // a story scene that was due when the game last closed plays now (rewards were already given by the battle)
+    if (s.story && s.story.pendingScene && A.Scenes && A.Scenes.get(s.story.pendingScene) && !UI.sceneBox) { const id = s.story.pendingScene; UI.queue.unshift({ type: 'fn', fn: (done) => UI.playScene(id, () => done()) }); UI.pump(); }
     if (resumed && !UI.queue.length && Date.now() - UI.lastIdle > 60000 && Math.random() < 0.6) { UI.lastIdle = Date.now(); UI.toast(T.pick(s, 'idle'), 'n'); }
   };
   // Non-interactive island used behind the arrival dialogue.
@@ -146,6 +148,11 @@
   };
 
   /* =========================================================== HUD */
+  // The Battle button (PvE and PvP): a triangle in the middle of the bottom bar, only a little larger than the others.
+  function battleBtn(s) {
+    const inRun = !!(s.run || (s.survival && s.survival.run));
+    return '<button class="nbtn tri' + (inRun ? ' live' : '') + '" data-act="battle" data-hl="battle" aria-label="Battle: PvE and PvP"><svg class="tri-bg" viewBox="0 0 100 90" aria-hidden="true"><path d="M50 4L96 86H4Z"/></svg>' + I('swords') + '<span>Battle</span>' + (inRun ? '<span class="badge">!</span>' : '') + '</button>';
+  }
   function navBtn(act, icon, label, extra) { extra = extra || {}; return '<button class="nbtn ' + (extra.cls || '') + '" data-act="' + act + '" data-hl="' + (extra.hl || act) + '">' + I(icon) + '<span>' + label + '</span>' + (extra.badge ? '<span class="badge">' + extra.badge + '</span>' : '') + '</button>'; }
   UI.hudHtml = function () {
     const s = st(), a = R.active(s), cm = Q.current(s), ready = Q.claimable(s), need = D.RANK_NEED(s.rank), isl = D.ISLANDS[s.currentIsland];
@@ -168,7 +175,7 @@
         '<div class="row"><button class="btn small gold" data-act="feed" data-kind="snack" data-hl="feed">' + I('food') + 'Snack ' + D.SNACKS.snack.food + '</button><button class="btn small" data-act="feed" data-kind="feast" data-hl="feed">Feast ' + D.SNACKS.feast.food + '</button></div></div>';
     }
     const eggReady = s.egg && R.eggStatus(s).ready;
-    h += '<div class="nav">' + navBtn('build', 'hammer', 'Build') + navBtn('collection', 'paw', 'Creatures') + navBtn('missions', 'scroll', 'Tasks', { badge: ready || '', hl: 'quests' }) + navBtn('explore', 'compass', 'Explore') + navBtn('dungeons', 'gate', 'Dungeon') + navBtn('hatchery', 'egg', 'Hatchery', { cls: s.struct.hatchery ? '' : 'locked', badge: eggReady ? '!' : '' }) + '</div>';
+    h += '<div class="nav">' + navBtn('build', 'hammer', 'Build') + navBtn('collection', 'paw', 'Creatures') + navBtn('missions', 'scroll', 'Tasks', { badge: ready || '', hl: 'quests' }) + battleBtn(s) + navBtn('explore', 'compass', 'Explore') + navBtn('hatchery', 'egg', 'Hatchery', { cls: s.struct.hatchery ? '' : 'locked', badge: eggReady ? '!' : '' }) + '</div>';
     return h + zoomBtns();
   };
   const zoomBtns = () => '<div class="zoom"><button class="round sm" data-act="zoom" data-d="1" aria-label="Zoom in">' + I('plus') + '</button><button class="round sm" data-act="zoom" data-d="-1" aria-label="Zoom out">' + I('minus') + '</button></div>';
@@ -577,6 +584,7 @@
 
   /* =========================================================== island map */
   // Island map thumbnail: a small floating block island in the island's own materials, with its signature feature.
+  UI.isleThumb = (iid) => isleThumb(iid);
   function isleThumb(iid) {
     const V = IA.VP[iid], d = (c, a) => A.Art.shade(c, a);
     const top = 'M-48 -2L0 -26 48 -2 0 22Z', L1 = 'M-48 -2L0 22V36L-48 12Z', R1 = 'M0 22L48 -2V12L0 36Z';
@@ -703,7 +711,7 @@
       case 'island_map': UI.islandMap(); break;
       case 'quests': UI.missions(null, plan.quest); break;
       case 'screen':
-        if (plan.screen === 'dungeons') UI.dungeons();
+        if (plan.screen === 'dungeons') UI.dungeons(null, plan.dungeon);
         else if (plan.screen === 'explore') { UI.exArea = plan.area || UI.exArea; UI.explore(); }
         else if (plan.screen === 'hatchery') UI.hatchery();
         else if (plan.screen === 'collection') UI.collection();
