@@ -47,7 +47,7 @@
     o = o || {}; const s = st();
     const draft = { look: Object.assign({}, PX.avatarLook(s.avatar && s.avatar.look)), name: (s.avatar && s.avatar.name) || '' };
     const PARTS = [['skin', 'Skin'], ['hair', 'Hair'], ['hairCol', 'Hair colour'], ['eyes', 'Eyes'], ['outfit', 'Outfit'], ['acc', 'Extra']];
-    const swatch = (k, i) => { const v = D.AVATAR[k][i][1]; return /^#/.test(v) ? '<i class="sw" style="background:' + v + '"></i>' : ''; };
+    const swatch = (k, i) => { const v = D.AVATAR[k][i][1]; return /^#/.test(v) ? '<i class="avc-sw" style="background:' + v + '"></i>' : ''; };
     const rows = () => PARTS.map(([k, lab]) => '<div class="avc-row"><span class="avc-l">' + lab + '</span><button class="round xs" data-act="avStep" data-k="' + k + '" data-d="-1" aria-label="Previous ' + lab + '">' + I('back') + '</button>' +
       '<span class="avc-v">' + swatch(k, draft.look[k]) + esc(D.AVATAR[k][draft.look[k]][0]) + '</span><button class="round xs" data-act="avStep" data-k="' + k + '" data-d="1" aria-label="Next ' + lab + '">' + I('arrow') + '</button></div>').join('');
     const html = '<div class="sheet panel avc' + (o.first ? ' first' : '') + '"><div class="sh-head"><h2>' + (o.first ? 'Who are you?' : 'Customise your avatar') + '</h2>' + (o.first ? '' : '<button class="x" data-act="close" aria-label="Close">' + I('close') + '</button>') + '</div>' +

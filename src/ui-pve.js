@@ -99,7 +99,7 @@
     UI.afterAction(); Au.play('ok');
     const ov = el.closest('.overlay');
     const art = r.artefact ? '<div class="panel" style="padding:.5rem;margin:.4rem 0"><b>' + I('scroll') + ' ' + esc(D.LORE[r.artefact].title) + '</b><p class="muted small-t" style="margin:.2rem 0">' + esc(D.LORE[r.artefact].text) + '</p><small class="muted">Added to your Journal.</small></div>' : '';
-    const m = UI.modal(UI.sheet('You searched ' + esc(D.RUINS[id].name), '<div class="vcard"><div class="rw" style="justify-content:center;font-size:1.05rem">' + UI.rewardRow(r.loot) + '</div>' + art + '</div>', '<button class="btn gold" data-act="close">Good</button>', 'narrow'), { onClose: () => { if (ov && ov.parentNode) UI.ruins(ov); } });
+    const m = UI.modal(UI.sheet('You searched ' + esc(D.RUINS[id].name), '<div class="vcard"><div class="rw" style="justify-content:center;font-size:1.05rem">' + UI.rewardRow(r.loot) + (r.essence && r.essence.n ? '<span>' + Art.essIcon(r.essence.el) + ' +' + r.essence.n + ' ' + esc(D.ELEMENTS[r.essence.el].name) + ' Essence</span>' : '') + '</div>' + art + '</div>', '<button class="btn gold" data-act="close">Good</button>', 'narrow'), { onClose: () => { if (ov && ov.parentNode) UI.ruins(ov); } });
     UI.sparkles($('.rw', m), 14);
   });
 
@@ -125,7 +125,7 @@
         const out = R.Survival.resolve(st(), U.b); R.after(st()); S.save();
         if (out.win) {
           Au.play('win');
-          const ov = UI.modal(UI.sheet('Wave ' + out.wave + ' cleared', '<div class="vcard"><h1>Wave ' + out.wave + '!</h1>' + (out.milestone ? '<div class="panel reward-first" style="padding:.45rem;margin:.4rem 0"><b>' + I('star') + ' Milestone: wave ' + out.milestone.wave + '</b><div class="rw" style="display:flex;justify-content:center">' + UI.rewardRow(out.milestone.reward) + '</div></div>' : '') + '<p>Earned so far: <b>' + UI.rwInline(out.earned) + '</b></p><p class="muted small-t">Your party recovers a little. Next: wave ' + out.next + (out.next % 5 === 0 ? ' (a Champion)' : '') + '.</p></div>',
+          const ov = UI.modal(UI.sheet('Wave ' + out.wave + ' cleared', '<div class="vcard"><h1>Wave ' + out.wave + '!</h1>' + (out.milestone ? '<div class="panel reward-first" style="padding:.45rem;margin:.4rem 0"><b>' + I('star') + ' Milestone: wave ' + out.milestone.wave + '</b><div class="rw" style="display:flex;justify-content:center">' + UI.rewardRow(out.milestone.reward) + '</div></div>' : '') + '' + (out.essence && out.essence.n ? '<p>' + Art.essIcon(out.essence.el) + ' +' + out.essence.n + ' ' + esc(D.ELEMENTS[out.essence.el].name) + ' Essence</p>' : '') + '<p>Earned so far: <b>' + UI.rwInline(out.earned) + '</b></p><p class="muted small-t">Your party recovers a little. Next: wave ' + out.next + (out.next % 5 === 0 ? ' (a Champion)' : '') + '.</p></div>',
             '<button class="btn ghost" id="sv-stop">Collect and stop</button><button class="btn gold" id="sv-next">Next wave</button>', 'narrow'), { dismiss: false });
           $('.x', ov).remove();
           $('#sv-next', ov).onclick = () => { UI.close(ov); UI.leaveBattle(() => svBattle()); };
