@@ -461,13 +461,13 @@
   // Seasonal dressing (v0.4): paper lanterns drifting up over the island while a festival runs. Drawn as an HTML
   // layer above the island (UI.festivalLayer) so the animation is composited and never repaints the SVG world.
   Art.festivalLayer = function (id) {
-    const c = ['#ffb05a', '#ffb05a', '#c88aff', '#ffb05a', '#ff9a7a', '#ffb05a'];
+    const c = ['#ffb05a', '#c88aff', '#ff9a7a', '#ffb05a']; // Dev 7: 6 -> 4 lanterns
     return '<div class="fest-layer fest-' + id + '" aria-hidden="true">' + c.map((col, i) => '<i class="fest-lan" style="--lc:' + col + ';left:' + (8 + i * 16 + (i % 2) * 5) + '%;--d:' + (14 + (i * 3) % 7) + 's;--dx:' + ((i % 3) - 1) * 2.5 + 'rem;--y:' + (18 + (i * 13) % 40) + '%;animation-delay:-' + (i * 2.7).toFixed(1) + 's"></i>').join('') + '</div>';
   };
   Art.ambient = function (iid) {
-    const isl = D.ISLANDS[iid], out = [], n = 9;
+    const isl = D.ISLANDS[iid], out = [], n = 5; // Dev 7: 9 -> 5 (each one repaints the island while it moves)
     for (let i = 0; i < n; i++) {
-      const x = 4 + hash(i, 1, 77) * (isl.grid.w - 8), y = 4 + hash(i, 2, 77) * (isl.grid.h - 8), [wx, wy] = Iso.top(x, y), d = f1(hash(i, 3, 77) * 6);
+      const x = 4 + hash(i, 1, 77) * (isl.grid.w - 8), y = 4 + hash(i, 2, 77) * (isl.grid.h - 8), [wx, wy] = Iso.top(x, y), d = (Math.round(hash(i, 3, 77) * 12) / 2).toFixed(1); // Dev 7: delays on the 0.5 s ambient beat
       if (iid === 'starter') out.push('<g transform="translate(' + f1(wx) + ' ' + f1(wy - 40) + ')"><g class="bfly" style="animation-delay:-' + d + 's"><g class="wings"><rect x="-8" y="-3" width="6" height="6" fill="' + ['#ffb0d8', '#ffe27a', '#b8e0ff'][i % 3] + '"/><rect x="2" y="-3" width="6" height="6" fill="' + ['#ffb0d8', '#ffe27a', '#b8e0ff'][i % 3] + '"/></g><rect x="-1" y="-4" width="2" height="8" fill="#4a3a2a"/></g></g>');
       else if (iid === 'verdant') out.push('<g transform="translate(' + f1(wx) + ' ' + f1(wy - 30) + ')"><g class="ffly" style="animation-delay:-' + d + 's"><rect x="-5" y="-5" width="10" height="10" fill="#e8ff7a" opacity=".25"/><rect x="-2" y="-2" width="4" height="4" fill="#f4ffb0"/></g></g>');
       else if (iid === 'obsidian') out.push('<g transform="translate(' + f1(wx) + ' ' + f1(wy) + ')"><g class="emb" style="animation-delay:-' + d + 's"><rect x="-2" y="-2" width="4" height="4" fill="' + (i % 2 ? '#ff9a5a' : '#ff5fc8') + '"/></g></g>');
@@ -489,7 +489,7 @@
 
   /* ================= backdrops (screen space, behind the island) ================= */
   // Voxel sky: stepped clouds, distant floating islands built from blocks, the sea (or cloud sea) far below.
-  const stars = (n, seed, h) => [...Array(n)].map((_, i) => '<rect x="' + f1(hash(i, 1, seed) * 1000) + '" y="' + f1(hash(i, 2, seed) * (h || 260)) + '" width="' + f1(1.5 + hash(i, 3, seed) * 2) + '" height="' + f1(1.5 + hash(i, 3, seed) * 2) + '" fill="#fff" opacity="' + f1(0.4 + hash(i, 4, seed) * 0.6) + '"' + (i % 4 === 0 ? ' class="twk" style="animation-delay:' + f1(hash(i, 5, seed) * 4) + 's"' : '') + '/>').join('');
+  const stars = (n, seed, h) => [...Array(n)].map((_, i) => '<rect x="' + f1(hash(i, 1, seed) * 1000) + '" y="' + f1(hash(i, 2, seed) * (h || 260)) + '" width="' + f1(1.5 + hash(i, 3, seed) * 2) + '" height="' + f1(1.5 + hash(i, 3, seed) * 2) + '" fill="#fff" opacity="' + f1(0.4 + hash(i, 4, seed) * 0.6) + '"' + (i % 4 === 0 ? ' class="twk" style="animation-delay:' + (Math.round(hash(i, 5, seed) * 8) / 2).toFixed(1) + 's"' : '') + '/>').join('');
   const vcloud = (x, y, s, op, cls, col) => { col = col || '#fff'; return '<g class="' + (cls || 'cl') + '"><g transform="translate(' + x + ' ' + y + ') scale(' + s + ')" opacity="' + op + '"><rect x="-60" y="-8" width="128" height="16" fill="' + col + '"/><rect x="-40" y="-20" width="56" height="14" fill="' + col + '"/><rect x="4" y="-28" width="40" height="22" fill="' + col + '"/><rect x="-60" y="6" width="128" height="4" fill="#000" opacity=".06"/></g></g>'; };
   // a small block island seen far away: grass slab, earth and stone steps narrowing downward, optional tree
   const farIsle = (x, y, s, top, side, low, tree) => {
@@ -763,6 +763,41 @@
     if (lv >= 3) g += torch(0.9, 0.62, 0, 0.9);
     return g;
   };
+  // Forge (Dev 7): a squat brick smithy with a tall chimney and a glowing furnace mouth on the +u face, an anvil and a
+  // weapon rack on the forecourt, a slate roof. Ruined: cold, roofless walls and a fallen chimney.
+  // Levels: 2 bellows and a second rack, 3 a gold-trimmed chimney crown and banner. No animation (static sprite).
+  const ANVIL_MARK = [[-0.32, 3], [0.32, 3], [0.2, 0], [0.08, -1], [0.08, -5], [0.26, -7], [-0.26, -7], [-0.08, -5], [-0.08, -1], [-0.2, 0]];
+  B.forge = function (lv, ruined) {
+    const BR = '#8a5a44', BR2 = '#6e4636', SL = '#4a4658', SL2 = '#3a3646', IR = '#4a4c58', IR2 = '#33343e';
+    let g = shadow(3, 3, 0.24) + plinth(3, 3, 6, '#7f7a72', 71);
+    if (ruined) {
+      g += sbox(-1.3, -1.3, 6, 1.5, 2.5, 16, BR2, 'brick', 72) + sbox(-1.3, -1.3, 6, 0.55, 0.55, 28, '#7a6a62', 'brick', 73);
+      g += vc(0.5, 0.9, 6, 0.5, 0.35, 5, '#7a6a62') + vc(0.95, 0.6, 6, 0.3, 0.3, 4, '#6a5a52') + vc(0.7, -0.5, 6, 0.42, 0.24, 7, IR2);
+      g += poly(onU(0.2, [[-0.2, 6], [0.25, 6], [0.25, 16], [-0.2, 16]]), '#2a2026') + grassCube(-0.6, 1.1, 6, 0.26) + rockCube(0.9, -1.0, 6, 0.24) + grassCube(-1.1, 0.4, 22, 0.22);
+      return g;
+    }
+    // workshop: brick walls, stepped slate roof
+    g += sbox(-1.3, -1.3, 6, 1.55, 2.6, 26, BR, 'brick', 74);
+    [[0, 2.6, 0], [5, 2.3, 0.15], [10, 1.9, 0.35], [15, 1.4, 0.6]].forEach(([dz, w, i]) => { g += vbox(-1.36 + i * 0.4, -1.36 + i, 32 + dz, 1.67 - i * 0.8, w + 0.12, 5, dz ? SL : SL2); });
+    // chimney with a glowing top
+    g += sbox(-1.25, -1.25, 32, 0.6, 0.6, 44, '#9a7a68', 'brick', 75) + vbox(-1.3, -1.3, 76, 0.7, 0.7, 4, lv >= 3 ? M.gd : IR);
+    g += poly(quadT(80.2, -1.18, -1.18, -0.72, -0.72), '#ff7a2a') + poly(quadT(80.4, -1.08, -1.08, -0.82, -0.82), '#ffd25a');
+    g += circ(pj(-0.95, -0.95, 86)[0], pj(-0.95, -0.95, 86)[1], 9, '#ffb04a', ' opacity=".25"');
+    // furnace mouth on the front (+u) face, iron frame, coals
+    g += opening('u', 0.25, -0.75, -0.05, 6, 24, IR, '#ff8a2a') + poly(onU(0.25, archPts(-0.62, -0.18, 6, 16)), '#ffd25a') + poly(onU(0.25, [[-0.55, 6], [-0.25, 6], [-0.25, 10], [-0.55, 10]]), '#fff1a0');
+    // doorway and a shuttered window on the long (+v) face
+    g += opening('v', 1.3, -0.55, -0.15, 6, 26, M.wd2, '#2a2026') + window_('v', 1.3, -1.05, -0.8, 14, 24, '#ffcf7a');
+    g += banner('u', 0.25, 0.75, 0.32, 30, 18, '#c0392b', ANVIL_MARK);
+    // forecourt: anvil on a stump, quench barrel, weapon rack
+    g += vc(0.85, -0.55, 6, 0.3, 0.3, 7, M.wd2) + vbox(0.66, -0.68, 13, 0.4, 0.26, 3, IR2) + vbox(0.72, -0.62, 16, 0.3, 0.14, 4, IR) + vbox(0.62, -0.6, 16, 0.12, 0.1, 2, IR);
+    g += vc(1.05, 0.2, 6, 0.32, 0.32, 10, '#7a5030') + poly(quadT(16.2, 0.92, 0.07, 1.18, 0.33), '#3a7ac8');
+    const rack = (cv) => vc(0.55, cv, 6, 0.06, 0.06, 18, M.wd2) + vc(0.55, cv + 0.4, 6, 0.06, 0.06, 18, M.wd2) + vbox(0.52, cv - 0.03, 20, 0.08, 0.48, 2, M.wd) +
+      vc(0.6, cv + 0.12, 6, 0.04, 0.04, 22, '#c8d0dc') + vc(0.6, cv + 0.28, 6, 0.04, 0.04, 19, '#d8c070');
+    g += rack(0.75);
+    if (lv >= 2) g += rack(-1.2) + vbox(-0.05, 0.95, 6, 0.4, 0.3, 6, '#6a4630') + vbox(0.0, 1.0, 12, 0.3, 0.2, 2, IR);
+    g += torch(1.2, 1.15, 6, 0.8);
+    return g;
+  };
   // Habitats: a stone cottage with a stepped dome roof in element colours; each element has its own silhouette
   // feature (fire chimney, water pool, wind vane, rock buttresses, sun spire, moon tower, a sapling on the roof).
   // Level visuals (v0.4): 2 front garden, 3 pennant and lit windows, 4 crystal crown, 5 golden trim.
@@ -981,7 +1016,7 @@
   // Approximate sprite heights (for hit areas, bubbles and label placement)
   Art.heightOf = function (b) {
     const d = D.BUILDINGS[b.type]; if (!d) return 60;
-    return { hollow: 112, tidegate: 100, moonshrine: 122, hatchery: 132, reliquarygate: 100, farm: 52, mine: 70, habitat: 122, lantern: 70, festlantern: 84, flowerbed: 24, bench: 40, statue: 76, fountain: 60 }[d.art || (d.cat === 'habitat' ? 'habitat' : '')] || 80;
+    return { hollow: 112, tidegate: 100, moonshrine: 122, hatchery: 132, forge: 96, reliquarygate: 100, farm: 52, mine: 70, habitat: 122, lantern: 70, festlantern: 84, flowerbed: 24, bench: 40, statue: 76, fountain: 60 }[d.art || (d.cat === 'habitat' ? 'habitat' : '')] || 80;
   };
   Art.obstacleHeight = (type) => ({ oak: 92, pine: 70, boulder: 52, elderroot: 90, vinetree: 90, basalt: 70, floatstone: 64, geode: 40, slagheap: 34, mossruin: 56, charred: 40, crystal: 36, fern: 30 }[type] || 34);
   Art.landmark = function (iid, st) {
@@ -1011,11 +1046,8 @@
   // 2D art on the island is drawn as an image of the creature's SVG (rasterised once and cached by the browser)
   // instead of a nested live SVG: with several Aminas on screen this keeps camera panning as smooth as in v0.3.
   const critterUri = {};
+  // v0.7: island creatures use the baked voxel portraits in every mode (live 3D only affects battles and viewers)
   Art.critter = function (id) {
-    if (!A.Art.use3d()) {
-      const uri = critterUri[id] || (critterUri[id] = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(A.Art.creature(id)));
-      return '<image class="critter2d" href="' + uri + '" x="-50" y="-92" width="100" height="100"/>';
-    }
     return '<image href="assets/portraits/' + id + '.webp" x="-62" y="-107" width="124" height="124" preserveAspectRatio="xMidYMid meet"/>';
   };
 

@@ -58,11 +58,17 @@
       desc: 'A hilltop shrine, half swallowed by ivy. Its resident slowly condenses gems from moonlight. Opens the Dusk Grove.',
       levels: [L(130, 0, { rate: 0.25, capMin: 40, capacity: 1 }), L(800, 300, { rate: 0.3, capMin: 60, capacity: 1 }), L(2400, 900, { rate: 0.35, capMin: 90, capacity: 2 }), L(6000, 1800, { rate: 0.4, capMin: 120, capacity: 2 })] },
     hatchery: { name: 'Old Hatchery', cat: 'story', story: true, w: 3, h: 3, canMove: true, canStore: false, req: { struct: 'tidegate' }, art: 'hatchery',
-      desc: 'A dome of cracked shell-stone. Restores breeding. Upgrades shorten incubation.',
-      levels: [L(110, 0, { eggTime: 1 }), L(500, 120, { eggTime: 0.85 }), L(1500, 600, { eggTime: 0.7 }), L(4000, 1500, { eggTime: 0.55 }), L(9000, 3000, { eggTime: 0.4 })] },
+      desc: 'A dome of cracked shell-stone. Restores breeding. Every upgrade adds one more breeding slot and shortens incubation.',
+      levels: [L(110, 0, { eggTime: 1, slots: 1 }), L(500, 120, { eggTime: 0.85, slots: 2 }), L(1500, 600, { eggTime: 0.7, slots: 3 }), L(4000, 1500, { eggTime: 0.55, slots: 4 }), L(9000, 3000, { eggTime: 0.4, slots: 5 })] },
     reliquarygate: { name: 'Reliquary Gate', cat: 'story', story: true, w: 3, h: 3, canMove: true, canStore: false, req: { flag: 'r1' }, art: 'reliquarygate',
       desc: 'A great door in the hillside, sealed by vines. Opens the Overgrown Reliquary dungeon. Upgrades improve dungeon clear rewards.',
       levels: [L(140, 0, { rewardMult: 1 }), L(700, 300, { rewardMult: 1.15 }), L(2200, 900, { rewardMult: 1.3 }), L(6000, 1800, { rewardMult: 1.5 })] },
+
+    // Dev 7: the Forge, an old smithy north of the plaza. Restoring it opens equipment crafting, merging and the shop;
+    // its level opens more recipes, higher merges and more shop stock (D.FORGE in gear-data.js).
+    forge: { name: 'Old Forge', cat: 'story', story: true, w: 3, h: 3, canMove: true, canStore: false, req: { struct: 'hatchery' }, art: 'forge',
+      desc: 'A cold smithy with a cracked chimney. Restored, it crafts, merges and sells equipment for your Aminas. Upgrades open stronger gear.',
+      levels: [L(300, 0, { forge: 1 }), L(1500, 600, { forge: 2 }), L(4500, 1800, { forge: 3 })] },
 
     // ---------- production ----------
     farm: { name: 'Berry Farm', cat: 'production', w: 3, h: 2, canMove: true, canStore: true, req: { struct: 'hollow' }, maxCount: 4,
@@ -89,7 +95,7 @@
       levels: [L(gold, 0, {})] };
   });
   Object.keys(D.BUILDINGS).forEach((k) => { const b = D.BUILDINGS[k]; b.id = k; b.canRotate = b.w !== b.h || b.cat === 'decor'; });
-  D.STORY_BUILDINGS = ['hollow', 'tidegate', 'moonshrine', 'hatchery', 'reliquarygate'];
+  D.STORY_BUILDINGS = ['hollow', 'tidegate', 'moonshrine', 'hatchery', 'reliquarygate', 'forge'];
   D.STRUCT_ORDER = ['hollow', 'tidegate', 'reliquarygate', 'hatchery', 'moonshrine'];
   D.CATALOG = ['farm', 'mine', 'hab_nature', 'hab_water', 'hab_earth', 'hab_fire', 'hab_light', 'hab_dark', 'hab_wind', 'lantern', 'flowerbed', 'bench', 'statue', 'fountain'];
   D.CATALOG_CATS = [['production', 'Production'], ['habitat', 'Habitats'], ['decor', 'Decor']];

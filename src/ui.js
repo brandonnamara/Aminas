@@ -298,7 +298,7 @@
     const cnt = (el) => { const all = D.ROSTER.filter((x) => x.el === el); return ' <small>' + all.filter((x) => s.owned[x.id]).length + '/' + all.length + '</small>'; };
     const seg = (k, opts) => '<span class="seg">' + opts.map(([v, t]) => '<button class="' + (f[k] === v ? 'on' : '') + '" data-act="colSet" data-k="' + k + '" data-v="' + v + '">' + t + '</button>').join('') + '</span>';
     const bar = '<div class="colbar"><div class="fchips">' + elBtn('all', 'All') + Object.keys(D.ELEMENTS).map((e) => elBtn(e, esc(D.ELEMENTS[e].name), cnt(e))).join('') + '</div><div class="colctl">' + seg('show', [['all', 'All'], ['owned', 'Befriended'], ['missing', 'Missing']]) + seg('sort', [['dex', 'No.'], ['level', 'Level'], ['element', 'Element'], ['name', 'A–Z']]) + '</div></div>';
-    const html = UI.sheet('Creature Collection · ' + R.ownedCount(s) + ' / ' + D.ROSTER.length, bar + '<div class="grid">' + cards + '</div>', '<span class="muted" style="margin-right:auto;font-size:.8rem">Tap any entry. Undiscovered entries tell you how to find them.</span><button class="btn gold" data-act="close">Close</button>', 'wide');
+    const html = UI.sheet('Creature Collection · ' + R.ownedCount(s) + ' / ' + D.ROSTER.length, bar + '<div class="grid">' + cards + '</div>', '<span class="muted" style="margin-right:auto;font-size:.8rem">Tap any entry. Undiscovered entries tell you how to find them.</span><button class="btn ghost" data-act="bag">' + I('book') + ' Bag</button><button class="btn gold" data-act="close">Close</button>', 'wide');
     if (ovEx && ovEx.parentNode) { const sc = $('.sh-body', ovEx).scrollTop; ovEx.innerHTML = html; $('.sh-body', ovEx).scrollTop = sc; return ovEx; }
     const ov = UI.modal(html); ov._collection = true; return ov;
   };
@@ -310,10 +310,7 @@
     return '<div class="kv"><b>Strong against:</b> ' + (strong.length ? strong.map((x) => D.ELEMENTS[x].name).join(', ') : '—') + ' &nbsp; <b>Weak to:</b> ' + (weak.length ? weak.map((x) => D.ELEMENTS[x].name).join(', ') : '—') + '</div>';
   };
   // Evolution family of a species: [base, evolved] in order (one or two stages in this roster).
-  UI.family = function (spId) {
-    const pre = D.ROSTER.find((x) => x.evo && x.evo.to === spId), sp = D.SPECIES[spId];
-    return pre ? [pre.id, spId] : sp.evo ? [spId, sp.evo.to] : [spId];
-  };
+  UI.family = function (spId) { return D.LINES[D.SPECIES[spId].line].ids.slice(); };
   const CLIP_LABEL = { idle: 'Idle', move: 'Hop', attack: 'Attack', hit: 'Ouch', victory: 'Cheer', defeat: 'Faint' };
   UI.detail = function (spId, o) {
     o = o || {}; const s = st(), W = A.World;
@@ -328,8 +325,8 @@
       body = '<div class="detail"><div class="big sil art">' + Art.portrait(spId) + '</div><div><h2>' + esc(sp.name) + ' ' + chip(sp.el) + '</h2><p class="muted">Sighted, but not yet befriended.</p><div class="kv"><b>How to find it:</b> ' + esc(sp.find) + '</div>' + UI.effLines(sp.el) + '</div></div>';
     } else {
       live = true;
-      const lv = inst.lv, stt = R.statsAt(spId, lv), next = lv < D.MAX_LEVEL ? R.statsAt(spId, lv + 1) : stt;
-      const evo = sp.evo ? 'Evolves into <b>' + (s.owned[sp.evo.to] ? D.SPECIES[sp.evo.to].name : '???') + '</b> at level ' + sp.evo.lv : (sp.stage === 2 ? 'Fully evolved form' : 'Does not evolve');
+      const lv = inst.lv, stt = R.statsWithGear(s, inst), next = lv < D.MAX_LEVEL ? R.statsWithGear(s, Object.assign({}, inst, { lv: lv + 1 })) : stt;
+      const evo = sp.evo ? 'Can evolve into <b>' + (s.owned[sp.evo.to] ? D.SPECIES[sp.evo.to].name : '???') + '</b> from level ' + sp.evo.lv + ' (you decide when).' : 'Final form.';
       const fam = UI.family(spId);
       const famHtml = '<div class="evo-path">' + fam.map((id, i) => { const known = R.status(s, id) !== 'unknown', own = !!s.owned[id], d = D.SPECIES[id], ev = i ? D.SPECIES[fam[i - 1]].evo : null;
         return (i ? '<div class="evo-arrow">' + I('arrow') + '<small>Lv ' + ev.lv + '</small></div>' : '') + '<div class="evo-node' + (id === spId ? ' cur' : '') + (own ? '' : ' unknown') + '">' + (own ? artBox(id) : silBox(id)) + '<b>' + (known ? esc(d.name) : '???') + '</b><small>Stage ' + d.stage + '</small></div>'; }).join('') + '</div>' +
@@ -338,17 +335,18 @@
       const breedHtml = recipes.length ? '<div class="kv"><b>Hatches from:</b> ' + recipes.map((k) => (s.recipes && s.recipes[k] ? k.split('+').map((e) => chip(e)).join(' + ') : '<span class="muted">an undiscovered pairing</span>')).join(' · ') + '</div>' : '';
       const homeType = 'hab_' + sp.el, home = D.BUILDINGS[homeType];
       const homeHtml = home ? '<div class="kv"><b>Best home:</b> ' + esc(home.name) + ' <span class="muted">(' + esc(D.ELEMENTS[sp.el].name) + ' residents earn 50% more)</span></div>' : '';
-      const tabs = '<div class="dtabs" role="tablist">' + [['about', 'About'], ['battle', 'Battle'], ['growth', 'Growth']].map(([k, t]) => '<button class="dtab ' + (tab === k ? 'on' : '') + '" role="tab" aria-selected="' + (tab === k) + '" data-act="dTab" data-tab="' + k + '">' + t + '</button>').join('') + '</div>';
+      const tabs = '<div class="dtabs" role="tablist">' + [['about', 'About'], ['battle', 'Battle'], ['gear', 'Gear'], ['growth', 'Growth']].map(([k, t]) => '<button class="dtab ' + (tab === k ? 'on' : '') + '" role="tab" aria-selected="' + (tab === k) + '" data-act="dTab" data-tab="' + k + '">' + t + '</button>').join('') + '</div>';
       const about = '<div class="dpanel" data-panel="about"' + (tab === 'about' ? '' : ' hidden') + '><div class="kv"><b>Personality:</b> ' + esc(sp.pers) + '</div><div class="kv">' + esc(sp.lore) + '</div><div class="kv"><b>Found:</b> ' + esc(sp.find) + '</div><div class="entnote"><div class="ep">' + Art.entity('n') + '</div><div>“' + esc(sp.ent) + '”</div></div></div>';
       const battle = '<div class="dpanel" data-panel="battle"' + (tab === 'battle' ? '' : ' hidden') + '><div class="stats">' + [['HP', 'hp'], ['ATK', 'atk'], ['DEF', 'def'], ['SPD', 'spd']].map((k) => '<div class="stat">' + k[0] + '<b>' + stt[k[1]] + '</b>' + (lv < D.MAX_LEVEL ? '<em>+' + (next[k[1]] - stt[k[1]]) + '</em>' : '') + '</div>').join('') + '</div>' + UI.effLines(sp.el) +
         sp.abil.map((id) => { const ab = D.ABILITIES[id]; return '<div class="abil"><b>' + ab.name + '</b> ' + chip(ab.el) + ' <span class="muted">' + (ab.power ? 'Power ' + ab.power : 'Utility') + (ab.cd ? ' · every ' + (ab.cd + 1) + ' turns' : '') + '</span><br>' + esc(ab.desc) + '</div>'; }).join('') + '</div>';
+      const gearP = '<div class="dpanel" data-panel="gear"' + (tab === 'gear' ? '' : ' hidden') + '>' + UI.gearHtml(s, inst) + '</div>';
       const growth = '<div class="dpanel" data-panel="growth"' + (tab === 'growth' ? '' : ' hidden') + '>' + famHtml + '<div class="kv"><b>Evolution:</b> ' + evo + '</div>' + breedHtml + homeHtml + '</div>';
       const clips = A.C3D && A.C3D.enabled() ? '<div class="clipbar">' + ['move', 'attack', 'hit', 'victory'].map((c) => '<button class="fchip" data-act="vPlay" data-clip="' + c + '">' + CLIP_LABEL[c] + '</button>').join('') + '</div>' : '';
-      body = '<div class="detail"><div><div class="big art viewer3d">' + Art.portrait(spId) + '</div>' + clips + '</div><div><h2>' + esc(sp.name) + ' ' + chip(sp.el) + '</h2>' + tabs + about + battle + growth + '</div></div>';
+      body = '<div class="detail"><div><div class="big art viewer3d">' + Art.portrait(spId) + '</div>' + clips + '</div><div><h2>' + esc(sp.name) + ' ' + chip(sp.el) + '</h2>' + (sp.title ? '<div class="sp-title muted">' + esc(sp.title) + ' · Stage ' + sp.stage + '</div>' : '') + tabs + about + battle + gearP + growth + '</div></div>';
       body += '<div class="section-t">Your ' + esc(sp.name) + (mine.length > 1 ? 's' : '') + '</div>' + mine.map((a) => {
         const need = R.xpNeed(a.lv), isAct = a.uid === s.active, hm = W.homeOf(s, a.uid);
         return '<div class="inst"><div class="art">' + Art.portrait(a.sp) + '</div><div class="grow"><b>Lv ' + a.lv + '</b> ' + (isAct ? '<span class="chip light">Companion</span>' : '') + ' <span class="muted" style="font-size:.7rem">' + (hm ? 'Lives in the ' + esc(W.def(hm).name) : isAct ? '' : 'Roams the island') + '</span><div class="bar xp" style="margin-top:.2rem"><i style="width:' + (a.lv >= D.MAX_LEVEL ? 100 : pct(a.xp, need)) + '%"></i></div><span class="muted" style="font-size:.7rem">' + (a.lv >= D.MAX_LEVEL ? 'MAX' : a.xp + ' / ' + need + ' xp') + '</span></div>' +
-          '<button class="btn small gold" data-act="detailFeed" data-uid="' + a.uid + '" data-kind="snack">Snack ' + D.SNACKS.snack.food + '</button><button class="btn small" data-act="detailFeed" data-uid="' + a.uid + '" data-kind="feast">Feast ' + D.SNACKS.feast.food + '</button>' + (isAct ? '' : '<button class="btn small ghost" data-act="makeActive" data-uid="' + a.uid + '">Companion</button>') + '</div>';
+          '<button class="btn small gold" data-act="detailFeed" data-uid="' + a.uid + '" data-kind="snack">Snack ' + D.SNACKS.snack.food + '</button><button class="btn small" data-act="detailFeed" data-uid="' + a.uid + '" data-kind="feast">Feast ' + D.SNACKS.feast.food + '</button>' + (isAct ? '' : '<button class="btn small ghost" data-act="makeActive" data-uid="' + a.uid + '">Companion</button>') + (D.SPECIES[a.sp].evo && a.lv >= D.SPECIES[a.sp].evo.lv ? '<button class="btn small gold evo-btn" data-act="evoAsk" data-uid="' + a.uid + '">' + I('spark') + 'Evolve</button>' : '') + '</div>';
       }).join('');
     }
     const html = UI.sheet(esc(status === 'unknown' ? 'Undiscovered Amina' : sp.name), body, '<button class="btn gold" data-act="close">Close</button>', 'wide');
@@ -443,7 +441,7 @@
     const seg = (k, label, opts) => '<div class="toggle"><span>' + label + '</span><span class="seg">' + opts.map(([v, t]) => '<button class="' + (s[k] === v ? 'on' : '') + '" data-act="setSeg" data-k="' + k + '" data-v="' + v + '">' + t + '</button>').join('') + '</span></div>';
     const st2 = S.status || {};
     const body = tog('music', 'Music') + tog('sfx', 'Sound effects') + tog('reduceMotion', 'Reduce motion', '(also follows your device setting)') + tog('gridAlways', 'Show the build grid all the time') +
-      tog('creatures3d', '3D creatures', A.C3D && !A.C3D.supported() ? '(this device has no WebGL: 2D art is used)' : A.C3D && A.C3D.failed() ? '(3D could not load here: 2D art is used)' : '(turn off on older devices for the classic 2D art)') + tog('dayNight', 'Day and night light on the island') +
+      tog('creatures3d', '3D creatures', A.C3D && !A.C3D.supported() ? '(this device has no WebGL: 2D art is used)' : A.C3D && A.C3D.failed() ? '(3D could not load here: 2D art is used)' : '(turn off on older devices for the classic 2D art)') + tog('dayNight', 'Day and night light on the island') + tog('batterySaver', 'Battery saver', '(30 fps 3D, fewer island effects. Switches on by itself for a session if this device struggles.)') +
       seg('timers', 'Build & clearing timers', [['normal', 'Standard'], ['quick', 'Quick (testing)']]) + seg('eggSpeed', 'Egg timer', [['fast', '20 sec (test)'], ['normal', '5 min']]) + seg('textSpeed', 'Text speed', [['slow', 'slow'], ['normal', 'normal'], ['fast', 'fast']]) +
       '<div class="row-actions">' + (has ? '<button class="btn small" data-act="saveNow">Save now</button>' : '') + '<button class="btn small" data-act="backup">Backup / restore code</button><button class="btn small" data-act="installHelp">Add to Home Screen</button>' + (UI.deferredPrompt ? '<button class="btn small gold" data-act="installNow">Install app</button>' : '') + '<button class="btn small ghost" data-act="howto">How to play</button></div>' +
       '<div class="section-t">Your save</div><p class="muted" style="font-size:.78rem;margin:.2rem 0">Progress is stored only on this device, in this browser (no account, no cloud). Clearing Safari website data or using Private Browsing removes it, and Safari may clear data for websites you have not opened for a few weeks — adding Aminas to your Home Screen avoids that. Keep a backup code. ' + (st2.lastSaveOk === false ? '<b class="bad">The last save failed: ' + esc(st2.lastError || '') + '.</b>' : 'Last saved ' + (st().lastSaved ? new Date(st().lastSaved).toLocaleTimeString() : 'not yet') + '.') + '</p>' +
@@ -454,7 +452,7 @@
     return UI.modal(html);
   };
   UI.act('settings', () => UI.settings());
-  UI.act('setPref', (el) => { const s = st().settings; s[el.dataset.k] = !s[el.dataset.k]; Au.setPrefs(s); S.save(); Au.unlock(); document.body.classList.toggle('calm', !!s.reduceMotion); UI.settings(el.closest('.overlay')); if (UI.screen === 'island') { UI.renderWorld(); UI.renderHud(); UI.daylight(); } });
+  UI.act('setPref', (el) => { const s = st().settings; s[el.dataset.k] = !s[el.dataset.k]; if (el.dataset.k === 'batterySaver' && A.Perf) { if (!s.batterySaver) A.Perf.autoSaver = false; A.Perf.apply(); } Au.setPrefs(s); S.save(); Au.unlock(); document.body.classList.toggle('calm', !!s.reduceMotion); UI.settings(el.closest('.overlay')); if (UI.screen === 'island') { UI.renderWorld(); UI.renderHud(); UI.daylight(); } });
   UI.act('setSeg', (el) => { st().settings[el.dataset.k] = el.dataset.v; S.save(); UI.settings(el.closest('.overlay')); });
   UI.act('saveNow', (el) => { S.save(); UI.gainFloat(el, 'Saved', '#8cffa0'); });
   UI.act('toTitle', () => { S.save(); UI.showTitle(); });
@@ -475,7 +473,7 @@
     const s = st(), k = el.dataset.k;
     if (k === 'res') R.addRes(s, { gold: 500, food: 200, gems: 20 });
     if (k === 'lv') { const a = R.active(s); if (a && a.lv < D.MAX_LEVEL) R.addXp(s, a, R.xpNeed(a.lv) - a.xp); }
-    if (k === 'egg' && s.egg) s.egg.readyAt = Date.now() - 1;
+    if (k === 'egg') (s.eggs || []).forEach((e) => (e.readyAt = Date.now() - 1));
     if (k === 'rank') R.gainRankXp(s, D.RANK_NEED(s.rank) - s.rankXp);
     if (k === 'all') D.ROSTER.forEach((sp) => { if (!s.owned[sp.id]) R.addAmina(s, sp.id, 5); });
     if (k === 'gold100k') R.addRes(s, { gold: 100000 });

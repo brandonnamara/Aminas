@@ -54,7 +54,7 @@
       L('s', 'That’s… no. Stones don’t sing. They never did.'),
       L('a', 'It’s resonance. The old sort. Hm.'),
       L('*', 'A creature steps out of the shimmer. Crystal-eared, humming, curious.'),
-      L('n', 'Resonyx. A new one. Don’t let it hum at you too long. It gets in your head.'),
+      L('n', 'Aimza. A new one. Copied from something older, and it knows it. Be kind to it.'),
       L('t', 'Disturbances. Spreading. Typical.'),
       L('c', 'Light and Dark. Always fighting. Always certain they were right.'),
       L('a', 'Whatever it was they were all quietly afraid of, it was not a thing you’d want humming on your shore.'),
@@ -210,7 +210,7 @@
       'Ah. That. Yes, I remember the paperwork. Terrible business. A great deal of overtime.',
       'Strange things? Every day. The trick is deciding which ones are your problem. Usually it’s all of them.',
       'The island has been hiccuping since the Resonance. Don’t take it personally. It certainly doesn’t.',
-      'If it hums, glows, or points at you, it’s probably not an accident. If it also smells of cabbage, it’s probably a Gloomole.',
+      'If it hums, glows, or points at you, it’s probably not an accident. If it also smells of cabbage, it’s probably a Voltar.',
     ] },
     resonance: { label: 'World Resonance', first: [
       L('n', 'World Resonance? Hm. Yes. That was a big mess.'),

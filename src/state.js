@@ -7,7 +7,7 @@
   const D = A.Data;
   const S = (A.State = {});
 
-  S.SCHEMA = 3;
+  S.SCHEMA = 5;
   // The key name is historical (v0.1 used it); keeping it means existing players keep their progress.
   const KEY = () => D.SAVE_KEY, BAK = () => D.SAVE_KEY + '-backup', BAD = () => D.SAVE_KEY + '-corrupt';
 
@@ -20,7 +20,7 @@
       starter: null,
       res: { gold: D.START.gold, food: D.START.food, gems: D.START.gems },
       rank: 1, rankXp: 0,
-      aminas: [],                // {uid, sp, lv, xp}
+      aminas: [],                // {uid, sp, lv, xp, gear:{weapon,armour,charm}, evoNote}
       active: null,              // uid of the companion
       nextUid: 1,
       seen: {},                  // species encountered in battle
@@ -42,7 +42,10 @@
       hideseek: { pref: 'hider', played: 0, won: 0, seekerCount: {} },
       pendingFind: null,         // {area, sp}
       pendingR2: false,
-      egg: null,                 // {sp, parents:[spA,spB], readyAt, startedAt}
+      eggs: [],                  // v0.7: one per hatchery slot {slot, sp, parents:[spA,spB], readyAt, startedAt}
+      items: [],                 // v0.7 equipment owned {iid, id, from, at}; worn items are referenced from aminas[].gear
+      nextIid: 1,
+      forge: { ops: [], stats: { crafted: 0, merged: 0, bought: 0 } }, // Dev 7: recent Forge operation ids (no double apply) and counts
       buildings: {},             // id -> {id,type,island,x,y,rot,level,state,residents[],last,stock,endAt,toLevel}
       islands: {},               // id -> {unlocked, obstacles:{oid:{state,endAt,paid,rewarded}}}
       currentIsland: 'starter',
@@ -50,7 +53,7 @@
       party: [],                 // last chosen party uids
       run: null,                 // active dungeon run
       recipes: {},               // breeding recipes discovered
-      settings: { music: true, sfx: true, eggSpeed: 'fast', textSpeed: 'normal', timers: 'normal', grid: true, reduceMotion: false, creatures3d: true, dayNight: true },
+      settings: { music: true, sfx: true, eggSpeed: 'fast', textSpeed: 'normal', timers: 'normal', grid: true, reduceMotion: false, creatures3d: true, dayNight: true, batterySaver: false },
       story: { used: {}, slips: {}, asked: {}, scenes: {} },
       lastSaved: 0,
     };
@@ -127,6 +130,30 @@
     d.schema = 3;
     return d;
   };
+  // v0.6 (schema 3) -> v0.7 (schema 4): the roster is replaced by the 21 designed lines. Every Amina keeps its uid,
+  // level, XP and home and becomes its v0.7 counterpart (D.LEGACY). The single egg moves into hatchery slot 1.
+  S.MIGRATIONS[3] = function (d) {
+    const map = (id) => (D.SPECIES[id] ? id : D.LEGACY[id] || null);
+    d.aminas = (d.aminas || []).map((a) => { const sp = map(a && a.sp); return sp ? Object.assign({}, a, { sp, gear: { weapon: null, armour: null, charm: null } }) : null; }).filter(Boolean);
+    ['owned', 'seen'].forEach((k) => { const o = {}; Object.keys(d[k] || {}).forEach((id) => { const m = map(id); if (m) o[m] = true; }); d[k] = o; });
+    d.aminas.forEach((a) => { d.owned[a.sp] = true; d.seen[a.sp] = true; });
+    if (d.egg && map(d.egg.sp)) d.eggs = [{ slot: 0, sp: map(d.egg.sp), parents: (d.egg.parents || []).map((p) => map(p) || p), startedAt: d.egg.startedAt || 0, readyAt: d.egg.readyAt }];
+    else d.eggs = [];
+    delete d.egg;
+    if (d.pendingFind && d.pendingFind.sp) { const m = map(d.pendingFind.sp); if (m) d.pendingFind.sp = m; else d.pendingFind = null; }
+    if (d.recipes) Object.keys(d.recipes).forEach((k) => { const m = map(d.recipes[k]); if (m) d.recipes[k] = m; else delete d.recipes[k]; });
+    d.items = []; d.nextIid = 1;
+    d.schema = 4;
+    return d;
+  };
+  // Dev 7 (schema 4) -> schema 5: the Forge. Nothing is converted: every v0.7 item id still exists with the same
+  // bonuses; the Old Forge ruin is added to the starter island by World.validate (at its default spot, or the
+  // nearest free one if the player built there); Forge bookkeeping starts empty.
+  S.MIGRATIONS[4] = function (d) {
+    d.forge = { ops: [], stats: { crafted: 0, merged: 0, bought: 0 } };
+    d.schema = 5;
+    return d;
+  };
   S.migrate = function (d) {
     let v = d.schema | 0 || 1;
     const from = v;
@@ -175,7 +202,21 @@
     ['gold', 'food', 'gems'].forEach((k) => { st.res[k] = Math.max(0, Math.floor(+st.res[k] || 0)); });
     st.rank = Math.max(1, Math.min(30, st.rank | 0)); st.rankXp = Math.max(0, st.rankXp | 0);
     Object.keys(st.missions || {}).forEach((k) => { if (st.missions[k] !== 'claimed') delete st.missions[k]; });
-    if (st.egg && !(st.egg.readyAt > 0 && D.SPECIES[st.egg.sp])) st.egg = null;
+    // hatchery slots: valid species, one egg per slot, slot index inside the hatchery's slot count (never lost on upgrade)
+    const seenSlot = {};
+    st.eggs = (Array.isArray(st.eggs) ? st.eggs : []).filter((e) => e && e.readyAt > 0 && D.SPECIES[e.sp] && e.slot >= 0 && e.slot < D.MAX_EGG_SLOTS && !seenSlot[e.slot] && (seenSlot[e.slot] = true));
+    delete st.egg;
+    // equipment: known items, unique iids, gear points at owned items only, each item worn by one Amina
+    const iids = {};
+    st.items = (Array.isArray(st.items) ? st.items : []).filter((it) => it && D.ITEMS[it.id] && it.iid > 0 && !iids[it.iid] && (iids[it.iid] = true));
+    st.nextIid = Math.max(st.nextIid | 0, 1 + st.items.reduce((m, it) => Math.max(m, it.iid), 0));
+    if (A.Rules && A.Rules.Forge) { const f = A.Rules.Forge.rec(st); f.ops = f.ops.filter((x) => typeof x === 'string').slice(-D.FORGE.opsKept); }
+    const worn = {};
+    st.aminas.forEach((a) => {
+      const g = (a.gear = Object.assign({ weapon: null, armour: null, charm: null }, a.gear || {}));
+      D.GEAR_SLOTS.forEach((k) => { const it = g[k] != null && st.items.find((x) => x.iid === g[k]); if (!it || D.ITEMS[it.id].slot !== k || worn[it.iid]) g[k] = null; else worn[it.iid] = true; });
+      Object.keys(g).forEach((k) => { if (D.GEAR_SLOTS.indexOf(k) < 0) delete g[k]; });
+    });
     if (st.run && !(D.DUNGEONS[st.run.d] && Array.isArray(st.run.uids) && st.run.uids.every((u) => uids[u]) && st.run.battle >= 0 && st.run.battle < D.DUNGEONS[st.run.d].battles.length)) st.run = null;
     if (A.Rules) Object.keys(st.dungeon || {}).forEach((id) => { if (D.DUNGEONS[id]) A.Rules.dungeonRec(st, id); });
     const sv = st.survival; if (sv && sv.run && !(Array.isArray(sv.run.uids) && sv.run.uids.some((u) => uids[u]))) sv.run = null;

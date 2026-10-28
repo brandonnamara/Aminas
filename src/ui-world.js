@@ -131,6 +131,7 @@
   };
   UI.tick = function () {
     const s = st(); if (UI.screen !== 'island') return;
+    if (A.Perf) { A.Perf.tick(); if (A.Perf.hidden()) return; }  // hidden: skip the work, the clocks catch up on return
     UI.tickN = (UI.tickN || 0) + 1; if (UI.tickN % 60 === 0) UI.daylight();
     const before = R.q.length; W.tick(s);
     if (R.q.length > before) { UI.afterAction(); }
@@ -138,9 +139,9 @@
       const busy = W.buildingsOn(s, s.currentIsland).some((b) => b.state === 'constructing' || b.state === 'upgrading') || W.obstaclesOn(s, s.currentIsland).some((o) => o.state === 'removing');
       if (busy) UI.renderObjects();
     }
-    const e = s.egg && R.eggStatus(s);
-    if (e && e.ready && !UI.eggNotified) { UI.eggNotified = true; UI.renderHud(); UI.toast('Something in the Hatchery is making noises. I’d look into it. Quietly.', 'a'); Au.play('ok'); }
-    if (!s.egg) UI.eggNotified = false;
+    const nReady = R.eggsReady(s);
+    if (nReady > (UI.eggNotified | 0)) { UI.renderHud(); UI.toast(nReady > 1 ? nReady + ' eggs in the Hatchery are making noises. I’d look into it. Quietly.' : 'Something in the Hatchery is making noises. I’d look into it. Quietly.', 'a'); Au.play('ok'); }
+    UI.eggNotified = nReady;
     if (UI.hatchTick) UI.hatchTick();
     // live timers in an open building / obstacle panel
     const ov = $('#modal-root .overlay:last-child');
@@ -169,17 +170,13 @@
       h += '<button class="pill mission-pill ' + (rdy ? 'ready' : '') + '" data-act="questGo" data-id="' + cm.id + '"><b>' + (rdy ? 'Ready to claim' : 'Current task') + '</b><span class="mt">' + esc(cm.title) + '</span>' +
         '<span class="mo">' + (rdy ? 'Tap to claim your reward.' : esc(Q.label(ob)) + (op && op.total > 1 ? ' · ' + fmt(op.cur) + '/' + fmt(op.total) : '')) + '</span><span class="go">' + (rdy ? 'Claim' : 'Go') + ' ' + I('arrow') + '</span></button>';
     } else if (s.flags.arcDone) h += '<button class="pill mission-pill" data-act="missions"><b>Chapter One complete</b><span class="mt">Sanctuary tasks remain</span></button>';
-    if (a) {
-      const sp = D.SPECIES[a.sp], need2 = R.xpNeed(a.lv);
-      h += '<div class="comp panel"><div class="art" data-act="detail" data-sp="' + a.sp + '">' + Art.portrait(a.sp) + '</div><div class="nm">' + esc(sp.name) + ' ' + chip(sp.el) + '</div><div><div class="bar xp"><i style="width:' + (a.lv >= D.MAX_LEVEL ? 100 : pct(a.xp, need2)) + '%"></i></div><div class="xpl"><span>Lv ' + a.lv + '</span><span>' + (a.lv >= D.MAX_LEVEL ? 'MAX' : a.xp + ' / ' + need2 + ' xp') + '</span></div></div>' +
-        '<div class="row"><button class="btn small gold" data-act="feed" data-kind="snack" data-hl="feed">' + I('food') + 'Snack ' + D.SNACKS.snack.food + '</button><button class="btn small" data-act="feed" data-kind="feast" data-hl="feed">Feast ' + D.SNACKS.feast.food + '</button></div></div>';
-    }
-    const eggReady = s.egg && R.eggStatus(s).ready;
+    if (a && UI.selectorHtml) h += UI.selectorHtml(s);
+    const eggReady = R.eggsReady(s) > 0;
     h += '<div class="nav">' + navBtn('build', 'hammer', 'Build') + navBtn('collection', 'paw', 'Creatures') + navBtn('missions', 'scroll', 'Tasks', { badge: ready || '', hl: 'quests' }) + battleBtn(s) + navBtn('explore', 'compass', 'Explore') + navBtn('hatchery', 'egg', 'Hatchery', { cls: s.struct.hatchery ? '' : 'locked', badge: eggReady ? '!' : '' }) + '</div>';
     return h + zoomBtns();
   };
   const zoomBtns = () => '<div class="zoom"><button class="round sm" data-act="zoom" data-d="1" aria-label="Zoom in">' + I('plus') + '</button><button class="round sm" data-act="zoom" data-d="-1" aria-label="Zoom out">' + I('minus') + '</button></div>';
-  UI.renderHud = function () { const h = $('#hud'); if (h) { h.innerHTML = UI.hudHtml(); UI.applyHl(); } };
+  UI.renderHud = function () { const h = $('#hud'); if (h) { h.innerHTML = UI.hudHtml(); UI.applyHl(); if (UI.selBind) UI.selBind(); } };
   UI.act('zoom', (el) => { const c = camFor(UI.wv.iid); c.z = c.z * (+el.dataset.d > 0 ? 1.25 : 0.8); clampCam(c); applyCam(); });
 
   /* =========================================================== input: pan, pinch, tap, drag ghost */
@@ -415,6 +412,8 @@
     if (a.capacity != null) rows.push(['Residents', a.capacity, b.capacity]);
     if (a.eggTime != null) rows.push(['Incubation', Math.round(a.eggTime * 100) + '%', Math.round(b.eggTime * 100) + '%']);
     if (a.rewardMult != null) rows.push(['Dungeon rewards', '×' + a.rewardMult, '×' + b.rewardMult]);
+    if (a.slots != null) rows.push(['Breeding slots', a.slots, b.slots]);
+    if (a.forge != null && D.FORGE) { const n = (k, lv) => D.FORGE[k].filter((x) => x.lv <= lv).length; rows.push(['Recipes', n('recipes', a.forge), n('recipes', b.forge)], ['Shop items', n('shop', a.forge), n('shop', b.forge)], ['Highest merge', 'Tier ' + Math.max(...Object.keys(D.FORGE.merge).filter((t) => D.FORGE.merge[t].lv <= a.forge)), 'Tier ' + Math.max(...Object.keys(D.FORGE.merge).filter((t) => D.FORGE.merge[t].lv <= b.forge))]); }
     // v0.4: habitats change their look with each level (island-art.js B.habitat)
     const LOOK = ['', 'Cottage', 'Front garden', 'Pennant and lit windows', 'Crystal crown', 'Golden trim'];
     if (d.cat === 'habitat') { const lv = d.levels.indexOf(b) + 1; if (LOOK[lv]) rows.push(['Look', LOOK[lv - 1] || '–', LOOK[lv]]); }
@@ -468,6 +467,7 @@
     if (b.state !== 'ruined' && b.island === s.currentIsland && d.canMove) acts += '<button class="btn small ghost" data-act="bpMove" data-id="' + id + '" data-hl="move">' + I('move') + 'Move</button>';
     if (b.state === 'built' && d.canStore) acts += '<button class="btn small ghost" data-act="bpStore" data-id="' + id + '" data-hl="store">' + I('box') + 'Store</button>';
     if (id === 'hatchery' && b.level >= 1) acts += '<button class="btn small" data-act="hatchery">' + I('egg') + 'Open Hatchery</button>';
+    if (id === 'forge' && b.level >= 1) acts += '<button class="btn small gold" data-act="forge" data-hl="forge">' + I('hammer') + 'Open Forge</button>';
     if (id === 'reliquarygate' && b.level >= 1) acts += '<button class="btn small" data-act="dungeons">' + I('gate') + 'Dungeons</button>';
     const html = UI.sheet(esc(d.name) + (b.level >= 1 ? ' <span class="lv">Lv ' + b.level + '</span>' : b.state === 'ruined' ? ' <span class="lv ruin">Ruin</span>' : ''), body, acts + '<span class="sp"></span>' + foot, 'narrow wide bpanel');
     let ov = ovEx;

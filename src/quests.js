@@ -293,7 +293,7 @@
         const area = D.AREA_ORDER.find((a) => R().areaUnlocked(st, a) && D.AREAS[a].steps.some((s) => s[0] === 'find' && !st.owned[s[1]])) || D.AREA_ORDER.find((a) => R().areaUnlocked(st, a)) || 'meadow';
         return plan('screen', { screen: 'explore', area, highlight: ['area:' + area, 'explore'], message: hint || 'Explore ' + D.AREAS[area].name + ' and befriend what you find.' });
       }
-      case 'evolve': return plan('screen', { screen: 'feed', highlight: ['feed'], message: hint || 'Starters evolve at level 12. Keep feeding your companion.' });
+      case 'evolve': return plan('screen', { screen: 'feed', highlight: ['feed'], message: hint || 'Starters can evolve at level 12. Keep feeding your companion, then confirm the evolution when it is offered.' });
       case 'hatch': {
         if (!st.struct.hatchery) return Nav.resolve(st, { id: 'p', type: 'restore', target: 'hatchery' });
         return plan('screen', { screen: 'hatchery', highlight: ['hatchery', 'hStart'], message: hint || 'Pick two level 5+ Aminas and start incubation.' });

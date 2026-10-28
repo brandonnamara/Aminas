@@ -68,7 +68,7 @@
 
   /* ---------- xp / feeding ---------- */
   R.addXp = function (st, inst, amt) {
-    const out = { levels: [], evolved: null, gained: 0 };
+    const out = { levels: [], evolved: null, evoReady: null, gained: 0 };
     if (inst.lv >= D.MAX_LEVEL || amt <= 0) return out;
     inst.xp += amt; out.gained = amt;
     while (inst.lv < D.MAX_LEVEL && inst.xp >= R.xpNeed(inst.lv)) {
@@ -78,18 +78,42 @@
       R.emit('creatureLevel', { uid: inst.uid, sp: inst.sp, from: inst.lv - 1, to: inst.lv });
     }
     if (inst.lv >= D.MAX_LEVEL) inst.xp = 0;
+    // v0.7: evolution is never automatic. When the next form becomes available the player is told once, and it
+    // only happens when they confirm (R.evolve). Level, XP, equipment and the uid are kept through it.
     const evo = sp(inst.sp).evo;
-    if (evo && inst.lv >= evo.lv) {
-      const from = inst.sp;
-      inst.sp = evo.to;
-      st.stats.evolved++;
-      const first = !st.owned[evo.to];
-      st.owned[evo.to] = true; st.seen[evo.to] = true;
-      out.evolved = { from, to: evo.to };
-      R.emit('evolve', { uid: inst.uid, from, to: evo.to, first });
-      R.gainRankXp(st, 15);
+    if (evo && inst.lv >= evo.lv && inst.evoNote !== evo.to) {
+      inst.evoNote = evo.to;
+      out.evoReady = { from: inst.sp, to: evo.to };
+      R.emit('evoReady', { uid: inst.uid, from: inst.sp, to: evo.to });
     }
     return out;
+  };
+
+  /* ---------- evolution (player-confirmed) ---------- */
+  // Requirements: the species has a next form, the Amina has reached its level, and the gold/food cost is affordable.
+  R.evoCheck = function (st, uid) {
+    const inst = R.inst(st, uid); if (!inst) return { ok: false, reason: 'invalid' };
+    const evo = sp(inst.sp).evo; if (!evo) return { ok: false, reason: 'final' };
+    const out = { to: evo.to, lv: evo.lv, cost: evo.cost || {}, from: inst.sp };
+    if (st.run && (st.run.uids || []).indexOf(uid) >= 0) return Object.assign(out, { ok: false, reason: 'busy' });
+    if (inst.lv < evo.lv) return Object.assign(out, { ok: false, reason: 'level', need: evo.lv - inst.lv });
+    if (evo.cost && !R.canAfford(st, evo.cost)) return Object.assign(out, { ok: false, reason: 'cost' });
+    return Object.assign(out, { ok: true });
+  };
+  R.canEvolve = (st, uid) => R.evoCheck(st, uid).ok;
+  // Every Amina whose next form is available right now (for notices and badges).
+  R.evoReadyList = (st) => st.aminas.filter((a) => { const e = sp(a.sp).evo; return e && a.lv >= e.lv; }).map((a) => a.uid);
+  R.evolve = function (st, uid) {
+    const c = R.evoCheck(st, uid); if (!c.ok) return c;
+    if (c.cost && (c.cost.gold || c.cost.food || c.cost.gems) && !A.Economy.spend(st, c.cost).ok) return Object.assign(c, { ok: false, reason: 'cost' });
+    const inst = R.inst(st, uid), from = inst.sp;
+    inst.sp = c.to; inst.evoNote = null;          // lv, xp, gear, uid and home are unchanged
+    st.stats.evolved++;
+    const first = !st.owned[c.to];
+    st.owned[c.to] = true; st.seen[c.to] = true;
+    R.emit('evolve', { uid, from, to: c.to, first });
+    R.gainRankXp(st, 15);
+    return { ok: true, from, to: c.to, first };
   };
 
   R.feed = function (st, uid, kind) {
@@ -177,7 +201,7 @@
   R.investigate = function (st) {
     if (!st.struct.tidegate || st.flags.r1) return { ok: false };
     st.flags.r1 = true;
-    R.addAmina(st, 'resonyx', 3);
+    R.addAmina(st, 'aimza', 3);
     R.addRes(st, { gold: 30 });
     R.gainRankXp(st, 25);
     R.emit('resonance', { id: 'r1' });
@@ -205,13 +229,22 @@
   R.recipeFor = function (elA, elB) {
     const key = [elA, elB].sort().join('+');
     if (D.BREED[key]) return Object.assign({ key }, D.BREED[key]);
-    if ((elA === 'resonance') !== (elB === 'resonance')) return { key, sp: 'chimerrow', locked: true };
+    if ((elA === 'resonance') !== (elB === 'resonance')) return { key, sp: D.RESONANCE_CHILD, locked: true };
     return null;
   };
-  R.breedCheck = function (st, uidA, uidB) {
+  // v0.7: the hatchery has one breeding slot per level (each upgrade adds exactly one). Slots run independently.
+  R.hatcheryLevel = (st) => { const h = st.buildings && st.buildings.hatchery; return st.struct.hatchery && h ? Math.max(1, h.level | 0) : 0; };
+  R.eggSlots = (st) => Math.min(D.MAX_EGG_SLOTS, R.hatcheryLevel(st));
+  R.eggs = (st) => (st.eggs = Array.isArray(st.eggs) ? st.eggs : []);
+  R.eggIn = (st, slot) => R.eggs(st).find((e) => e && e.slot === slot) || null;
+  R.freeSlot = function (st) { for (let i = 0; i < R.eggSlots(st); i++) if (!R.eggIn(st, i)) return i; return -1; };
+  // parents incubating in another slot can still breed (they are not consumed); the same pair just can't be used twice at once
+  R.breedCheck = function (st, uidA, uidB, slot) {
     const a = R.inst(st, uidA), b = R.inst(st, uidB);
     if (!st.struct.hatchery) return { ok: false, reason: 'noHatchery' };
-    if (st.egg) return { ok: false, reason: 'egg' };
+    if (slot == null) slot = R.freeSlot(st);
+    if (slot < 0 || slot >= R.eggSlots(st)) return { ok: false, reason: R.freeSlot(st) < 0 ? 'egg' : 'slot' };
+    if (R.eggIn(st, slot)) return { ok: false, reason: 'egg' };
     if (!a || !b) return { ok: false, reason: 'pick' };
     if (a.uid === b.uid) return { ok: false, reason: 'same' };
     if (a.lv < D.BREED_MIN_LEVEL || b.lv < D.BREED_MIN_LEVEL) return { ok: false, reason: 'level' };
@@ -219,38 +252,91 @@
     if (!r) return { ok: false, reason: 'incompat' };
     if (r.locked && !st.flags.r2) return { ok: false, reason: 'locked' };
     if (!R.canAfford(st, D.BREED_COST)) return { ok: false, reason: 'cost' };
-    return { ok: true, sp: r.sp, key: r.key };
+    return { ok: true, sp: r.sp, key: r.key, slot };
   };
-  R.startBreed = function (st, uidA, uidB) {
-    const c = R.breedCheck(st, uidA, uidB);
+  R.startBreed = function (st, uidA, uidB, slot) {
+    const c = R.breedCheck(st, uidA, uidB, slot);
     if (!c.ok) return c;
     const a = R.inst(st, uidA), b = R.inst(st, uidB);
     if (!A.Economy.spend(st, D.BREED_COST).ok) return { ok: false, reason: 'cost' };
     const secs = Math.max(5, Math.round((D.EGG_SECONDS[st.settings.eggSpeed] || D.EGG_SECONDS.fast) * A.World.eggTimeFactor(st)));
     const now = R.now();
-    st.egg = { sp: c.sp, parents: [a.sp, b.sp], startedAt: now, readyAt: now + secs * 1000 };
+    R.eggs(st).push({ slot: c.slot, sp: c.sp, parents: [a.sp, b.sp], startedAt: now, readyAt: now + secs * 1000 });
     st.recipes = st.recipes || {};
     st.recipes[c.key] = c.sp;
-    R.emit('eggStart', { sp: c.sp });
-    return { ok: true, sp: c.sp };
+    R.emit('eggStart', { sp: c.sp, slot: c.slot });
+    return { ok: true, sp: c.sp, slot: c.slot };
   };
-  R.eggStatus = function (st, now) {
-    if (!st.egg) return null;
+  R.eggStatus = function (st, now, slot) {
+    const e = slot == null ? R.eggs(st)[0] : R.eggIn(st, slot);
+    if (!e) return null;
     now = now || R.now();
-    const total = st.egg.readyAt - st.egg.startedAt, left = Math.max(0, st.egg.readyAt - now);
-    return { ready: left === 0, left, progress: total > 0 ? 1 - left / total : 1 };
+    const total = e.readyAt - e.startedAt, left = Math.max(0, e.readyAt - now);
+    return { slot: e.slot, sp: e.sp, ready: left === 0, left, progress: total > 0 ? 1 - left / total : 1 };
   };
-  R.hatch = function (st, now) {
-    const s = R.eggStatus(st, now);
+  R.eggsReady = (st, now) => R.eggs(st).filter((e) => e.readyAt <= (now || R.now())).length;
+  R.hatch = function (st, now, slot) {
+    if (slot == null) { const r = R.eggs(st).find((e) => e.readyAt <= (now || R.now())); if (!r) return { ok: false }; slot = r.slot; }
+    const s = R.eggStatus(st, now, slot);
     if (!s || !s.ready) return { ok: false };
-    const spId = st.egg.sp;
+    const e = R.eggIn(st, slot), spId = e.sp;
     const inst = R.addAmina(st, spId, 1);
-    st.egg = null;
-    if (!inst) return { ok: false, reason: 'full' };
+    if (!inst) return { ok: false, reason: 'full' };   // the egg stays in its slot until there is room
+    st.eggs = R.eggs(st).filter((x) => x !== e);
     st.stats.hatched++;
     R.gainRankXp(st, 15);
-    R.emit('hatched', { sp: spId, uid: inst.uid });
-    return { ok: true, inst };
+    R.emit('hatched', { sp: spId, uid: inst.uid, slot });
+    return { ok: true, inst, slot };
+  };
+
+  /* ---------- equipment ---------- */
+  // Items are owned instances {iid, id} in st.items. inst.gear = {weapon, armour, charm} holds iids.
+  // An item instance is worn by at most one Amina. Bonuses are percentages, applied once when a fighter is created.
+  R.gearOf = (inst) => (inst.gear = inst.gear || { weapon: null, armour: null, charm: null });
+  R.items = (st) => (st.items = Array.isArray(st.items) ? st.items : []);
+  R.item = (st, iid) => R.items(st).find((x) => x.iid === iid) || null;
+  R.wearer = (st, iid) => st.aminas.find((a) => a.gear && Object.keys(a.gear).some((k) => a.gear[k] === iid)) || null;
+  R.grantItem = function (st, id, source) {
+    const d = D.ITEMS[id]; if (!d) return null;
+    if (d.unique && R.items(st).some((x) => x.id === id)) { A.Economy.gain(st, { gold: d.dupGold || 100 }); R.emit('itemDup', { id, gold: d.dupGold || 100 }); return null; }
+    st.nextIid = Math.max(st.nextIid | 0, 1);
+    const it = { iid: st.nextIid++, id, from: source || null, at: R.now() };
+    R.items(st).push(it);
+    R.emit('item', { id, iid: it.iid, source });
+    return it;
+  };
+  R.equip = function (st, uid, iid) {
+    const inst = R.inst(st, uid), it = R.item(st, iid);
+    if (!inst || !it) return { ok: false, reason: 'invalid' };
+    if (st.run && (st.run.uids || []).indexOf(uid) >= 0) return { ok: false, reason: 'busy' };
+    const slot = D.ITEMS[it.id].slot, prev = R.wearer(st, iid);
+    if (prev && prev.uid !== uid && st.run && (st.run.uids || []).indexOf(prev.uid) >= 0) return { ok: false, reason: 'busy' };
+    if (prev) Object.keys(prev.gear).forEach((k) => { if (prev.gear[k] === iid) prev.gear[k] = null; });
+    R.gearOf(inst)[slot] = iid;
+    R.emit('equip', { uid, iid, slot });
+    return { ok: true, slot, movedFrom: prev && prev.uid !== uid ? prev.uid : null };
+  };
+  R.unequip = function (st, uid, slot) {
+    const inst = R.inst(st, uid); if (!inst) return { ok: false, reason: 'invalid' };
+    if (st.run && (st.run.uids || []).indexOf(uid) >= 0) return { ok: false, reason: 'busy' };
+    const g = R.gearOf(inst); if (!g[slot]) return { ok: false, reason: 'empty' };
+    g[slot] = null; R.emit('unequip', { uid, slot });
+    return { ok: true };
+  };
+  // Total bonus (fractions) from everything an Amina wears.
+  R.gearBonus = function (st, inst) {
+    const out = { hp: 0, atk: 0, def: 0, spd: 0 };
+    if (!st || !inst || !inst.gear) return out;
+    Object.keys(inst.gear).forEach((k) => { const it = inst.gear[k] != null && R.item(st, inst.gear[k]); const d = it && D.ITEMS[it.id]; if (d && d.slot === k) Object.keys(d.bonus).forEach((s) => (out[s] += d.bonus[s])); });
+    return out;
+  };
+  // A party fighter for an owned Amina, with its equipment applied exactly once.
+  R.partyFighter = function (st, inst, opts) {
+    return B.fighter(inst.sp, inst.lv, Object.assign({ uid: inst.uid, gear: R.gearBonus(st, inst) }, opts || {}));
+  };
+  R.statsWithGear = function (st, inst) {
+    const b = R.statsAt(inst.sp, inst.lv), g = R.gearBonus(st, inst);
+    return { hp: Math.round(b.hp * (1 + g.hp)), atk: Math.round(b.atk * (1 + g.atk)), def: Math.round(b.def * (1 + g.def)), spd: Math.round(b.spd * (1 + g.spd)) };
   };
 
   /* ---------- battle ---------- */
@@ -265,11 +351,12 @@
   const B = (R.Battle = {});
   B.fighter = function (spId, lv, opts) {
     opts = opts || {};
-    const s = sp(spId), st = R.statsAt(spId, lv);
+    const s = sp(spId), st = R.statsAt(spId, lv), g = opts.gear || { hp: 0, atk: 0, def: 0, spd: 0 };
+    ['hp', 'atk', 'def', 'spd'].forEach((k) => (st[k] = Math.round(st[k] * (1 + (g[k] || 0)))));  // equipment, applied once here
     const hpMax = Math.round(st.hp * (opts.hpMult || 1));
     const f = { sp: spId, uid: opts.uid || null, name: opts.name || s.name, lv, el: s.el, hpMax,
       hp: opts.hp != null ? Math.max(0, Math.min(hpMax, Math.round(opts.hp))) : hpMax,
-      atk: st.atk, def: st.def, spd: st.spd, abil: s.abil.slice(), cd: {}, weak: 0, guard: false, st: {}, boost: 1 };
+      atk: st.atk, def: st.def, spd: st.spd, abil: s.abil.slice(), cd: {}, weak: 0, guard: false, st: {}, boost: 1, gear: !!opts.gear };
     f.abil.forEach((a) => (f.cd[a] = 0));
     return f;
   };
@@ -562,7 +649,7 @@
     const rec = R.dungeonRec(st, id);
     const start = rec.clears > 0 ? Math.max(0, Math.min(NB() - 1, (opts && opts.from) | 0)) : rec.next;
     const hp = {};
-    uids.forEach((u) => { const i = R.inst(st, u); hp[u] = R.statsAt(i.sp, i.lv).hp; });
+    uids.forEach((u) => { const i = R.inst(st, u); hp[u] = R.statsWithGear(st, i).hp; });
     st.run = { d: id, battle: start, start, uids, hp, gold: 0, food: 0 };
     st.party = uids.slice();
     return { ok: true, battle: start };
@@ -592,7 +679,7 @@
   };
   R.createBattle = function (st, rng) {
     const run = st.run, enc = R.encounter(st);
-    const party = run.uids.map((u) => { const i = R.inst(st, u); return B.fighter(i.sp, i.lv, { uid: u, hp: run.hp[u] }); });
+    const party = run.uids.map((u) => R.partyFighter(st, R.inst(st, u), { hp: run.hp[u] }));
     st.seen[enc.spec.sp] = true;
     return B.create(party, R.enemyFromSpec(enc.spec), { rng });
   };
@@ -603,8 +690,8 @@
       const inst = R.inst(st, f.uid); if (!inst) return;
       const alive = f.hp > 0;
       const r = R.addXp(st, inst, alive ? baseXp : Math.round(baseXp / 2));
-      xp.push({ uid: f.uid, sp: inst.sp, gained: r.gained, levels: r.levels, evolved: r.evolved, alive });
-      const hpMax = R.statsAt(inst.sp, inst.lv).hp;
+      xp.push({ uid: f.uid, sp: inst.sp, gained: r.gained, levels: r.levels, evolved: r.evolved, evoReady: r.evoReady, alive });
+      const hpMax = R.statsWithGear(st, inst).hp;
       const prev = alive ? f.hp : Math.round(hpMax * 0.2);
       hpStore[f.uid] = Math.max(1, Math.min(hpMax, prev + (alive ? Math.round(hpMax * heal) : 0)));
     });
@@ -636,7 +723,7 @@
     const si = d.sections.findIndex((x) => x.to === idx);
     if (si >= 0) {
       const sc = d.sections[si]; out.sectionDone = { index: si, name: sc.name };
-      run.uids.forEach((u) => { const inst = R.inst(st, u); if (!inst) return; const hpMax = R.statsAt(inst.sp, inst.lv).hp; run.hp[u] = Math.min(hpMax, run.hp[u] + Math.round(hpMax * 0.5)); });
+      run.uids.forEach((u) => { const inst = R.inst(st, u); if (!inst) return; const hpMax = R.statsWithGear(st, inst).hp; run.hp[u] = Math.min(hpMax, run.hp[u] + Math.round(hpMax * 0.5)); });
       if (!rec.floors[si]) {
         rec.floors[si] = true;
         if (sc.first && Object.keys(sc.first).length) { A.Economy.gain(st, sc.first); out.sectionFirst = { index: si, name: sc.name, reward: Object.assign({}, sc.first) }; }
@@ -656,15 +743,19 @@
       out.reward = reward;
       R.gainRankXp(st, 50);
       st.flags['cleared_' + run.d] = true;
+      // equipment: the dungeon's own item on the first clear, then a chance at a common/rare one on later clears
+      out.items = [];
+      const gearId = out.first ? D.DUNGEON_GEAR[run.d] : (R.rng() < D.GEAR_REPEAT_CHANCE ? D.GEAR_REPEAT_POOL[Math.floor(R.rng() * D.GEAR_REPEAT_POOL.length)] : null);
+      if (gearId) { const it = R.grantItem(st, gearId, 'dungeon:' + run.d); if (it) out.items.push(it.id); }
       if (run.d === 'reliquary') {
-        if (rec.clears === 1 && !st.owned.relicwarden) { R.addAmina(st, 'relicwarden', 6); out.newSp.push('relicwarden'); }
-        if (rec.clears === 2 && !st.owned.briarstag) { R.addAmina(st, 'briarstag', 8); out.newSp.push('briarstag'); }
+        if (rec.clears === 1 && !st.owned.terraki) { R.addAmina(st, 'terraki', 6); out.newSp.push('terraki'); }
+        if (rec.clears === 2 && !st.owned.sylvaneer2) { R.addAmina(st, 'sylvaneer2', 8); out.newSp.push('sylvaneer2'); }
         if (rec.clears === 1) st.pendingR2 = true;
       } else if (run.d === 'hollowveil') {
         st.flags.hollowveil = true;
-        if (rec.clears === 1 && !st.owned.veilfox) { R.addAmina(st, 'veilfox', 12); out.newSp.push('veilfox'); }
-      } else if (run.d === 'resonancescar' && rec.clears === 1 && !st.owned.echolyn) {
-        R.addAmina(st, 'echolyn', 18); out.newSp.push('echolyn');
+        if (rec.clears === 1 && !st.owned.meta1) { R.addAmina(st, 'meta1', 12); out.newSp.push('meta1'); }
+      } else if (run.d === 'resonancescar' && rec.clears === 1 && !st.owned.atem1) {
+        R.addAmina(st, 'atem1', 18); out.newSp.push('atem1');
       }
       // the Island Boss: defeating it the first time unlocks the next island (once; replays never repeat it)
       if (spec.islandBoss) {
@@ -702,7 +793,7 @@
     const rec = svRec(st);
     uids = cleanUids(st, uids, D.SURVIVAL.party);
     if (!uids.length) return { ok: false, reason: 'party' };
-    const hp = {}; uids.forEach((u) => { const i = R.inst(st, u); hp[u] = R.statsAt(i.sp, i.lv).hp; });
+    const hp = {}; uids.forEach((u) => { const i = R.inst(st, u); hp[u] = R.statsWithGear(st, i).hp; });
     rec.run = { wave: 1, uids, hp, earned: { gold: 0, food: 0 }, seed: Math.floor(R.rng() * 1e9) };
     rec.runs++;
     return { ok: true };
@@ -717,7 +808,7 @@
   };
   SV.createBattle = function (st, rng) {
     const run = svRec(st).run, spec = SV.spec(st);
-    const party = run.uids.filter((u) => R.inst(st, u)).map((u) => { const i = R.inst(st, u); return B.fighter(i.sp, i.lv, { uid: u, hp: run.hp[u] }); });
+    const party = run.uids.filter((u) => R.inst(st, u)).map((u) => R.partyFighter(st, R.inst(st, u), { hp: run.hp[u] }));
     st.seen[spec.sp] = true;
     return B.create(party, R.enemyFromSpec(spec), { rng });
   };
@@ -740,7 +831,10 @@
     out.xp = partyAfterWin(st, b, Math.round((10 + spec.lv * 3) * (spec.boss ? 1.5 : 1)), run.hp, D.SURVIVAL.healBetween);
     run.earned.gold += D.SURVIVAL.perWave.gold * run.wave; run.earned.food += D.SURVIVAL.perWave.food * run.wave;
     const ms = D.SURVIVAL.milestones[run.wave];
-    if (ms && !rec.milestones[run.wave]) { rec.milestones[run.wave] = true; A.Economy.gain(st, ms); out.milestone = { wave: run.wave, reward: Object.assign({}, ms) }; }
+    if (ms && !rec.milestones[run.wave]) {
+      rec.milestones[run.wave] = true; A.Economy.gain(st, ms); out.milestone = { wave: run.wave, reward: Object.assign({}, ms) };
+      const gid = D.SURVIVAL_GEAR[run.wave]; if (gid) { const it = R.grantItem(st, gid, 'survival:' + run.wave); if (it) out.milestone.item = it.id; }
+    }
     if (run.wave > rec.best) rec.best = run.wave;
     run.wave++;
     out.next = run.wave; out.earned = Object.assign({}, run.earned);
@@ -772,8 +866,10 @@
     r.searches++; r.last = now;
     let artefact = null;
     if (!r.artefact && site.artefact) { r.artefact = true; if (R.unlockLore(st, site.artefact)) artefact = site.artefact; }
-    R.emit('ruinSearched', { id, loot, artefact });
-    return { ok: true, loot, artefact };
+    let item = null;
+    if (R.rng() < D.RUIN_CHARM_CHANCE) { const it = R.grantItem(st, D.RUIN_CHARMS[Math.floor(R.rng() * D.RUIN_CHARMS.length)], 'ruin:' + id); if (it) item = it.id; }
+    R.emit('ruinSearched', { id, loot, artefact, item });
+    return { ok: true, loot, artefact, item };
   };
 
   /* ---------- PvP foundations (local only: there is no server yet) ---------- */
@@ -789,7 +885,7 @@
   PV.roster = (st) => cleanUids(st, pvRec(st).roster, D.PVP.rosterSize);
   // A local practice opponent: n Aminas around the given level, chosen from a fixed pool with a seed.
   PV.aiTeam = function (lv, n, seed) {
-    const pool = D.SURVIVAL.pool.concat(['lumifern', 'umbrit', 'resonyx', 'haloray', 'whisperhusk']);
+    const pool = D.SURVIVAL.pool.concat(['lumifern', 'umbrit', 'aimza', 'igniflare', 'zeep']);
     const out = [];
     for (let i = 0; i < n; i++) { const sp = pool[(seed + i * 104729) % pool.length]; out.push(B.fighter(sp, Math.max(1, Math.min(D.MAX_LEVEL, lv + ((seed >> i) % 3) - 1)), { name: 'Rival ' + D.SPECIES[sp].name })); }
     return out;
@@ -797,7 +893,7 @@
   const avgLv = (st, uids) => Math.round(uids.reduce((a, u) => a + (R.inst(st, u) || { lv: 1 }).lv, 0) / Math.max(1, uids.length));
   PV.createPractice = function (st, rng, seed) {
     const uids = PV.roster(st); if (uids.length !== D.PVP.rosterSize) return null;
-    const party = uids.map((u) => { const i = R.inst(st, u); return B.fighter(i.sp, i.lv, { uid: u }); });
+    const party = uids.map((u) => R.partyFighter(st, R.inst(st, u)));
     return B.create(party, PV.aiTeam(avgLv(st, uids), D.PVP.rosterSize, seed == null ? Math.floor((rng || R.rng)() * 1e6) : seed), { rng });
   };
   const today = () => { const d = new Date(R.now()); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); };
@@ -825,7 +921,7 @@
   PV.team = (st, kind) => cleanUids(st, dfRec(st)[kind], D.PVP.defenceSize);
   PV.createRaid = function (st, rng, seed) {
     const uids = PV.team(st, 'attack'); if (uids.length !== D.PVP.defenceSize) return null;
-    const party = uids.map((u) => { const i = R.inst(st, u); return B.fighter(i.sp, i.lv, { uid: u }); });
+    const party = uids.map((u) => R.partyFighter(st, R.inst(st, u)));
     const foes = PV.aiTeam(avgLv(st, uids), D.PVP.defenceSize, seed == null ? Math.floor((rng || R.rng)() * 1e6) : seed);
     foes.forEach((f) => (f.name = f.name.replace('Rival', 'Defender')));
     return B.create(party, foes, { rng });
@@ -841,7 +937,7 @@
   PV.simulateDefence = function (st, rng, seed) {
     const uids = PV.team(st, 'defence'); if (uids.length !== D.PVP.defenceSize) return { ok: false, reason: 'size' };
     rng = rng || R.rng;
-    const defenders = uids.map((u) => { const i = R.inst(st, u); return B.fighter(i.sp, i.lv, { uid: u }); });
+    const defenders = uids.map((u) => R.partyFighter(st, R.inst(st, u)));
     const raiders = PV.aiTeam(avgLv(st, uids), D.PVP.defenceSize, seed == null ? Math.floor(rng() * 1e6) : seed);
     raiders.forEach((f) => (f.name = f.name.replace('Rival', 'Raider')));
     const b = B.create(defenders, raiders, { rng });

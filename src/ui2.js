@@ -399,7 +399,7 @@
     const s = st(), dn = D.DUNGEONS[out.dungeon || (UI.B && UI.B.d) || 'reliquary'];
     const rows = out.xp.map((x) => {
       const lvl = x.levels.length ? '<div class="lvlup">LEVEL UP! Lv ' + x.levels[0].from + ' → ' + x.levels[x.levels.length - 1].to + '</div>' : '';
-      const evo = x.evolved ? '<div class="lvlup">Evolved into ' + esc(D.SPECIES[x.evolved.to].name) + '!</div>' : '';
+      const evo = x.evoReady ? '<div class="lvlup">Ready to evolve! (you choose when)</div>' : '';
       return '<div class="xprow"><div class="art">' + Art.portrait(x.sp) + '</div><div class="grow"><b>' + esc(D.SPECIES[x.sp].name) + '</b> <span class="muted">+' + x.gained + ' xp' + (x.alive ? '' : ' (fainted: half)') + '</span>' + lvl + evo + '</div></div>';
     }).join('');
     const cleared = out.cleared;

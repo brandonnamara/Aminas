@@ -19,9 +19,9 @@
     /* Starter Island, Dungeon 1: after the Waywarden. Target length 35-50 s. */
     oldroads: {
       title: 'Old Roads', tone: 'melancholy', dungeon: 'forgottenroad', bg: 'roadend',
-      cast: { waywarden: { name: 'The Waywarden', sp: 'graniteling' } },
+      cast: { waywarden: { name: 'The Waywarden', sp: 'gaiaroki' } },
       beats: [
-        { who: '*', show: { sp: 'graniteling', pose: 'bow' }, text: 'The Waywarden lowers its head. The old stones beneath its feet stop glowing.' },
+        { who: '*', show: { sp: 'gaiaroki', pose: 'bow' }, text: 'The Waywarden lowers its head. The old stones beneath its feet stop glowing.' },
         { who: '*', entity: 'in', text: 'The Entity appears beside the ruined road, looking more inconvenienced than impressed.' },
         { who: 'entity', mood: 'w', text: 'Well. That was a great deal of effort for a glorified roadblock.' },
         { who: 'entity', mood: 'n', text: 'Still, it has done its job rather well. This road used to lead to a settlement. People travelled it every day, apparently. Can’t imagine why anyone would want to walk that far.' },
@@ -32,15 +32,15 @@
         { who: '*', text: 'He looks away.' },
         { who: 'entity', mood: 'a', text: 'Old roads have a habit of outliving the people who built them.' },
         { who: 'entity', mood: 'n', bg: 'roadend', text: 'Come along, Kind Soul. If we’re going to repair this place, I’d rather we started before another few centuries pass.' },
-        { who: '*', bg: 'roadopen', entity: 'out', show: { sp: 'graniteling', pose: 'watch' }, text: 'The Entity leaves. The Waywarden watches you pass through the newly opened road.' },
+        { who: '*', bg: 'roadopen', entity: 'out', show: { sp: 'gaiaroki', pose: 'watch' }, text: 'The Entity leaves. The Waywarden watches you pass through the newly opened road.' },
       ],
     },
     /* Dungeon 2 (draft for review): the central question is why the place was abandoned. Deliberately unanswered. */
     emptyhall: {
       title: 'The Empty Hall', tone: 'quiet', dungeon: 'gatheringhall', bg: 'hall3', draft: true,
-      cast: { lamplighter: { name: 'The Lamplighter', sp: 'gloomole' } },
+      cast: { lamplighter: { name: 'The Lamplighter', sp: 'voltar' } },
       beats: [
-        { who: '*', show: { sp: 'gloomole', pose: 'bow' }, text: 'The Lamplighter lets the last lantern go out. In the dark, the hall looks bigger, and emptier.' },
+        { who: '*', show: { sp: 'voltar', pose: 'bow' }, text: 'The Lamplighter lets the last lantern go out. In the dark, the hall looks bigger, and emptier.' },
         { who: '*', entity: 'in', text: 'The Entity is already sitting at one of the long tables, as if he had a seat there.' },
         { who: 'entity', mood: 'n', text: 'A gathering hall. People and Kind Souls ate here, argued here, and left the washing-up for later.' },
         { who: 'you', choice: [{ text: 'Why did they leave?' }, { text: 'Did you know them?', goto: 'knew' }] },
@@ -54,9 +54,9 @@
     /* Starter Island, Dungeon 10: after the Island Boss. The prismatic light is never explained. */
     heartwood: {
       title: 'The Heart of the Island', tone: 'unsettling', dungeon: 'heartwood', bg: 'heart',
-      cast: { stag: { name: 'The Heartwood Stag', sp: 'briarstag' } },
+      cast: { stag: { name: 'The Heartwood Stag', sp: 'sylvaneer2' } },
       beats: [
-        { who: '*', show: { sp: 'briarstag', pose: 'bow' }, text: 'The stag lowers its antlers. The light around it thins, colour by colour, until only one is left.' },
+        { who: '*', show: { sp: 'sylvaneer2', pose: 'bow' }, text: 'The stag lowers its antlers. The light around it thins, colour by colour, until only one is left.' },
         { who: '*', entity: 'in', text: 'The Entity steps out from between the roots. He keeps his eyes on the last colour until it fades.' },
         { who: 'entity', mood: 't', text: 'There. It was only keeping a door shut. Doors do that, if nobody tells them otherwise.' },
         { who: 'you', choice: [{ text: 'What door?' }, { text: 'What was that light?', goto: 'light' }] },

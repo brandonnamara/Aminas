@@ -69,8 +69,14 @@
   }
   Au.applyMusic = function () {
     if (musicTimer) { clearInterval(musicTimer); musicTimer = null; }
-    if (ctx && Au.musicOn) musicTimer = setInterval(tick, Au.mode === 'battle' ? 260 : 420);
+    if (ctx && Au.musicOn && !(root.document && root.document.hidden)) musicTimer = setInterval(tick, Au.mode === 'battle' ? 260 : 420);
   };
+  // Dev 7: release the audio hardware while the game is hidden; resume (and restart music) on return.
+  let suspendedByUs = false;
+  Au.suspend = function () { if (musicTimer) { clearInterval(musicTimer); musicTimer = null; } if (ctx && ctx.state === 'running') { suspendedByUs = true; try { ctx.suspend(); } catch (e) {} } };
+  Au.resume = function () { if (ctx && suspendedByUs) { suspendedByUs = false; try { ctx.resume(); } catch (e) {} } if (ctx) Au.applyMusic(); };
+  Au.ctxState = () => (ctx ? ctx.state : 'none');
+  Au.musicRunning = () => !!musicTimer;
   Au.setMode = function (m) { if (Au.mode !== m) { Au.mode = m; Au.applyMusic(); } };
   Au.setPrefs = function (s) { Au.sfxOn = !!s.sfx; Au.musicOn = !!s.music; Au.applyMusic(); };
 })(typeof window !== 'undefined' ? window : globalThis);

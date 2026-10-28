@@ -10,12 +10,13 @@ const THREE = C.THREE;
 const A = window.A, D = A.Data;
 
 /* ------------------------------------------------------------------ renderer & loop */
-let renderer = null, active = null, raf = 0, last = 0, frames = 0, lastStatsT = 0, fps = 0;
+let renderer = null, active = null, raf = 0, last = 0, frames = 0, lastStatsT = 0, fps = 0, drawn = 0, starts = 0;
 const clock = new THREE.Clock(false);
 function getRenderer() {
   if (renderer) return renderer;
   // MSAA only on low-density screens: on retina displays (2x/3x) edges are already fine and multisampling costs a lot
-  renderer = new THREE.WebGLRenderer({ antialias: (window.devicePixelRatio || 1) < 2, alpha: true, powerPreference: 'high-performance' });
+  // Dev 7: 'default' power preference (laptops with two GPUs stay on the efficient one; phones are unaffected)
+  renderer = new THREE.WebGLRenderer({ antialias: (window.devicePixelRatio || 1) < 2, alpha: true, powerPreference: 'default' });
   renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.NeutralToneMapping; renderer.toneMappingExposure = 1;
   renderer.setPixelRatio(pr);
   renderer.domElement.className = 'c3d-canvas';
@@ -25,26 +26,40 @@ function getRenderer() {
 }
 let contextLost = false;
 // Adaptive resolution: if frames are slow for a while, render fewer pixels (down to 1x); speed back up when there is room.
-const PR_CAP = Math.min(window.devicePixelRatio || 1, 2);
+// Dev 7: phones (coarse pointer) render at most 1.5x: voxel art stays sharp and it is ~44% fewer pixels than 2x
+const COARSE = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+const PR_CAP = Math.min(window.devicePixelRatio || 1, COARSE ? 1.5 : 2);
+const Perf = () => window.A && window.A.Perf;
+const prCap = () => (Perf() && Perf().saver() ? 1 : PR_CAP);
 let pr = PR_CAP, slow = 0, quick = 0, sampled = 0, since = 0;
 function adapt(ms, now) {
   if (ms > 28) slow++; else if (ms < 18) quick++; sampled++;
   if (!since) since = now; if (now - since < 1500 || sampled < 8) return; // judge every 1.5 s of rendering
-  const next = slow > sampled * 0.5 && pr > 1 ? Math.max(1, pr - 0.25) : quick > sampled * 0.95 && pr < PR_CAP ? Math.min(PR_CAP, pr + 0.25) : pr;
+  const cap = prCap();
+  if (slow > sampled * 0.5 && pr <= 1 && Perf()) Perf().reportSlow();   // already at the lowest resolution and still slow
+  const next = pr > cap ? cap : slow > sampled * 0.5 && pr > 1 ? Math.max(1, pr - 0.25) : quick > sampled * 0.95 && pr < cap ? Math.min(cap, pr + 0.25) : pr;
   slow = quick = sampled = 0; since = now; if (next !== pr) { pr = next; renderer.setPixelRatio(pr); resize(); }
 }
+// Dev 7 frame budget: 30 fps while the view is idle, 60 fps for a moment after an action, 30 in Battery saver.
+// Frames in between are skipped before any update or draw, so the GPU does no work for them.
+let lastDraw = 0;
 function loop(now) {
   raf = 0; if (!active || document.hidden || contextLost) return;
+  const P = Perf(), cap = P ? P.targetFps() : 60;
+  if (now - lastDraw < 1000 / cap - 2) { raf = requestAnimationFrame(loop); return; }
+  lastDraw = now; drawn++;
   const raw = clock.getDelta(), dt = Math.min(0.05, raw); const t = clock.elapsedTime;
   active.update(dt, t); renderer.render(active.scene, active.camera);
-  if (raw > 0 && raw < 1) adapt(raw * 1000, now);
+  if (raw > 0 && raw < 1) adapt(Math.max(0, raw * 1000 - (1000 / cap - 1000 / 60)), now); // judge render time, not the frame cap
   frames++; if (now - lastStatsT > 1000) { fps = (frames * 1000) / (now - lastStatsT); frames = 0; lastStatsT = now; }
   raf = requestAnimationFrame(loop);
 }
-function start() { if (!raf && active && !document.hidden) { clock.start(); since = 0; slow = quick = sampled = 0; raf = requestAnimationFrame(loop); } }
+function start() { if (!raf && active && !document.hidden) { starts++; clock.start(); since = 0; slow = quick = sampled = 0; raf = requestAnimationFrame(loop); } }
 function stop() { if (raf) cancelAnimationFrame(raf); raf = 0; clock.stop(); }
 document.addEventListener('visibilitychange', () => (document.hidden ? stop() : start()));
+const boost = (ms) => { const P = Perf(); if (P) P.boost(ms); };
 function attach(view, container) {
+  boost();
   if (active && active !== view) active.detach();
   active = view; const r = getRenderer(); container.appendChild(r.domElement); resize(); start();
 }
@@ -58,7 +73,8 @@ const calm = () => !!(A.UI && A.UI.calm && A.UI.calm());
 
 /* ------------------------------------------------------------------ templates (shared geometry/materials) */
 const templates = new Map(); // spId -> Promise<{ root, clips, refs }>
-const heroUrl = (id) => (C.HERO_IDS.indexOf(id) >= 0 ? 'assets/creatures/' + id + '.glb' : null);
+const isVox = (id) => !!(A.Voxel && D.SPECIES[id] && D.SPECIES[id].art && A.Voxel.has(D.SPECIES[id].art.vox));
+const heroUrl = (id) => (!isVox(id) && C.HERO_IDS.indexOf(id) >= 0 ? 'assets/creatures/' + id + '.glb' : null);
 function template(spId) {
   if (templates.has(spId)) return templates.get(spId);
   const p = (async () => {
@@ -67,7 +83,7 @@ function template(spId) {
       try { const g = await new GLTFLoader().loadAsync(url); const root = g.scene.getObjectByName('amina'); if (root) { root.userData = Object.assign({ id: spId, hover: C.isHover(D.SPECIES[spId].art) }, root.userData); return { root, clips: g.animations, refs: 0, source: 'glb' }; } }
       catch (e) { /* fall back to the procedural build below */ }
     }
-    const m = C.buildAmina(D.SPECIES[spId]); return { root: m.root, clips: m.clips, refs: 0, source: 'procedural' };
+    const m = isVox(spId) ? C.buildVoxel(D.SPECIES[spId]) : C.buildAmina(D.SPECIES[spId]); return { root: m.root, clips: m.clips, refs: 0, source: isVox(spId) ? 'voxel' : 'procedural' };
   })();
   templates.set(spId, p); trimTemplates(); return p;
 }
@@ -197,16 +213,16 @@ export async function createBattle(container, o) {
   return {
     is3d: true,
     anchor: (who) => toScreen(head(who)),
-    attack(who) { return slots[who].play('attack'); },
+    attack(who) { boost(); return slots[who].play('attack'); },
     // 'attack' lunges at the foe; anything else (guard, heal) is a short hop in place
-    use(who, kind) { return slots[who].play(kind === 'attack' ? 'attack' : 'move'); },
-    async hit(who, el, eff) { const a = slots[who]; a.flash(eff === 'super' ? '#ffffff' : elCol(el)); bursts.emit(head(who), elCol(el), eff === 'super' ? 22 : 12, eff === 'super' ? 2.2 : 1.4, 0.6); shake = eff === 'super' ? 0.35 : 0.18; return a.play('hit'); },
+    use(who, kind) { boost(); return slots[who].play(kind === 'attack' ? 'attack' : 'move'); },
+    async hit(who, el, eff) { boost(); const a = slots[who]; a.flash(eff === 'super' ? '#ffffff' : elCol(el)); bursts.emit(head(who), elCol(el), eff === 'super' ? 22 : 12, eff === 'super' ? 2.2 : 1.4, 0.6); shake = eff === 'super' ? 0.35 : 0.18; return a.play('hit'); },
     heal(who) { bursts.emit(head(who), '#8cffa0', 10, 1, 0.8); },
     guard(who) { bursts.emit(head(who), '#9ad4ff', 8, 0.8, 0.5); },
     status(who, color) { bursts.emit(head(who), color, 6, 0.7, 0.6); },
-    faint(who) { return slots[who].play('defeat'); },
-    victory(who) { return slots[who].play('victory', { loop: true }); },
-    async swap(who, spId) { const old = slots[who]; const n = await actor(spId); place(who, n, who === 'e' ? 1.3 : 1.25); slots[who] = n; old.dispose(); n.play('move'); bursts.emit(head(who), '#ffffff', 10, 1.2, 0.5); },
+    faint(who) { boost(); return slots[who].play('defeat'); },
+    victory(who) { boost(2500); return slots[who].play('victory', { loop: true }); },
+    async swap(who, spId) { boost(); const old = slots[who]; const n = await actor(spId); place(who, n, who === 'e' ? 1.3 : 1.25); slots[who] = n; old.dispose(); n.play('move'); bursts.emit(head(who), '#ffffff', 10, 1.2, 0.5); },
     setTelegraph(on) { telegraph = !!on; },
     setBarrier(on) { barrier = !!on; },
     setElement(el) { bursts.emit(head('e'), elCol(el), 14, 1.4, 0.7); },
@@ -236,13 +252,13 @@ export async function createViewer(container, spId, o) {
   };
   attach(view, container);
   const el = renderer.domElement;
-  const down = (e) => { drag = { x: e.clientX, y0: yaw, t: performance.now(), moved: false }; el.setPointerCapture && el.setPointerCapture(e.pointerId); };
-  const move = (e) => { if (!drag) return; const dx = e.clientX - drag.x; if (Math.abs(dx) > 4) drag.moved = true; const ny = drag.y0 + dx * 0.012; vel = (ny - yaw) / Math.max(0.016, (performance.now() - drag.t) / 1000); drag.t = performance.now(); yaw = ny; };
+  const down = (e) => { boost(3000); drag = { x: e.clientX, y0: yaw, t: performance.now(), moved: false }; el.setPointerCapture && el.setPointerCapture(e.pointerId); };
+  const move = (e) => { if (!drag) return; boost(); const dx = e.clientX - drag.x; if (Math.abs(dx) > 4) drag.moved = true; const ny = drag.y0 + dx * 0.012; vel = (ny - yaw) / Math.max(0.016, (performance.now() - drag.t) / 1000); drag.t = performance.now(); yaw = ny; };
   const up = () => { if (drag && !drag.moved) act.play('victory'); drag = null; vel = Math.max(-6, Math.min(6, vel)); };
   el.addEventListener('pointerdown', down); el.addEventListener('pointermove', move); el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up);
   if (o.intro) act.play(o.intro);
   return {
-    play: (n) => act.play(n),
+    play: (n) => { boost(); return act.play(n); },
     async set(sp) { const n = await actor(sp); scene.add(n.group); act.dispose(); act = n; },
     dispose() {
       el.removeEventListener('pointerdown', down); el.removeEventListener('pointermove', move); el.removeEventListener('pointerup', up); el.removeEventListener('pointercancel', up);
@@ -255,6 +271,6 @@ export async function createViewer(container, spId, o) {
 /* ------------------------------------------------------------------ diagnostics */
 export function stats() {
   const i = renderer ? renderer.info : null;
-  return { c3dFps: +fps.toFixed(1), pixelRatio: pr, drawCalls: i ? i.render.calls : 0, triangles: i ? i.render.triangles : 0, geometries: i ? i.memory.geometries : 0, textures: i ? i.memory.textures : 0, templates: templates.size, live: !!active };
+  return { c3dFps: +fps.toFixed(1), drawn, starts, loopRunning: !!raf, targetFps: Perf() ? Perf().targetFps() : 60, pixelRatio: pr, drawCalls: i ? i.render.calls : 0, triangles: i ? i.render.triangles : 0, geometries: i ? i.memory.geometries : 0, textures: i ? i.memory.textures : 0, templates: templates.size, live: !!active };
 }
 export const VERSION = C.VERSION;

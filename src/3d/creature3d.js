@@ -734,3 +734,62 @@ export function adoptModel(scene, o) {
 function Box3All(meshes) { const box = new THREE.Box3(); meshes.forEach((m) => box.expandByObject(m)); this.box = box; this.cx = (box.min.x + box.max.x) / 2; }
 
 export { THREE };
+
+/* ---------------------------------------------------------------- v0.7 voxel creatures */
+// Builds a creature from the same voxel model the 2D portraits use (window.A.Voxel), so 2D and 3D always match.
+// Greedy meshing merges same-coloured faces into larger quads (a few thousand triangles per creature). Glowing
+// voxels go in a second mesh with brightened colours. The model faces +x; it is turned to face +z like every
+// other creature here, then normalised and animated with the shared clips (rig / body pivots).
+export function voxelGeometry(m, glowPass) {
+  const pos = [], col = [], idx = [], c = new THREE.Color();
+  const lo = m.min, hi = m.max;
+  const get = (x, y, z) => m.get(x, y, z);
+  for (let d = 0; d < 3; d++) {
+    const u = (d + 1) % 3, v = (d + 2) % 3, du = hi[u] - lo[u] + 1, dv = hi[v] - lo[v] + 1;
+    for (const sgn of [1, -1]) {
+      for (let s = lo[d]; s <= hi[d]; s++) {
+        const mask = new Array(du * dv).fill(null), p = [0, 0, 0];
+        for (let j = 0; j < dv; j++) for (let i = 0; i < du; i++) {
+          p[d] = s; p[u] = lo[u] + i; p[v] = lo[v] + j;
+          const a = get(p[0], p[1], p[2]); if (!a || (a.g > 0.5) !== glowPass) continue;
+          p[d] = s + sgn; if (m.has(p[0], p[1], p[2])) continue;
+          mask[i + j * du] = a.c + (a.g ? '|' + a.g : '');
+        }
+        for (let j = 0; j < dv; j++) for (let i = 0; i < du; ) {
+          const k = mask[i + j * du]; if (!k) { i++; continue; }
+          let w = 1; while (i + w < du && mask[i + w + j * du] === k) w++;
+          let h = 1; grow: for (; j + h < dv; h++) for (let q = 0; q < w; q++) if (mask[i + q + (j + h) * du] !== k) break grow;
+          for (let y = 0; y < h; y++) for (let q = 0; q < w; q++) mask[i + q + (j + y) * du] = null;
+          const plane = s + (sgn > 0 ? 1 : 0), base = pos.length / 3;
+          const corner = (a2, b2) => { const q = [0, 0, 0]; q[d] = plane; q[u] = lo[u] + a2; q[v] = lo[v] + b2; pos.push(q[0], q[1], q[2]); };
+          corner(i, j); corner(i + w, j); corner(i + w, j + h); corner(i, j + h);
+          const hex = k.split('|')[0]; c.set(hex); if (glowPass) c.multiplyScalar(1.9);
+          // a little baked light: tops brighter, undersides darker (reads well even under flat lighting)
+          const lift = d === 1 ? (sgn > 0 ? 1.12 : 0.62) : d === 0 ? 0.95 : 0.86; if (!glowPass) c.multiplyScalar(lift);
+          for (let n = 0; n < 4; n++) col.push(c.r, c.g, c.b);
+          if (sgn > 0) idx.push(base, base + 1, base + 2, base, base + 2, base + 3); else idx.push(base, base + 2, base + 1, base, base + 3, base + 2);
+          i += w;
+        }
+      }
+    }
+  }
+  if (!pos.length) return null;
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); g.setIndex(idx); g.computeVertexNormals();
+  return g;
+}
+export function buildVoxel(spec) {
+  const Vx = window.A && window.A.Voxel, art = spec.art;
+  const m = Vx.model(art.vox, art.st || 1);
+  const root = pivot('amina'), rig = pivot('rig'); root.add(rig);
+  const body = pivot('body'); rig.add(body);
+  const holder = new THREE.Group(); holder.rotation.y = -Math.PI / 2; body.add(holder);
+  const cx = (m.min[0] + m.max[0] + 1) / 2, cz = (m.min[2] + m.max[2] + 1) / 2;
+  const solid = voxelGeometry(m, false), glow = voxelGeometry(m, true);
+  if (solid) { solid.translate(-cx, 0, -cz); const me = new THREE.Mesh(solid, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.85, metalness: 0, flatShading: true, name: 'voxel' })); me.name = 'body:voxel'; holder.add(me); }
+  if (glow) { glow.translate(-cx, 0, -cz); const me = new THREE.Mesh(glow, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.6, metalness: 0, flatShading: true, emissive: '#000000', name: 'voxelGlow', toneMapped: false })); me.name = 'body:glow'; holder.add(me); }
+  normalise(root, { big: spec.stage === 3 });
+  root.userData = { id: spec.id, hover: false, glow: null, version: VERSION, voxel: true };
+  const clips = makeClips(root, {});
+  return { root, clips, info: summarise(root, clips) };
+}

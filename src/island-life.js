@@ -7,7 +7,7 @@
   const A = root.A, D = A.Data;
   const Life = (A.Life = {});
   const MAX_ROAMERS = 5;
-  let pos = {}, islandKey = '', walk = null, walkKey = '', roamKey = '', roamVal = [];
+  let tickN = 0, pos = {}, islandKey = '', walk = null, walkKey = '', roamKey = '', roamVal = [];
 
   // Cells a creature may stand on: land that is not covered by a building or an obstacle (paths and sand are fine).
   Life.walkable = function (st, iid) {
@@ -50,7 +50,8 @@
   function setMv(el, p, dur) {
     const mv = el.querySelector('.cr-mv'), an = el.querySelector('.cr-an'); if (!mv || !an) return;
     const sc = +el.dataset.sc || 1;
-    mv.style.transition = dur ? 'transform ' + dur + 's linear' : 'none';
+    // Dev 7: walking moves in small hops (4 a second) instead of a 60 fps glide: each move repaints the island SVG
+    mv.style.transition = dur ? 'transform ' + dur + 's steps(' + Math.max(2, Math.round(dur * 4)) + ', end)' : 'none';
     mv.style.transform = 'translate(' + (p.dx / sc).toFixed(1) + 'px,' + (p.dy / sc).toFixed(1) + 'px)';
     an.classList.toggle('flip', !!p.flip);
     an.classList.toggle('sleep', p.mode === 'sleep');
@@ -74,13 +75,19 @@
     const dist = Math.hypot(nx - p.dx, ny - p.dy); if (dist < 4) return false;
     p.flip = nx > p.dx; p.dx = nx; p.dy = ny; p.mode = 'walk';
     const dur = Math.max(0.6, dist / 34);
-    setMv(el, p, dur);
-    const an = el.querySelector('.cr-an'); an.classList.add('walk'); clearTimeout(p.tw); p.tw = setTimeout(() => { an.classList.remove('walk'); p.mode = ''; }, dur * 1000);
+    // start on the shared 250 ms beat, so every walker hops on the same frames (fewer repaints of the island)
+    const wait = 250 - (Date.now() % 250); p.mode = 'walk';
+    clearTimeout(p.tw); p.tw = setTimeout(() => {
+      if (!el.isConnected) { p.mode = ''; return; }
+      setMv(el, p, dur);
+      const an = el.querySelector('.cr-an'); an.classList.add('walk'); p.tw = setTimeout(() => { an.classList.remove('walk'); p.mode = ''; }, dur * 1000);
+    }, wait);
     return true;
   }
   function once(el, cls, ms) { const an = el.querySelector('.cr-an'); if (!an) return; an.classList.remove(cls); void an.getBoundingClientRect(); an.classList.add(cls); setTimeout(() => an.classList.remove(cls), ms); }
   function step() {
     const U = UI(); if (!U || U.screen !== 'island' || document.hidden || U.dragging || U.bm || U.calm()) return;
+    const P = A.Perf; if (P && (P.resting() || U.modalOpen() || (P.saver() && (tickN = (tickN + 1) % 2)))) return; // still scene or saver: move less
     const list = els(); if (!list.length) return;
     const n = Math.min(list.length, 1 + (Math.random() < 0.4 ? 1 : 0));
     for (let i = 0; i < n; i++) {
