@@ -1,7 +1,7 @@
 // v0.6 modes: Survival, Loot Ruins, PvP practice, Island Defence, Hide and Seek, lore journal, quests/navigation.
 const { load, seeded, ok, done } = require('./harness');
 const G = load(), A = G.A, D = A.Data, R = A.Rules, S = A.State, W = A.World, B = R.Battle, Q = A.Quests, Nav = A.Nav;
-const mk = () => { const st = S.fresh(); st.phase = 'play'; st.starter = 'lumifern'; ['lumifern', 'mossbun', 'emberkit', 'ripplet', 'pebblop', 'gloomole'].forEach((sp) => R.addAmina(st, sp, 8)); st.struct.hollow = true; R.drain(); return st; };
+const mk = () => { const st = S.fresh(); st.phase = 'play'; st.starter = 'lumifern'; ['lumifern', 'acinus', 'pyrokai', 'cannonis', 'gaiaroki', 'voltar'].forEach((sp) => R.addAmina(st, sp, 8)); st.struct.hollow = true; R.drain(); return st; };
 const win = (b) => { b.foes.forEach((f) => (f.hp = 0)); b.over = true; b.result = 'win'; return b; };
 const lose = (b) => { b.party.forEach((f) => (f.hp = 0)); b.over = true; b.result = 'lose'; return b; };
 

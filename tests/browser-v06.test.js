@@ -15,7 +15,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   const skipDlg = async () => { for (let i = 0; i < 10; i++) { const d = await page.$('.dlg-skip'); if (d) { await d.click(); await sleep(200); } else break; } };
   await page.goto(srv.url); await page.waitForSelector('.logo');
   // a player who has restored the Sunlit Hollow, with two Aminas (3D off: software WebGL here is slow)
-  await page.evaluate(() => { const s = A.State.newGame(); s.phase = 'play'; s.introDone = true; s.starter = 'lumifern'; s.settings.creatures3d = false; A.Rules.addAmina(s, 'lumifern', 6); A.Rules.addAmina(s, 'mossbun', 5); s.struct.hollow = true; s.buildings.hollow.level = 1; s.buildings.hollow.state = 'built'; A.Rules.drain(); A.State.save(); A.UI.showIsland(); });
+  await page.evaluate(() => { const s = A.State.newGame(); s.phase = 'play'; s.introDone = true; s.starter = 'lumifern'; s.settings.creatures3d = false; A.Rules.addAmina(s, 'lumifern', 6); A.Rules.addAmina(s, 'acinus', 5); s.struct.hollow = true; s.buildings.hollow.level = 1; s.buildings.hollow.state = 'built'; A.Rules.drain(); A.State.save(); A.UI.showIsland(); });
   await sleep(900); await skipDlg(); await page.evaluate(() => { A.UI.queue.length = 0; document.querySelectorAll('#toast-root .toast').forEach((t) => t.remove()); });
   ok(!!(await page.$('.nav .nbtn.tri[data-act=battle]')), 'the bottom bar has the triangle Battle button');
   const tri = await page.$eval('.nav .nbtn.tri', (e) => e.getBoundingClientRect().width), nb = await page.$eval('.nav .nbtn:not(.tri)', (e) => e.getBoundingClientRect().width);
@@ -86,7 +86,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   s = await S(); ok(s.survival.best >= 1 && !s.survival.run && JSON.stringify(s.dungeon) === dBefore, 'Survival pays out, records the best wave, and leaves dungeon progress alone');
   await page.evaluate(() => A.UI.closeAll());
   // PvP 5v5 practice
-  await page.evaluate(() => { const s = A.State.state; ['ripplet', 'emberkit', 'pebblop'].forEach((x) => A.Rules.addAmina(s, x, 6)); A.Rules.drain(); A.Rules.PvP.setRoster(s, s.aminas.slice(0, 5).map((a) => a.uid)); A.State.save(); A.UI.closeAll(); A.UI.pvp5(); });
+  await page.evaluate(() => { const s = A.State.state; ['cannonis', 'pyrokai', 'gaiaroki'].forEach((x) => A.Rules.addAmina(s, x, 6)); A.Rules.drain(); A.Rules.PvP.setRoster(s, s.aminas.slice(0, 5).map((a) => a.uid)); A.State.save(); A.UI.closeAll(); A.UI.pvp5(); });
   await page.waitForSelector('[data-act=pvpPlay]'); await shot('24-pvp5'); await click('[data-act=pvpPlay]'); await page.waitForSelector('#battle'); await sleep(900);
   ok((await page.$$('.b-party .pm')).length === 5 && !!(await page.$('.foedots')), '5v5: five Aminas on each side'); await shot('25-pvp5-battle');
   await page.evaluate(() => { const b = A.UI.B.b; b.foes.forEach((f, i) => { if (i < 4) f.hp = 0; }); b.ei = 4; b.enemy = b.foes[4]; b.enemy.hp = 1; }); await page.click('.abtn:not(.off):not(.swap)'); await page.waitForSelector('#pr-ok', { timeout: 12000 });
@@ -105,7 +105,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   else { await page.click('.hs-c'); await sleep(200); ok((await page.$$('.hs-c.sr')).length === 1, 'as the Seeker you can search the map'); }
   await shot('31-hs-match'); await click('#hs-quit'); await page.waitForSelector('#hs-out'); await shot('32-hs-result'); await click('#hs-out'); await page.evaluate(() => A.UI.closeAll());
   // Island Boss
-  await page.evaluate(() => { const s = A.State.state; A.Data.CAMPAIGN.starter.dungeons.slice(0, 9).forEach((id) => (s.dungeon[id] = { clears: 1 })); s.rank = 12; ['lumifern', 'mossbun', 'emberkit'].forEach((sp) => { const a = s.aminas.find((x) => x.sp === sp); if (a) a.lv = 22; }); s.party = s.aminas.slice(0, 3).map((a) => a.uid); A.State.save(); A.UI.closeAll(); A.UI.dungeons(null, 'heartwood'); });
+  await page.evaluate(() => { const s = A.State.state; A.Data.CAMPAIGN.starter.dungeons.slice(0, 9).forEach((id) => (s.dungeon[id] = { clears: 1 })); s.rank = 12; ['lumifern', 'acinus', 'pyrokai'].forEach((sp) => { const a = s.aminas.find((x) => x.sp === sp); if (a) a.lv = 22; }); s.party = s.aminas.slice(0, 3).map((a) => a.uid); A.State.save(); A.UI.closeAll(); A.UI.dungeons(null, 'heartwood'); });
   await page.waitForSelector('.dd'); await shot('33-dungeon10'); await click('[data-act=enterDungeon][data-id=heartwood]'); await click('#pp-go');
   await page.evaluate(() => { const s = A.State.state; s.run.battle = 9; s.dungeon.heartwood.next = 9; A.UI.closeAll(); A.UI.nextEncounter(); }); await page.waitForSelector('.prism-card'); await shot('34-island-boss-card');
   await click('#enc-go'); await page.waitForSelector('#battle.islandboss'); await sleep(1200); ok(!!(await page.$('#spr-e.prism')) && /Island Boss/.test(await page.textContent('#pan-e')), 'the Island Boss has its prismatic glow and label'); await shot('35-island-boss-battle');

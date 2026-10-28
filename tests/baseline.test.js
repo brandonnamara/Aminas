@@ -2,8 +2,8 @@
 const { load, seeded, ok, done } = require('./harness');
 const G = load(), A = G.A, D = A.Data, R = A.Rules, S = A.State;
 const st = S.fresh(); st.phase = 'play'; st.starter = 'lumifern';
-R.addAmina(st, 'lumifern', 8); R.addAmina(st, 'emberkit', 8); R.addAmina(st, 'ripplet', 8);
-ok(Object.keys(D.SPECIES).length === 28, '28 species');
+R.addAmina(st, 'lumifern', 8); R.addAmina(st, 'pyrokai', 8); R.addAmina(st, 'cannonis', 8);
+ok(Object.keys(D.SPECIES).length === 63, '63 species');
 ok(D.DUNGEON_ORDER.length >= 3, 'dungeons defined: ' + D.DUNGEON_ORDER.join(','));
 st.struct.reliquarygate = true;
 // v0.6: dungeons open in order, so the two dungeons before the Reliquary count as cleared here

@@ -90,7 +90,7 @@ ok(!W.islandUnlocked(st, 'obsidian') && W.unlockIsland(st, 'obsidian').reason ==
 
 /* ---------- combat mechanics ---------- */
 // Waywarden barrier: thresholds, a tell, then a barrier that specials crack twice as fast
-st = fresh(); R.addAmina(st, 'mossbun', 6); st.struct.hollow = true;
+st = fresh(); R.addAmina(st, 'acinus', 6); st.struct.hollow = true;
 R.startRun(st, 'forgottenroad', [st.aminas[0].uid]); st.run.battle = 9;
 b = R.createBattle(st, seeded(7)); const w = b.enemy;
 ok(w.name === 'The Waywarden' && w.mech.type === 'barrier' && w.scale > 1.3, 'the Waywarden is a larger boss with a barrier');
@@ -98,12 +98,12 @@ w.hp = Math.floor(w.hpMax * 0.7);
 let ev = B.act(b, { t: 'ab', id: 'vinewhip' });
 ok(ev.some((e) => e.t === 'barrierTell') && w.barrierDue, 'crossing 66% announces the barrier');
 ev = B.act(b, { t: 'ab', id: 'vinewhip' });
-ok(ev.some((e) => e.t === 'barrier') && w.shield > 0, 'the Waywarden raises its barrier on its next action');
+ok(ev.some((e) => e.t === 'barrier' && e.shield > 0), 'the Waywarden raises its barrier on its next action');
 const sh = w.shield, hp1 = w.hp; b.party[0].cd.leafguard = 0;
 const evA = B.act(b, { t: 'ab', id: 'vinewhip' }); const sh1 = evA.find((e) => e.t === 'shieldHit');
 ok(sh1 && !sh1.special && w.hp === hp1 - (sh1.broke ? evA.find((e) => e.t === 'hit' && e.who === 'e').dmg : 0), 'the barrier absorbs damage from basic attacks');
 // specials double damage to the barrier
-const f2 = B.fighter('mossbun', 6), w2 = R.enemyFromSpec(D.DUNGEONS.forgottenroad.battles[9]); w2.shield = w2.shieldMax = 500;
+const f2 = B.fighter('acinus', 6), w2 = R.enemyFromSpec(D.DUNGEONS.forgottenroad.battles[9]); w2.shield = w2.shieldMax = 500;
 const b2 = B.create([f2], w2, { rng: seeded(1) });
 const fakeSpecial = 'flarebite'; b2.party[0].abil = ['vinewhip', fakeSpecial]; b2.party[0].cd[fakeSpecial] = 0;
 const e1 = B.act(b2, { t: 'ab', id: fakeSpecial }).find((e) => e.t === 'shieldHit');
@@ -115,7 +115,7 @@ for (let i = 0; i < 4 && !b3.over; i++) { const e = B.act(b3, B.autoAction(b3));
 ok(warned && shifted && isb.el !== el0, 'the Island Boss warns, then shifts its element every few turns');
 ok(isb.chargeIn != null, 'the Island Boss also telegraphs a charged move');
 // multi-foe battles
-const team = R.PvP.aiTeam(8, 3, 42), b4 = B.create([B.fighter('emberkit', 30)], team, { rng: seeded(3) });
+const team = R.PvP.aiTeam(8, 3, 42), b4 = B.create([B.fighter('pyrokai', 30)], team, { rng: seeded(3) });
 play(b4, 400);
 ok(b4.over && b4.result === 'win' && b4.foes.every((f) => f.hp <= 0), 'a team of foes is beaten one after another');
 
@@ -151,7 +151,7 @@ function trial(id, team, n) {
   }
   return wins;
 }
-const t1 = trial('forgottenroad', [['lumifern', 4], ['mossbun', 3]], 40);
+const t1 = trial('forgottenroad', [['lumifern', 4], ['acinus', 3]], 40);
 console.log('     Forgotten Road, Lumifern 4 + Mossbun 3, one sitting: ' + t1 + '/40');
 ok(t1 >= 20, 'Dungeon 1 is clearable in one sitting by a recommended-level pair most of the time');
 const t1b = trial('forgottenroad', [['umbrit', 5]], 40);
