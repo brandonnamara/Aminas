@@ -101,17 +101,17 @@ B.hatchery = (m, lv) => {
   // tiled hip roof, deep red with a darker eave
   const top = m.hip(-11, -12, 11, 8, 17, shingles(PAL.roof.red), PAL.woodDark);
   // the great egg: cream shell-stone with blue speckles and a crack, ringed with a metal band
-  // the egg sits in a stone cradle that rises through the roof, so it reads from across the island
-  const ex = 0, ez = -2, base = top - 2;
-  m.disc(ex, ez, 6.5, top - 6, base + 2, stoneWork(['#c9c1b2', '#bdb4a3']));
-  m.disc(ex, ez, 7.5, base + 2, base + 3, gold);
-  m.ball(ex, base + 10, ez, 6.5, 9.5, 6.5, (x, y, z) => (H(x, y, z, 21) > 0.9 ? '#5a9ae0' : H(x, y, z, 22) > 0.84 ? '#e8dcc0' : '#f8f2e2'));
-  for (let y = base + 9; y < base + 17; y++) { const x = ex + 6 - Math.floor((y - base - 9) / 3); m.put(x, y, ez + 2 + ((y >> 1) % 2), '#9a8e78'); }
-  if (lv >= 3) m.disc(ex, ez, 6.8, base + 6, base + 7, gold);
-  m.glow(ex - 1, base + 19, ez - 1, ex + 1, base + 21, ez + 1, lv >= 2 ? PAL.glow : '#d8f4ff');
+  // the egg rests in a straw-and-gold nest crowning the roof, so it reads from across the island as "the egg house"
+  const ex = 0, ez = -2, base = top - 3;
+  m.disc(ex, ez, 6, base, base + 3, (x, y, z) => pick(['#d8b860', '#c8a850', '#e8c870', '#b8964a'], H(x, y, z, 23)));
+  m.disc(ex, ez, 6.6, base + 2, base + 3, gold);
+  m.ball(ex, base + 8, ez, 5, 7.5, 5, (x, y, z) => (H(x, y, z, 21) > 0.88 ? '#5a9ae0' : H(x, y, z, 22) > 0.82 ? '#ece0c4' : '#fbf5e6'));
+  for (let y = base + 8; y < base + 14; y++) { const x = ex + 5 - Math.floor((y - base - 8) / 3); m.put(x, y, ez + 1 + ((y >> 1) % 2), '#9a8e78'); }
+  if (lv >= 3) m.disc(ex, ez, 5.3, base + 5, base + 6, gold);
+  m.glow(ex - 1, base + 16, ez - 1, ex + 1, base + 17, ez + 1, lv >= 2 ? PAL.glow : '#d8f4ff');
   // banners at the front corners in the island's egg-blue
   if (lv >= 2) { banner(m, -10, 10, 6, 6, '#3f7cc8', '#f2c440', 'z'); banner(m, 8, 10, 6, 6, '#3f7cc8', '#f2c440', 'z'); }
-  if (lv >= 4) { m.box(ex, base + 21, ez, ex + 1, base + 27, ez + 1, PAL.woodDark); m.box(ex + 1, base + 24, ez, ex + 5, base + 27, ez + 1, '#3f7cc8'); m.box(ex + 2, base + 25, ez, ex + 3, base + 26, ez + 1, '#f2c440'); }
+  if (lv >= 4) { m.box(ex, base + 17, ez, ex + 1, base + 23, ez + 1, PAL.woodDark); m.box(ex + 1, base + 20, ez, ex + 5, base + 23, ez + 1, '#3f7cc8'); m.box(ex + 2, base + 21, ez, ex + 3, base + 22, ez + 1, '#f2c440'); }
   // the nest: a straw ring with eggs on the platform's front right corner
   const nx = 7, nz = 8;
   m.disc(nx, nz, 3, 3, 4, ['#d8b860', '#c8a850', '#e8c870']); m.disc(nx, nz, 2, 3, 4, null); m.disc(nx, nz, 2, 3, 3.9, '#b8964a');
@@ -120,7 +120,7 @@ B.hatchery = (m, lv) => {
   // plants and a crate
   m.box(-11, 3, 8, -8, 6, 11, planks(PAL.wood)); m.box(-11, 6, 8, -8, 7, 11, PAL.woodDark);
   flower(m, -6, 10, 3, PAL.flowers[2]); flower(m, -5, 9, 3, PAL.flowers[1]); grassTuft(m, 10, -10, 3); grassTuft(m, -10, -9, 3);
-  if (lv >= 5) m.ball(ex, base + 10, ez, 6.5, 9.5, 6.5, (x, y, z) => (H(x, y, z, 21) > 0.88 ? '#f2c440' : '#fff8ea'));
+  if (lv >= 5) m.ball(ex, base + 8, ez, 5, 7.5, 5, (x, y, z) => (H(x, y, z, 21) > 0.88 ? '#f2c440' : '#fff8ea'));
 };
 B.hatchery.ruin = (m) => { ruin(m, ['#c9c1b2', '#bdb4a3'], '#f6efdd'); m.ball(2, 3, -2, 3, 2.5, 3, (x, y, z) => (H(x, y, z) > 0.5 ? '#f6efdd' : '#e8dcc0')); m.ball(2, 4.2, -2, 2.4, 2.2, 2.4, null); };
 
