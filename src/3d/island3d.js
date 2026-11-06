@@ -115,7 +115,9 @@ export function createIsland() {
   let terr = null, waterMesh = null, detail = null, motes = null, clouds = [];
   const disposables = [];
 
-  function setTerrain(iid, key, cols, extras) {
+  const cost = { terrainMs: 0, syncMs: 0 };
+  function setTerrain(iid, key, cols, extras) { const c0 = performance.now(); try { return setTerrain0(iid, key, cols, extras); } finally { cost.terrainMs = +(performance.now() - c0).toFixed(1); } }
+  function setTerrain0(iid, key, cols, extras) {
     if (state.key === key && terr) return;
     clearGroup(groups.terrain); clouds = [];
     const t = buildTerrain(cols); terr = t;
@@ -160,7 +162,8 @@ export function createIsland() {
   function clearGroup(g) { while (g.children.length) { const c = g.children.pop(); c.traverse && c.traverse((o) => { if (o.isInstancedMesh) o.dispose(); }); } disposables.splice(0).forEach((d) => d.dispose && d.dispose()); }
 
   /* ---- buildings, obstacles and scenery: rebuilt as instanced batches whenever the layout changes */
-  function sync(items, scenery) {
+  function sync(items, scenery) { const c0 = performance.now(); try { return sync0(items, scenery); } finally { cost.syncMs = +(performance.now() - c0).toFixed(1); } }
+  function sync0(items, scenery) {
     const sig = JSON.stringify(items) + '|' + state.key;
     if (sig === state.sig) return;
     state.sig = sig;
@@ -223,11 +226,15 @@ export function createIsland() {
   const calm = () => !!(A && A.State && A.State.state && A.State.state.settings && A.State.state.settings.reduceMotion);
 
   /* ---- render loop: on demand, plus a slow ambient tick ---- */
-  let raf = 0, last = 0, t0 = performance.now(), frames = 0, drawMs = 0;
+  // slow: set when the device cannot keep the ambient tick (frames arriving under ~8 per second while animating, e.g.
+  // no GPU and WebGL falling back to software). The island then only redraws when something changes.
+  let raf = 0, last = 0, t0 = performance.now(), frames = 0, drawMs = 0, slow = false, prev = 0, gaps = [];
   function kick() { if (!raf) raf = requestAnimationFrame(loop); }
   function loop(now) {
     raf = 0; if (!R.domElement.isConnected) return;
-    const animate = !saver() && !resting() && !calm();
+    const animate = !slow && !saver() && !resting() && !calm();
+    if (animate && prev && now - prev < 2000) { gaps.push(now - prev); if (gaps.length > 6) gaps.shift(); if (gaps.length >= 6 && gaps.reduce((a, b) => a + b, 0) / gaps.length > 125) { slow = true; if (window.console) console.info('Voxel island: slow frames, ambient animation off'); } }
+    prev = animate ? now : 0;
     if (animate && now - last >= 1000 / AMBIENT_FPS - 2) { tickAmbient((now - t0) / 1000, Math.min(0.2, (now - last) / 1000)); last = now; state.dirty = true; }
     if (state.dirty) draw();
     if (animate) raf = requestAnimationFrame(loop);
@@ -249,7 +256,7 @@ export function createIsland() {
     setTerrain, sync, setView, kick,
     redraw() { state.dirty = true; kick(); },
     has: (k, art, cat, st) => (k === 'b' ? VB.hasBuilding(art, cat) && st !== 'constructing' : k === 'l' ? VB.hasExtra(art) : VB.hasNature(art)),
-    stats() { const i = R.info; return { frames, avgDrawMs: frames ? +(drawMs / frames).toFixed(2) : 0, calls: i.render.calls, triangles: i.render.triangles, geometries: i.memory.geometries, textures: i.memory.textures, shadow: sun.castShadow, pixelRatio: R.getPixelRatio() }; },
+    stats() { const i = R.info; return { frames, avgDrawMs: frames ? +(drawMs / frames).toFixed(2) : 0, calls: i.render.calls, triangles: i.render.triangles, geometries: i.memory.geometries, textures: i.memory.textures, shadow: sun.castShadow, pixelRatio: R.getPixelRatio(), slow, terrainMs: cost.terrainMs, syncMs: cost.syncMs }; },
     dispose() { if (raf) cancelAnimationFrame(raf); raf = 0; clearGroup(groups.terrain); groups.things.children.slice().forEach((c) => { groups.things.remove(c); if (c.isInstancedMesh) c.dispose(); }); state = { things: new Map(), sig: '' }; },
   };
 }

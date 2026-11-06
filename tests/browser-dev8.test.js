@@ -167,4 +167,4 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   ok(errors.length === 0, 'no console errors' + (errors.length ? ': ' + errors.slice(0, 3).join(' | ') : ''));
   await browser.close(); srv.close();
   console.log('\nbrowser dev8: ' + pass + ' passed, ' + fail + ' failed'); process.exitCode = fail ? 1 : 0;
-})().catch((e) => { console.error('ERROR ' + (e && e.message ? e.message.split('\n')[0] : e)); process.exit(1); });
+})().catch((e) => { console.error('ERROR ' + (e && e.message ? e.message.split('\n').slice(0,14).join('\n') : e)); process.exit(1); });

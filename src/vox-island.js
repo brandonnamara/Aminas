@@ -74,6 +74,7 @@
     });
     W.obstaclesOn(s, iid).forEach((o) => { if (o.state === 'cleared') return; const t = D.OBSTACLE_TYPES[o.type]; items.push({ k: 'o', id: o.id, type: o.type, x: o.x, y: o.y, w: t.w, h: t.h, seed: Math.abs(String(o.id).split('').reduce((a, c) => a * 31 + c.charCodeAt(0), 7)) % 1000 }); });
     IA.landmark(iid, s).forEach((l) => items.push({ k: 'l', kind: l.kind, on: l.kind === 'stones' ? !!(s.struct.tidegate && !s.flags.r1) : false, x: l.x, y: l.y, w: l.w, h: l.h }));
+    V.items = items.map((i) => i.k + ":" + (i.id || i.kind));
     ctrl.sync(items.map((i) => (i.k === 'b' && !i.draw ? Object.assign({}, i, { k: 'l' }) : i)), sceneryCache);
   };
   V.view = function (cam, view) { if (ctrl && V.on) ctrl.setView(cam, view); };
