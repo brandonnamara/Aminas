@@ -30,9 +30,9 @@
      test only (never saved). */
   const COARSE = !!(root.matchMedia && root.matchMedia('(pointer: coarse)').matches);
   P.TIERS = {
-    high:     { id: 'high', label: 'High', prCap: 2, shadowMap: 2048, shadows: true, natureLod: false, buildingLod: false },
-    balanced: { id: 'balanced', label: 'Balanced', prCap: 1.5, shadowMap: 1024, shadows: true, natureLod: false, buildingLod: false },
-    saver:    { id: 'saver', label: 'Battery saver', prCap: 1, shadowMap: 512, shadows: true, natureLod: true, buildingLod: true },
+    high:     { id: 'high', label: 'High', prCap: 2, shadowMap: 2048, shadowSoft: 'vsm', shadowRadius: 3, detail: 1, shadows: true, natureLod: false, buildingLod: false },
+    balanced: { id: 'balanced', label: 'Balanced', prCap: 1.5, shadowMap: 1024, shadowSoft: 'pcf', shadowRadius: 2, detail: 0.85, shadows: true, natureLod: false, buildingLod: false },
+    saver:    { id: 'saver', label: 'Battery saver', prCap: 1, shadowMap: 512, shadowSoft: 'pcf', shadowRadius: 1, detail: 0.55, shadows: true, natureLod: true, buildingLod: true },
   };
   P.QUALITY = ['auto', 'high', 'balanced'];
   P.forceTier = null;

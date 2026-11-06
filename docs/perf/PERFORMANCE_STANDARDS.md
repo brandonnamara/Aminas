@@ -54,7 +54,9 @@ is redrawn. A still island draws nothing.
 could be at 30 % or at 95 %. The test ran in the Claude app's viewer (750 × 312 pt), which has about 70 % of the
 pixels of full-screen Safari (844 × 390 pt). Battles were not measured.
 
-The Starter Island today is 170k triangles and 68 draw calls at normal zoom, 127k at the widest zoom, and 91k in
+**Phase 4 note:** the visual refinement raised the Starter Island to 196k triangles on High, 191k on Balanced, 147k at the widest zoom and 103k in Battery saver (desktop measurement; draw calls unchanged). High's shadows are now variance shadow maps. These need the iPhone test again.
+
+In Phase 3, the Starter Island was 170k triangles and 68 draw calls at normal zoom, 127k at the widest zoom, and 91k in
 Battery saver. It is inside every column except A12–A13 at normal zoom. That is why those phones should fall back to
 Battery saver if their frame times say so; the automatic switch already does that.
 

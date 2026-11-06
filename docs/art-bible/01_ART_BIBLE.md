@@ -235,11 +235,12 @@ There is one standard: `LIGHT` in `voxstyle.js`. The island, the viewer and the 
 
 | | Value |
 |---|---|
-| **Sun** | warm `#ffe6b8`, intensity 2.2, from upper-left-front (−x, +y, +z), matching the 2D art |
-| Sky fill | hemisphere, sky `#eaf6ff`, ground `#b39a6c`, intensity 1.3: keeps shadows colourful |
-| **Shadows** | soft PCF (radius 3, 8 samples), short; redrawn only when the island changes |
+| **Sun** | golden `#ffdeae`, intensity 2.7, from upper-left-front (−x, +y, +z), matching the 2D art (Phase 4; was `#ffe6b8` at 2.2) |
+| Sky fill | hemisphere, sky `#c6dcff` (cool, so shade turns soft blue), ground `#d6a46a` (warm bounce), intensity 1.15 (Phase 4; was `#eaf6ff` / `#b39a6c` at 1.3) |
+| **Grade** | neutral tone mapping at exposure 1.04: bright tops roll off instead of clipping, hues hold (Phase 4) |
+| **Shadows** | by quality tier: High soft variance shadows (2048 map, radius 3); Balanced PCF (1024, radius 2); Battery saver PCF (512, radius 1). Redrawn only when the island changes |
 | Ambient occlusion | baked per vertex in every mesh |
-| Haze | `#bfe0f6`: distant islands are baked part-way toward it |
+| Haze | `#bfe0f6`: distant islands are baked part-way toward it. Aerial depth (Phase 4): the island's own rock fades towards `#a9d2f0` as it hangs lower, up to 50 % at 10 units down |
 
 **Glow discipline**
 

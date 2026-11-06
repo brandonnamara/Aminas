@@ -78,7 +78,9 @@ function buildTerrain(cols, avoid) {
       const d = top - 1 - y; let col;
       const h = hash(X * 3 + y, Z * 5 - y, 11);
       if (d === 0) {
-        if (grassy(kind) && !(kind === 'ledge' && c.top < -24)) { const t = vnoise(X * 0.35, Z * 0.35, 3); col = h < 0.06 ? PAL.grass[4] : t < 0.38 ? PAL.grass[1] : t < 0.62 ? PAL.grass[0] : t < 0.8 ? PAL.grass[2] : PAL.grass[3]; }
+        if (grassy(kind) && !(kind === 'ledge' && c.top < -24)) { const t = vnoise(X * 0.35, Z * 0.35, 3); col = h < 0.06 ? PAL.grass[4] : t < 0.38 ? PAL.grass[1] : t < 0.62 ? PAL.grass[0] : t < 0.8 ? PAL.grass[2] : PAL.grass[3];
+          // Phase 4: broad meadow moods on top of the fine mix: lush, deeper green hollows and sun-warmed open swards
+          const m = vnoise(X * 0.09, Z * 0.09, 21); if (m > 0.7 && h < 0.55) col = h < 0.25 ? PAL.grassDark[0] : PAL.grass[3]; else if (m < 0.24 && h < 0.5) col = h < 0.2 ? PAL.grass[4] : PAL.grass[2]; }
         else if (kind === 'sand') col = pick(PAL.sand, h);
         else if (kind === 'path') col = hash(X, Z, 41) < 0.2 ? pick(PAL.pathStone, h) : pick(PAL.path, h);
         else if (kind === 'plaza') col = PAL.plaza[(c.x + c.y) % 2];
@@ -161,7 +163,7 @@ const FAR = [
 export function createIsland() {
   if (!R) {
     R = new THREE.WebGLRenderer({ antialias: !COARSE, alpha: true, stencil: true, powerPreference: 'default' });
-    R.setClearColor(0x000000, 0); R.outputColorSpace = THREE.SRGBColorSpace;
+    R.setClearColor(0x000000, 0); R.outputColorSpace = THREE.SRGBColorSpace; R.toneMapping = THREE.NeutralToneMapping; R.toneMappingExposure = LIGHT.exposure || 1; // Phase 4 grade
     R.shadowMap.enabled = true; R.shadowMap.type = THREE.PCFShadowMap; R.shadowMap.autoUpdate = false;
     R.domElement.className = 'vox3d';
   }
@@ -170,12 +172,20 @@ export function createIsland() {
   // Phase 1.1 light: warmer, brighter sun and a stronger sky fill so shadows stay soft and colourful, never murky
   const hemi = new THREE.HemisphereLight(LIGHT.sky, LIGHT.ground, LIGHT.hemi); scene.add(hemi);
   const sun = new THREE.DirectionalLight(LIGHT.sun, LIGHT.sunI); sun.castShadow = true;
-  sun.shadow.mapSize.set(tier().shadowMap, tier().shadowMap); sun.shadow.bias = -0.0008; sun.shadow.normalBias = 0.02; sun.shadow.radius = 3; sun.shadow.blurSamples = 8;
+  sun.shadow.mapSize.set(tier().shadowMap, tier().shadowMap); sun.shadow.bias = -0.0008; sun.shadow.normalBias = 0.02; sun.shadow.radius = 3; sun.shadow.blurSamples = 10;
   scene.add(sun); scene.add(sun.target);
   const groups = { terrain: new THREE.Group(), things: new THREE.Group(), fx: new THREE.Group() };
   const farGroup = new THREE.Group(); scene.add(farGroup); let farBase = null;
   Object.values(groups).forEach((g) => scene.add(g));
   const matSolid = new THREE.MeshLambertMaterial({ vertexColors: true }), matGlow = new THREE.MeshBasicMaterial({ vertexColors: true });
+  // Phase 4: aerial depth. The island's own terrain fades towards the sky haze as it hangs lower (the rock root, the
+  // stalactites), so the island reads as floating high in bright air rather than ending in a dark block.
+  const matTerrain = new THREE.MeshLambertMaterial({ vertexColors: true });
+  matTerrain.onBeforeCompile = (sh) => {
+    sh.uniforms.uHaze = { value: new THREE.Color(LIGHT.depthHaze) }; sh.uniforms.uDepth = { value: new THREE.Vector3(LIGHT.depthFrom, LIGHT.depthTo, LIGHT.depthMax) };
+    sh.vertexShader = 'varying float vWy;\n' + sh.vertexShader.replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\nvWy = (modelMatrix * vec4(transformed, 1.0)).y;');
+    sh.fragmentShader = 'uniform vec3 uHaze; uniform vec3 uDepth; varying float vWy;\n' + sh.fragmentShader.replace('#include <tonemapping_fragment>', 'gl_FragColor.rgb = mix(gl_FragColor.rgb, uHaze, smoothstep(uDepth.x, uDepth.y, vWy) * uDepth.z);\n#include <tonemapping_fragment>');
+  };
   const matMist = new THREE.MeshBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.38, depthWrite: false });
   const uni = { uTime: { value: 0 } };
   // leaves sway a little (a vertex nudge proportional to height inside each tree instance)
@@ -192,7 +202,7 @@ export function createIsland() {
     clearGroup(groups.terrain); clouds = [];
     const t = buildTerrain(cols, (extras || []).filter((e) => e.kind === 'jetty' || e.kind === 'skiff').map((e) => [e.x, e.z])); terr = t;
     const geo = meshGrid(t.g, { size: TV, shadeFaces: false }); disposables.push(geo);
-    const m = new THREE.Mesh(geo, matSolid); m.castShadow = true; m.receiveShadow = true; groups.terrain.add(m);
+    const m = new THREE.Mesh(geo, matTerrain); m.castShadow = true; m.receiveShadow = true; groups.terrain.add(m);
     // water: subdivided quads that ripple (vertex shader) with a sheen
     if (t.water.length) {
       const pos = [], idx = []; let n = 0;
@@ -212,7 +222,10 @@ export function createIsland() {
           'void main(){ vec2 q = vec2(floor(vUv.x * 8.0), floor(vUv.y * 8.0)); float col = q.x; float lane = h(vec2(col, 3.0));\n' +
           ' float s = fract(q.y / 9.0 - uTime * (0.9 + lane * 0.5) + lane); float streak = step(0.72, s) * (0.6 + 0.4 * h(vec2(col, floor(s * 9.0))));\n' +
           ' float edge = (col < 0.5 || col > 6.5) ? 0.25 : 0.0; float top = 1.0 - smoothstep(0.0, 0.6, vUv.y);\n' +
-          ' vec3 c = mix(vec3(0.36, 0.74, 0.96), vec3(0.94, 0.99, 1.0), clamp(streak * 0.85 + top * 0.6 + edge, 0.0, 1.0));\n' +
+          // Phase 4: body colour deepens towards the sides and with the drop, and pixel sparkles race down the sheet
+          ' float side = abs(q.x - 3.5) / 3.5; vec3 base = mix(vec3(0.42, 0.80, 0.98), vec3(0.17, 0.53, 0.84), side * side * 0.8 + smoothstep(0.0, uLen, vUv.y) * 0.25);\n' +
+          ' float spark = step(0.97, h(vec2(col * 7.0, floor(q.y - uTime * 16.0 * (0.8 + lane)))));\n' +
+          ' vec3 c = mix(base, vec3(0.95, 0.99, 1.0), clamp(streak * 0.85 + top * 0.6 + edge + spark, 0.0, 1.0));\n' +
           ' float a = 0.9 * (1.0 - smoothstep(uLen * 0.45, uLen, vUv.y)); gl_FragColor = vec4(c, a); }' });
       disposables.push(fm); const fall = new THREE.Mesh(fg, fm); fall.renderOrder = 2; groups.terrain.add(fall);
       // a darker sheet just behind gives the falling water some body
@@ -279,11 +292,17 @@ export function createIsland() {
     (scenery || []).forEach((sc) => { if (occupied.has(sc.cx + ',' + sc.cz)) return; const md = VB.natureModel(sc.kind, sc.seed); if (md) { push(md.geo, sc.still ? matSolid : matSway, sc.x, sc.y, sc.z, sc.ry, !sc.still, sc.s, md.lod && md.lod.geo, true); push(md.glow, matGlow, sc.x, sc.y, sc.z, sc.ry, false, sc.s, md.lod && md.lod.glow, true); } });
     lodPairs = [];
     batches.forEach((bt) => {
-      const make = (geo) => { const im = new THREE.InstancedMesh(geo, bt.mat, bt.list.length); bt.list.forEach((m, i) => im.setMatrixAt(i, m)); im.instanceMatrix.needsUpdate = true; if (bt.mat !== matGlow) { im.castShadow = true; im.receiveShadow = true; } im.computeBoundingSphere(); groups.things.add(im); return im; };
+      // Phase 4: every tree, bush and rock gets its own small shift in brightness and warmth (a sunnier or a shadier
+      // specimen), so a grove of the same species reads as individuals rather than copies
+      const tint = bt.nature && bt.mat !== matGlow ? bt.list.map((m) => { const e = m.elements, a = hash(Math.round(e[12] * 16), Math.round(e[14] * 16), 131), w = hash(Math.round(e[14] * 16), Math.round(e[12] * 16), 132) - 0.5, l = 0.9 + a * 0.16; return new THREE.Color(l * (1 + w * 0.08), l, l * (1 - w * 0.1)); }) : null;
+      const make = (geo) => { const im = new THREE.InstancedMesh(geo, bt.mat, bt.list.length); bt.list.forEach((m, i) => { im.setMatrixAt(i, m); if (tint) im.setColorAt(i, tint[i]); }); im.instanceMatrix.needsUpdate = true; if (tint) im.instanceColor.needsUpdate = true; if (bt.mat !== matGlow) { im.castShadow = true; im.receiveShadow = true; } im.computeBoundingSphere(); groups.things.add(im); return im; };
       const full = make(bt.geo); full.userData.nature = !!bt.nature; if (bt.lgeo) { const lo = make(bt.lgeo); lo.userData.nature = !!bt.nature; lodPairs.push([full, lo, !!bt.nature]); }
     });
     applyLod(true);
-    buildDetail(occupied); buildSparks(items);
+    const trees = []; const TREE = { oak: 1, oakOld: 1, pine: 1, birch: 1, blossom: 1, willow: 1 };
+    (scenery || []).forEach((sc) => { if (TREE[sc.kind] && !occupied.has(sc.cx + ',' + sc.cz)) trees.push([sc.x, sc.y, sc.z, sc.kind]); });
+    items.forEach((it) => { if (it.k === 'o' && TREE[it.type]) trees.push([it.x + it.w / 2, 0, it.y + it.h / 2, it.type]); });
+    buildDetail(occupied, trees); buildSparks(items);
     state.shadowDirty = true; state.dirty = true; state.moved = true;
   }
   // magic: slow motes of light that spiral up around the island's enchanted places (the Hatchery's egg, the
@@ -300,24 +319,52 @@ export function createIsland() {
     groups.fx.add(sparks);
   }
   // meadow details: grass blades, flowers and pebbles (one instanced mesh of small blocks)
-  function buildDetail(occupied) {
+  // Phase 4 (denser, handcrafted): taller tufts with sunlit tips, flower clusters instead of single flowers, clover
+  // under lush ground, daisies in the open, tall wildflowers in long grass, and a skirt of undergrowth, fallen leaves
+  // and pebbles around every tree, so groves sit in the ground instead of on it. Density follows the quality tier.
+  let detailArgs = null, detailDens = null;
+  function buildDetail(occupied, trees) {
+    detailArgs = [occupied, trees]; const dens = tier().detail == null ? 1 : tier().detail; detailDens = dens;
     if (detail) { groups.things.remove(detail); detail.dispose(); detail = null; }
     if (!terr) return;
-    const list = [];
+    const list = [], tip = PAL.grass[4];
+    const tuft = (bx, y0, bz, n, hi, s0) => { for (let i = 0; i < n; i++) { const hgt = 1 + Math.floor(hash(s0 + i, bx * 97, 95) * 2) + hi, x = bx + (i % 2) * DV + (i > 1 ? DV * 0.5 : 0), z = bz + (i >> 1) * DV; const col = pick([PAL.grass[3], PAL.grassDark[0], PAL.grass[1]], hash(i, s0, 96));
+      list.push([x, y0, z, 1, hgt, 1, col]); if (hgt >= 2) list.push([x, y0 + hgt * DV, z, 1, 1, 1, hash(i, s0, 97) < 0.6 ? tip : PAL.grass[2]]); } };
+    const flower = (x, y0, z, fc, tall) => { list.push([x, y0, z, 1, tall ? 3 : 2, 1, PAL.leafDark[0]]); list.push([x - DV / 2, y0 + (tall ? 3 : 2) * DV, z - DV / 2, 2, 1, 2, fc]); };
     terr.colAt.forEach((v, k) => {
       const [X, Z] = k.split(',').map(Number), c = v.c; if (occupied.has(c.x + ',' + c.y)) return;
       const y0 = v.top * TV, h = hash(X, Z, 91);
       if ((c.kind === 'grass' || c.kind === 'hill') && v.top >= 0) {
         // Phase 1.1: flowers gather in meadow patches and grass clumps thin out in the open, so the ground reads
         // as calm grass with a few bright drifts, instead of an even sprinkle everywhere
-        const patch = vnoise(X * 0.16, Z * 0.16, 17), tall = vnoise(X * 0.22, Z * 0.22, 18);
-        if (patch > 0.66 && h < 0.42) { const x = X * TV + 0.1 + hash(X, Z, 96) * 0.3, z = Z * TV + 0.1 + hash(Z, X, 97) * 0.3, fc = pick(PAL.flowers, vnoise(X * 0.5, Z * 0.5, 19)); list.push([x, y0, z, 1, 2, 1, PAL.leafDark[0]]); list.push([x - DV / 2, y0 + 2 * DV, z - DV / 2, 2, 1, 2, hash(X, Z, 98) < 0.75 ? fc : pick(PAL.flowers, hash(X, Z, 99))]); }
-        else if (h < (tall > 0.55 ? 0.22 : 0.07)) { const bx = X * TV + 0.08 + hash(X, Z, 93) * 0.3, bz = Z * TV + 0.08 + hash(Z, X, 94) * 0.3, n = 2 + Math.floor(hash(X, Z, 92) * 2); for (let i = 0; i < n; i++) list.push([bx + (i % 2) * DV, y0, bz + (i >> 1) * DV, 1, 1 + Math.floor(hash(X + i, Z, 95) * 2) + (tall > 0.65 ? 1 : 0), 1, pick([PAL.grass[3], PAL.grass[4], PAL.grassDark[0]], hash(i, X, Z))]); }
+        const patch = vnoise(X * 0.16, Z * 0.16, 17), tall = vnoise(X * 0.22, Z * 0.22, 18), lush = vnoise(X * 0.11, Z * 0.11, 23), h2 = hash(X, Z, 101), h3 = hash(X, Z, 102);
+        if (patch > 0.66 && h < 0.42 + 0.12 * dens) {
+          const x = X * TV + 0.1 + hash(X, Z, 96) * 0.3, z = Z * TV + 0.1 + hash(Z, X, 97) * 0.3, fc = pick(PAL.flowers, vnoise(X * 0.5, Z * 0.5, 19));
+          flower(x, y0, z, hash(X, Z, 98) < 0.75 ? fc : pick(PAL.flowers, hash(X, Z, 99)), false);
+          const extra = Math.floor(hash(X, Z, 103) * 3 * dens); for (let i = 0; i < extra; i++) flower(x + (hash(i, X, 104) - 0.5) * 0.18, y0, z + (hash(Z, i, 105) - 0.5) * 0.18, hash(i, Z, 106) < 0.7 ? fc : pick(PAL.flowers, hash(X, i, 107)), false);
+          if (h2 < 0.5 * dens) tuft(x + 0.12, y0, z - 0.06, 2, 0, X * 7 + Z);
+        } else if (h < (tall > 0.55 ? 0.4 : 0.2) * dens) {
+          const bx = X * TV + 0.08 + hash(X, Z, 93) * 0.3, bz = Z * TV + 0.08 + hash(Z, X, 94) * 0.3;
+          tuft(bx, y0, bz, 2 + Math.floor(hash(X, Z, 92) * 3), tall > 0.65 ? 1 : 0, X * 13 + Z * 3);
+          if (tall > 0.62 && h2 < 0.3) flower(bx + 0.14, y0, bz + 0.1, pick(['#b48cff', '#ffe066', '#ff8fb8'], h3), true);
+        }
+        if (lush > 0.62 && h2 < 0.22 * dens) { const x = X * TV + 0.06 + hash(X, Z, 108) * 0.28, z = Z * TV + 0.06 + hash(Z, X, 109) * 0.28; list.push([x, y0, z, 3, 1, 3, PAL.grass[3]]); list.push([x + DV, y0 + DV, z, 1, 1, 2, PAL.grassDark[0]]); if (h3 < 0.3) list.push([x + DV, y0 + DV, z + DV, 1, 1, 1, h3 < 0.15 ? '#ffffff' : '#ffc0d8']); }
+        else if (lush < 0.4 && h3 < 0.05 * dens) { const x = X * TV + 0.1 + hash(X, Z, 110) * 0.3, z = Z * TV + 0.1 + hash(Z, X, 111) * 0.3; list.push([x, y0, z, 1, 1, 1, '#ffffff']); list.push([x + DV * 2, y0, z + DV, 1, 1, 1, '#fff6c8']); }
       } else if (c.kind === 'path' && h < 0.12) list.push([X * TV + 0.1 + hash(X, Z, 99) * 0.3, y0, Z * TV + 0.15, 2, 1, 2, pick(PAL.pathStone, h * 8)]);
       else if (c.kind === 'sand' && h < 0.08) list.push([X * TV + 0.2, y0, Z * TV + 0.2, 2, 1, 1, '#ffffff']);
+      else if (c.kind === 'sand' && h > 0.93 && dens > 0.6) list.push([X * TV + 0.15, y0, Z * TV + 0.3, 2, 1, 1, pick(PAL.pathStone, h)]);
+    });
+    // undergrowth around trees
+    (trees || []).forEach(([tx, ty, tz, kind], ti) => {
+      const n = Math.round((kind === 'pine' ? 5 : 7) * dens), leaf = kind === 'blossom' ? PAL.blossom || PAL.flowers : kind === 'pine' ? PAL.pine : PAL.leaf;
+      for (let i = 0; i < n; i++) { const a = hash(ti, i, 120) * 6.283, r = 0.22 + hash(i, ti, 121) * 0.34, x = tx + Math.cos(a) * r, z = tz + Math.sin(a) * r, w = hash(ti * 3 + i, 7, 122);
+        if (w < 0.45) tuft(x, ty, z, 2 + Math.floor(w * 4), 0, ti * 31 + i);
+        else if (w < 0.72) list.push([x, ty, z, 1, 1, 1, pick(leaf, hash(i, ti, 123))]); // a fallen leaf or needle cluster
+        else if (w < 0.86) list.push([x, ty, z, 2, 1, 1, pick(PAL.leafDark, w)]); // low fern spray
+        else list.push([x, ty, z, 1, 1, 1, pick(PAL.pathStone, w)]); } // a pebble
     });
     if (!list.length) return;
-    const geo = new THREE.BoxGeometry(DV, DV, DV); geo.translate(DV / 2, DV / 2, DV / 2); disposables.push(geo);
+    const geo = new THREE.BoxGeometry(DV, DV, DV); geo.translate(DV / 2, DV / 2, DV / 2); { const ix = Array.from(geo.index.array); ix.splice(18, 6); geo.setIndex(ix); geo.clearGroups(); } // Phase 4: no bottom face (it sits on the ground): 10 triangles a piece instead of 12 disposables.push(geo);
     const im = new THREE.InstancedMesh(geo, new THREE.MeshLambertMaterial(), list.length), m = new THREE.Matrix4(), c = new THREE.Color();
     list.forEach(([x, y, z, sx, sy, sz, col], i) => { m.makeScale(sx, sy, sz).setPosition(x, y, z); im.setMatrixAt(i, m); im.setColorAt(i, c.set(col)); });
     im.instanceMatrix.needsUpdate = true; im.instanceColor.needsUpdate = true; im.receiveShadow = true; detail = im; groups.things.add(im);
@@ -444,6 +491,12 @@ export function createIsland() {
     if (state.moved && lastMoveDraw && s0 - lastMoveDraw < 100 && A && A.Perf && A.Perf.sample) A.Perf.sample(s0 - lastMoveDraw);
     if (state.moved) lastMoveDraw = s0;
     const T = tier();
+    if (detailArgs && (T.detail == null ? 1 : T.detail) !== detailDens) { buildDetail(detailArgs[0], detailArgs[1]); state.shadowDirty = true; }
+    // Phase 4 soft shadows: High filters the shadow map with variance shadows (a wide, soft penumbra, blurred once when
+    // the shadow is redrawn, then one lookup per pixel); Balanced and Battery saver use PCF with a smaller radius
+    const stype = T.shadowSoft === 'vsm' ? THREE.VSMShadowMap : THREE.PCFShadowMap;
+    if (R.shadowMap.type !== stype) { R.shadowMap.type = stype; scene.traverse((o) => { if (o.material) [].concat(o.material).forEach((m) => { m.needsUpdate = true; }); }); if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; } state.shadowDirty = true; }
+    if (sun.shadow.radius !== (T.shadowRadius || 3)) { sun.shadow.radius = T.shadowRadius || 3; state.shadowDirty = true; }
     if (sun.shadow.mapSize.x !== T.shadowMap) { sun.shadow.mapSize.set(T.shadowMap, T.shadowMap); if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; } state.shadowDirty = true; }
     sun.castShadow = T.shadows;
     if (state.shadowDirty && sun.castShadow) { R.shadowMap.needsUpdate = true; state.shadowDirty = false; }
@@ -471,7 +524,7 @@ export function createIsland() {
     breakdown() { const t = (o) => (o.geometry && o.geometry.index ? o.geometry.index.count / 3 : 0) * (o.isInstancedMesh ? o.count : 1); const out = { terrain: 0, buildings: 0, nature: 0, detail: 0, far: 0, fx: 0 };
       groups.terrain.traverse((o) => { if (o.isMesh) out.terrain += t(o); }); farGroup.traverse((o) => { if (o.isMesh) out.far += t(o); });
       groups.things.children.forEach((o) => { if (!o.isMesh || !o.visible) return; if (o === detail) out.detail += t(o); else if (o.material === matSway || o.userData.nature) out.nature += t(o); else out.buildings += t(o); }); Object.keys(out).forEach((k) => (out[k] = Math.round(out[k]))); return out; },
-    stats() { const i = R.info; return { frames, avgDrawMs: frames ? +(drawMs / frames).toFixed(2) : 0, calls: i.render.calls, triangles: i.render.triangles, geometries: i.memory.geometries, textures: i.memory.textures, shadow: sun.castShadow, shadowMap: sun.shadow.mapSize.x, tier: tier().id, canvas: [R.domElement.width, R.domElement.height], pixelRatio: R.getPixelRatio(), slow, lod: lodOn === 0 ? 'off' : lodOn === 1 ? 'nature' : 'all', terrainMs: cost.terrainMs, syncMs: cost.syncMs, occ: { shown: occ.shown, proxies: occ.data ? occ.data.up.length + occ.data.flat.length : 0, ms: +occ.cost.toFixed(1) } }; },
+    stats() { const i = R.info; return { frames, avgDrawMs: frames ? +(drawMs / frames).toFixed(2) : 0, calls: i.render.calls, triangles: i.render.triangles, geometries: i.memory.geometries, textures: i.memory.textures, shadow: sun.castShadow, shadowMap: sun.shadow.mapSize.x, shadowType: R.shadowMap.type === THREE.VSMShadowMap ? 'vsm' : 'pcf', detail: detail ? detail.count : 0, grade: { toneMapping: R.toneMapping === THREE.NeutralToneMapping ? 'neutral' : 'none', exposure: R.toneMappingExposure }, tinted: groups.things.children.filter((o) => o.isInstancedMesh && o.instanceColor).length, tier: tier().id, canvas: [R.domElement.width, R.domElement.height], pixelRatio: R.getPixelRatio(), slow, lod: lodOn === 0 ? 'off' : lodOn === 1 ? 'nature' : 'all', terrainMs: cost.terrainMs, syncMs: cost.syncMs, occ: { shown: occ.shown, proxies: occ.data ? occ.data.up.length + occ.data.flat.length : 0, ms: +occ.cost.toFixed(1) } }; },
     dispose() { if (raf) cancelAnimationFrame(raf); raf = 0; clearGroup(groups.terrain); groups.things.children.slice().forEach((c) => { groups.things.remove(c); if (c.isInstancedMesh) c.dispose(); }); state = { things: new Map(), sig: '' }; },
   };
 }

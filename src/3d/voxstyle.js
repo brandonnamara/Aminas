@@ -59,4 +59,8 @@ export const MAGIC = { egg: '#a8e4ff', water: '#8fe4ff', moon: '#e2d4ff', life: 
 
 // Phase 2: the lighting standard (art bible section 7). The island, the asset library viewer and the exporter all
 // light with these values, so an asset looks the same wherever it is reviewed.
-export const LIGHT = { sky: '#eaf6ff', ground: '#b39a6c', hemi: 1.3, sun: '#ffe6b8', sunI: 2.2, sunDir: [-9, 22, 17], haze: '#bfe0f6' };
+// Phase 4 (warmer light): a golden sun, a cooler sky fill so shade turns soft blue instead of grey, a warmer
+// ground bounce, neutral tone mapping so bright tops roll off instead of clipping, and aerial depth (the hanging rock
+// under an island fades into the sky haze). Phase 2 values, for reference: sky #eaf6ff, ground #b39a6c, hemi 1.3,
+// sun #ffe6b8 at 2.2, no tone mapping.
+export const LIGHT = { sky: '#c6dcff', ground: '#d6a46a', hemi: 1.15, sun: '#ffdeae', sunI: 2.7, sunDir: [-9, 22, 17], haze: '#bfe0f6', exposure: 1.04, depthHaze: '#a9d2f0', depthFrom: 0, depthTo: -10, depthMax: 0.5 };

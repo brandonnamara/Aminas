@@ -98,7 +98,7 @@ It writes `validation_report.json` and two renders. Copies are in `docs/godot/`.
 - **Result:** after calibration, the grass top in Godot is RGB 113, 169, 47; in the web viewer it is 113–131,
   180–191, 54–66.
 - **Light settings for both renderers:**
-  - sun colour `#ffe6b8`, direction from (−9, 22, 17);
+  - sun colour `#ffe6b8`, direction from (−9, 22, 17) (Phase 2 values; Environment Phase 4 warmed the game's light to sun `#ffdeae` at 2.7, sky `#c6dcff`, ground `#d6a46a` at 1.15, with neutral tone mapping; recalibrate in Godot when its scenes are built);
   - background `#bfe0f6` (`haze`);
   - tonemap Linear.
 

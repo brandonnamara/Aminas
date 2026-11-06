@@ -505,12 +505,27 @@
     let s = '<svg class="backdrop" viewBox="0 0 1000 500" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><defs>';
     if (iid === 'starter') {
       s += '<linearGradient id="bk-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + (fl.r2 ? '#3e3e8e' : '#4f8ee0') + '"/><stop offset=".55" stop-color="' + (fl.r2 ? '#c890c8' : '#9fd0f6') + '"/><stop offset="1" stop-color="#e8f6ff"/></linearGradient>' +
-        '<linearGradient id="bk-sea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8fd4ec"/><stop offset=".25" stop-color="#4fb4dc"/><stop offset="1" stop-color="#1f6c9c"/></linearGradient><radialGradient id="bk-sun"><stop offset="0" stop-color="#fff6cc" stop-opacity=".95"/><stop offset="1" stop-color="#fff6cc" stop-opacity="0"/></radialGradient></defs>';
+        '<linearGradient id="bk-sea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c4ecf4"/><stop offset=".08" stop-color="#7fd0e8"/><stop offset=".3" stop-color="#3fa6d6"/><stop offset=".62" stop-color="#2580b8"/><stop offset="1" stop-color="#14527f"/></linearGradient><radialGradient id="bk-sun"><stop offset="0" stop-color="#fff6cc" stop-opacity=".95"/><stop offset="1" stop-color="#fff6cc" stop-opacity="0"/></radialGradient>' +
+        // Phase 4 water: the sun's path on the sea, shallow turquoise shelves, and three bands of moving voxel waves
+        '<radialGradient id="bk-sunpath"><stop offset="0" stop-color="#fff2c8" stop-opacity=".42"/><stop offset=".5" stop-color="#ffe7b0" stop-opacity=".16"/><stop offset="1" stop-color="#ffe7b0" stop-opacity="0"/></radialGradient>' +
+        '<radialGradient id="bk-shelf"><stop offset="0" stop-color="#6fe0dc" stop-opacity=".55"/><stop offset=".7" stop-color="#4cc4d8" stop-opacity=".2"/><stop offset="1" stop-color="#4cc4d8" stop-opacity="0"/></radialGradient>' +
+        '</defs>';
       s += '<rect width="1000" height="500" fill="url(#bk-sky)"/>' + circ(820, 80, 90, 'url(#bk-sun)') + '<rect x="796" y="56" width="48" height="48" fill="#fff8d8"/>';
       if (fl.r1) s += '<g class="aurora">' + path('M0 60q250-60 500-10t500-30v70q-250 40-500-10T0 120z', '#7affc8', ' opacity=".14"') + path('M0 90q250-40 500 0t500-20v50q-250 30-500-10T0 140z', '#ff9ee0', ' opacity=".12"') + '</g>';
       s += vcloud(160, 70, 1, 0.8, 'cl c1') + vcloud(620, 46, 0.8, 0.65, 'cl c2') + vcloud(900, 150, 0.6, 0.55, 'cl c3');
       // the sea far below, with a misty horizon
       s += '<rect y="230" width="1000" height="270" fill="url(#bk-sea)"/><rect y="226" width="1000" height="10" fill="#e8f6ff" opacity=".8"/>';
+      // Phase 4: shallow turquoise water over sunken shelves, the clouds mirrored faintly, the sun's glittering path,
+      // and wave rows that drift with the wind (each row moves at its own pace; still when the island rests)
+      s += '<ellipse cx="170" cy="330" rx="210" ry="40" fill="url(#bk-shelf)"/><ellipse cx="640" cy="420" rx="260" ry="55" fill="url(#bk-shelf)" opacity=".7"/><ellipse cx="930" cy="300" rx="150" ry="28" fill="url(#bk-shelf)" opacity=".8"/>';
+      s += '<g opacity=".14"><rect x="96" y="246" width="128" height="6" fill="#fff"/><rect x="116" y="252" width="56" height="4" fill="#fff"/><rect x="572" y="242" width="102" height="5" fill="#fff"/><rect x="866" y="262" width="77" height="4" fill="#fff"/></g>';
+      s += '<ellipse cx="820" cy="300" rx="46" ry="72" fill="url(#bk-sunpath)"/><ellipse cx="820" cy="246" rx="70" ry="14" fill="url(#bk-sunpath)"/>';
+      // each row: scattered crests (light) with a trough shadow under them, longer and thicker nearer the viewer; the
+      // pattern repeats every 250 units so the row can loop seamlessly as it drifts
+      const waveRow = (k, y0, y1, n) => { let r = ''; for (let i = 0; i < n; i++) { const y = y0 + Math.pow(hash(i, k, 66), 0.9) * (y1 - y0), d = (y - 230) / 270, x = hash(i, k, 67) * 250, w = Math.round(5 + d * 22 + hash(i, k, 68) * (6 + d * 12)), h = 1 + Math.round(d * 2), op = 0.25 + hash(i, k, 69) * 0.35;
+          for (let rep = -1; rep < 5; rep++) { const xx = x + rep * 250; r += '<rect x="' + f1(xx) + '" y="' + f1(y) + '" width="' + w + '" height="' + h + '" fill="#e6f8ff" opacity="' + f1(op) + '"/><rect x="' + f1(xx + w * 0.2) + '" y="' + f1(y + h) + '" width="' + Math.round(w * 0.7) + '" height="' + h + '" fill="#0d4a78" opacity="' + f1(op * 0.45) + '"/>'; } } return r; };
+      s += '<g class="sea-waves">' + [[0, 240, 300, 22], [1, 300, 390, 16], [2, 390, 500, 12]].map(([k, y0, y1, n]) => '<g class="wv wv' + k + '">' + waveRow(k, y0, y1, n) + '</g>').join('') + '</g>';
+      s += '<g class="sea-sun">' + [0, 1].map((k) => '<g class="ss ss' + k + '">' + [...Array(14)].map((_, i) => { const y = 238 + Math.pow(hash(i, k, 64), 1.3) * 250, spread = 14 + (y - 232) * 0.2, x = 820 + (hash(i, k, 65) - 0.5) * spread * 2, w = 3 + Math.round((y - 230) / 40) * 2; return '<rect x="' + f1(x) + '" y="' + f1(y) + '" width="' + w + '" height="2" fill="#fffbe8"/>'; }).join('') + '</g>').join('') + '</g>';
       // Phase 1.2: layered depth over the sea: a low cloud bank on the horizon, two bands of mist, and pixel glints
       // that twinkle on the water in three staggered sets (paused with the rest of the island when it is still)
       s += '<g class="sea-deep">' + vcloud(80, 226, 1.4, 0.55, 'cl c2') + vcloud(470, 222, 1.1, 0.5, 'cl c3') + vcloud(980, 228, 1.5, 0.5, 'cl c1') + '</g>' +

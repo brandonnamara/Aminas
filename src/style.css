@@ -1065,3 +1065,15 @@ body.bench-on #world { pointer-events: none; }
 .bench-table th, .bench-table td { padding: .15rem .3rem; text-align: right; border-bottom: 1px solid rgba(255, 255, 255, .12); }
 .bench-table th:first-child, .bench-table td:first-child { text-align: left; }
 .bench-out { width: 100%; font: .62rem/1.3 ui-monospace, monospace; resize: none; }
+
+/* Environment Phase 4: moving sea (wave rows drift at their own pace; the sun path shimmers in two sets). Like every
+   island ambient animation they pause when the island rests, is covered or hidden; Battery saver and Reduce motion
+   keep them still. Transform-only, so the compositor moves them without repainting the sea. */
+.backdrop .sea-waves .wv { animation: seaWave 90s steps(180, end) infinite; will-change: transform; }
+.backdrop .sea-waves .wv1 { animation-duration: 70s; animation-timing-function: steps(140, end); animation-direction: reverse; }
+.backdrop .sea-waves .wv2 { animation-duration: 55s; animation-timing-function: steps(110, end); }
+@keyframes seaWave { to { transform: translateX(-250px); } }
+.backdrop .sea-sun .ss { animation: seaGlint 3s steps(3, end) infinite; opacity: 0; }
+.backdrop .sea-sun .ss1 { animation-delay: -1.5s; }
+body.perf-saver .backdrop .sea-waves .wv, body.calm .backdrop .sea-waves .wv { animation: none; }
+body.perf-saver .backdrop .sea-sun .ss, body.calm .backdrop .sea-sun .ss { animation: none; opacity: .6; }
