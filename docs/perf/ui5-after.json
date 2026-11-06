@@ -1,0 +1,164 @@
+[
+ {
+  "cfg": {
+   "name": "High",
+   "q": "high"
+  },
+  "idle": {
+   "taskMsPerS": 136.3,
+   "styleMsPerS": 29.78,
+   "styleRecalcs": 328,
+   "layouts": 121
+  },
+  "idleAnims": {
+   "running": 36,
+   "css": [
+    "cld",
+    "seaWave",
+    "seaGlint",
+    "dfar",
+    "glows",
+    "markr",
+    "ring",
+    "tagb",
+    "bfly",
+    "flap2",
+    "festrise",
+    "avbob",
+    "pzbar"
+   ]
+  },
+  "openSettingsMs": 41.7,
+  "panel": {
+   "taskMsPerS": 1.5,
+   "styleMsPerS": 0.04,
+   "styleRecalcs": 5,
+   "layouts": 0
+  },
+  "panelAnims": {
+   "running": 0,
+   "css": []
+  },
+  "openCollectionMs": 35.2,
+  "heapMB": 13.3,
+  "nodes": 6701
+ },
+ {
+  "cfg": {
+   "name": "Balanced",
+   "q": "balanced"
+  },
+  "idle": {
+   "taskMsPerS": 131,
+   "styleMsPerS": 26.96,
+   "styleRecalcs": 292,
+   "layouts": 96
+  },
+  "idleAnims": {
+   "running": 36,
+   "css": [
+    "cld",
+    "seaWave",
+    "seaGlint",
+    "dfar",
+    "glows",
+    "markr",
+    "ring",
+    "tagb",
+    "bfly",
+    "flap2",
+    "festrise",
+    "avbob",
+    "pzbar"
+   ]
+  },
+  "openSettingsMs": 73.4,
+  "panel": {
+   "taskMsPerS": 3,
+   "styleMsPerS": 0.05,
+   "styleRecalcs": 6,
+   "layouts": 0
+  },
+  "panelAnims": {
+   "running": 0,
+   "css": []
+  },
+  "openCollectionMs": 22.9,
+  "heapMB": 15.6,
+  "nodes": 6669
+ },
+ {
+  "cfg": {
+   "name": "Battery saver",
+   "q": "balanced",
+   "saver": true
+  },
+  "idle": {
+   "taskMsPerS": 100.4,
+   "styleMsPerS": 18.89,
+   "styleRecalcs": 338,
+   "layouts": 97
+  },
+  "idleAnims": {
+   "running": 26,
+   "css": [
+    "cld",
+    "seaGlint",
+    "dfar",
+    "glows",
+    "markr",
+    "ring",
+    "tagb",
+    "crhop",
+    "bfly",
+    "flap2",
+    "avbob"
+   ]
+  },
+  "openSettingsMs": 32.7,
+  "panel": {
+   "taskMsPerS": 3,
+   "styleMsPerS": 0.09,
+   "styleRecalcs": 13,
+   "layouts": 0
+  },
+  "panelAnims": {
+   "running": 0,
+   "css": []
+  },
+  "openCollectionMs": 39.8,
+  "heapMB": 17.6,
+  "nodes": 6683
+ },
+ {
+  "cfg": {
+   "name": "Balanced + Reduce motion",
+   "q": "balanced",
+   "calm": true
+  },
+  "idle": {
+   "taskMsPerS": 2.6,
+   "styleMsPerS": 0,
+   "styleRecalcs": 0,
+   "layouts": 0
+  },
+  "idleAnims": {
+   "running": 0,
+   "css": []
+  },
+  "openSettingsMs": 23.3,
+  "panel": {
+   "taskMsPerS": 2.4,
+   "styleMsPerS": 0,
+   "styleRecalcs": 0,
+   "layouts": 0
+  },
+  "panelAnims": {
+   "running": 0,
+   "css": []
+  },
+  "openCollectionMs": 49.2,
+  "heapMB": 11.1,
+  "nodes": 6560
+ }
+]

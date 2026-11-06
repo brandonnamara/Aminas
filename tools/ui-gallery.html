@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Aminas UI Gallery</title>
+<!-- Phase 5: every Prismatic Fantasy component in every state, with the game's own stylesheets (no copies).
+     Open over the dev server: /tools/ui-gallery.html. Screenshot: docs/ui/gallery.png. -->
+<link rel="stylesheet" href="../src/style.css">
+<link rel="stylesheet" href="../src/ui-prism.css">
+<style>
+  html, body { position: static; overflow: auto; height: auto; -webkit-user-select: text; user-select: text; }
+  body { background: radial-gradient(120% 90% at 30% 0%, #3a2c7e, #120e2e 70%); padding: 1rem 1.2rem 2rem; font-size: 15px; }
+  h1.g { font-size: 1.3rem; margin: 0 0 .2rem; background: linear-gradient(180deg, #fffaf0, #ffd978 60%, #ffb6e6); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .g-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .9rem; }
+  .g-sec { display: block; padding: .7rem .8rem .8rem; }
+  .g-sec > b { display: block; font-size: .72rem; letter-spacing: .16em; text-transform: uppercase; color: var(--pz-gold); margin-bottom: .45rem; }
+  .g-row { display: flex; flex-wrap: wrap; gap: .45rem; align-items: center; margin: .3rem 0; }
+  .g-lbl { font-size: .66rem; color: var(--pz-muted); width: 4.4rem; }
+  .gem { width: 1.2em; height: 1.2em; }
+  .demo-nav { position: static; display: flex; gap: .5rem; }
+  .demo-res { margin: 0; }
+  .g-sec.wide { grid-column: span 2; }
+  .reward-card { animation: none; filter: none; margin-bottom: .45rem; }
+  .g-sec .stats { grid-template-columns: repeat(4, 1fr); }
+  .g-sec .card { display: block; }
+</style>
+</head>
+<body>
+<h1 class="g">Aminas · Prismatic Fantasy UI</h1>
+<p class="muted" style="margin:.1rem 0 .8rem;font-size:.8rem">Live components from <code>src/ui-prism.css</code>. Rules: <code>docs/ui/UI_DESIGN_SYSTEM.md</code>.</p>
+<div class="g-grid">
+  <div class="g-sec panel">
+    <b>Buttons · primary</b>
+    <div class="g-row"><span class="g-lbl">default</span><button class="btn gold">Upgrade</button><button class="btn gold small">Craft</button></div>
+    <div class="g-row"><span class="g-lbl">hover</span><button class="btn gold is-hover">Upgrade</button><span class="g-lbl">pressed</span><button class="btn gold is-pressed">Upgrade</button></div>
+    <div class="g-row"><span class="g-lbl">ready</span><button class="btn gold pulse">Claim</button><span class="g-lbl">disabled</span><button class="btn gold off">Upgrade</button></div>
+  </div>
+  <div class="g-sec panel">
+    <b>Buttons · secondary and ghost</b>
+    <div class="g-row"><span class="g-lbl">secondary</span><button class="btn">Details</button><button class="btn small">Moves</button></div>
+    <div class="g-row"><span class="g-lbl">pressed</span><button class="btn is-pressed">Details</button><span class="g-lbl">disabled</span><button class="btn off">Feast 10</button></div>
+    <div class="g-row"><span class="g-lbl">ghost</span><button class="btn ghost">Leave for now</button><button class="btn small ghost">Move</button></div>
+  </div>
+  <div class="g-sec panel">
+    <b>Round, toggles, choices</b>
+    <div class="g-row"><button class="round" aria-label="Chat">💬</button><button class="round" aria-label="Settings">⚙</button><button class="x" aria-label="Close">✕</button></div>
+    <div class="g-row"><button class="sw on" aria-label="on"></button><button class="sw" aria-label="off"></button>
+      <span class="seg"><button class="on">Auto</button><button>High</button><button>Balanced</button></span></div>
+    <div class="g-row"><span class="fchip on">All</span><span class="fchip">Light</span><span class="fchip">Water</span></div>
+  </div>
+  <div class="g-sec panel wide">
+    <b>HUD</b>
+    <div class="g-row"><div class="pill rank" style="min-width:9rem"><small>PLAYER RANK 6</small><div class="bar"><i style="width:35%"></i></div></div>
+      <div class="pill res demo-res"><span class="gold">◆ 11,960</span><span class="food">● 640</span><span class="gems">◇ 35</span></div>
+      <div class="pill mission-pill ready" style="position:static"><b>Current task</b>First Meal</div></div>
+    <div class="g-row demo-nav"><button class="nbtn">⚒<span>Build</span></button><button class="nbtn on">✿<span>Creatures</span><i class="badge">2</i></button><button class="nbtn">☰<span>Tasks</span></button><button class="nbtn locked">⌖<span>Explore</span></button></div>
+  </div>
+  <div class="g-sec panel">
+    <b>Tabs</b>
+    <div class="dtabs"><button class="dtab on">About</button><button class="dtab">Battle</button><button class="dtab">Moves</button></div>
+    <div class="ftabs" style="position:static;grid-template-columns:repeat(2,1fr)"><button class="ftab on">Crafting</button><button class="ftab">Equipment</button></div>
+  </div>
+  <div class="g-sec panel">
+    <b>Elements and progress</b>
+    <div class="g-row"><span class="chip light">Light</span><span class="chip dark">Dark</span><span class="chip nature">Nature</span><span class="chip fire">Fire</span><span class="chip water">Water</span><span class="chip earth">Earth</span><span class="chip wind">Wind</span><span class="chip resonance">Resonance</span></div>
+    <div class="g-row"><span class="g-lbl">XP</span><div class="bar xp" style="flex:1"><i style="width:62%"></i></div></div>
+    <div class="g-row"><span class="g-lbl">health</span><div class="bar hp" style="flex:1"><i style="width:80%"></i></div></div>
+    <div class="g-row"><span class="g-lbl">low</span><div class="bar hp low" style="flex:1"><i style="width:22%"></i></div></div>
+    <div class="timer-box" style="margin-top:.4rem">Upgrading · 4m 10s<div class="bar"><i style="width:45%"></i></div></div>
+  </div>
+  <div class="g-sec panel">
+    <b>Information</b>
+    <div class="stats"><div class="stat">HP<b>142</b><em>+5</em></div><div class="stat">ATK<b>38</b></div><div class="stat">DEF<b>31</b></div><div class="stat">SPD<b>27</b></div></div>
+    <div class="section-t">Residents 1 / 2</div>
+    <div class="g-row"><span class="rchip">Lumifern · 12 <em>companion</em></span><span class="rchip add">+ Add resident</span></div>
+  </div>
+  <div class="g-sec panel">
+    <b>Rarity · item rows</b>
+    <div class="gitem"><div class="grow"><b>Driftwood Club</b><br><small>Tier I · Common</small></div></div>
+    <div class="gitem r-uncommon" style="margin-top:.3rem"><div class="grow"><b>Ironbound Club</b><br><small class="tier t-uncommon">Tier II · Uncommon</small></div></div>
+    <div class="gitem r-rare" style="margin-top:.3rem"><div class="grow"><b>Stonebreaker</b><br><small class="tier t-rare">Tier III · Rare</small></div></div>
+    <div class="gitem r-epic" style="margin-top:.3rem"><div class="grow"><b>Titan Maul</b><br><small class="tier t-epic">Tier IV · Epic</small></div></div>
+    <div class="gitem r-mythic" style="margin-top:.3rem"><div class="grow"><b>Stormglass Blade</b> <span class="chip uniq">Unique</span><br><small class="tier t-mythic">Unique</small></div></div>
+  </div>
+  <div class="g-sec panel">
+    <b>Rarity · reward cards</b>
+    <div class="reward-card r-common"><div class="rw-ico">◆</div><small>New equipment</small><b>Driftwood Club</b><div class="rw-sub">calm: no burst, short stay</div></div>
+    <div class="reward-card r-rare"><div class="rw-ico">◆</div><small>Rare find</small><b>Stonebreaker</b><div class="rw-sub">blue edge, glow, a small burst</div></div>
+    <div class="reward-card r-epic"><div class="rw-ico">◆</div><small>Epic find</small><b>Titan Maul</b><div class="rw-sub">violet, a sweep of light, a larger burst</div></div>
+    <div class="reward-card r-mythic"><div class="rw-ico">◆</div><small>Unique · Legendary find</small><b>Coral Aegis</b><div class="rw-sub">spectrum rim, turning rays, the full burst</div></div>
+  </div>
+  <div class="g-sec panel">
+    <b>Cards</b>
+    <div class="g-row"><div class="card" style="width:6rem;height:6.5rem"><div class="nm" style="margin-top:4.2rem">Lumifern</div></div><div class="card sel" style="width:6rem;height:6.5rem"><div class="nm" style="margin-top:4.2rem">Selected</div></div><div class="card unknown" style="width:6rem;height:6.5rem"><div class="nm" style="margin-top:4.2rem">???</div></div><div class="card legendary" style="width:6rem;height:6.5rem"><div class="nm" style="margin-top:4.2rem">Legendary</div></div></div>
+  </div>
+</div>
+</body>
+</html>

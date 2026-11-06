@@ -1,0 +1,308 @@
+/* =====================================================================================================
+   Aminas — Prismatic Fantasy UI (Phase 5). One design system for every screen.
+   Loaded after style.css; it restyles the shared components the game already uses (.btn, .panel/.sheet,
+   .pill, .nbtn, .chip, .bar, tabs, toggles, cards, toasts, banners) instead of adding new markup, so every existing
+   screen picks it up at once. Rules and examples: docs/ui/UI_DESIGN_SYSTEM.md.
+
+   Principles: a dark amethyst glass base; light lives on the edges (spectral rims, facet glints) and in a few
+   chosen highlights (gold = the main action, cyan = selection, the full spectrum = rare and magical things);
+   faceted crystal corners; motion only on what is selected, ready or rare, and never while the island rests,
+   in Battery saver or with Reduce motion.
+   ===================================================================================================== */
+:root {
+  /* palette: ink to glass */
+  --pz-ink: #0f0b28; --pz-deep: #1a1440; --pz-glass: rgba(40, 30, 92, .9); --pz-glass-hi: rgba(66, 50, 140, .92); --pz-glass-lo: rgba(20, 15, 52, .94);
+  /* the five spectral notes, used sparingly */
+  --pz-pink: #ff9ee0; --pz-violet: #b49bff; --pz-blue: #86b4ff; --pz-cyan: #8ff0ff; --pz-gold: #ffd978;
+  --pz-text: #fff9f0; --pz-muted: #cfc6ee;
+  /* edges */
+  --pz-rim: linear-gradient(118deg, rgba(255, 170, 230, .75), rgba(180, 155, 255, .55) 28%, rgba(134, 180, 255, .45) 50%, rgba(143, 240, 255, .6) 70%, rgba(255, 217, 120, .7));
+  --pz-rim-soft: linear-gradient(118deg, rgba(255, 170, 230, .38), rgba(180, 155, 255, .26) 30%, rgba(143, 240, 255, .3) 70%, rgba(255, 217, 120, .36));
+  --pz-rim-gold: linear-gradient(118deg, #fff6d0, #ffd978 35%, #ffb6e6 62%, #c6f6ff);
+  --pz-spectrum: linear-gradient(100deg, #ff9ee0, #b49bff 22%, #86b4ff 42%, #8ff0ff 60%, #fff0b0 80%, #ff9ee0);
+  /* surfaces */
+  --pz-opal: radial-gradient(130% 90% at 0% 0%, rgba(255, 168, 236, .16), transparent 55%), radial-gradient(120% 90% at 100% 100%, rgba(120, 225, 255, .13), transparent 60%);
+  --pz-sheet: linear-gradient(168deg, rgba(58, 44, 124, .95), rgba(26, 20, 64, .97));
+  --pz-btn: linear-gradient(180deg, #7058d8 0%, #5a46c4 48%, #4a37a6 100%); /* top kept dark enough for white text at 4.9:1 */
+  --pz-btn-gold: linear-gradient(180deg, #fff4c8 0%, #ffd873 42%, #f5ab3e 100%);
+  --pz-sheen: linear-gradient(180deg, rgba(255, 255, 255, .28), rgba(255, 255, 255, 0) 52%);
+  /* geometry and motion */
+  /* an opaque base under translucent fills, so a border-box rim never shows through the face */
+  --pz-base: linear-gradient(#271e58, #1c1545);
+  --cut: 6px; --pz-edge: 1.5px; --pz-fast: .09s; --pz-med: .22s; --pz-ease: cubic-bezier(.2, .9, .3, 1.2);
+  /* rarity: one hue per step, the spectrum for the top */
+  --r-common: #cdc7e2; --r-uncommon: #8fe39a; --r-rare: #7fc6ff; --r-epic: #cf9bff; --r-mythic: #ffd978;
+}
+
+/* ---- faceted crystal corners: one shape for every framed element (replaces Dev 8's stepped pixel corners) ---- */
+.btn, .pill, .ftab, .dtab, .fchip, .prodopt, .avatar-btn, .ach-toast, .sheet.panel, .comp, .card, .stat, .timer-box, .rchip, .gitem, .fitem, .hslot, .dl-row, .seg, .seg button, .seg .seg-b, .toggle, .mv, .pst, .ach, .ess-c, .xprow, .toast, .reward-card {
+  clip-path: polygon(var(--cut) 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, var(--cut) 100%, 0 calc(100% - var(--cut)), 0 var(--cut));
+  border-radius: 0 !important;
+}
+.sheet.panel { --cut: 12px; } .comp { --cut: 10px; } .pill, .seg, .toggle { --cut: 7px; } .btn.small, .fchip, .dtab, .seg button, .seg .seg-b, .rchip { --cut: 5px; }
+/* elements that carry badges or overflowing parts keep rounded corners instead of a clip (a clip would cut the badge) */
+.panel:not(.sheet):not(.comp):not(.toast) { border-radius: .8rem; } .nbtn { border-radius: .7rem; }
+
+/* Facet glints: four thin diagonal strokes along the cut corners, painted as the top background layer. The
+   triangles end just past the cut, so after clipping only a hairline on each diagonal remains. */
+.btn, .pill, .sheet.panel, .comp, .card, .ftab, .dtab, .fchip, .gitem, .fitem, .hslot, .toast, .reward-card, .avatar-btn, .ach-toast, .vcard {
+  --glint: rgba(255, 232, 255, .7);
+  --facets: linear-gradient(135deg, var(--glint) calc(var(--cut) * .7071 + 1.2px), transparent 0) left top / calc(var(--cut) * 2) calc(var(--cut) * 2) no-repeat,
+            linear-gradient(225deg, rgba(200, 245, 255, .7) calc(var(--cut) * .7071 + 1.2px), transparent 0) right top / calc(var(--cut) * 2) calc(var(--cut) * 2) no-repeat,
+            linear-gradient(315deg, rgba(200, 170, 255, .55) calc(var(--cut) * .7071 + 1.2px), transparent 0) right bottom / calc(var(--cut) * 2) calc(var(--cut) * 2) no-repeat,
+            linear-gradient(45deg, rgba(255, 225, 150, .6) calc(var(--cut) * .7071 + 1.2px), transparent 0) left bottom / calc(var(--cut) * 2) calc(var(--cut) * 2) no-repeat;
+}
+
+/* ===================================================== surfaces ===================================================== */
+.panel {
+  border: var(--pz-edge) solid transparent;
+  background: var(--pz-opal) padding-box, var(--pz-sheet) padding-box, var(--pz-rim) border-box;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .16), inset 0 -1px 0 rgba(0, 0, 0, .25);
+}
+.sheet.panel { --pz-edge: 2px; }
+.sheet.panel, .comp { background: var(--facets), var(--pz-opal) padding-box, var(--pz-sheet) padding-box, var(--pz-rim) border-box; }
+/* translucency: the island shows faintly through panels; the blur keeps text legible (off in Battery saver) */
+.overlay .sheet.panel { -webkit-backdrop-filter: blur(10px) saturate(1.15); backdrop-filter: blur(10px) saturate(1.15); background: var(--facets), var(--pz-opal) padding-box, linear-gradient(168deg, rgba(58, 44, 124, .9), rgba(24, 18, 60, .94)) padding-box, var(--pz-rim) border-box; }
+.overlay { background: radial-gradient(120% 120% at 50% 40%, rgba(30, 20, 70, .42), rgba(6, 4, 20, .72)); animation: pzfade var(--pz-med) ease-out; }
+.overlay > .sheet { animation: pzrise .26s var(--pz-ease); }
+@keyframes pzfade { from { opacity: 0; } }
+@keyframes pzrise { from { opacity: 0; transform: translateY(.6rem) scale(.985); } }
+
+.sh-head { border-bottom: 0; position: relative; padding: .55rem .9rem .5rem; }
+.sh-head::after, .sh-foot::before { content: ''; position: absolute; left: .8rem; right: .8rem; height: 1px; background: linear-gradient(90deg, transparent, rgba(255, 170, 230, .55) 20%, rgba(143, 240, 255, .55) 60%, rgba(255, 217, 120, .5) 85%, transparent); }
+.sh-head::after { bottom: 0; } .sh-foot { border-top: 0; position: relative; } .sh-foot::before { top: 0; }
+.sh-head h2 { font-size: 1.12rem; letter-spacing: .04em; background: linear-gradient(180deg, #fffaf0 30%, #ffe2b0 75%, #ffc6ec); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: none; }
+.sh-head h2 .ico { color: var(--pz-gold); }
+.section-t { color: var(--pz-gold); letter-spacing: .14em; display: flex; align-items: center; gap: .5rem; }
+.section-t::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(255, 217, 120, .5), transparent); }
+.kv b { color: var(--pz-gold); }
+.muted { color: var(--pz-muted); }
+
+/* inner wells: stats, timers, list rows, toggles */
+.stat, .timer-box, .toggle, .mv, .pst, .ess-c, .ach, .xprow, .dl-row {
+  background: linear-gradient(180deg, rgba(10, 6, 30, .38), rgba(10, 6, 30, .22)); box-shadow: inset 0 0 0 1px rgba(190, 170, 255, .14), inset 0 1px 0 rgba(255, 255, 255, .05);
+}
+.toggle { --cut: 7px; margin-bottom: .3rem; }
+
+/* ===================================================== buttons ===================================================== */
+/* Three ranks: primary (sun-crystal gold: the one action that moves things forward), secondary (amethyst), ghost
+   (glass). States: hover lifts the light, press sinks and dims, disabled is clearly flat but still readable. */
+.btn {
+  border: var(--pz-edge) solid transparent; color: var(--pz-text); text-shadow: 0 1px 0 rgba(20, 10, 60, .45); letter-spacing: .03em;
+  background: var(--facets), var(--pz-sheen) padding-box, var(--pz-btn) padding-box, var(--pz-rim) border-box;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35), inset 0 -.22rem 0 rgba(20, 8, 70, .35);
+  transition: transform var(--pz-fast) ease-out, filter var(--pz-med), box-shadow var(--pz-fast);
+  position: relative; isolation: isolate; overflow: hidden;
+}
+.btn.gold {
+  color: #3a2208; text-shadow: 0 1px 0 rgba(255, 255, 255, .45); border-color: transparent;
+  --glint: rgba(255, 255, 255, .95);
+  background: var(--facets), var(--pz-sheen) padding-box, var(--pz-btn-gold) padding-box, var(--pz-rim-gold) border-box;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .7), inset 0 -.22rem 0 rgba(150, 70, 10, .35);
+}
+.btn.ghost { background: var(--facets), linear-gradient(180deg, rgba(255, 255, 255, .12), rgba(255, 255, 255, .04)) padding-box, var(--pz-base) padding-box, var(--pz-rim-soft) border-box; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .14); }
+@media (hover: hover) { .btn:hover { filter: brightness(1.08) saturate(1.05); } }
+.btn.is-hover { filter: brightness(1.08) saturate(1.05); } /* the same states as classes, for the component gallery */
+.btn:active, .btn.is-pressed { transform: translateY(1px) scale(.97); filter: brightness(.92); box-shadow: inset 0 .16rem .3rem rgba(10, 4, 40, .45); transition-duration: .05s; }
+.btn.gold:active { box-shadow: inset 0 .16rem .3rem rgba(120, 50, 0, .4); }
+.btn:focus-visible, .nbtn:focus-visible, .round:focus-visible, .ftab:focus-visible, .dtab:focus-visible { outline: 2px solid var(--pz-cyan); outline-offset: 2px; }
+.btn[disabled], .btn.off { opacity: .62; filter: saturate(.25) brightness(.85); }
+/* spectral sweep: a band of light that crosses the button now and then; only on actions that are ready (pulse),
+   the selected tab and rare things */
+.btn::after, .ftab.on::after, .dtab.on::after, .reward-card.r-epic::after, .reward-card.r-mythic::after, .reward-card.r-legendary::after, .mission-pill.ready::after {
+  content: ''; position: absolute; inset: -20% auto -20% -60%; width: 40%; pointer-events: none; z-index: 2; opacity: 0;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .5) 40%, rgba(170, 250, 255, .45) 55%, transparent); transform: translateX(0) skewX(-18deg);
+}
+.btn.pulse::after, .btn.gold.pulse-ui::after, .mission-pill.ready::after, .reward-card.r-epic::after, .reward-card.r-mythic::after, .reward-card.r-legendary::after { animation: pzsweep 3.6s ease-in-out infinite; }
+.ftab.on::after, .dtab.on::after { animation: pzsweep 5.5s ease-in-out 1; }
+@keyframes pzsweep { 0%, 58% { opacity: 0; transform: translateX(0) skewX(-18deg); } 62% { opacity: 1; } 92% { opacity: 1; } 100% { opacity: 0; transform: translateX(420%) skewX(-18deg); } }
+/* the old pulse grew the button and animated box-shadow every frame (repaints); now the sweep does the calling */
+.btn.pulse, .pulse-ui { animation: none; }
+.btn.pulse { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .7), inset 0 -.22rem 0 rgba(150, 70, 10, .35), inset 0 0 0 1px rgba(255, 255, 255, .5); }
+
+/* round glass buttons (chat, settings, close) */
+.round, .x { background: radial-gradient(circle at 35% 25%, rgba(255, 255, 255, .22), transparent 55%), linear-gradient(180deg, rgba(64, 48, 132, .92), rgba(26, 20, 66, .94)) padding-box, var(--pz-rim) border-box; border: 1.5px solid transparent; box-shadow: 0 .2rem .5rem rgba(5, 2, 20, .35), inset 0 1px 0 rgba(255, 255, 255, .2); transition: transform var(--pz-fast); }
+.x { background: radial-gradient(circle at 35% 25%, rgba(255, 255, 255, .2), transparent 55%), linear-gradient(rgba(255, 255, 255, .08), rgba(255, 255, 255, .08)) padding-box, var(--pz-base) padding-box, var(--pz-rim-soft) border-box; }
+.round:active, .x:active { transform: scale(.92); }
+/* small controls get an invisible hit area of at least ~2.3rem without changing their look */
+.sw, .round.xs { position: relative; } .sw::before, .round.xs::before { content: ''; position: absolute; inset: -.5rem -.35rem; }
+
+/* toggles and segmented choices */
+.sw { background: linear-gradient(180deg, #2a2258, #3d3470); box-shadow: inset 0 1px 3px rgba(0, 0, 0, .5), 0 0 0 1px rgba(190, 170, 255, .25); }
+.sw::after { background: radial-gradient(circle at 35% 30%, #fff, #e6e0ff 60%, #b9adec); box-shadow: 0 1px 3px rgba(0, 0, 0, .4); }
+.sw.on { background: linear-gradient(90deg, #6f8bff, #6fe6ff); box-shadow: inset 0 1px 2px rgba(0, 0, 0, .25), 0 0 0 1px rgba(143, 240, 255, .6), 0 0 .5rem rgba(143, 240, 255, .35); }
+.seg { background: rgba(8, 5, 26, .45); box-shadow: inset 0 0 0 1px rgba(190, 170, 255, .2); }
+.seg button.on, .seg .seg-b.on, .fchip.on { background: linear-gradient(180deg, #e9fbff, #9feaff 55%, #79c8ff); color: #10204a; box-shadow: 0 0 .5rem rgba(143, 240, 255, .4); }
+
+/* tabs: selected = clear cyan crystal (not gold, which is kept for actions) */
+.ftab, .dtab, .fchip { border: 1.5px solid transparent; background: var(--facets), linear-gradient(180deg, rgba(255, 255, 255, .07), rgba(255, 255, 255, .02)) padding-box, var(--pz-base) padding-box, var(--pz-rim-soft) border-box; color: var(--pz-muted); position: relative; overflow: hidden; transition: color var(--pz-med), filter var(--pz-med); }
+.dtabs { background: rgba(8, 5, 26, .4); box-shadow: inset 0 0 0 1px rgba(190, 170, 255, .16); padding: .2rem; gap: .2rem; border-radius: 0; clip-path: polygon(7px 0, calc(100% - 7px) 0, 100% 7px, 100% calc(100% - 7px), calc(100% - 7px) 100%, 7px 100%, 0 calc(100% - 7px), 0 7px); }
+.ftab.on, .dtab.on { color: #0f1d48; background: var(--facets), linear-gradient(180deg, #f2fdff, #a9eeff 55%, #7ec9ff) padding-box, var(--pz-rim-gold) border-box; box-shadow: 0 0 .7rem rgba(143, 240, 255, .35); }
+.fchip.on { color: #10204a; }
+
+/* ===================================================== HUD ===================================================== */
+.pill {
+  border: 1.5px solid transparent; background: var(--facets), var(--pz-opal) padding-box, linear-gradient(180deg, rgba(42, 32, 98, .86), rgba(18, 13, 48, .9)) padding-box, var(--pz-rim) border-box;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .14); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+}
+.res { gap: 1.1rem; padding: .3rem .95rem; font-size: 1rem; font-variant-numeric: tabular-nums; }
+.res span { position: relative; } .res span + span::before { content: ''; position: absolute; left: -.58rem; top: 15%; bottom: 15%; width: 1px; background: linear-gradient(transparent, rgba(190, 170, 255, .5), transparent); }
+.res .gold { color: #ffe08a; } .res .food { color: #ffb1a6; } .res .gems { color: #a9ecff; }
+.res .bump { transform: scale(1.18); text-shadow: 0 0 .6rem currentColor; }
+.rank small { color: #e7defe; letter-spacing: .12em; font-weight: 800; }
+.rank small b, .rank .rk-n { color: var(--pz-gold); }
+.mission-pill { --cut: 9px; position: absolute; overflow: hidden; }
+.mission-pill b { color: var(--pz-gold); letter-spacing: .12em; }
+.mission-pill.ready { animation: none; --glint: rgba(170, 255, 190, .9); background: var(--facets), radial-gradient(120% 120% at 0 0, rgba(123, 224, 138, .25), transparent 60%) padding-box, linear-gradient(180deg, rgba(42, 32, 98, .9), rgba(18, 13, 48, .92)) padding-box, linear-gradient(118deg, #b9ffc8, #8ff0ff 50%, #ffd978) border-box; }
+.avatar-btn { border: 1.5px solid transparent; --cut: 8px; background: var(--facets), radial-gradient(circle at 50% 30%, rgba(255, 220, 255, .25), transparent 60%) padding-box, linear-gradient(180deg, #5d48c2, #261d5c) padding-box, var(--pz-rim-gold) border-box; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .3); }
+
+/* bottom navigation: glass tiles, light gathers on press; the Battle triangle keeps its own shape */
+.nbtn {
+  border: 1.5px solid transparent; color: #f4efff; letter-spacing: .02em;
+  background: radial-gradient(90% 70% at 50% 0%, rgba(255, 200, 255, .22), transparent 70%) padding-box, linear-gradient(180deg, #5a46b6, #2e2470 70%, #241c58) padding-box, var(--pz-rim) border-box;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .28), inset 0 -.25rem 0 rgba(10, 6, 40, .45), 0 .3rem .6rem rgba(4, 2, 18, .35);
+  transition: transform var(--pz-fast), filter var(--pz-med);
+}
+.nbtn .ico { filter: drop-shadow(0 1px 0 rgba(10, 5, 40, .6)); }
+.nbtn:active { transform: translateY(1px) scale(.95); filter: brightness(1.15); }
+.nbtn.on { background: radial-gradient(90% 80% at 50% 0%, rgba(160, 250, 255, .4), transparent 70%) padding-box, linear-gradient(180deg, #6a5ad8, #34298a) padding-box, var(--pz-rim-gold) border-box; }
+.nbtn.locked { opacity: .5; filter: saturate(.2); }
+.badge { background: radial-gradient(circle at 35% 30%, #ffd0e8, #ff5e9a 55%, #d0326e); border: 1.5px solid #fff4fa; box-shadow: 0 0 .45rem rgba(255, 94, 154, .55); animation: none; }
+
+/* toasts and achievement toasts */
+.toast { --cut: 10px; border: 1.5px solid transparent; background: var(--facets), var(--pz-opal) padding-box, linear-gradient(170deg, rgba(56, 42, 120, .94), rgba(22, 16, 58, .96)) padding-box, var(--pz-rim) border-box; box-shadow: none; filter: drop-shadow(0 .4rem .7rem rgba(4, 2, 18, .4)); animation: pztoast .32s var(--pz-ease); }
+@keyframes pztoast { from { opacity: 0; transform: translate(-50%, -.6rem) scale(.97); } }
+.ach-toast { --cut: 9px; border: 1.5px solid transparent; background: var(--facets), radial-gradient(120% 140% at 0 50%, rgba(255, 217, 120, .28), transparent 60%) padding-box, linear-gradient(170deg, rgba(64, 44, 120, .95), rgba(26, 18, 60, .96)) padding-box, var(--pz-rim-gold) border-box; animation: pzach .45s var(--pz-ease); }
+.ach-toast small { color: var(--pz-gold); letter-spacing: .16em; }
+.ach-toast .ach-i, .ach-toast > .ico:first-child { filter: drop-shadow(0 0 .35rem rgba(255, 217, 120, .7)); }
+@keyframes pzach { from { opacity: 0; transform: translate(-50%, .8rem) scale(.95); } }
+
+/* ===================================================== information ===================================================== */
+/* chips: element gems. The element hue stays the identity; the gem gets a top highlight and a dark keyline */
+.chip { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .5), inset 0 -1px 0 rgba(0, 0, 0, .2), 0 0 0 1px rgba(10, 5, 35, .35); background-image: linear-gradient(180deg, rgba(255, 255, 255, .28), rgba(255, 255, 255, 0) 60%); letter-spacing: .03em; }
+/* progress bars: crystal tubes. Fills keep their meaning (green health, gold XP) with a glass highlight on top */
+.bar { background: linear-gradient(180deg, rgba(6, 3, 22, .7), rgba(30, 22, 70, .6)); border: 1px solid rgba(190, 170, 255, .28); box-shadow: inset 0 1px 2px rgba(0, 0, 0, .5); position: relative; }
+.bar > i { position: relative; background: linear-gradient(180deg, #d4ffd8, #6fe08a 55%, #3fbf62); box-shadow: 0 0 .35rem rgba(111, 224, 138, .45); }
+.bar.xp > i { background: linear-gradient(90deg, #ffd86b, #ffb46b 55%, #ff9ee0); box-shadow: 0 0 .4rem rgba(255, 190, 120, .5); }
+.bar > i::after { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 45%; background: linear-gradient(180deg, rgba(255, 255, 255, .55), rgba(255, 255, 255, 0)); border-radius: inherit; }
+/* animated progress: a slow glint runs along XP and timer bars that are on screen in the HUD, details and timers */
+/* transform-only (composited): a full-width layer with a narrow bright band slides across the fill */
+.bar { overflow: hidden; }
+.comp .bar.xp > i::before, .rank .bar > i::before, .timer-box .bar > i::before, .hslot .bar > i::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent 40%, rgba(255, 255, 255, .6) 50%, transparent 60%); transform: translateX(-100%); animation: pzbar 3.2s ease-in-out infinite; will-change: transform; }
+@keyframes pzbar { 0%, 30% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+.bar.hp.mid > i { background: linear-gradient(180deg, #fff1b0, #ffc95a 55%, #f0a23a); } .bar.hp.low > i { background: linear-gradient(180deg, #ffc4c4, #ff6a6a 55%, #e03a4a); }
+
+/* ===================================================== monsters ===================================================== */
+/* the creature is the focus: it stands on a soft prism halo and pedestal, the interface frames it from the edges */
+.detail .big, .bp-art, .reveal-art, .evo-stage, .comp .art { position: relative; }
+.detail .big::before, .reveal .reveal-art::before, .evolve .evo-stage::before {
+  content: ''; position: absolute; left: 8%; right: 8%; bottom: 2%; height: 22%; z-index: -1; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(170, 240, 255, .5), rgba(180, 155, 255, .28) 55%, transparent);
+}
+.detail .big, .detail .big.viewer3d { background: radial-gradient(60% 55% at 50% 45%, rgba(255, 210, 250, .16), transparent 70%), radial-gradient(circle at 50% 80%, rgba(143, 240, 255, .12), transparent 60%); border-radius: 0; isolation: isolate; }
+.stats { gap: .35rem; }
+.stat { --cut: 5px; padding: .3rem .25rem; } .stat b { font-size: 1.08rem; font-variant-numeric: tabular-nums; background: linear-gradient(180deg, #fff, #e6dcff); -webkit-background-clip: text; background-clip: text; color: transparent; } .stat em { color: #8ff0b0; }
+/* collection cards */
+.card { --cut: 8px; border: 1.5px solid transparent; background: var(--facets), radial-gradient(70% 55% at 50% 38%, rgba(255, 220, 255, .14), transparent 70%) padding-box, linear-gradient(180deg, rgba(56, 42, 120, .82), rgba(26, 20, 64, .9)) padding-box, var(--pz-base) padding-box, var(--pz-rim-soft) border-box; transition: transform var(--pz-fast); }
+.card.unknown { background: var(--facets), linear-gradient(180deg, rgba(18, 12, 46, .7), rgba(10, 6, 30, .8)) padding-box, linear-gradient(118deg, rgba(190, 170, 255, .18), rgba(143, 240, 255, .14)) border-box; }
+.card.sel { background: var(--facets), radial-gradient(70% 55% at 50% 38%, rgba(160, 250, 255, .22), transparent 70%) padding-box, linear-gradient(180deg, rgba(66, 52, 140, .9), rgba(30, 22, 72, .92)) padding-box, var(--pz-rim-gold) border-box; box-shadow: none; }
+.card.legendary, .card.r-legendary { background: var(--facets), radial-gradient(70% 55% at 50% 38%, rgba(255, 230, 160, .2), transparent 70%) padding-box, linear-gradient(180deg, rgba(66, 50, 120, .88), rgba(30, 22, 70, .92)) padding-box, var(--pz-spectrum) border-box; }
+/* the bottom-left companion panel */
+.comp { --cut: 10px; }
+.comp.sel8.picked { background: var(--facets), var(--pz-opal) padding-box, var(--pz-sheet) padding-box, var(--pz-rim-gold) border-box; }
+.comp .nm { letter-spacing: .02em; }
+.comp .art::before { content: ''; position: absolute; left: 6%; right: 6%; bottom: 0; height: 26%; border-radius: 50%; background: radial-gradient(closest-side, rgba(170, 240, 255, .45), transparent); z-index: -1; }
+.comp .art { isolation: isolate; }
+/* evolution path and badges */
+.evo-badge { background: var(--pz-spectrum); color: #1a1240; box-shadow: 0 0 .5rem rgba(255, 170, 230, .45); }
+.lvlup { background: linear-gradient(90deg, #ffe08a, #ffb6e6, #a9ecff); -webkit-background-clip: text; background-clip: text; color: transparent; letter-spacing: .04em; }
+
+/* ===================================================== buildings ===================================================== */
+.bp-art { --cut: 10px; clip-path: polygon(var(--cut) 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, var(--cut) 100%, 0 calc(100% - var(--cut)), 0 var(--cut)); border-radius: 0; background: radial-gradient(70% 60% at 50% 40%, rgba(255, 230, 255, .18), transparent 70%), radial-gradient(60% 30% at 50% 88%, rgba(143, 240, 255, .2), transparent 70%), linear-gradient(180deg, rgba(40, 30, 92, .6), rgba(14, 10, 38, .7)); box-shadow: inset 0 0 0 1px rgba(190, 170, 255, .22); }
+.timer-box { --cut: 7px; }
+.rchip { border: 1.5px solid transparent; background: linear-gradient(180deg, rgba(255, 255, 255, .08), rgba(255, 255, 255, .03)) padding-box, var(--pz-base) padding-box, var(--pz-rim-soft) border-box; }
+.rchip.add { border: 1.5px dashed rgba(190, 170, 255, .5); background: rgba(255, 255, 255, .03); }
+.prodopt { --cut: 7px; border: 1.5px solid transparent; background: linear-gradient(180deg, rgba(10, 6, 30, .35), rgba(10, 6, 30, .2)) padding-box, var(--pz-base) padding-box, var(--pz-rim-soft) border-box; }
+.prodopt.on { background: radial-gradient(120% 120% at 0 0, rgba(143, 240, 255, .18), transparent 60%) padding-box, linear-gradient(180deg, rgba(60, 46, 128, .7), rgba(26, 20, 64, .7)) padding-box, var(--pz-base) padding-box, var(--pz-rim-gold) border-box; }
+.prodopt em { color: var(--pz-cyan); }
+.hslot { --cut: 8px; border: 1.5px solid transparent; background: var(--facets), linear-gradient(180deg, rgba(56, 42, 120, .55), rgba(20, 15, 52, .7)) padding-box, var(--pz-base) padding-box, var(--pz-rim-soft) border-box; }
+.hslot.free { border: 1.5px dashed rgba(190, 170, 255, .45); background: rgba(255, 255, 255, .03); }
+.hslot.free.sel { border-color: transparent; background: var(--facets), radial-gradient(100% 100% at 50% 0, rgba(143, 240, 255, .2), transparent 70%) padding-box, var(--pz-base) padding-box, var(--pz-rim-gold) border-box; }
+.hslot.ready { background: var(--facets), radial-gradient(100% 100% at 50% 0, rgba(123, 224, 138, .25), transparent 70%) padding-box, var(--pz-base) padding-box, linear-gradient(118deg, #b9ffc8, #8ff0ff) border-box; }
+/* costs: affordable reads clean, unaffordable keeps the soft red the game already uses */
+.res-row, .costs { font-variant-numeric: tabular-nums; }
+
+/* ===================================================== rarity ===================================================== */
+/* One ladder for items, creatures and rewards. Intensity rises with rarity; common things stay calm.
+   common: plain · uncommon: green edge · rare: blue edge + soft glow · epic: violet edge, glow, occasional sweep ·
+   mythic / legendary: the full spectrum rim, glow and sweep. */
+.gitem, .fitem { --cut: 7px; border: 1.5px solid transparent; border-left-width: 1.5px; background: var(--facets), var(--pz-base) padding-box, linear-gradient(118deg, rgba(205, 199, 226, .35), rgba(205, 199, 226, .12)) border-box; }
+.gitem.r-uncommon, .fitem:has(.t-uncommon) { background: var(--facets), linear-gradient(90deg, rgba(143, 227, 154, .12), transparent 40%) padding-box, var(--pz-base) padding-box, linear-gradient(118deg, var(--r-uncommon), rgba(143, 227, 154, .25)) border-box; }
+.gitem.r-rare, .fitem:has(.t-rare) { background: var(--facets), linear-gradient(90deg, rgba(127, 198, 255, .16), transparent 45%) padding-box, var(--pz-base) padding-box, linear-gradient(118deg, var(--r-rare), rgba(143, 240, 255, .5) 50%, rgba(127, 198, 255, .3)) border-box; }
+.gitem.r-epic, .fitem:has(.t-epic) { background: var(--facets), linear-gradient(90deg, rgba(207, 155, 255, .2), transparent 50%) padding-box, var(--pz-base) padding-box, linear-gradient(118deg, #ffb6e6, var(--r-epic) 45%, #8f9bff) border-box; }
+.gitem.r-mythic, .fitem:has(.t-mythic) { background: var(--facets), linear-gradient(90deg, rgba(255, 217, 120, .2), rgba(255, 158, 224, .1) 40%, transparent 60%) padding-box, var(--pz-base) padding-box, var(--pz-spectrum) border-box; }
+.tier.t-uncommon { color: var(--r-uncommon); } .tier.t-rare { color: var(--r-rare); } .tier.t-epic { color: var(--r-epic); }
+.tier.t-mythic { background: var(--pz-spectrum); -webkit-background-clip: text; background-clip: text; color: transparent; font-weight: 900; }
+.gicon.r-rare { filter: drop-shadow(0 0 2px rgba(127, 198, 255, .7)); } .gicon.r-epic { filter: drop-shadow(0 0 3px rgba(207, 155, 255, .8)); } .gicon.r-mythic { filter: drop-shadow(0 0 4px rgba(255, 217, 120, .9)); }
+.chip.uniq { background: var(--pz-spectrum); color: #1a1240; }
+
+/* ===================================================== rewards and ceremonies ===================================================== */
+/* banners (level up, rank up): spectral lettering over a soft prism burst, no heavy blur */
+.banner-fx h1 { background: linear-gradient(180deg, #fffbe8 10%, #ffd978 45%, #ff9ee0 75%, #a9ecff); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-stroke: 0; text-shadow: none; filter: drop-shadow(0 .14rem 0 rgba(60, 20, 70, .85)) drop-shadow(0 0 .7rem rgba(255, 217, 120, .55)); letter-spacing: .1em; }
+.banner-fx::before { content: ''; position: absolute; left: 50%; top: 50%; width: 22rem; height: 22rem; transform: translate(-50%, -50%); z-index: -1; pointer-events: none;
+  background: repeating-conic-gradient(from 0deg, rgba(255, 240, 200, .22) 0 6deg, transparent 6deg 18deg); -webkit-mask: radial-gradient(closest-side, #000 20%, transparent); mask: radial-gradient(closest-side, #000 20%, transparent); animation: pzrays 1.9s ease-out forwards; }
+@keyframes pzrays { from { opacity: 0; transform: translate(-50%, -50%) scale(.5) rotate(0); } 25% { opacity: 1; } to { opacity: 0; transform: translate(-50%, -50%) scale(1.2) rotate(25deg); } }
+.banner-fx p { text-shadow: 0 .1rem .35rem rgba(0, 0, 0, .8); }
+
+/* reveal (a new Amina) and evolution: the card glows; legendary creatures get the spectrum rim and turning rays */
+.vcard h1 { background: linear-gradient(180deg, #fffbe8 20%, #ffd978 60%, #ffb6e6); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: none; filter: drop-shadow(0 .12rem 0 rgba(40, 14, 60, .7)); }
+.reveal .reveal-art, .evolve .evo-stage { isolation: isolate; }
+.reveal .reveal-art::after, .evolve.done .evo-stage::after { content: ''; position: absolute; inset: -25%; z-index: -2; pointer-events: none; background: repeating-conic-gradient(from 0deg, rgba(255, 236, 190, .16) 0 8deg, transparent 8deg 22deg); -webkit-mask: radial-gradient(closest-side, #000 25%, transparent 92%); mask: radial-gradient(closest-side, #000 25%, transparent 92%); animation: pzspin 24s linear infinite; }
+.vcard.r-legendary { background: var(--facets), radial-gradient(90% 60% at 50% 30%, rgba(255, 217, 120, .2), transparent 70%) padding-box, var(--pz-opal) padding-box, var(--pz-sheet) padding-box, var(--pz-spectrum) border-box; --pz-edge: 3px; }
+.vcard.r-legendary .reveal-art::after { background: repeating-conic-gradient(from 0deg, rgba(255, 158, 224, .22) 0 6deg, rgba(143, 240, 255, .2) 6deg 12deg, rgba(255, 217, 120, .22) 12deg 18deg, transparent 18deg 26deg); animation-duration: 14s; }
+.vcard .rar-tag { display: block; width: max-content; margin: .1rem auto .25rem; padding: .08rem .6rem; font-size: .7rem; font-weight: 900; letter-spacing: .2em; text-transform: uppercase; color: #1a1240; background: var(--pz-spectrum); clip-path: polygon(5px 0, calc(100% - 5px) 0, 100% 50%, calc(100% - 5px) 100%, 5px 100%, 0 50%); }
+@keyframes pzspin { to { transform: rotate(360deg); } }
+.evo-flash { background: radial-gradient(circle, #fff 0%, rgba(255, 240, 255, .75) 25%, rgba(170, 240, 255, .45) 45%, transparent 70%); }
+
+/* item discoveries (src/ui-prism.js): a reward card whose intensity follows rarity */
+.reward-wrap { position: absolute; left: 50%; top: calc(4.6rem + var(--sat)); transform: translateX(-50%); z-index: 72; pointer-events: none; width: min(24rem, 80%); }
+.reward-card { --cut: 12px; pointer-events: auto; position: relative; overflow: hidden; display: grid; grid-template-columns: 3.2rem 1fr; gap: .2rem .7rem; align-items: center; padding: .6rem .8rem; border: 2px solid transparent; color: var(--pz-text);
+  background: var(--facets), var(--pz-opal) padding-box, linear-gradient(170deg, rgba(58, 44, 124, .96), rgba(22, 16, 58, .97)) padding-box, linear-gradient(118deg, var(--rc, #cdc7e2), rgba(255, 255, 255, .25)) border-box;
+  filter: drop-shadow(0 .4rem .8rem rgba(4, 2, 18, .45)); animation: pzreward .5s var(--pz-ease); }
+.reward-card .rw-ico { width: 3.2rem; height: 3.2rem; display: grid; place-items: center; grid-row: span 3; position: relative; isolation: isolate; }
+.reward-card .rw-ico svg { width: 2.6rem; height: 2.6rem; }
+.reward-card .rw-ico::before { content: ''; position: absolute; inset: -10%; z-index: -1; border-radius: 50%; background: radial-gradient(closest-side, var(--rc, #cdc7e2), transparent); opacity: .45; }
+.reward-card small { font-size: .64rem; font-weight: 900; letter-spacing: .18em; text-transform: uppercase; color: var(--rc, #cdc7e2); }
+.reward-card > * { min-width: 0; } .reward-card b { font-size: 1.02rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .reward-card .rw-sub { white-space: normal; line-height: 1.25; } .reward-card .rw-sub { font-size: .74rem; color: var(--pz-muted); }
+.reward-card.r-uncommon { --rc: var(--r-uncommon); } .reward-card.r-rare { --rc: var(--r-rare); } .reward-card.r-epic { --rc: var(--r-epic); }
+.reward-card.r-rare .rw-ico::before { opacity: .65; } .reward-card.r-epic .rw-ico::before { opacity: .8; }
+.reward-card.r-mythic, .reward-card.r-legendary { --rc: var(--r-mythic); background: var(--facets), radial-gradient(90% 120% at 0 50%, rgba(255, 217, 120, .25), transparent 60%) padding-box, var(--pz-opal) padding-box, linear-gradient(170deg, rgba(64, 46, 128, .97), rgba(24, 16, 60, .98)) padding-box, var(--pz-spectrum) border-box; }
+.reward-card.r-mythic small, .reward-card.r-legendary small { background: var(--pz-spectrum); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.reward-card.r-mythic .rw-ico::after, .reward-card.r-legendary .rw-ico::after { content: ''; position: absolute; inset: -60%; z-index: -2; background: repeating-conic-gradient(rgba(255, 236, 190, .3) 0 7deg, transparent 7deg 20deg); -webkit-mask: radial-gradient(closest-side, #000 20%, transparent); mask: radial-gradient(closest-side, #000 20%, transparent); animation: pzspin 10s linear infinite; }
+.reward-card.out { opacity: 0; transform: translateY(-.4rem); transition: opacity .3s, transform .3s; }
+@keyframes pzreward { from { opacity: 0; transform: translateY(-.8rem) scale(.92); } 60% { transform: translateY(0) scale(1.02); } }
+
+/* ===================================================== motion budget ===================================================== */
+/* Everything above is still unless selected, ready or rare. When the island rests, a panel covers it, the page is
+   hidden, Battery saver is on or the player asked for less motion, the decorative motion stops entirely. */
+body.perf-saver .btn::after, body.perf-saver .ftab.on::after, body.perf-saver .dtab.on::after, body.perf-saver .mission-pill.ready::after,
+body.perf-saver .bar > i::before, body.perf-saver .reveal .reveal-art::after, body.perf-saver .evolve .evo-stage::after, body.perf-saver .reward-card .rw-ico::after,
+body.calm .btn::after, body.calm .ftab.on::after, body.calm .dtab.on::after, body.calm .mission-pill.ready::after, body.calm .bar > i::before, body.calm .reveal .reveal-art::after,
+body.calm .evolve .evo-stage::after, body.calm .reward-card .rw-ico::after, body.calm .reward-card::after, body.perf-saver .reward-card::after { animation: none !important; }
+body.perf-rest .hud *, body.perf-covered .hud *, body.perf-hidden .hud *, body.perf-rest .comp *, body.perf-covered .comp *, body.perf-rest .rank *, body.perf-covered .rank *, body.perf-hidden .bar > i::before { animation-play-state: paused !important; }
+body.perf-rest .bar > i::before, body.perf-covered .bar > i::before { animation-play-state: paused !important; }
+/* a panel's own bars (timers, hatchery) keep moving while it is open: they sit inside .overlay */
+body.perf-covered .overlay .bar > i::before { animation-play-state: running !important; }
+body.perf-saver .overlay .sheet.panel, body.perf-saver .pill { -webkit-backdrop-filter: none; backdrop-filter: none; }
+body.calm .overlay, body.calm .overlay > .sheet, body.calm .toast, body.calm .ach-toast, body.calm .reward-card { animation: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  .btn::after, .ftab.on::after, .dtab.on::after, .mission-pill.ready::after, .bar > i::before, .reveal .reveal-art::after, .evolve .evo-stage::after, .reward-card .rw-ico::after, .reward-card::after,
+  .overlay, .overlay > .sheet, .toast, .ach-toast, .reward-card, .banner-fx::before { animation: none !important; }
+}
+
+/* ===================================================== small screens ===================================================== */
+@media (max-height: 400px) { .reward-wrap { top: calc(3.6rem + var(--sat)); } .reward-card { padding: .45rem .65rem; grid-template-columns: 2.6rem 1fr; } .reward-card .rw-ico { width: 2.6rem; height: 2.6rem; } }
+
+/* item rows: the old left stripe is replaced by the full rarity rim; equipped items keep a gold inner marker */
+.gitem.gitem, .fitem.fitem { border-left-color: transparent; }
+.fitem.fitem.worn { box-shadow: inset .22rem 0 0 var(--pz-gold); }

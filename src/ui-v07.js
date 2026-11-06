@@ -255,7 +255,7 @@
   };
   UI.act('bag', () => UI.bag());
   // item notices
-  R.on((ev) => { if (ev.name === 'item' && !/^forge/.test(ev.data.source || '') && UI.toast && S.state && S.state.phase === 'play') setTimeout(() => UI.toast('New equipment: ' + D.ITEMS[ev.data.id].name + '. Equip it from the Forge or a creature’s Gear tab.', 'c'), 400); });
+  R.on((ev) => { if (ev.name === 'item' && !/^forge/.test(ev.data.source || '') && UI.toast && S.state && S.state.phase === 'play') setTimeout(() => { if (UI.itemFound) UI.itemFound(ev.data.id); else UI.toast('New equipment: ' + D.ITEMS[ev.data.id].name + '. Equip it from the Forge or a creature’s Gear tab.', 'c'); }, 400); }); // Phase 5: rarity reward card
 })(typeof window !== 'undefined' ? window : globalThis);
 /* Dev 7: keep the performance body classes in step with panels opening and closing (pauses the island under them) */
 (function (root) {
