@@ -1,3 +1,5 @@
 tests/shots*/
 *.bundle
 node_modules/
+# library glTF exports are large and regenerable: node tools/export-library.js
+assets/library/glb/

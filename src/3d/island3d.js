@@ -13,8 +13,9 @@
    in the background and in Battery saver. */
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.170.0/+esm';
 import { VoxGrid, meshGrid, hash, pick } from './voxmesh.js';
-import { PAL, TV, DV, UNIT_PX, HEIGHT_PX, MAGIC } from './voxstyle.js';
+import { PAL, TV, DV, UNIT_PX, HEIGHT_PX, MAGIC, LIGHT } from './voxstyle.js';
 import * as VB from './voxbuild.js';
+import './library/vegetation.js'; import './library/terrain.js'; import './library/decor.js'; // Phase 2: library kinds used by the island
 
 const A = window.A;
 const COARSE = !!(window.matchMedia && matchMedia('(pointer: coarse)').matches);
@@ -163,8 +164,8 @@ export function createIsland() {
   const scene = new THREE.Scene(), camera = new THREE.OrthographicCamera(-1, 1, 1, -1, -200, 200);
   camera.up.copy(UP);
   // Phase 1.1 light: warmer, brighter sun and a stronger sky fill so shadows stay soft and colourful, never murky
-  const hemi = new THREE.HemisphereLight('#eaf6ff', '#b39a6c', 1.3); scene.add(hemi);
-  const sun = new THREE.DirectionalLight('#ffe6b8', 2.2); sun.castShadow = true;
+  const hemi = new THREE.HemisphereLight(LIGHT.sky, LIGHT.ground, LIGHT.hemi); scene.add(hemi);
+  const sun = new THREE.DirectionalLight(LIGHT.sun, LIGHT.sunI); sun.castShadow = true;
   sun.shadow.mapSize.set(COARSE ? 1024 : 2048, COARSE ? 1024 : 2048); sun.shadow.bias = -0.0008; sun.shadow.normalBias = 0.02; sun.shadow.radius = 3; sun.shadow.blurSamples = 8;
   scene.add(sun); scene.add(sun.target);
   const groups = { terrain: new THREE.Group(), things: new THREE.Group(), fx: new THREE.Group() };
@@ -259,23 +260,25 @@ export function createIsland() {
     if (sig === state.sig) return;
     state.sig = sig;
     groups.things.children.slice().forEach((c) => { groups.things.remove(c); if (c.isInstancedMesh) c.dispose(); });
+    if (detail) detail = null;
     const batches = new Map(); // geometry -> { mat, list: [matrix] , sway }
-    const push = (geo, mat, x, y, z, ry, sway, s) => { if (!geo) return; const k = geo.uuid + mat.uuid; let bt = batches.get(k); if (!bt) batches.set(k, (bt = { geo, mat, list: [], sway })); bt.list.push(new THREE.Matrix4().compose(new THREE.Vector3(x, y, z), new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), ry || 0), new THREE.Vector3(s || 1, s || 1, s || 1))); };
+    const push = (geo, mat, x, y, z, ry, sway, s, lgeo, nature) => { if (!geo) return; const k = geo.uuid + mat.uuid; let bt = batches.get(k); if (!bt) batches.set(k, (bt = { geo, mat, list: [], sway, lgeo, nature })); bt.list.push(new THREE.Matrix4().compose(new THREE.Vector3(x, y, z), new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), ry || 0), new THREE.Vector3(s || 1, s || 1, s || 1))); };
     const occupied = new Set();
     items.forEach((it) => {
       for (let y = it.y; y < it.y + it.h; y++) for (let x = it.x; x < it.x + it.w; x++) occupied.add(x + ',' + y);
       const cx = it.x + it.w / 2, cz = it.y + it.h / 2;
-      if (it.k === 'b') { const md = VB.buildingModel({ type: it.type, level: it.level, state: it.state, rot: it.rot }, { w0: it.w0, h0: it.h0 }, { art: it.art, cat: it.cat }); if (md) { push(md.geo, matSolid, cx, 0, cz); push(md.glow, matGlow, cx, 0, cz); } }
-      else if (it.k === 'l' && it.kind && VB.hasExtra(it.kind)) { const md = VB.extraModel(it.kind, it.on); if (md) { push(md.geo, matSolid, cx, 0, cz); push(md.glow, matGlow, cx, 0, cz); } }
-      else if (it.k === 'o') { const md = VB.natureModel(it.type, it.seed, it.w, it.h); if (md) { const ry = (it.seed % 4) * Math.PI / 2, sway = it.type === 'oak' || it.type === 'pine' || it.type === 'bush'; push(md.geo, sway ? matSway : matSolid, cx, 0, cz, ry, sway); push(md.glow, matGlow, cx, 0, cz, ry); } }
+      if (it.k === 'b') { const md = VB.buildingModel({ type: it.type, level: it.level, state: it.state, rot: it.rot }, { w0: it.w0, h0: it.h0 }, { art: it.art, cat: it.cat }); if (md) { push(md.geo, matSolid, cx, 0, cz, 0, false, 1, md.lod && md.lod.geo); push(md.glow, matGlow, cx, 0, cz, 0, false, 1, md.lod && md.lod.glow); } }
+      else if (it.k === 'l' && it.kind && VB.hasExtra(it.kind)) { const md = VB.extraModel(it.kind, it.on); if (md) { push(md.geo, matSolid, cx, 0, cz, 0, false, 1, md.lod && md.lod.geo); push(md.glow, matGlow, cx, 0, cz, 0, false, 1, md.lod && md.lod.glow); } }
+      else if (it.k === 'o') { const md = VB.natureModel(it.type, it.seed, it.w, it.h); if (md) { const ry = (it.seed % 4) * Math.PI / 2, sway = it.type === 'oak' || it.type === 'pine' || it.type === 'bush'; push(md.geo, sway ? matSway : matSolid, cx, 0, cz, ry, sway, 1, md.lod && md.lod.geo, true); push(md.glow, matGlow, cx, 0, cz, ry, false, 1, md.lod && md.lod.glow, true); } }
     });
     // scenery trees on hills, ledges and loose chunks, and meadow details, skipping anything occupied
-    (scenery || []).forEach((sc) => { if (occupied.has(sc.cx + ',' + sc.cz)) return; const md = VB.natureModel(sc.kind, sc.seed); if (md) push(md.geo, matSway, sc.x, sc.y, sc.z, sc.ry, true, sc.s); });
+    (scenery || []).forEach((sc) => { if (occupied.has(sc.cx + ',' + sc.cz)) return; const md = VB.natureModel(sc.kind, sc.seed); if (md) { push(md.geo, sc.still ? matSolid : matSway, sc.x, sc.y, sc.z, sc.ry, !sc.still, sc.s, md.lod && md.lod.geo, true); push(md.glow, matGlow, sc.x, sc.y, sc.z, sc.ry, false, sc.s, md.lod && md.lod.glow, true); } });
+    lodPairs = [];
     batches.forEach((bt) => {
-      const im = new THREE.InstancedMesh(bt.geo, bt.mat, bt.list.length); bt.list.forEach((m, i) => im.setMatrixAt(i, m)); im.instanceMatrix.needsUpdate = true;
-      if (bt.mat !== matGlow) { im.castShadow = true; im.receiveShadow = true; }
-      im.computeBoundingSphere(); groups.things.add(im);
+      const make = (geo) => { const im = new THREE.InstancedMesh(geo, bt.mat, bt.list.length); bt.list.forEach((m, i) => im.setMatrixAt(i, m)); im.instanceMatrix.needsUpdate = true; if (bt.mat !== matGlow) { im.castShadow = true; im.receiveShadow = true; } im.computeBoundingSphere(); groups.things.add(im); return im; };
+      const full = make(bt.geo); full.userData.nature = !!bt.nature; if (bt.lgeo) { const lo = make(bt.lgeo); lo.userData.nature = !!bt.nature; lodPairs.push([full, lo, !!bt.nature]); }
     });
+    applyLod(true);
     buildDetail(occupied); buildSparks(items);
     state.shadowDirty = true; state.dirty = true; state.moved = true;
   }
@@ -381,6 +384,18 @@ export function createIsland() {
     try { return occCtx.getImageData(px, py, 1, 1).data[3] > 40; } catch (e) { return false; }
   }
 
+  /* ---- level of detail (Phase 2) ----
+     Every building, tree and rock has a half-resolution twin (Model.lod in voxbuild.js). Nature switches to it when
+     the camera is near its widest zoom (a prop voxel is then about 2 screen pixels); buildings keep full detail,
+     because their silhouettes carry the island's identity. In Battery saver everything uses the twins. Same draw
+     calls either way; the twins have roughly a quarter of the triangles. */
+  const LOD_Z = 0.4; let lodPairs = [], lodOn = null;
+  function applyLod(force) {
+    const v = state.view, far = !!(v && v.z < LOD_Z), sv = saver(), key = (far ? 1 : 0) + (sv ? 2 : 0);
+    if (!force && key === lodOn) return; lodOn = key;
+    lodPairs.forEach(([full, lo, nature]) => { const on = sv || (far && nature); full.visible = !on; lo.visible = on; }); state.shadowDirty = true;
+  }
+
   /* ---- camera: same view as the 2D layer ---- */
   function setView(cam, view) {
     state.view = { x: cam.x, y: cam.y, z: cam.z, w: view.w, h: view.h };
@@ -392,7 +407,7 @@ export function createIsland() {
     const pr = Math.min(window.devicePixelRatio || 1, saver() ? 1 : COARSE ? 1.5 : 2);
     if (R.getPixelRatio() !== pr) R.setPixelRatio(pr);
     const sz = R.getSize(new THREE.Vector2()); if (sz.x !== view.w || sz.y !== view.h) R.setSize(view.w, view.h, true);
-    state.dirty = true; state.moved = true; kick();
+    applyLod(false); state.dirty = true; state.moved = true; kick();
   }
   const saver = () => !!(A && A.Perf && A.Perf.saver());
   const resting = () => !!(A && A.Perf && (A.Perf.resting() || A.Perf.hidden())) || document.body.classList.contains('perf-covered');
@@ -443,7 +458,11 @@ export function createIsland() {
     setTerrain, sync, setView, kick, setOverlay, occludedAt,
     redraw() { state.dirty = true; kick(); },
     has: (k, art, cat, st) => (k === 'b' ? VB.hasBuilding(art, cat) && st !== 'constructing' : k === 'l' ? VB.hasExtra(art) : VB.hasNature(art)),
-    stats() { const i = R.info; return { frames, avgDrawMs: frames ? +(drawMs / frames).toFixed(2) : 0, calls: i.render.calls, triangles: i.render.triangles, geometries: i.memory.geometries, textures: i.memory.textures, shadow: sun.castShadow, pixelRatio: R.getPixelRatio(), slow, terrainMs: cost.terrainMs, syncMs: cost.syncMs, occ: { shown: occ.shown, proxies: occ.data ? occ.data.up.length + occ.data.flat.length : 0, ms: +occ.cost.toFixed(1) } }; },
+    // triangles by layer: what the island is made of (for the performance report)
+    breakdown() { const t = (o) => (o.geometry && o.geometry.index ? o.geometry.index.count / 3 : 0) * (o.isInstancedMesh ? o.count : 1); const out = { terrain: 0, buildings: 0, nature: 0, detail: 0, far: 0, fx: 0 };
+      groups.terrain.traverse((o) => { if (o.isMesh) out.terrain += t(o); }); farGroup.traverse((o) => { if (o.isMesh) out.far += t(o); });
+      groups.things.children.forEach((o) => { if (!o.isMesh || !o.visible) return; if (o === detail) out.detail += t(o); else if (o.material === matSway || o.userData.nature) out.nature += t(o); else out.buildings += t(o); }); Object.keys(out).forEach((k) => (out[k] = Math.round(out[k]))); return out; },
+    stats() { const i = R.info; return { frames, avgDrawMs: frames ? +(drawMs / frames).toFixed(2) : 0, calls: i.render.calls, triangles: i.render.triangles, geometries: i.memory.geometries, textures: i.memory.textures, shadow: sun.castShadow, pixelRatio: R.getPixelRatio(), slow, lod: lodOn === 0 ? 'off' : lodOn === 1 ? 'nature' : 'all', terrainMs: cost.terrainMs, syncMs: cost.syncMs, occ: { shown: occ.shown, proxies: occ.data ? occ.data.up.length + occ.data.flat.length : 0, ms: +occ.cost.toFixed(1) } }; },
     dispose() { if (raf) cancelAnimationFrame(raf); raf = 0; clearGroup(groups.terrain); groups.things.children.slice().forEach((c) => { groups.things.remove(c); if (c.isInstancedMesh) c.dispose(); }); state = { things: new Map(), sig: '' }; },
   };
 }

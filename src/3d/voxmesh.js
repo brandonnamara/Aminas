@@ -70,3 +70,25 @@ export function meshGrid(g, o) {
 // small deterministic helpers shared by the voxel builders
 export const hash = (x, y, s) => { let h = (x * 374761393 + y * 668265263 + (s || 0) * 2147483647) | 0; h = (h ^ (h >>> 13)) * 1274126177; return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
 export const pick = (arr, h) => arr[Math.min(arr.length - 1, Math.floor(h * arr.length))];
+
+// joins two indexed geometries with the same attributes (position, normal, color) into one
+export function mergeGeo(a, b) {
+  if (!a || !b) return a || b;
+  const out = new a.constructor(), n = a.attributes.position.count;
+  ['position', 'normal', 'color'].forEach((k) => { const A1 = a.attributes[k].array, B1 = b.attributes[k].array, arr = new Float32Array(A1.length + B1.length); arr.set(A1); arr.set(B1, A1.length); out.setAttribute(k, new a.attributes[k].constructor(arr, 3)); });
+  const ia = a.index.array, ib = b.index.array, tot = n + b.attributes.position.count, idx = tot > 65535 ? new Uint32Array(ia.length + ib.length) : new Uint16Array(ia.length + ib.length); idx.set(ia); for (let i = 0; i < ib.length; i++) idx[ia.length + i] = ib[i] + n;
+  out.setIndex(new a.index.constructor(idx, 1)); out.computeBoundingSphere(); out.computeBoundingBox(); a.dispose(); b.dispose(); return out;
+}
+
+
+// half resolution copy of a grid (see Model.lod in voxbuild.js)
+export function halfGrid(src, minFill) {
+  const g = new VoxGrid(Math.floor(src.x0 / 2), Math.floor(src.y0 / 2), Math.floor(src.z0 / 2), Math.ceil(src.nx / 2) + 1, Math.ceil(src.ny / 2) + 1, Math.ceil(src.nz / 2) + 1);
+  if (!src.count) return g;
+  for (let y = g.y0; y < g.y0 + g.ny; y++) for (let z = g.z0; z < g.z0 + g.nz; z++) for (let x = g.x0; x < g.x0 + g.nx; x++) {
+    let n = 0, best = 0, bc = 0; const seen = [];
+    for (let dy = 0; dy < 2; dy++) for (let dz = 0; dz < 2; dz++) for (let dx = 0; dx < 2; dx++) { const v = src.get(x * 2 + dx, y * 2 + dy, z * 2 + dz); if (!v) continue; n++; let c = 1; for (let k = 0; k < seen.length; k++) if (seen[k] === v) c++; seen.push(v); if (c > bc) { bc = c; best = v; } }
+    if (n >= minFill) { g.d[g.idx(x, y, z)] = best; g.count++; }
+  }
+  return g;
+}

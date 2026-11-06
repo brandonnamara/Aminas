@@ -3,7 +3,7 @@
    (lit, shadowed, ambient-occluded) and glow blocks (windows, lanterns, embers: unlit and bright).
    Coordinates: x and z run across the footprint (centred on 0), y up from the ground. The entrance side of a
    building faces +z (the lit, lower-left side on screen). rot = 1 swaps x and z, like the 2D art's mirror. */
-import { VoxGrid, meshGrid, hash, pick } from './voxmesh.js';
+import { VoxGrid, meshGrid, hash, pick, mergeGeo, halfGrid } from './voxmesh.js';
 import { PAL, EL, PV, MAGIC } from './voxstyle.js';
 
 class Model {
@@ -36,22 +36,20 @@ class Model {
     }
     return y + steps;
   }
-  disc(cx, cz, r, y0, y1, c) { for (let z = Math.floor(cz - r); z <= Math.ceil(cz + r); z++) for (let x = Math.floor(cx - r); x <= Math.ceil(cx + r); x++) if ((x + 0.5 - cx) ** 2 + (z + 0.5 - cz) ** 2 <= r * r) this.box(x, y0, z, x + 1, y1, z + 1, c); return this; }
+  disc(cx, cz, r, y0, y1, c, glow) { for (let z = Math.floor(cz - r); z <= Math.ceil(cz + r); z++) for (let x = Math.floor(cx - r); x <= Math.ceil(cx + r); x++) if ((x + 0.5 - cx) ** 2 + (z + 0.5 - cz) ** 2 <= r * r) this.box(x, y0, z, x + 1, y1, z + 1, c, glow); return this; }
   ball(cx, cy, cz, rx, ry, rz, c, glow) { for (let y = Math.floor(cy - ry); y <= Math.ceil(cy + ry); y++) for (let z = Math.floor(cz - rz); z <= Math.ceil(cz + rz); z++) for (let x = Math.floor(cx - rx); x <= Math.ceil(cx + rx); x++) if (((x + 0.5 - cx) / rx) ** 2 + ((y + 0.5 - cy) / ry) ** 2 + ((z + 0.5 - cz) / rz) ** 2 <= 1) this.put(x, y, z, c, glow); return this; }
   build() {
     const g = this.g, l = this.l, u = this.u, any = (x, y, z) => g.get(x, y, z) !== 0 || l.get(x, y, z) !== 0 || u.get(x, y, z) !== 0;
     const glow = l.count ? meshGrid(l, { size: PV, ao: false, shadeFaces: false, solid: any }) : null, self = u.count ? meshGrid(u, { size: PV, solid: any }) : null;
-    return { geo: g.count ? meshGrid(g, { size: PV, solid: (x, y, z) => l.get(x, y, z) !== 0 || u.get(x, y, z) !== 0 }) : null, glow: mergeGeo(glow, self), h: g.ny * PV };
+    return { geo: g.count ? meshGrid(g, { size: PV, solid: (x, y, z) => l.get(x, y, z) !== 0 || u.get(x, y, z) !== 0 }) : null, glow: mergeGeo(glow, self), h: g.ny * PV, lod: this.lod() };
   }
-}
-
-// joins two indexed geometries with the same attributes (position, normal, color) into one
-function mergeGeo(a, b) {
-  if (!a || !b) return a || b;
-  const out = new a.constructor(), n = a.attributes.position.count;
-  ['position', 'normal', 'color'].forEach((k) => { const A1 = a.attributes[k].array, B1 = b.attributes[k].array, arr = new Float32Array(A1.length + B1.length); arr.set(A1); arr.set(B1, A1.length); out.setAttribute(k, new a.attributes[k].constructor(arr, 3)); });
-  const ia = a.index.array, ib = b.index.array, tot = n + b.attributes.position.count, idx = tot > 65535 ? new Uint32Array(ia.length + ib.length) : new Uint16Array(ia.length + ib.length); idx.set(ia); for (let i = 0; i < ib.length; i++) idx[ia.length + i] = ib[i] + n;
-  out.setIndex(new a.index.constructor(idx, 1)); out.computeBoundingSphere(); out.computeBoundingBox(); a.dispose(); b.dispose(); return out;
+  // LOD 1 (Phase 2): the same model at half resolution (each 2x2x2 block becomes one voxel if at least 3 of its 8
+  // are filled, in its most common colour; glow survives if any of the block glows). About a quarter of the faces,
+  // used at far zoom and in Battery saver.
+  lod() {
+    const g = halfGrid(this.g, 3), l = halfGrid(this.l, 1), u = halfGrid(this.u, 3), any = (x, y, z) => g.get(x, y, z) !== 0 || l.get(x, y, z) !== 0 || u.get(x, y, z) !== 0;
+    return { geo: g.count ? meshGrid(g, { size: PV * 2, solid: (x, y, z) => l.get(x, y, z) !== 0 || u.get(x, y, z) !== 0 }) : null, glow: mergeGeo(l.count ? meshGrid(l, { size: PV * 2, ao: false, shadeFaces: false, solid: any }) : null, u.count ? meshGrid(u, { size: PV * 2, solid: any }) : null) };
+  }
 }
 
 /* ---------------------------------------------------------------- shared parts */
@@ -389,9 +387,12 @@ N.bush = (m, s) => { m.ball(0, 2, 0, 3.4, 2.6, 3.4, PAL.leaf); [[2, 3, 2], [-2, 
 N.pebble = (m, s) => { m.ball(0, 1, 0, 2.4, 1.6, 2, PAL.rock); m.ball(2.5, 0.6, 2, 1.2, 1, 1.2, PAL.rockDark); if (hash(s, 1, 4) > 0.5) m.put(-1, 2, 0, PAL.moss[0]); };
 N.boulder = (m, s) => { m.ball(0, 3, 0, 6, 4.5, 5.5, (x, y, z) => (y > 5 && H(x, y, z, s) > 0.55 ? pick(PAL.moss, H(x, z, y)) : pick(PAL.rock.concat(PAL.rockDark), H(x, y, z, s)))); m.ball(4, 1.5, 4, 2, 2, 2, PAL.rock); };
 N.stump = (m) => { m.disc(0, 0, 2.6, 0, 3, PAL.woodDark.concat(PAL.wood[1])); m.disc(0, 0, 2, 3, 3.9, '#c9965e'); m.put(0, 3, 0, '#a8774a'); m.box(2, 0, -1, 4, 1, 0, PAL.woodDark); m.put(-2, 3, 1, PAL.moss[0]); };
-N.birch = (m, s) => { m.box(0, 0, 0, 1, 11, 1, (x, y) => (y % 3 === 0 ? '#3a3a3a' : '#f2efe6')); m.ball(0.5, 12, 0.5, 3.5, 4.5, 3.5, ['#9ad85a', '#8ac84a', '#aae86a']); };
-N.blossom = (m, s) => { m.box(0, 0, 0, 1, 7, 1, PAL.woodDark); m.ball(0.5, 9, 0.5, 4, 3, 4, (x, y, z) => (H(x, y, z, s) > 0.75 ? '#ffffff' : pick(PAL.blossom, H(x, y, z)))); };
-N.sapling = (m) => { m.box(0, 0, 0, 1, 4, 1, PAL.woodDark); m.ball(0.5, 5, 0.5, 2, 2, 2, PAL.leaf); };
+N.birch = (m, s) => { const h = 9 + s * 2, bark = (x, y) => (y % 3 === 0 || (y + x) % 7 === 0 ? '#3a3a3a' : '#f2efe6'); m.box(0, 0, 0, 1, h, 1, bark); if (s !== 2) { m.box(1, h - 4, 0, 3, h - 3, 1, bark); } if (s === 3) m.box(-2, h - 6, 0, 0, h - 5, 1, bark);
+  const leaf = ['#9ad85a', '#8ac84a', '#aae86a']; m.ball(0.5, h + 1, 0.5, 3.2, 4, 3.2, leaf); if (s !== 2) m.ball(3, h - 2, 0.5, 2.2, 2.6, 2.2, leaf); if (s === 3) m.ball(-2, h - 4, 0.5, 2, 2.4, 2, leaf); };
+N.blossom = (m, s) => { const pink = (x, y, z) => (H(x, y, z, s) > 0.75 ? '#ffffff' : pick(PAL.blossom, H(x, y, z))); m.box(0, 0, 0, 1, 6 + s, 1, PAL.woodDark);
+  if (s === 1) m.ball(0.5, 9, 0.5, 4, 3, 4, pink); else if (s === 2) { m.box(1, 5, 0, 3, 6, 1, PAL.woodDark); m.ball(-0.5, 10, 0.5, 3.4, 2.6, 3.4, pink); m.ball(3, 8, 1, 2.6, 2.2, 2.6, pink); } else { m.box(-2, 6, 0, 0, 7, 1, PAL.woodDark); m.box(1, 7, 0, 3, 8, 1, PAL.woodDark); m.ball(-2, 9, 0, 2.8, 2.2, 2.8, pink); m.ball(2.5, 10, 1, 3, 2.4, 3, pink); m.ball(0.5, 12, -1, 2.2, 1.8, 2.2, pink); }
+  for (let i = 0; i < 3; i++) m.put(Math.round((H(i, s, 1) - 0.5) * 8), 0, Math.round((H(s, i, 2) - 0.5) * 8), pick(PAL.blossom, H(i, 1, s))); };
+N.sapling = (m, s) => { m.box(0, 0, 0, 1, 3 + s, 1, PAL.woodDark); m.ball(0.5, 4 + s, 0.5, 1.6 + s * 0.3, 2, 1.6 + s * 0.3, s === 3 ? ['#9ad85a', '#8ac84a'] : PAL.leaf); if (s === 2) m.put(1, 4, 1, PAL.fruit[0]); };
 N.fern = (m, s) => { for (let i = 0; i < 6; i++) { const a = i * 1.05 + s; m.put(Math.round(Math.cos(a) * 2), 1, Math.round(Math.sin(a) * 2), PAL.leaf); } m.box(0, 0, 0, 1, 2, 1, PAL.leafDark); };
 
 /* ---------------------------------------------------------------- the jetty, the skiff, the lighthouse */
@@ -446,15 +447,19 @@ export function buildingModel(b, size, opts) {
   const out = m.build(); cache.set(k, out); return out;
 }
 export const hasBuilding = (art, cat) => !!(B[art] || cat === 'habitat');
+const HANG = { vines: 1, hangingMoss: 1 }; // kinds that hang below their anchor
 export function natureModel(kind, seed, w, h) {
   const k = 'n|' + kind + '|' + (seed % 3); if (cache.has(k)) return cache.get(k);
   const fn = N[kind]; if (!fn) return null;
-  const m = new Model(w || 1, h || 1, 34, 0, seed % 3 + 1); fn(m, seed % 3 + 1);
+  const m = new Model(w || 1, h || 1, 34, 0, seed % 3 + 1, HANG[kind] ? -14 : null); fn(m, seed % 3 + 1);
   const out = m.build(); cache.set(k, out); return out;
 }
 export const hasNature = (kind) => !!N[kind];
 const XSIZE = { skiff: [3, 2], lighthouse: [2.5, 2.5], jetty: [1, 4.5], plaza: [4, 4], stones: [3, 3] };
 export function extraModel(kind, variant) { const k = 'x|' + kind + '|' + (variant ? 1 : 0); if (cache.has(k)) return cache.get(k); if (!X[kind]) return null; const sz = XSIZE[kind] || [2, 2]; const m = new Model(sz[0], sz[1], 40, 0, 3, -18); X[kind](m, variant); const out = m.build(); cache.set(k, out); return out; }
 export const hasExtra = (kind) => !!X[kind];
-export function disposeCache() { cache.forEach((v) => { if (v.geo) v.geo.dispose(); if (v.glow) v.glow.dispose(); }); cache.clear(); }
+export function disposeCache() { cache.forEach((v) => { [v.geo, v.glow, v.lod && v.lod.geo, v.lod && v.lod.glow].forEach((g) => g && g.dispose()); }); cache.clear(); }
 export { keyOf };
+// Phase 2: the construction kit is shared with the environment library (src/3d/library), which builds on it and
+// registers new vegetation kinds into N so the island can use them.
+export { Model, H, stoneWork, planks, shingles, foundation, grassTuft, flower, torch, banner, windowZ, windowX, skirt, tower, crack, scatter, overgrow, ruin, mergeGeo, B, N, X };

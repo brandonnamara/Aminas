@@ -1,0 +1,4453 @@
+{
+ "generated": "2026-11-06T17:19:22.607Z",
+ "unit": "1 unit = 1 island cell (glb); 1 voxel = 1/8 cell (vox)",
+ "assets": [
+  {
+   "id": "grassBlock",
+   "cat": "terrain",
+   "sub": "blocks",
+   "title": "Grass block",
+   "fp": [
+    0.5,
+    0.5
+   ],
+   "variants": 1,
+   "status": "in-game",
+   "note": "the island ground uses this layering at terrain scale",
+   "files": [
+    "glb/terrain/grassBlock.glb",
+    "vox/terrain/grassBlock.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      4,
+      4,
+      4
+     ],
+     "colours": 11,
+     "colourBits": 8,
+     "voxels": 64,
+     "glow": 0,
+     "tris": 192,
+     "lodTris": 48
+    }
+   ]
+  },
+  {
+   "id": "soilBlock",
+   "cat": "terrain",
+   "sub": "blocks",
+   "title": "Soil block",
+   "fp": [
+    0.5,
+    0.5
+   ],
+   "variants": 1,
+   "status": "in-game",
+   "note": "",
+   "files": [
+    "glb/terrain/soilBlock.glb",
+    "vox/terrain/soilBlock.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      4,
+      4,
+      4
+     ],
+     "colours": 5,
+     "colourBits": 8,
+     "voxels": 64,
+     "glow": 0,
+     "tris": 192,
+     "lodTris": 48
+    }
+   ]
+  },
+  {
+   "id": "cliff",
+   "cat": "terrain",
+   "sub": "cliffs",
+   "title": "Layered cliff segment",
+   "fp": [
+    2,
+    1.5
+   ],
+   "variants": 3,
+   "status": "library",
+   "note": "",
+   "files": [
+    "glb/terrain/cliff_1.glb",
+    "vox/terrain/cliff_1.vox",
+    "glb/terrain/cliff_2.glb",
+    "vox/terrain/cliff_2.vox",
+    "glb/terrain/cliff_3.glb",
+    "vox/terrain/cliff_3.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      16,
+      14,
+      23
+     ],
+     "colours": 29,
+     "colourBits": 8,
+     "voxels": 4008,
+     "glow": 0,
+     "tris": 4360,
+     "lodTris": 824
+    },
+    {
+     "variant": 2,
+     "voxSize": [
+      16,
+      13,
+      24
+     ],
+     "colours": 32,
+     "colourBits": 8,
+     "voxels": 4068,
+     "glow": 0,
+     "tris": 4192,
+     "lodTris": 836
+    },
+    {
+     "variant": 3,
+     "voxSize": [
+      16,
+      12,
+      23
+     ],
+     "colours": 25,
+     "colourBits": 8,
+     "voxels": 4041,
+     "glow": 0,
+     "tris": 4068,
+     "lodTris": 836
+    }
+   ]
+  },
+  {
+   "id": "islandEdge",
+   "cat": "terrain",
+   "sub": "cliffs",
+   "title": "Floating island edge",
+   "fp": [
+    2,
+    2
+   ],
+   "variants": 1,
+   "status": "library",
+   "note": "",
+   "files": [
+    "glb/terrain/islandEdge.glb",
+    "vox/terrain/islandEdge.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      16,
+      16,
+      30
+     ],
+     "colours": 23,
+     "colourBits": 8,
+     "voxels": 3614,
+     "glow": 0,
+     "tris": 3984,
+     "lodTris": 960
+    }
+   ]
+  },
+  {
+   "id": "stonePillars",
+   "cat": "terrain",
+   "sub": "rock",
+   "title": "Stone pillar formation",
+   "fp": [
+    1.5,
+    1.5
+   ],
+   "variants": 2,
+   "status": "library",
+   "note": "",
+   "files": [
+    "glb/terrain/stonePillars_1.glb",
+    "vox/terrain/stonePillars_1.vox",
+    "glb/terrain/stonePillars_2.glb",
+    "vox/terrain/stonePillars_2.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      11,
+      11,
+      14
+     ],
+     "colours": 9,
+     "colourBits": 8,
+     "voxels": 416,
+     "glow": 0,
+     "tris": 1216,
+     "lodTris": 324
+    },
+    {
+     "variant": 2,
+     "voxSize": [
+      11,
+      11,
+      14
+     ],
+     "colours": 9,
+     "colourBits": 8,
+     "voxels": 416,
+     "glow": 0,
+     "tris": 1216,
+     "lodTris": 324
+    }
+   ]
+  },
+  {
+   "id": "outcrop",
+   "cat": "terrain",
+   "sub": "rock",
+   "title": "Rocky outcrop",
+   "fp": [
+    2,
+    1.5
+   ],
+   "variants": 2,
+   "status": "library",
+   "note": "",
+   "files": [
+    "glb/terrain/outcrop_1.glb",
+    "vox/terrain/outcrop_1.vox",
+    "glb/terrain/outcrop_2.glb",
+    "vox/terrain/outcrop_2.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      14,
+      10,
+      8
+     ],
+     "colours": 12,
+     "colourBits": 8,
+     "voxels": 506,
+     "glow": 0,
+     "tris": 1324,
+     "lodTris": 316
+    },
+    {
+     "variant": 2,
+     "voxSize": [
+      14,
+      10,
+      8
+     ],
+     "colours": 12,
+     "colourBits": 8,
+     "voxels": 498,
+     "glow": 0,
+     "tris": 1348,
+     "lodTris": 312
+    }
+   ]
+  },
+  {
+   "id": "mossyRock",
+   "cat": "terrain",
+   "sub": "rock",
+   "title": "Moss-covered rock",
+   "fp": [
+    1.5,
+    1.5
+   ],
+   "variants": 2,
+   "status": "library",
+   "note": "",
+   "files": [
+    "glb/terrain/mossyRock_1.glb",
+    "vox/terrain/mossyRock_1.vox",
+    "glb/terrain/mossyRock_2.glb",
+    "vox/terrain/mossyRock_2.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      12,
+      8,
+      10
+     ],
+     "colours": 9,
+     "colourBits": 8,
+     "voxels": 451,
+     "glow": 0,
+     "tris": 892,
+     "lodTris": 232
+    },
+    {
+     "variant": 2,
+     "voxSize": [
+      14,
+      8,
+      10
+     ],
+     "colours": 9,
+     "colourBits": 8,
+     "voxels": 515,
+     "glow": 0,
+     "tris": 956,
+     "lodTris": 272
+    }
+   ]
+  },
+  {
+   "id": "boulder",
+   "cat": "terrain",
+   "sub": "rock",
+   "title": "Boulder (obstacle)",
+   "fp": [
+    1,
+    1
+   ],
+   "variants": 1,
+   "status": "in-game",
+   "note": "",
+   "files": [
+    "glb/terrain/boulder.glb",
+    "vox/terrain/boulder.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      12,
+      11,
+      8
+     ],
+     "colours": 7,
+     "colourBits": 8,
+     "voxels": 631,
+     "glow": 0,
+     "tris": 1076,
+     "lodTris": 312
+    }
+   ]
+  },
+  {
+   "id": "pebble",
+   "cat": "terrain",
+   "sub": "rock",
+   "title": "Pebbles (obstacle)",
+   "fp": [
+    1,
+    1
+   ],
+   "variants": 1,
+   "status": "in-game",
+   "note": "",
+   "files": [
+    "glb/terrain/pebble.glb",
+    "vox/terrain/pebble.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      6,
+      5,
+      4
+     ],
+     "colours": 4,
+     "colourBits": 8,
+     "voxels": 40,
+     "glow": 0,
+     "tris": 192,
+     "lodTris": 48
+    }
+   ]
+  },
+  {
+   "id": "crystals",
+   "cat": "terrain",
+   "sub": "magic",
+   "title": "Crystal cluster",
+   "fp": [
+    1,
+    1
+   ],
+   "variants": 5,
+   "status": "library",
+   "note": "one per magic hue",
+   "files": [
+    "glb/terrain/crystals_1.glb",
+    "vox/terrain/crystals_1.vox",
+    "glb/terrain/crystals_2.glb",
+    "vox/terrain/crystals_2.vox",
+    "glb/terrain/crystals_3.glb",
+    "vox/terrain/crystals_3.vox",
+    "glb/terrain/crystals_4.glb",
+    "vox/terrain/crystals_4.vox",
+    "glb/terrain/crystals_5.glb",
+    "vox/terrain/crystals_5.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      8,
+      8,
+      12
+     ],
+     "colours": 8,
+     "colourBits": 8,
+     "voxels": 187,
+     "glow": 36,
+     "tris": 676,
+     "lodTris": 188
+    },
+    {
+     "variant": 2,
+     "voxSize": [
+      8,
+      8,
+      12
+     ],
+     "colours": 8,
+     "colourBits": 8,
+     "voxels": 187,
+     "glow": 36,
+     "tris": 676,
+     "lodTris": 188
+    },
+    {
+     "variant": 3,
+     "voxSize": [
+      8,
+      8,
+      12
+     ],
+     "colours": 8,
+     "colourBits": 8,
+     "voxels": 187,
+     "glow": 36,
+     "tris": 676,
+     "lodTris": 188
+    },
+    {
+     "variant": 4,
+     "voxSize": [
+      8,
+      8,
+      12
+     ],
+     "colours": 8,
+     "colourBits": 8,
+     "voxels": 187,
+     "glow": 36,
+     "tris": 676,
+     "lodTris": 188
+    },
+    {
+     "variant": 5,
+     "voxSize": [
+      8,
+      8,
+      12
+     ],
+     "colours": 8,
+     "colourBits": 8,
+     "voxels": 187,
+     "glow": 36,
+     "tris": 676,
+     "lodTris": 188
+    }
+   ]
+  },
+  {
+   "id": "caveMouth",
+   "cat": "terrain",
+   "sub": "ancient",
+   "title": "Cave entrance",
+   "fp": [
+    3,
+    2.5
+   ],
+   "variants": 1,
+   "status": "library",
+   "note": "",
+   "files": [
+    "glb/terrain/caveMouth.glb",
+    "vox/terrain/caveMouth.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      20,
+      17,
+      12
+     ],
+     "colours": 18,
+     "colourBits": 8,
+     "voxels": 1505,
+     "glow": 4,
+     "tris": 2244,
+     "lodTris": 588
+    }
+   ]
+  },
+  {
+   "id": "arch",
+   "cat": "terrain",
+   "sub": "ancient",
+   "title": "Natural stone arch",
+   "fp": [
+    3,
+    1
+   ],
+   "variants": 1,
+   "status": "library",
+   "note": "",
+   "files": [
+    "glb/terrain/arch.glb",
+    "vox/terrain/arch.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      22,
+      4,
+      13
+     ],
+     "colours": 9,
+     "colourBits": 8,
+     "voxels": 564,
+     "glow": 0,
+     "tris": 1312,
+     "lodTris": 360
+    }
+   ]
+  },
+  {
+   "id": "basalt",
+   "cat": "terrain",
+   "sub": "ancient",
+   "title": "Basalt columns",
+   "fp": [
+    1.5,
+    1.5
+   ],
+   "variants": 1,
+   "status": "library",
+   "note": "",
+   "files": [
+    "glb/terrain/basalt.glb",
+    "vox/terrain/basalt.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      13,
+      13,
+      14
+     ],
+     "colours": 4,
+     "colourBits": 8,
+     "voxels": 1084,
+     "glow": 0,
+     "tris": 3204,
+     "lodTris": 640
+    }
+   ]
+  },
+  {
+   "id": "monolithRing",
+   "cat": "terrain",
+   "sub": "ancient",
+   "title": "Fallen monolith ring",
+   "fp": [
+    2.5,
+    2.5
+   ],
+   "variants": 1,
+   "status": "library",
+   "note": "",
+   "files": [
+    "glb/terrain/monolithRing.glb",
+    "vox/terrain/monolithRing.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      18,
+      16,
+      10
+     ],
+     "colours": 6,
+     "colourBits": 8,
+     "voxels": 184,
+     "glow": 0,
+     "tris": 832,
+     "lodTris": 184
+    }
+   ]
+  },
+  {
+   "id": "oak",
+   "cat": "vegetation",
+   "sub": "trees",
+   "title": "Oak",
+   "fp": [
+    1,
+    1
+   ],
+   "variants": 3,
+   "status": "in-game",
+   "note": "",
+   "files": [
+    "glb/vegetation/oak_1.glb",
+    "vox/vegetation/oak_1.vox",
+    "glb/vegetation/oak_2.glb",
+    "vox/vegetation/oak_2.vox",
+    "glb/vegetation/oak_3.glb",
+    "vox/vegetation/oak_3.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      13,
+      13,
+      19
+     ],
+     "colours": 9,
+     "colourBits": 8,
+     "voxels": 1114,
+     "glow": 0,
+     "tris": 1788,
+     "lodTris": 480
+    },
+    {
+     "variant": 2,
+     "voxSize": [
+      11,
+      11,
+      16
+     ],
+     "colours": 9,
+     "colourBits": 8,
+     "voxels": 647,
+     "glow": 0,
+     "tris": 1260,
+     "lodTris": 332
+    },
+    {
+     "variant": 3,
+     "voxSize": [
+      13,
+      13,
+      20
+     ],
+     "colours": 9,
+     "colourBits": 8,
+     "voxels": 1130,
+     "glow": 0,
+     "tris": 1804,
+     "lodTris": 480
+    }
+   ]
+  },
+  {
+   "id": "oakOld",
+   "cat": "vegetation",
+   "sub": "trees",
+   "title": "Old oak",
+   "fp": [
+    1,
+    1
+   ],
+   "variants": 3,
+   "status": "library",
+   "note": "",
+   "files": [
+    "glb/vegetation/oakOld_1.glb",
+    "vox/vegetation/oakOld_1.vox",
+    "glb/vegetation/oakOld_2.glb",
+    "vox/vegetation/oakOld_2.vox",
+    "glb/vegetation/oakOld_3.glb",
+    "vox/vegetation/oakOld_3.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      17,
+      13,
+      19
+     ],
+     "colours": 9,
+     "colourBits": 8,
+     "voxels": 1310,
+     "glow": 0,
+     "tris": 2028,
+     "lodTris": 540
+    },
+    {
+     "variant": 2,
+     "voxSize": [
+      17,
+      15,
+      19
+     ],
+     "colours": 10,
+     "colourBits": 8,
+     "voxels": 1347,
+     "glow": 0,
+     "tris": 2056,
+     "lodTris": 544
+    },
+    {
+     "variant": 3,
+     "voxSize": [
+      17,
+      15,
+      19
+     ],
+     "colours": 11,
+     "colourBits": 8,
+     "voxels": 1360,
+     "glow": 0,
+     "tris": 2088,
+     "lodTris": 560
+    }
+   ]
+  },
+  {
+   "id": "pine",
+   "cat": "vegetation",
+   "sub": "trees",
+   "title": "Pine",
+   "fp": [
+    1,
+    1
+   ],
+   "variants": 3,
+   "status": "in-game",
+   "note": "",
+   "files": [
+    "glb/vegetation/pine_1.glb",
+    "vox/vegetation/pine_1.vox",
+    "glb/vegetation/pine_2.glb",
+    "vox/vegetation/pine_2.vox",
+    "glb/vegetation/pine_3.glb",
+    "vox/vegetation/pine_3.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      9,
+      9,
+      15
+     ],
+     "colours": 5,
+     "colourBits": 8,
+     "voxels": 327,
+     "glow": 0,
+     "tris": 812,
+     "lodTris": 196
+    },
+    {
+     "variant": 2,
+     "voxSize": [
+      7,
+      7,
+      14
+     ],
+     "colours": 5,
+     "colourBits": 8,
+     "voxels": 222,
+     "glow": 0,
+     "tris": 612,
+     "lodTris": 164
+    },
+    {
+     "variant": 3,
+     "voxSize": [
+      9,
+      9,
+      15
+     ],
+     "colours": 5,
+     "colourBits": 8,
+     "voxels": 351,
+     "glow": 0,
+     "tris": 812,
+     "lodTris": 212
+    }
+   ]
+  },
+  {
+   "id": "birch",
+   "cat": "vegetation",
+   "sub": "trees",
+   "title": "Birch",
+   "fp": [
+    1,
+    1
+   ],
+   "variants": 3,
+   "status": "in-game",
+   "note": "",
+   "files": [
+    "glb/vegetation/birch_1.glb",
+    "vox/vegetation/birch_1.vox",
+    "glb/vegetation/birch_2.glb",
+    "vox/vegetation/birch_2.vox",
+    "glb/vegetation/birch_3.glb",
+    "vox/vegetation/birch_3.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      8,
+      7,
+      16
+     ],
+     "colours": 5,
+     "colourBits": 8,
+     "voxels": 229,
+     "glow": 0,
+     "tris": 624,
+     "lodTris": 144
+    },
+    {
+     "variant": 2,
+     "voxSize": [
+      7,
+      7,
+      18
+     ],
+     "colours": 5,
+     "colourBits": 8,
+     "voxels": 194,
+     "glow": 0,
+     "tris": 548,
+     "lodTris": 112
+    },
+    {
+     "variant": 3,
+     "voxSize": [
+      9,
+      7,
+      20
+     ],
+     "colours": 5,
+     "colourBits": 8,
+     "voxels": 272,
+     "glow": 0,
+     "tris": 764,
+     "lodTris": 180
+    }
+   ]
+  },
+  {
+   "id": "blossom",
+   "cat": "vegetation",
+   "sub": "trees",
+   "title": "Blossom tree",
+   "fp": [
+    1,
+    1
+   ],
+   "variants": 3,
+   "status": "in-game",
+   "note": "",
+   "files": [
+    "glb/vegetation/blossom_1.glb",
+    "vox/vegetation/blossom_1.vox",
+    "glb/vegetation/blossom_2.glb",
+    "vox/vegetation/blossom_2.vox",
+    "glb/vegetation/blossom_3.glb",
+    "vox/vegetation/blossom_3.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      8,
+      7,
+      12
+     ],
+     "colours": 6,
+     "colourBits": 8,
+     "voxels": 199,
+     "glow": 0,
+     "tris": 564,
+     "lodTris": 144
+    },
+    {
+     "variant": 2,
+     "voxSize": [
+      9,
+      8,
+      13
+     ],
+     "colours": 6,
+     "colourBits": 8,
+     "voxels": 179,
+     "glow": 0,
+     "tris": 572,
+     "lodTris": 136
+    },
+    {
+     "variant": 3,
+     "voxSize": [
+      10,
+      7,
+      14
+     ],
+     "colours": 6,
+     "colourBits": 8,
+     "voxels": 204,
+     "glow": 0,
+     "tris": 668,
+     "lodTris": 140
+    }
+   ]
+  },
+  {
+   "id": "willow",
+   "cat": "vegetation",
+   "sub": "trees",
+   "title": "Weeping willow",
+   "fp": [
+    1,
+    1
+   ],
+   "variants": 3,
+   "status": "library",
+   "note": "",
+   "files": [
+    "glb/vegetation/willow_1.glb",
+    "vox/vegetation/willow_1.vox",
+    "glb/vegetation/willow_2.glb",
+    "vox/vegetation/willow_2.vox",
+    "glb/vegetation/willow_3.glb",
+    "vox/vegetation/willow_3.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      13,
+      12,
+      14
+     ],
+     "colours": 8,
+     "colourBits": 8,
+     "voxels": 622,
+     "glow": 0,
+     "tris": 1672,
+     "lodTris": 300
+    },
+    {
+     "variant": 2,
+     "voxSize": [
+      13,
+      12,
+      14
+     ],
+     "colours": 8,
+     "colourBits": 8,
+     "voxels": 622,
+     "glow": 0,
+     "tris": 1672,
+     "lodTris": 300
+    },
+    {
+     "variant": 3,
+     "voxSize": [
+      13,
+      12,
+      14
+     ],
+     "colours": 8,
+     "colourBits": 8,
+     "voxels": 627,
+     "glow": 0,
+     "tris": 1712,
+     "lodTris": 308
+    }
+   ]
+  },
+  {
+   "id": "glowcap",
+   "cat": "vegetation",
+   "sub": "trees",
+   "title": "Glowcap (fantasy)",
+   "fp": [
+    1,
+    1
+   ],
+   "variants": 3,
+   "status": "library",
+   "note": "",
+   "files": [
+    "glb/vegetation/glowcap_1.glb",
+    "vox/vegetation/glowcap_1.vox",
+    "glb/vegetation/glowcap_2.glb",
+    "vox/vegetation/glowcap_2.vox",
+    "glb/vegetation/glowcap_3.glb",
+    "vox/vegetation/glowcap_3.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      13,
+      13,
+      14
+     ],
+     "colours": 5,
+     "colourBits": 8,
+     "voxels": 417,
+     "glow": 97,
+     "tris": 1260,
+     "lodTris": 390
+    },
+    {
+     "variant": 2,
+     "voxSize": [
+      13,
+      13,
+      16
+     ],
+     "colours": 5,
+     "colourBits": 8,
+     "voxels": 428,
+     "glow": 97,
+     "tris": 1320,
+     "lodTris": 400
+    },
+    {
+     "variant": 3,
+     "voxSize": [
+      13,
+      13,
+      18
+     ],
+     "colours": 5,
+     "colourBits": 8,
+     "voxels": 437,
+     "glow": 97,
+     "tris": 1368,
+     "lodTris": 414
+    }
+   ]
+  },
+  {
+   "id": "crystalwood",
+   "cat": "vegetation",
+   "sub": "trees",
+   "title": "Crystalwood (fantasy)",
+   "fp": [
+    1,
+    1
+   ],
+   "variants": 3,
+   "status": "library",
+   "note": "",
+   "files": [
+    "glb/vegetation/crystalwood_1.glb",
+    "vox/vegetation/crystalwood_1.vox",
+    "glb/vegetation/crystalwood_2.glb",
+    "vox/vegetation/crystalwood_2.vox",
+    "glb/vegetation/crystalwood_3.glb",
+    "vox/vegetation/crystalwood_3.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      9,
+      7,
+      16
+     ],
+     "colours": 8,
+     "colourBits": 8,
+     "voxels": 234,
+     "glow": 174,
+     "tris": 652,
+     "lodTris": 204
+    },
+    {
+     "variant": 2,
+     "voxSize": [
+      9,
+      7,
+      17
+     ],
+     "colours": 8,
+     "colourBits": 8,
+     "voxels": 235,
+     "glow": 138,
+     "tris": 660,
+     "lodTris": 186
+    },
+    {
+     "variant": 3,
+     "voxSize": [
+      9,
+      7,
+      18
+     ],
+     "colours": 8,
+     "colourBits": 8,
+     "voxels": 236,
+     "glow": 84,
+     "tris": 668,
+     "lodTris": 186
+    }
+   ]
+  },
+  {
+   "id": "charredTree",
+   "cat": "vegetation",
+   "sub": "trees",
+   "title": "Charred tree",
+   "fp": [
+    1,
+    1
+   ],
+   "variants": 3,
+   "status": "library",
+   "note": "",
+   "files": [
+    "glb/vegetation/charredTree_1.glb",
+    "vox/vegetation/charredTree_1.vox",
+    "glb/vegetation/charredTree_2.glb",
+    "vox/vegetation/charredTree_2.vox",
+    "glb/vegetation/charredTree_3.glb",
+    "vox/vegetation/charredTree_3.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      7,
+      1,
+      10
+     ],
+     "colours": 3,
+     "colourBits": 8,
+     "voxels": 19,
+     "glow": 1,
+     "tris": 156,
+     "lodTris": 28
+    },
+    {
+     "variant": 2,
+     "voxSize": [
+      7,
+      1,
+      11
+     ],
+     "colours": 4,
+     "colourBits": 8,
+     "voxels": 21,
+     "glow": 2,
+     "tris": 172,
+     "lodTris": 36
+    },
+    {
+     "variant": 3,
+     "voxSize": [
+      7,
+      1,
+      12
+     ],
+     "colours": 3,
+     "colourBits": 8,
+     "voxels": 21,
+     "glow": 1,
+     "tris": 172,
+     "lodTris": 28
+    }
+   ]
+  },
+  {
+   "id": "sapling",
+   "cat": "vegetation",
+   "sub": "trees",
+   "title": "Sapling",
+   "fp": [
+    1,
+    1
+   ],
+   "variants": 3,
+   "status": "in-game",
+   "note": "",
+   "files": [
+    "glb/vegetation/sapling_1.glb",
+    "vox/vegetation/sapling_1.vox",
+    "glb/vegetation/sapling_2.glb",
+    "vox/vegetation/sapling_2.vox",
+    "glb/vegetation/sapling_3.glb",
+    "vox/vegetation/sapling_3.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      3,
+      3,
+      7
+     ],
+     "colours": 5,
+     "colourBits": 8,
+     "voxels": 31,
+     "glow": 0,
+     "tris": 156,
+     "lodTris": 44
+    },
+    {
+     "variant": 2,
+     "voxSize": [
+      5,
+      5,
+      8
+     ],
+     "colours": 7,
+     "colourBits": 8,
+     "voxels": 48,
+     "glow": 0,
+     "tris": 212,
+     "lodTris": 44
+    },
+    {
+     "variant": 3,
+     "voxSize": [
+      5,
+      5,
+      9
+     ],
+     "colours": 4,
+     "colourBits": 8,
+     "voxels": 65,
+     "glow": 0,
+     "tris": 252,
+     "lodTris": 64
+    }
+   ]
+  },
+  {
+   "id": "bush",
+   "cat": "vegetation",
+   "sub": "ground",
+   "title": "Berry bush",
+   "fp": [
+    1,
+    1
+   ],
+   "variants": 3,
+   "status": "in-game",
+   "note": "",
+   "files": [
+    "glb/vegetation/bush_1.glb",
+    "vox/vegetation/bush_1.vox",
+    "glb/vegetation/bush_2.glb",
+    "vox/vegetation/bush_2.vox",
+    "glb/vegetation/bush_3.glb",
+    "vox/vegetation/bush_3.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      7,
+      6,
+      6
+     ],
+     "colours": 5,
+     "colourBits": 8,
+     "voxels": 124,
+     "glow": 0,
+     "tris": 388,
+     "lodTris": 112
+    },
+    {
+     "variant": 2,
+     "voxSize": [
+      6,
+      6,
+      6
+     ],
+     "colours": 5,
+     "colourBits": 8,
+     "voxels": 122,
+     "glow": 0,
+     "tris": 372,
+     "lodTris": 112
+    },
+    {
+     "variant": 3,
+     "voxSize": [
+      7,
+      6,
+      6
+     ],
+     "colours": 5,
+     "colourBits": 8,
+     "voxels": 123,
+     "glow": 0,
+     "tris": 376,
+     "lodTris": 112
+    }
+   ]
+  },
+  {
+   "id": "roundBush",
+   "cat": "vegetation",
+   "sub": "ground",
+   "title": "Round bush",
+   "fp": [
+    1,
+    1
+   ],
+   "variants": 3,
+   "status": "library",
+   "note": "",
+   "files": [
+    "glb/vegetation/roundBush_1.glb",
+    "vox/vegetation/roundBush_1.vox",
+    "glb/vegetation/roundBush_2.glb",
+    "vox/vegetation/roundBush_2.vox",
+    "glb/vegetation/roundBush_3.glb",
+    "vox/vegetation/roundBush_3.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      7,
+      6,
+      6
+     ],
+     "colours": 6,
+     "colourBits": 8,
+     "voxels": 123,
+     "glow": 0,
+     "tris": 364,
+     "lodTris": 88
+    },
+    {
+     "variant": 2,
+     "voxSize": [
+      8,
+      6,
+      6
+     ],
+     "colours": 6,
+     "colourBits": 8,
+     "voxels": 129,
+     "glow": 0,
+     "tris": 384,
+     "lodTris": 88
+    },
+    {
+     "variant": 3,
+     "voxSize": [
+      8,
+      6,
+      6
+     ],
+     "colours": 6,
+     "colourBits": 8,
+     "voxels": 142,
+     "glow": 0,
+     "tris": 396,
+     "lodTris": 88
+    }
+   ]
+  },
+  {
+   "id": "flowerBush",
+   "cat": "vegetation",
+   "sub": "ground",
+   "title": "Flowering bush",
+   "fp": [
+    1,
+    1
+   ],
+   "variants": 3,
+   "status": "library",
+   "note": "",
+   "files": [
+    "glb/vegetation/flowerBush_1.glb",
+    "vox/vegetation/flowerBush_1.vox",
+    "glb/vegetation/flowerBush_2.glb",
+    "vox/vegetation/flowerBush_2.vox",
+    "glb/vegetation/flowerBush_3.glb",
+    "vox/vegetation/flowerBush_3.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      6,
+      6,
+      6
+     ],
+     "colours": 5,
+     "colourBits": 8,
+     "voxels": 120,
+     "glow": 0,
+     "tris": 352,
+     "lodTris": 112
+    },
+    {
+     "variant": 2,
+     "voxSize": [
+      6,
+      6,
+      6
+     ],
+     "colours": 5,
+     "colourBits": 8,
+     "voxels": 120,
+     "glow": 0,
+     "tris": 352,
+     "lodTris": 112
+    },
+    {
+     "variant": 3,
+     "voxSize": [
+      6,
+      6,
+      6
+     ],
+     "colours": 5,
+     "colourBits": 8,
+     "voxels": 120,
+     "glow": 0,
+     "tris": 352,
+     "lodTris": 112
+    }
+   ]
+  },
+  {
+   "id": "flowerPatch",
+   "cat": "vegetation",
+   "sub": "ground",
+   "title": "Flower patch",
+   "fp": [
+    1,
+    1
+   ],
+   "variants": 3,
+   "status": "library",
+   "note": "",
+   "files": [
+    "glb/vegetation/flowerPatch_1.glb",
+    "vox/vegetation/flowerPatch_1.vox",
+    "glb/vegetation/flowerPatch_2.glb",
+    "vox/vegetation/flowerPatch_2.vox",
+    "glb/vegetation/flowerPatch_3.glb",
+    "vox/vegetation/flowerPatch_3.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      7,
+      7,
+      3
+     ],
+     "colours": 4,
+     "colourBits": 8,
+     "voxels": 24,
+     "glow": 0,
+     "tris": 200,
+     "lodTris": 12
+    },
+    {
+     "variant": 2,
+     "voxSize": [
+      5,
+      7,
+      4
+     ],
+     "colours": 4,
+     "colourBits": 8,
+     "voxels": 27,
+     "glow": 0,
+     "tris": 220,
+     "lodTris": 36
+    },
+    {
+     "variant": 3,
+     "voxSize": [
+      7,
+      7,
+      3
+     ],
+     "colours": 4,
+     "colourBits": 8,
+     "voxels": 24,
+     "glow": 0,
+     "tris": 224,
+     "lodTris": 12
+    }
+   ]
+  },
+  {
+   "id": "tallGrass",
+   "cat": "vegetation",
+   "sub": "ground",
+   "title": "Tall grass",
+   "fp": [
+    1,
+    1
+   ],
+   "variants": 3,
+   "status": "library",
+   "note": "",
+   "files": [
+    "glb/vegetation/tallGrass_1.glb",
+    "vox/vegetation/tallGrass_1.vox",
+    "glb/vegetation/tallGrass_2.glb",
+    "vox/vegetation/tallGrass_2.vox",
+    "glb/vegetation/tallGrass_3.glb",
+    "vox/vegetation/tallGrass_3.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      4,
+      4,
+      5
+     ],
+     "colours": 4,
+     "colourBits": 8,
+     "voxels": 24,
+     "glow": 0,
+     "tris": 152,
+     "lodTris": 20
+    },
+    {
+     "variant": 2,
+     "voxSize": [
+      4,
+      5,
+      5
+     ],
+     "colours": 4,
+     "colourBits": 8,
+     "voxels": 30,
+     "glow": 0,
+     "tris": 248,
+     "lodTris": 20
+    },
+    {
+     "variant": 3,
+     "voxSize": [
+      4,
+      5,
+      5
+     ],
+     "colours": 4,
+     "colourBits": 8,
+     "voxels": 29,
+     "glow": 0,
+     "tris": 208,
+     "lodTris": 36
+    }
+   ]
+  },
+  {
+   "id": "fern",
+   "cat": "vegetation",
+   "sub": "ground",
+   "title": "Fern (small)",
+   "fp": [
+    1,
+    1
+   ],
+   "variants": 3,
+   "status": "in-game",
+   "note": "",
+   "files": [
+    "glb/vegetation/fern_1.glb",
+    "vox/vegetation/fern_1.vox",
+    "glb/vegetation/fern_2.glb",
+    "vox/vegetation/fern_2.vox",
+    "glb/vegetation/fern_3.glb",
+    "vox/vegetation/fern_3.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      5,
+      5,
+      2
+     ],
+     "colours": 4,
+     "colourBits": 8,
+     "voxels": 8,
+     "glow": 0,
+     "tris": 92,
+     "lodTris": 0
+    },
+    {
+     "variant": 2,
+     "voxSize": [
+      5,
+      5,
+      2
+     ],
+     "colours": 5,
+     "colourBits": 8,
+     "voxels": 8,
+     "glow": 0,
+     "tris": 92,
+     "lodTris": 0
+    },
+    {
+     "variant": 3,
+     "voxSize": [
+      5,
+      5,
+      2
+     ],
+     "colours": 6,
+     "colourBits": 8,
+     "voxels": 8,
+     "glow": 0,
+     "tris": 92,
+     "lodTris": 0
+    }
+   ]
+  },
+  {
+   "id": "fernLarge",
+   "cat": "vegetation",
+   "sub": "ground",
+   "title": "Fern (large)",
+   "fp": [
+    1,
+    1
+   ],
+   "variants": 3,
+   "status": "library",
+   "note": "",
+   "files": [
+    "glb/vegetation/fernLarge_1.glb",
+    "vox/vegetation/fernLarge_1.vox",
+    "glb/vegetation/fernLarge_2.glb",
+    "vox/vegetation/fernLarge_2.vox",
+    "glb/vegetation/fernLarge_3.glb",
+    "vox/vegetation/fernLarge_3.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      9,
+      9,
+      4
+     ],
+     "colours": 6,
+     "colourBits": 8,
+     "voxels": 32,
+     "glow": 0,
+     "tris": 304,
+     "lodTris": 12
+    },
+    {
+     "variant": 2,
+     "voxSize": [
+      9,
+      9,
+      4
+     ],
+     "colours": 6,
+     "colourBits": 8,
+     "voxels": 31,
+     "glow": 0,
+     "tris": 300,
+     "lodTris": 12
+    },
+    {
+     "variant": 3,
+     "voxSize": [
+      9,
+      9,
+      4
+     ],
+     "colours": 6,
+     "colourBits": 8,
+     "voxels": 32,
+     "glow": 0,
+     "tris": 304,
+     "lodTris": 12
+    }
+   ]
+  },
+  {
+   "id": "mushrooms",
+   "cat": "vegetation",
+   "sub": "ground",
+   "title": "Mushrooms",
+   "fp": [
+    1,
+    1
+   ],
+   "variants": 3,
+   "status": "library",
+   "note": "",
+   "files": [
+    "glb/vegetation/mushrooms_1.glb",
+    "vox/vegetation/mushrooms_1.vox",
+    "glb/vegetation/mushrooms_2.glb",
+    "vox/vegetation/mushrooms_2.vox",
+    "glb/vegetation/mushrooms_3.glb",
+    "vox/vegetation/mushrooms_3.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      7,
+      5,
+      5
+     ],
+     "colours": 3,
+     "colourBits": 8,
+     "voxels": 39,
+     "glow": 0,
+     "tris": 248,
+     "lodTris": 28
+    },
+    {
+     "variant": 2,
+     "voxSize": [
+      7,
+      5,
+      4
+     ],
+     "colours": 2,
+     "colourBits": 8,
+     "voxels": 36,
+     "glow": 0,
+     "tris": 232,
+     "lodTris": 28
+    },
+    {
+     "variant": 3,
+     "voxSize": [
+      7,
+      5,
+      4
+     ],
+     "colours": 2,
+     "colourBits": 8,
+     "voxels": 36,
+     "glow": 28,
+     "tris": 232,
+     "lodTris": 76
+    }
+   ]
+  },
+  {
+   "id": "roots",
+   "cat": "vegetation",
+   "sub": "ground",
+   "title": "Exposed roots",
+   "fp": [
+    1,
+    1
+   ],
+   "variants": 3,
+   "status": "library",
+   "note": "",
+   "files": [
+    "glb/vegetation/roots_1.glb",
+    "vox/vegetation/roots_1.vox",
+    "glb/vegetation/roots_2.glb",
+    "vox/vegetation/roots_2.vox",
+    "glb/vegetation/roots_3.glb",
+    "vox/vegetation/roots_3.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      9,
+      12,
+      3
+     ],
+     "colours": 2,
+     "colourBits": 8,
+     "voxels": 34,
+     "glow": 0,
+     "tris": 276,
+     "lodTris": 20
+    },
+    {
+     "variant": 2,
+     "voxSize": [
+      12,
+      9,
+      3
+     ],
+     "colours": 2,
+     "colourBits": 8,
+     "voxels": 34,
+     "glow": 0,
+     "tris": 276,
+     "lodTris": 24
+    },
+    {
+     "variant": 3,
+     "voxSize": [
+      10,
+      10,
+      3
+     ],
+     "colours": 2,
+     "colourBits": 8,
+     "voxels": 32,
+     "glow": 0,
+     "tris": 260,
+     "lodTris": 20
+    }
+   ]
+  },
+  {
+   "id": "stump",
+   "cat": "vegetation",
+   "sub": "ground",
+   "title": "Stump (obstacle)",
+   "fp": [
+    1,
+    1
+   ],
+   "variants": 1,
+   "status": "in-game",
+   "note": "",
+   "files": [
+    "glb/vegetation/stump.glb",
+    "vox/vegetation/stump.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      7,
+      6,
+      4
+     ],
+     "colours": 6,
+     "colourBits": 8,
+     "voxels": 86,
+     "glow": 0,
+     "tris": 280,
+     "lodTris": 56
+    }
+   ]
+  },
+  {
+   "id": "vines",
+   "cat": "vegetation",
+   "sub": "hanging",
+   "title": "Hanging vines",
+   "fp": [
+    1.25,
+    0.5
+   ],
+   "variants": 3,
+   "status": "library",
+   "note": "",
+   "files": [
+    "glb/vegetation/vines_1.glb",
+    "vox/vegetation/vines_1.vox",
+    "glb/vegetation/vines_2.glb",
+    "vox/vegetation/vines_2.vox",
+    "glb/vegetation/vines_3.glb",
+    "vox/vegetation/vines_3.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      10,
+      1,
+      9
+     ],
+     "colours": 9,
+     "colourBits": 8,
+     "voxels": 35,
+     "glow": 0,
+     "tris": 384,
+     "lodTris": 0
+    },
+    {
+     "variant": 2,
+     "voxSize": [
+      10,
+      1,
+      7
+     ],
+     "colours": 9,
+     "colourBits": 8,
+     "voxels": 26,
+     "glow": 0,
+     "tris": 284,
+     "lodTris": 0
+    },
+    {
+     "variant": 3,
+     "voxSize": [
+      10,
+      1,
+      8
+     ],
+     "colours": 9,
+     "colourBits": 8,
+     "voxels": 33,
+     "glow": 0,
+     "tris": 364,
+     "lodTris": 0
+    }
+   ]
+  },
+  {
+   "id": "hangingMoss",
+   "cat": "vegetation",
+   "sub": "hanging",
+   "title": "Hanging moss",
+   "fp": [
+    1,
+    0.5
+   ],
+   "variants": 2,
+   "status": "library",
+   "note": "",
+   "files": [
+    "glb/vegetation/hangingMoss_1.glb",
+    "vox/vegetation/hangingMoss_1.vox",
+    "glb/vegetation/hangingMoss_2.glb",
+    "vox/vegetation/hangingMoss_2.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      8,
+      2,
+      6
+     ],
+     "colours": 3,
+     "colourBits": 8,
+     "voxels": 58,
+     "glow": 0,
+     "tris": 356,
+     "lodTris": 80
+    },
+    {
+     "variant": 2,
+     "voxSize": [
+      8,
+      2,
+      6
+     ],
+     "colours": 3,
+     "colourBits": 8,
+     "voxels": 54,
+     "glow": 0,
+     "tris": 360,
+     "lodTris": 72
+    }
+   ]
+  },
+  {
+   "id": "materialBoard",
+   "cat": "architecture",
+   "sub": "reference",
+   "title": "Material board",
+   "fp": [
+    7,
+    7
+   ],
+   "variants": 1,
+   "status": "demo",
+   "note": "",
+   "files": [
+    "glb/architecture/materialBoard.glb",
+    "vox/architecture/materialBoard.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      46,
+      46,
+      4
+     ],
+     "colours": 83,
+     "colourBits": 8,
+     "voxels": 4608,
+     "glow": 864,
+     "tris": 10752,
+     "lodTris": 2688
+    }
+   ]
+  },
+  {
+   "id": "kitSampler",
+   "cat": "architecture",
+   "sub": "kit",
+   "title": "Component kit sampler",
+   "fp": [
+    8,
+    7
+   ],
+   "variants": 1,
+   "status": "demo",
+   "note": "",
+   "files": [
+    "glb/architecture/kitSampler.glb",
+    "vox/architecture/kitSampler.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      57,
+      54,
+      11
+     ],
+     "colours": 52,
+     "colourBits": 8,
+     "voxels": 4483,
+     "glow": 142,
+     "tris": 14916,
+     "lodTris": 3624
+    }
+   ]
+  },
+  {
+   "id": "habitatCottage",
+   "cat": "architecture",
+   "sub": "standards",
+   "title": "Habitat: meadow cottage",
+   "fp": [
+    2.5,
+    2.5
+   ],
+   "variants": 1,
+   "status": "demo",
+   "note": "",
+   "files": [
+    "glb/architecture/habitatCottage.glb",
+    "vox/architecture/habitatCottage.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      21,
+      19,
+      19
+     ],
+     "colours": 27,
+     "colourBits": 8,
+     "voxels": 1689,
+     "glow": 39,
+     "tris": 7464,
+     "lodTris": 1246
+    }
+   ]
+  },
+  {
+   "id": "resourceGranary",
+   "cat": "architecture",
+   "sub": "standards",
+   "title": "Resource: granary",
+   "fp": [
+    3,
+    2.5
+   ],
+   "variants": 1,
+   "status": "demo",
+   "note": "",
+   "files": [
+    "glb/architecture/resourceGranary.glb",
+    "vox/architecture/resourceGranary.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      21,
+      19,
+      22
+     ],
+     "colours": 22,
+     "colourBits": 8,
+     "voxels": 1641,
+     "glow": 46,
+     "tris": 7684,
+     "lodTris": 1712
+    }
+   ]
+  },
+  {
+   "id": "breedingLodge",
+   "cat": "architecture",
+   "sub": "standards",
+   "title": "Breeding: twin nest lodge",
+   "fp": [
+    3,
+    2
+   ],
+   "variants": 1,
+   "status": "demo",
+   "note": "",
+   "files": [
+    "glb/architecture/breedingLodge.glb",
+    "vox/architecture/breedingLodge.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      24,
+      16,
+      20
+     ],
+     "colours": 27,
+     "colourBits": 8,
+     "voxels": 2444,
+     "glow": 38,
+     "tris": 4312,
+     "lodTris": 996
+    }
+   ]
+  },
+  {
+   "id": "craftWorkshop",
+   "cat": "architecture",
+   "sub": "standards",
+   "title": "Crafting: workshop",
+   "fp": [
+    3.5,
+    2.5
+   ],
+   "variants": 1,
+   "status": "demo",
+   "note": "",
+   "files": [
+    "glb/architecture/craftWorkshop.glb",
+    "vox/architecture/craftWorkshop.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      26,
+      20,
+      24
+     ],
+     "colours": 25,
+     "colourBits": 8,
+     "voxels": 2788,
+     "glow": 61,
+     "tris": 6868,
+     "lodTris": 1646
+    }
+   ]
+  },
+  {
+   "id": "decorGazebo",
+   "cat": "architecture",
+   "sub": "standards",
+   "title": "Decorative: gazebo",
+   "fp": [
+    2,
+    2
+   ],
+   "variants": 1,
+   "status": "demo",
+   "note": "",
+   "files": [
+    "glb/architecture/decorGazebo.glb",
+    "vox/architecture/decorGazebo.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      16,
+      17,
+      27
+     ],
+     "colours": 18,
+     "colourBits": 8,
+     "voxels": 2165,
+     "glow": 8,
+     "tris": 3892,
+     "lodTris": 960
+    }
+   ]
+  },
+  {
+   "id": "magicSpire",
+   "cat": "architecture",
+   "sub": "standards",
+   "title": "Magical: moon spire",
+   "fp": [
+    2,
+    2
+   ],
+   "variants": 1,
+   "status": "demo",
+   "note": "",
+   "files": [
+    "glb/architecture/magicSpire.glb",
+    "vox/architecture/magicSpire.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      18,
+      20,
+      41
+     ],
+     "colours": 24,
+     "colourBits": 8,
+     "voxels": 3056,
+     "glow": 51,
+     "tris": 4584,
+     "lodTris": 1180
+    }
+   ]
+  },
+  {
+   "id": "b_hatchery",
+   "cat": "buildings",
+   "sub": "game",
+   "title": "Hatchery",
+   "fp": [
+    3,
+    3
+   ],
+   "variants": 3,
+   "status": "in-game",
+   "note": "variants are levels 1-3",
+   "files": [
+    "glb/buildings/b_hatchery_1.glb",
+    "vox/buildings/b_hatchery_1.vox",
+    "glb/buildings/b_hatchery_2.glb",
+    "vox/buildings/b_hatchery_2.vox",
+    "glb/buildings/b_hatchery_3.glb",
+    "vox/buildings/b_hatchery_3.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      26,
+      27,
+      41
+     ],
+     "colours": 51,
+     "colourBits": 8,
+     "voxels": 6452,
+     "glow": 954,
+     "tris": 13788,
+     "lodTris": 3004
+    },
+    {
+     "variant": 2,
+     "voxSize": [
+      26,
+      27,
+      41
+     ],
+     "colours": 52,
+     "colourBits": 8,
+     "voxels": 6489,
+     "glow": 960,
+     "tris": 13904,
+     "lodTris": 3050
+    },
+    {
+     "variant": 3,
+     "voxSize": [
+      26,
+      27,
+      41
+     ],
+     "colours": 54,
+     "colourBits": 8,
+     "voxels": 6549,
+     "glow": 884,
+     "tris": 14008,
+     "lodTris": 3106
+    }
+   ]
+  },
+  {
+   "id": "r_hatchery",
+   "cat": "ruins",
+   "sub": "game",
+   "title": "Hatchery (ruin)",
+   "fp": [
+    3,
+    3
+   ],
+   "variants": 1,
+   "status": "in-game",
+   "note": "",
+   "files": [
+    "glb/ruins/r_hatchery.glb",
+    "vox/ruins/r_hatchery.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      27,
+      28,
+      17
+     ],
+     "colours": 24,
+     "colourBits": 8,
+     "voxels": 1821,
+     "glow": 4,
+     "tris": 4596,
+     "lodTris": 1028
+    }
+   ]
+  },
+  {
+   "id": "b_hollow",
+   "cat": "buildings",
+   "sub": "game",
+   "title": "Hollow",
+   "fp": [
+    3,
+    3
+   ],
+   "variants": 3,
+   "status": "in-game",
+   "note": "variants are levels 1-3",
+   "files": [
+    "glb/buildings/b_hollow_1.glb",
+    "vox/buildings/b_hollow_1.vox",
+    "glb/buildings/b_hollow_2.glb",
+    "vox/buildings/b_hollow_2.vox",
+    "glb/buildings/b_hollow_3.glb",
+    "vox/buildings/b_hollow_3.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      24,
+      24,
+      19
+     ],
+     "colours": 32,
+     "colourBits": 8,
+     "voxels": 2990,
+     "glow": 55,
+     "tris": 5200,
+     "lodTris": 1182
+    },
+    {
+     "variant": 2,
+     "voxSize": [
+      24,
+      24,
+      19
+     ],
+     "colours": 32,
+     "colourBits": 8,
+     "voxels": 2994,
+     "glow": 56,
+     "tris": 5232,
+     "lodTris": 1194
+    },
+    {
+     "variant": 3,
+     "voxSize": [
+      24,
+      24,
+      19
+     ],
+     "colours": 34,
+     "colourBits": 8,
+     "voxels": 2994,
+     "glow": 56,
+     "tris": 5232,
+     "lodTris": 1194
+    }
+   ]
+  },
+  {
+   "id": "r_hollow",
+   "cat": "ruins",
+   "sub": "game",
+   "title": "Hollow (ruin)",
+   "fp": [
+    3,
+    3
+   ],
+   "variants": 1,
+   "status": "in-game",
+   "note": "",
+   "files": [
+    "glb/ruins/r_hollow.glb",
+    "vox/ruins/r_hollow.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      28,
+      27,
+      13
+     ],
+     "colours": 24,
+     "colourBits": 8,
+     "voxels": 1550,
+     "glow": 0,
+     "tris": 3860,
+     "lodTris": 880
+    }
+   ]
+  },
+  {
+   "id": "b_tidegate",
+   "cat": "buildings",
+   "sub": "game",
+   "title": "Tidegate",
+   "fp": [
+    3,
+    2
+   ],
+   "variants": 3,
+   "status": "in-game",
+   "note": "variants are levels 1-3",
+   "files": [
+    "glb/buildings/b_tidegate_1.glb",
+    "vox/buildings/b_tidegate_1.vox",
+    "glb/buildings/b_tidegate_2.glb",
+    "vox/buildings/b_tidegate_2.vox",
+    "glb/buildings/b_tidegate_3.glb",
+    "vox/buildings/b_tidegate_3.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      24,
+      16,
+      27
+     ],
+     "colours": 16,
+     "colourBits": 8,
+     "voxels": 2422,
+     "glow": 288,
+     "tris": 5104,
+     "lodTris": 1304
+    },
+    {
+     "variant": 2,
+     "voxSize": [
+      24,
+      16,
+      27
+     ],
+     "colours": 19,
+     "colourBits": 8,
+     "voxels": 2430,
+     "glow": 290,
+     "tris": 5168,
+     "lodTris": 1328
+    },
+    {
+     "variant": 3,
+     "voxSize": [
+      24,
+      16,
+      27
+     ],
+     "colours": 21,
+     "colourBits": 8,
+     "voxels": 2430,
+     "glow": 290,
+     "tris": 5168,
+     "lodTris": 1328
+    }
+   ]
+  },
+  {
+   "id": "r_tidegate",
+   "cat": "ruins",
+   "sub": "game",
+   "title": "Tidegate (ruin)",
+   "fp": [
+    3,
+    2
+   ],
+   "variants": 1,
+   "status": "in-game",
+   "note": "",
+   "files": [
+    "glb/ruins/r_tidegate.glb",
+    "vox/ruins/r_tidegate.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      26,
+      20,
+      17
+     ],
+     "colours": 16,
+     "colourBits": 8,
+     "voxels": 1249,
+     "glow": 12,
+     "tris": 3068,
+     "lodTris": 744
+    }
+   ]
+  },
+  {
+   "id": "b_moonshrine",
+   "cat": "buildings",
+   "sub": "game",
+   "title": "Moonshrine",
+   "fp": [
+    2,
+    2
+   ],
+   "variants": 3,
+   "status": "in-game",
+   "note": "variants are levels 1-3",
+   "files": [
+    "glb/buildings/b_moonshrine_1.glb",
+    "vox/buildings/b_moonshrine_1.vox",
+    "glb/buildings/b_moonshrine_2.glb",
+    "vox/buildings/b_moonshrine_2.vox",
+    "glb/buildings/b_moonshrine_3.glb",
+    "vox/buildings/b_moonshrine_3.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      18,
+      18,
+      30
+     ],
+     "colours": 17,
+     "colourBits": 8,
+     "voxels": 1971,
+     "glow": 54,
+     "tris": 4260,
+     "lodTris": 912
+    },
+    {
+     "variant": 2,
+     "voxSize": [
+      18,
+      19,
+      30
+     ],
+     "colours": 20,
+     "colourBits": 8,
+     "voxels": 1979,
+     "glow": 56,
+     "tris": 4324,
+     "lodTris": 936
+    },
+    {
+     "variant": 3,
+     "voxSize": [
+      18,
+      19,
+      30
+     ],
+     "colours": 22,
+     "colourBits": 8,
+     "voxels": 1979,
+     "glow": 56,
+     "tris": 4324,
+     "lodTris": 936
+    }
+   ]
+  },
+  {
+   "id": "r_moonshrine",
+   "cat": "ruins",
+   "sub": "game",
+   "title": "Moonshrine (ruin)",
+   "fp": [
+    2,
+    2
+   ],
+   "variants": 1,
+   "status": "in-game",
+   "note": "",
+   "files": [
+    "glb/ruins/r_moonshrine.glb",
+    "vox/ruins/r_moonshrine.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      20,
+      19,
+      18
+     ],
+     "colours": 18,
+     "colourBits": 8,
+     "voxels": 1082,
+     "glow": 2,
+     "tris": 2556,
+     "lodTris": 460
+    }
+   ]
+  },
+  {
+   "id": "b_reliquarygate",
+   "cat": "buildings",
+   "sub": "game",
+   "title": "Reliquarygate",
+   "fp": [
+    3,
+    3
+   ],
+   "variants": 3,
+   "status": "in-game",
+   "note": "variants are levels 1-3",
+   "files": [
+    "glb/buildings/b_reliquarygate_1.glb",
+    "vox/buildings/b_reliquarygate_1.vox",
+    "glb/buildings/b_reliquarygate_2.glb",
+    "vox/buildings/b_reliquarygate_2.vox",
+    "glb/buildings/b_reliquarygate_3.glb",
+    "vox/buildings/b_reliquarygate_3.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      22,
+      21,
+      17
+     ],
+     "colours": 28,
+     "colourBits": 8,
+     "voxels": 3616,
+     "glow": 10,
+     "tris": 4024,
+     "lodTris": 996
+    },
+    {
+     "variant": 2,
+     "voxSize": [
+      22,
+      21,
+      17
+     ],
+     "colours": 28,
+     "colourBits": 8,
+     "voxels": 3616,
+     "glow": 10,
+     "tris": 4024,
+     "lodTris": 996
+    },
+    {
+     "variant": 3,
+     "voxSize": [
+      22,
+      21,
+      17
+     ],
+     "colours": 28,
+     "colourBits": 8,
+     "voxels": 3616,
+     "glow": 10,
+     "tris": 4024,
+     "lodTris": 996
+    }
+   ]
+  },
+  {
+   "id": "r_reliquarygate",
+   "cat": "ruins",
+   "sub": "game",
+   "title": "Reliquarygate (ruin)",
+   "fp": [
+    3,
+    3
+   ],
+   "variants": 1,
+   "status": "in-game",
+   "note": "",
+   "files": [
+    "glb/ruins/r_reliquarygate.glb",
+    "vox/ruins/r_reliquarygate.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      22,
+      21,
+      17
+     ],
+     "colours": 25,
+     "colourBits": 8,
+     "voxels": 3606,
+     "glow": 0,
+     "tris": 3964,
+     "lodTris": 960
+    }
+   ]
+  },
+  {
+   "id": "b_forge",
+   "cat": "buildings",
+   "sub": "game",
+   "title": "Forge",
+   "fp": [
+    3,
+    3
+   ],
+   "variants": 3,
+   "status": "in-game",
+   "note": "variants are levels 1-3",
+   "files": [
+    "glb/buildings/b_forge_1.glb",
+    "vox/buildings/b_forge_1.vox",
+    "glb/buildings/b_forge_2.glb",
+    "vox/buildings/b_forge_2.vox",
+    "glb/buildings/b_forge_3.glb",
+    "vox/buildings/b_forge_3.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      26,
+      26,
+      28
+     ],
+     "colours": 24,
+     "colourBits": 8,
+     "voxels": 2183,
+     "glow": 41,
+     "tris": 8764,
+     "lodTris": 1612
+    },
+    {
+     "variant": 2,
+     "voxSize": [
+      26,
+      26,
+      28
+     ],
+     "colours": 25,
+     "colourBits": 8,
+     "voxels": 2205,
+     "glow": 42,
+     "tris": 8820,
+     "lodTris": 1624
+    },
+    {
+     "variant": 3,
+     "voxSize": [
+      26,
+      26,
+      28
+     ],
+     "colours": 29,
+     "colourBits": 8,
+     "voxels": 2205,
+     "glow": 42,
+     "tris": 8820,
+     "lodTris": 1624
+    }
+   ]
+  },
+  {
+   "id": "r_forge",
+   "cat": "ruins",
+   "sub": "game",
+   "title": "Forge (ruin)",
+   "fp": [
+    3,
+    3
+   ],
+   "variants": 1,
+   "status": "in-game",
+   "note": "",
+   "files": [
+    "glb/ruins/r_forge.glb",
+    "vox/ruins/r_forge.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      28,
+      28,
+      23
+     ],
+     "colours": 17,
+     "colourBits": 8,
+     "voxels": 1302,
+     "glow": 0,
+     "tris": 4748,
+     "lodTris": 1112
+    }
+   ]
+  },
+  {
+   "id": "b_farm",
+   "cat": "buildings",
+   "sub": "game",
+   "title": "Farm",
+   "fp": [
+    3,
+    2
+   ],
+   "variants": 3,
+   "status": "in-game",
+   "note": "variants are levels 1-3",
+   "files": [
+    "glb/buildings/b_farm_1.glb",
+    "vox/buildings/b_farm_1.vox",
+    "glb/buildings/b_farm_2.glb",
+    "vox/buildings/b_farm_2.vox",
+    "glb/buildings/b_farm_3.glb",
+    "vox/buildings/b_farm_3.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      24,
+      16,
+      11
+     ],
+     "colours": 16,
+     "colourBits": 8,
+     "voxels": 897,
+     "glow": 0,
+     "tris": 4080,
+     "lodTris": 720
+    },
+    {
+     "variant": 2,
+     "voxSize": [
+      24,
+      16,
+      11
+     ],
+     "colours": 16,
+     "colourBits": 8,
+     "voxels": 897,
+     "glow": 0,
+     "tris": 4080,
+     "lodTris": 720
+    },
+    {
+     "variant": 3,
+     "voxSize": [
+      24,
+      16,
+      11
+     ],
+     "colours": 16,
+     "colourBits": 8,
+     "voxels": 897,
+     "glow": 0,
+     "tris": 4080,
+     "lodTris": 720
+    }
+   ]
+  },
+  {
+   "id": "b_mine",
+   "cat": "buildings",
+   "sub": "game",
+   "title": "Mine",
+   "fp": [
+    2,
+    2
+   ],
+   "variants": 3,
+   "status": "in-game",
+   "note": "variants are levels 1-3",
+   "files": [
+    "glb/buildings/b_mine_1.glb",
+    "vox/buildings/b_mine_1.vox",
+    "glb/buildings/b_mine_2.glb",
+    "vox/buildings/b_mine_2.vox",
+    "glb/buildings/b_mine_3.glb",
+    "vox/buildings/b_mine_3.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      16,
+      16,
+      10
+     ],
+     "colours": 16,
+     "colourBits": 8,
+     "voxels": 1084,
+     "glow": 4,
+     "tris": 1792,
+     "lodTris": 478
+    },
+    {
+     "variant": 2,
+     "voxSize": [
+      16,
+      16,
+      10
+     ],
+     "colours": 17,
+     "colourBits": 8,
+     "voxels": 1088,
+     "glow": 5,
+     "tris": 1828,
+     "lodTris": 490
+    },
+    {
+     "variant": 3,
+     "voxSize": [
+      16,
+      16,
+      10
+     ],
+     "colours": 17,
+     "colourBits": 8,
+     "voxels": 1088,
+     "glow": 5,
+     "tris": 1828,
+     "lodTris": 490
+    }
+   ]
+  },
+  {
+   "id": "b_habitat",
+   "cat": "buildings",
+   "sub": "game",
+   "title": "Habitat (7 elements)",
+   "fp": [
+    3,
+    3
+   ],
+   "variants": 7,
+   "status": "in-game",
+   "note": "variants are elements",
+   "files": [
+    "glb/buildings/b_habitat_1.glb",
+    "vox/buildings/b_habitat_1.vox",
+    "glb/buildings/b_habitat_2.glb",
+    "vox/buildings/b_habitat_2.vox",
+    "glb/buildings/b_habitat_3.glb",
+    "vox/buildings/b_habitat_3.vox",
+    "glb/buildings/b_habitat_4.glb",
+    "vox/buildings/b_habitat_4.vox",
+    "glb/buildings/b_habitat_5.glb",
+    "vox/buildings/b_habitat_5.vox",
+    "glb/buildings/b_habitat_6.glb",
+    "vox/buildings/b_habitat_6.vox",
+    "glb/buildings/b_habitat_7.glb",
+    "vox/buildings/b_habitat_7.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      26,
+      26,
+      21
+     ],
+     "colours": 29,
+     "colourBits": 8,
+     "voxels": 2026,
+     "glow": 16,
+     "tris": 7936,
+     "lodTris": 1684
+    },
+    {
+     "variant": 2,
+     "voxSize": [
+      24,
+      24,
+      18
+     ],
+     "colours": 36,
+     "colourBits": 8,
+     "voxels": 1718,
+     "glow": 41,
+     "tris": 7492,
+     "lodTris": 1570
+    },
+    {
+     "variant": 3,
+     "voxSize": [
+      24,
+      24,
+      15
+     ],
+     "colours": 42,
+     "colourBits": 8,
+     "voxels": 1702,
+     "glow": 14,
+     "tris": 4892,
+     "lodTris": 1144
+    },
+    {
+     "variant": 4,
+     "voxSize": [
+      24,
+      24,
+      22
+     ],
+     "colours": 32,
+     "colourBits": 8,
+     "voxels": 1556,
+     "glow": 20,
+     "tris": 7080,
+     "lodTris": 1490
+    },
+    {
+     "variant": 5,
+     "voxSize": [
+      24,
+      24,
+      25
+     ],
+     "colours": 37,
+     "colourBits": 8,
+     "voxels": 1822,
+     "glow": 33,
+     "tris": 7600,
+     "lodTris": 1588
+    },
+    {
+     "variant": 6,
+     "voxSize": [
+      24,
+      24,
+      25
+     ],
+     "colours": 32,
+     "colourBits": 8,
+     "voxels": 1781,
+     "glow": 29,
+     "tris": 6148,
+     "lodTris": 1396
+    },
+    {
+     "variant": 7,
+     "voxSize": [
+      24,
+      24,
+      26
+     ],
+     "colours": 29,
+     "colourBits": 8,
+     "voxels": 1459,
+     "glow": 16,
+     "tris": 7016,
+     "lodTris": 1392
+    }
+   ]
+  },
+  {
+   "id": "r_habitat",
+   "cat": "ruins",
+   "sub": "game",
+   "title": "Habitat (ruin)",
+   "fp": [
+    3,
+    3
+   ],
+   "variants": 1,
+   "status": "in-game",
+   "note": "",
+   "files": [
+    "glb/ruins/r_habitat.glb",
+    "vox/ruins/r_habitat.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      28,
+      28,
+      9
+     ],
+     "colours": 19,
+     "colourBits": 8,
+     "voxels": 717,
+     "glow": 0,
+     "tris": 3280,
+     "lodTris": 732
+    }
+   ]
+  },
+  {
+   "id": "b_lantern",
+   "cat": "buildings",
+   "sub": "game",
+   "title": "Lantern",
+   "fp": [
+    1,
+    1
+   ],
+   "variants": 1,
+   "status": "in-game",
+   "note": "variants are levels 1-3",
+   "files": [
+    "glb/buildings/b_lantern.glb",
+    "vox/buildings/b_lantern.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      3,
+      3,
+      17
+     ],
+     "colours": 6,
+     "colourBits": 8,
+     "voxels": 60,
+     "glow": 27,
+     "tris": 272,
+     "lodTris": 62
+    }
+   ]
+  },
+  {
+   "id": "b_festlantern",
+   "cat": "buildings",
+   "sub": "game",
+   "title": "Festlantern",
+   "fp": [
+    1,
+    1
+   ],
+   "variants": 1,
+   "status": "in-game",
+   "note": "variants are levels 1-3",
+   "files": [
+    "glb/buildings/b_festlantern.glb",
+    "vox/buildings/b_festlantern.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      4,
+      3,
+      14
+     ],
+     "colours": 4,
+     "colourBits": 8,
+     "voxels": 59,
+     "glow": 36,
+     "tris": 252,
+     "lodTris": 76
+    }
+   ]
+  },
+  {
+   "id": "b_flowerbed",
+   "cat": "buildings",
+   "sub": "game",
+   "title": "Flowerbed",
+   "fp": [
+    1,
+    1
+   ],
+   "variants": 1,
+   "status": "in-game",
+   "note": "variants are levels 1-3",
+   "files": [
+    "glb/buildings/b_flowerbed.glb",
+    "vox/buildings/b_flowerbed.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      8,
+      8,
+      4
+     ],
+     "colours": 12,
+     "colourBits": 8,
+     "voxels": 106,
+     "glow": 0,
+     "tris": 448,
+     "lodTris": 80
+    }
+   ]
+  },
+  {
+   "id": "b_bench",
+   "cat": "buildings",
+   "sub": "game",
+   "title": "Bench",
+   "fp": [
+    2,
+    1
+   ],
+   "variants": 1,
+   "status": "in-game",
+   "note": "variants are levels 1-3",
+   "files": [
+    "glb/buildings/b_bench.glb",
+    "vox/buildings/b_bench.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      14,
+      4,
+      8
+     ],
+     "colours": 8,
+     "colourBits": 8,
+     "voxels": 113,
+     "glow": 0,
+     "tris": 564,
+     "lodTris": 120
+    }
+   ]
+  },
+  {
+   "id": "b_statue",
+   "cat": "buildings",
+   "sub": "game",
+   "title": "Statue",
+   "fp": [
+    2,
+    2
+   ],
+   "variants": 1,
+   "status": "in-game",
+   "note": "variants are levels 1-3",
+   "files": [
+    "glb/buildings/b_statue.glb",
+    "vox/buildings/b_statue.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      14,
+      14,
+      17
+     ],
+     "colours": 10,
+     "colourBits": 8,
+     "voxels": 978,
+     "glow": 0,
+     "tris": 1972,
+     "lodTris": 416
+    }
+   ]
+  },
+  {
+   "id": "b_fountain",
+   "cat": "buildings",
+   "sub": "game",
+   "title": "Fountain",
+   "fp": [
+    2,
+    2
+   ],
+   "variants": 1,
+   "status": "in-game",
+   "note": "variants are levels 1-3",
+   "files": [
+    "glb/buildings/b_fountain.glb",
+    "vox/buildings/b_fountain.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      14,
+      14,
+      11
+     ],
+     "colours": 8,
+     "colourBits": 8,
+     "voxels": 536,
+     "glow": 104,
+     "tris": 1328,
+     "lodTris": 392
+    }
+   ]
+  },
+  {
+   "id": "lanternPost",
+   "cat": "decor",
+   "sub": "monuments",
+   "title": "Lantern post",
+   "fp": [
+    1,
+    1
+   ],
+   "variants": 2,
+   "status": "library",
+   "note": "",
+   "files": [
+    "glb/decor/lanternPost_1.glb",
+    "vox/decor/lanternPost_1.vox",
+    "glb/decor/lanternPost_2.glb",
+    "vox/decor/lanternPost_2.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      6,
+      3,
+      13
+     ],
+     "colours": 6,
+     "colourBits": 8,
+     "voxels": 58,
+     "glow": 18,
+     "tris": 292,
+     "lodTris": 60
+    },
+    {
+     "variant": 2,
+     "voxSize": [
+      6,
+      3,
+      13
+     ],
+     "colours": 6,
+     "colourBits": 8,
+     "voxels": 58,
+     "glow": 18,
+     "tris": 292,
+     "lodTris": 60
+    }
+   ]
+  },
+  {
+   "id": "torch",
+   "cat": "decor",
+   "sub": "monuments",
+   "title": "Torch",
+   "fp": [
+    1,
+    1
+   ],
+   "variants": 1,
+   "status": "library",
+   "note": "",
+   "files": [
+    "glb/decor/torch.glb",
+    "vox/decor/torch.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      3,
+      3,
+      8
+     ],
+     "colours": 5,
+     "colourBits": 8,
+     "voxels": 17,
+     "glow": 3,
+     "tris": 120,
+     "lodTris": 28
+    }
+   ]
+  },
+  {
+   "id": "statue",
+   "cat": "decor",
+   "sub": "monuments",
+   "title": "Guardian statue",
+   "fp": [
+    2,
+    2
+   ],
+   "variants": 1,
+   "status": "in-game",
+   "note": "",
+   "files": [
+    "glb/decor/statue.glb",
+    "vox/decor/statue.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      14,
+      14,
+      17
+     ],
+     "colours": 10,
+     "colourBits": 8,
+     "voxels": 978,
+     "glow": 0,
+     "tris": 1972,
+     "lodTris": 416
+    }
+   ]
+  },
+  {
+   "id": "obelisk",
+   "cat": "decor",
+   "sub": "magic",
+   "title": "Rune obelisk",
+   "fp": [
+    1,
+    1
+   ],
+   "variants": 1,
+   "status": "library",
+   "note": "",
+   "files": [
+    "glb/decor/obelisk.glb",
+    "vox/decor/obelisk.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      8,
+      8,
+      24
+     ],
+     "colours": 6,
+     "colourBits": 8,
+     "voxels": 408,
+     "glow": 48,
+     "tris": 992,
+     "lodTris": 280
+    }
+   ]
+  },
+  {
+   "id": "columnRuin",
+   "cat": "decor",
+   "sub": "monuments",
+   "title": "Ruined column",
+   "fp": [
+    2,
+    2
+   ],
+   "variants": 2,
+   "status": "library",
+   "note": "",
+   "files": [
+    "glb/decor/columnRuin_1.glb",
+    "vox/decor/columnRuin_1.vox",
+    "glb/decor/columnRuin_2.glb",
+    "vox/decor/columnRuin_2.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      8,
+      6,
+      12
+     ],
+     "colours": 7,
+     "colourBits": 8,
+     "voxels": 201,
+     "glow": 0,
+     "tris": 544,
+     "lodTris": 128
+    },
+    {
+     "variant": 2,
+     "voxSize": [
+      14,
+      6,
+      4
+     ],
+     "colours": 7,
+     "colourBits": 8,
+     "voxels": 142,
+     "glow": 0,
+     "tris": 532,
+     "lodTris": 148
+    }
+   ]
+  },
+  {
+   "id": "runeStone",
+   "cat": "decor",
+   "sub": "magic",
+   "title": "Rune stone",
+   "fp": [
+    1,
+    1
+   ],
+   "variants": 3,
+   "status": "library",
+   "note": "",
+   "files": [
+    "glb/decor/runeStone_1.glb",
+    "vox/decor/runeStone_1.vox",
+    "glb/decor/runeStone_2.glb",
+    "vox/decor/runeStone_2.vox",
+    "glb/decor/runeStone_3.glb",
+    "vox/decor/runeStone_3.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      6,
+      3,
+      11
+     ],
+     "colours": 9,
+     "colourBits": 8,
+     "voxels": 134,
+     "glow": 5,
+     "tris": 436,
+     "lodTris": 118
+    },
+    {
+     "variant": 2,
+     "voxSize": [
+      6,
+      3,
+      11
+     ],
+     "colours": 9,
+     "colourBits": 8,
+     "voxels": 134,
+     "glow": 5,
+     "tris": 436,
+     "lodTris": 118
+    },
+    {
+     "variant": 3,
+     "voxSize": [
+      6,
+      3,
+      11
+     ],
+     "colours": 9,
+     "colourBits": 8,
+     "voxels": 134,
+     "glow": 5,
+     "tris": 436,
+     "lodTris": 118
+    }
+   ]
+  },
+  {
+   "id": "orbPedestal",
+   "cat": "decor",
+   "sub": "magic",
+   "title": "Orb pedestal",
+   "fp": [
+    1,
+    1
+   ],
+   "variants": 1,
+   "status": "library",
+   "note": "",
+   "files": [
+    "glb/decor/orbPedestal.glb",
+    "vox/decor/orbPedestal.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      6,
+      6,
+      12
+     ],
+     "colours": 9,
+     "colourBits": 8,
+     "voxels": 208,
+     "glow": 56,
+     "tris": 672,
+     "lodTris": 112
+    }
+   ]
+  },
+  {
+   "id": "crystalPylon",
+   "cat": "decor",
+   "sub": "magic",
+   "title": "Crystal pylon",
+   "fp": [
+    1,
+    1
+   ],
+   "variants": 1,
+   "status": "library",
+   "note": "",
+   "files": [
+    "glb/decor/crystalPylon.glb",
+    "vox/decor/crystalPylon.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      6,
+      6,
+      16
+     ],
+     "colours": 5,
+     "colourBits": 8,
+     "voxels": 149,
+     "glow": 85,
+     "tris": 480,
+     "lodTris": 144
+    }
+   ]
+  },
+  {
+   "id": "barrel",
+   "cat": "decor",
+   "sub": "props",
+   "title": "Barrel",
+   "fp": [
+    1,
+    1
+   ],
+   "variants": 1,
+   "status": "library",
+   "note": "",
+   "files": [
+    "glb/decor/barrel.glb",
+    "vox/decor/barrel.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      6,
+      6,
+      6
+     ],
+     "colours": 5,
+     "colourBits": 8,
+     "voxels": 144,
+     "glow": 0,
+     "tris": 384,
+     "lodTris": 64
+    }
+   ]
+  },
+  {
+   "id": "crate",
+   "cat": "decor",
+   "sub": "props",
+   "title": "Crates",
+   "fp": [
+    1,
+    1
+   ],
+   "variants": 3,
+   "status": "library",
+   "note": "",
+   "files": [
+    "glb/decor/crate_1.glb",
+    "vox/decor/crate_1.vox",
+    "glb/decor/crate_2.glb",
+    "vox/decor/crate_2.vox",
+    "glb/decor/crate_3.glb",
+    "vox/decor/crate_3.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      4,
+      4,
+      4
+     ],
+     "colours": 3,
+     "colourBits": 8,
+     "voxels": 57,
+     "glow": 0,
+     "tris": 252,
+     "lodTris": 48
+    },
+    {
+     "variant": 2,
+     "voxSize": [
+      8,
+      5,
+      4
+     ],
+     "colours": 3,
+     "colourBits": 8,
+     "voxels": 121,
+     "glow": 0,
+     "tris": 396,
+     "lodTris": 96
+    },
+    {
+     "variant": 3,
+     "voxSize": [
+      8,
+      5,
+      8
+     ],
+     "colours": 3,
+     "colourBits": 8,
+     "voxels": 185,
+     "glow": 0,
+     "tris": 532,
+     "lodTris": 140
+    }
+   ]
+  },
+  {
+   "id": "sacks",
+   "cat": "decor",
+   "sub": "props",
+   "title": "Sacks",
+   "fp": [
+    1,
+    1
+   ],
+   "variants": 1,
+   "status": "library",
+   "note": "",
+   "files": [
+    "glb/decor/sacks.glb",
+    "vox/decor/sacks.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      7,
+      7,
+      5
+     ],
+     "colours": 3,
+     "colourBits": 8,
+     "voxels": 59,
+     "glow": 0,
+     "tris": 308,
+     "lodTris": 68
+    }
+   ]
+  },
+  {
+   "id": "pots",
+   "cat": "decor",
+   "sub": "props",
+   "title": "Clay pots",
+   "fp": [
+    1,
+    1
+   ],
+   "variants": 1,
+   "status": "library",
+   "note": "",
+   "files": [
+    "glb/decor/pots.glb",
+    "vox/decor/pots.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      7,
+      4,
+      3
+     ],
+     "colours": 4,
+     "colourBits": 8,
+     "voxels": 28,
+     "glow": 0,
+     "tris": 160,
+     "lodTris": 24
+    }
+   ]
+  },
+  {
+   "id": "bucket",
+   "cat": "decor",
+   "sub": "props",
+   "title": "Bucket",
+   "fp": [
+    1,
+    1
+   ],
+   "variants": 1,
+   "status": "library",
+   "note": "",
+   "files": [
+    "glb/decor/bucket.glb",
+    "vox/decor/bucket.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      4,
+      4,
+      4
+     ],
+     "colours": 5,
+     "colourBits": 8,
+     "voxels": 40,
+     "glow": 0,
+     "tris": 164,
+     "lodTris": 48
+    }
+   ]
+  },
+  {
+   "id": "logPile",
+   "cat": "decor",
+   "sub": "props",
+   "title": "Log pile",
+   "fp": [
+    1,
+    1
+   ],
+   "variants": 1,
+   "status": "library",
+   "note": "",
+   "files": [
+    "glb/decor/logPile.glb",
+    "vox/decor/logPile.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      8,
+      6,
+      6
+     ],
+     "colours": 4,
+     "colourBits": 8,
+     "voxels": 192,
+     "glow": 0,
+     "tris": 480,
+     "lodTris": 144
+    }
+   ]
+  },
+  {
+   "id": "cartWheel",
+   "cat": "decor",
+   "sub": "props",
+   "title": "Cart wheel",
+   "fp": [
+    1,
+    1
+   ],
+   "variants": 1,
+   "status": "library",
+   "note": "",
+   "files": [
+    "glb/decor/cartWheel.glb",
+    "vox/decor/cartWheel.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      9,
+      2,
+      9
+     ],
+     "colours": 3,
+     "colourBits": 8,
+     "voxels": 30,
+     "glow": 0,
+     "tris": 292,
+     "lodTris": 12
+    }
+   ]
+  },
+  {
+   "id": "haystack",
+   "cat": "decor",
+   "sub": "props",
+   "title": "Haystack",
+   "fp": [
+    1,
+    1
+   ],
+   "variants": 1,
+   "status": "library",
+   "note": "",
+   "files": [
+    "glb/decor/haystack.glb",
+    "vox/decor/haystack.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      8,
+      8,
+      6
+     ],
+     "colours": 4,
+     "colourBits": 8,
+     "voxels": 208,
+     "glow": 0,
+     "tris": 512,
+     "lodTris": 128
+    }
+   ]
+  },
+  {
+   "id": "signpost",
+   "cat": "decor",
+   "sub": "monuments",
+   "title": "Signpost",
+   "fp": [
+    1,
+    1
+   ],
+   "variants": 1,
+   "status": "library",
+   "note": "",
+   "files": [
+    "glb/decor/signpost.glb",
+    "vox/decor/signpost.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      13,
+      2,
+      10
+     ],
+     "colours": 5,
+     "colourBits": 8,
+     "voxels": 35,
+     "glow": 0,
+     "tris": 244,
+     "lodTris": 40
+    }
+   ]
+  },
+  {
+   "id": "bench",
+   "cat": "decor",
+   "sub": "monuments",
+   "title": "Bench",
+   "fp": [
+    2,
+    1
+   ],
+   "variants": 1,
+   "status": "in-game",
+   "note": "",
+   "files": [
+    "glb/decor/bench.glb",
+    "vox/decor/bench.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      14,
+      4,
+      8
+     ],
+     "colours": 8,
+     "colourBits": 8,
+     "voxels": 113,
+     "glow": 0,
+     "tris": 564,
+     "lodTris": 120
+    }
+   ]
+  },
+  {
+   "id": "pond",
+   "cat": "water",
+   "sub": "objects",
+   "title": "Lily pond",
+   "fp": [
+    2,
+    2
+   ],
+   "variants": 2,
+   "status": "library",
+   "note": "",
+   "files": [
+    "glb/water/pond_1.glb",
+    "vox/water/pond_1.vox",
+    "glb/water/pond_2.glb",
+    "vox/water/pond_2.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      14,
+      14,
+      4
+     ],
+     "colours": 14,
+     "colourBits": 8,
+     "voxels": 218,
+     "glow": 0,
+     "tris": 1032,
+     "lodTris": 224
+    },
+    {
+     "variant": 2,
+     "voxSize": [
+      14,
+      14,
+      4
+     ],
+     "colours": 13,
+     "colourBits": 8,
+     "voxels": 215,
+     "glow": 0,
+     "tris": 1008,
+     "lodTris": 224
+    }
+   ]
+  },
+  {
+   "id": "stream",
+   "cat": "water",
+   "sub": "objects",
+   "title": "Stream segment",
+   "fp": [
+    2,
+    1.5
+   ],
+   "variants": 2,
+   "status": "library",
+   "note": "",
+   "files": [
+    "glb/water/stream_1.glb",
+    "vox/water/stream_1.vox",
+    "glb/water/stream_2.glb",
+    "vox/water/stream_2.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      16,
+      12,
+      2
+     ],
+     "colours": 15,
+     "colourBits": 8,
+     "voxels": 194,
+     "glow": 0,
+     "tris": 896,
+     "lodTris": 248
+    },
+    {
+     "variant": 2,
+     "voxSize": [
+      16,
+      12,
+      2
+     ],
+     "colours": 15,
+     "colourBits": 8,
+     "voxels": 194,
+     "glow": 0,
+     "tris": 896,
+     "lodTris": 248
+    }
+   ]
+  },
+  {
+   "id": "trough",
+   "cat": "water",
+   "sub": "objects",
+   "title": "Water trough",
+   "fp": [
+    1,
+    1
+   ],
+   "variants": 1,
+   "status": "library",
+   "note": "",
+   "files": [
+    "glb/water/trough.glb",
+    "vox/water/trough.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      8,
+      4,
+      3
+     ],
+     "colours": 6,
+     "colourBits": 8,
+     "voxels": 84,
+     "glow": 0,
+     "tris": 304,
+     "lodTris": 80
+    }
+   ]
+  },
+  {
+   "id": "fountain",
+   "cat": "water",
+   "sub": "objects",
+   "title": "Fountain",
+   "fp": [
+    2,
+    2
+   ],
+   "variants": 1,
+   "status": "in-game",
+   "note": "",
+   "files": [
+    "glb/water/fountain.glb",
+    "vox/water/fountain.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      14,
+      14,
+      11
+     ],
+     "colours": 8,
+     "colourBits": 8,
+     "voxels": 536,
+     "glow": 104,
+     "tris": 1328,
+     "lodTris": 392
+    }
+   ]
+  },
+  {
+   "id": "cloud",
+   "cat": "water",
+   "sub": "objects",
+   "title": "Cloud puff",
+   "fp": [
+    3,
+    1.5
+   ],
+   "variants": 3,
+   "status": "library",
+   "note": "",
+   "files": [
+    "glb/water/cloud_1.glb",
+    "vox/water/cloud_1.vox",
+    "glb/water/cloud_2.glb",
+    "vox/water/cloud_2.vox",
+    "glb/water/cloud_3.glb",
+    "vox/water/cloud_3.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      16,
+      8,
+      4
+     ],
+     "colours": 3,
+     "colourBits": 8,
+     "voxels": 306,
+     "glow": 0,
+     "tris": 732,
+     "lodTris": 172
+    },
+    {
+     "variant": 2,
+     "voxSize": [
+      18,
+      8,
+      4
+     ],
+     "colours": 2,
+     "colourBits": 8,
+     "voxels": 244,
+     "glow": 0,
+     "tris": 712,
+     "lodTris": 184
+    },
+    {
+     "variant": 3,
+     "voxSize": [
+      17,
+      7,
+      4
+     ],
+     "colours": 2,
+     "colourBits": 8,
+     "voxels": 286,
+     "glow": 0,
+     "tris": 732,
+     "lodTris": 160
+    }
+   ]
+  },
+  {
+   "id": "jetty",
+   "cat": "water",
+   "sub": "objects",
+   "title": "Jetty",
+   "fp": [
+    1,
+    4.5
+   ],
+   "variants": 1,
+   "status": "in-game",
+   "note": "",
+   "files": [
+    "glb/water/jetty.glb",
+    "vox/water/jetty.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      8,
+      36,
+      23
+     ],
+     "colours": 6,
+     "colourBits": 8,
+     "voxels": 437,
+     "glow": 18,
+     "tris": 2516,
+     "lodTris": 460
+    }
+   ]
+  },
+  {
+   "id": "skiff",
+   "cat": "water",
+   "sub": "objects",
+   "title": "Skiff",
+   "fp": [
+    3,
+    2
+   ],
+   "variants": 1,
+   "status": "in-game",
+   "note": "",
+   "files": [
+    "glb/water/skiff.glb",
+    "vox/water/skiff.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      22,
+      10,
+      26
+     ],
+     "colours": 9,
+     "colourBits": 8,
+     "voxels": 1080,
+     "glow": 0,
+     "tris": 2116,
+     "lodTris": 484
+    }
+   ]
+  },
+  {
+   "id": "v_starter",
+   "cat": "biomes",
+   "sub": "vignettes",
+   "title": "Sunlit Sanctuary (Starter Island)",
+   "fp": [
+    6,
+    6
+   ],
+   "variants": 1,
+   "status": "demo",
+   "note": "",
+   "files": [
+    "glb/biomes/v_starter.glb",
+    "vox/biomes/v_starter.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      43,
+      43,
+      50
+     ],
+     "colours": 62,
+     "colourBits": 8,
+     "voxels": 22714,
+     "glow": 50,
+     "tris": 23080,
+     "lodTris": 4958
+    }
+   ]
+  },
+  {
+   "id": "v_verdant",
+   "cat": "biomes",
+   "sub": "vignettes",
+   "title": "Verdant Reach",
+   "fp": [
+    6,
+    6
+   ],
+   "variants": 1,
+   "status": "demo",
+   "note": "",
+   "files": [
+    "glb/biomes/v_verdant.glb",
+    "vox/biomes/v_verdant.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      43,
+      43,
+      52
+     ],
+     "colours": 60,
+     "colourBits": 8,
+     "voxels": 24212,
+     "glow": 37,
+     "tris": 23800,
+     "lodTris": 5194
+    }
+   ]
+  },
+  {
+   "id": "v_obsidian",
+   "cat": "biomes",
+   "sub": "vignettes",
+   "title": "Obsidian Forge",
+   "fp": [
+    6,
+    6
+   ],
+   "variants": 1,
+   "status": "demo",
+   "note": "",
+   "files": [
+    "glb/biomes/v_obsidian.glb",
+    "vox/biomes/v_obsidian.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      43,
+      43,
+      52
+     ],
+     "colours": 57,
+     "colourBits": 8,
+     "voxels": 21902,
+     "glow": 80,
+     "tris": 22368,
+     "lodTris": 4718
+    }
+   ]
+  },
+  {
+   "id": "v_celestial",
+   "cat": "biomes",
+   "sub": "vignettes",
+   "title": "Celestial Spire",
+   "fp": [
+    6,
+    6
+   ],
+   "variants": 1,
+   "status": "demo",
+   "note": "",
+   "files": [
+    "glb/biomes/v_celestial.glb",
+    "vox/biomes/v_celestial.vox"
+   ],
+   "stats": [
+    {
+     "variant": 1,
+     "voxSize": [
+      43,
+      43,
+      60
+     ],
+     "colours": 58,
+     "colourBits": 8,
+     "voxels": 22190,
+     "glow": 658,
+     "tris": 21448,
+     "lodTris": 4962
+    }
+   ]
+  }
+ ]
+}

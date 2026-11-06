@@ -1,3 +1,5 @@
+> **Superseded in Phase 2 by `art-bible/01_ART_BIBLE.md`** (the permanent standard). Kept for history.
+
 # Aminas — Voxel Environment Style Guide (Environment Phase 1)
 
 The rules every environment model follows so terrain, scenery and buildings read as one family.

@@ -1,0 +1,78 @@
+[
+ {
+  "mode": "2D",
+  "readyMs": 255,
+  "idleMainMsPerS": 66,
+  "panMainMsPerS": 142,
+  "panFps": 46.6,
+  "heapMB": 9.7,
+  "svgNodes": 436,
+  "gl": null
+ },
+ {
+  "mode": "voxel 3D",
+  "readyMs": 5736,
+  "idleMainMsPerS": 19,
+  "panMainMsPerS": 38,
+  "panFps": 1,
+  "heapMB": 13.2,
+  "svgNodes": 396,
+  "gl": {
+   "frames": 31,
+   "avgDrawMs": 11.86,
+   "calls": 73,
+   "triangles": 168684,
+   "geometries": 76,
+   "textures": 1,
+   "shadow": true,
+   "pixelRatio": 2,
+   "slow": true,
+   "lod": "off",
+   "terrainMs": 398.2,
+   "syncMs": 176.9,
+   "occ": {
+    "shown": true,
+    "proxies": 3,
+    "ms": 5.8
+   }
+  }
+ },
+ {
+  "mode": "2D",
+  "readyMs": 278,
+  "idleMainMsPerS": 106,
+  "panMainMsPerS": 147,
+  "panFps": 51,
+  "heapMB": 9.6,
+  "svgNodes": 436,
+  "gl": null
+ },
+ {
+  "mode": "voxel 3D",
+  "readyMs": 5774,
+  "idleMainMsPerS": 19,
+  "panMainMsPerS": 37,
+  "panFps": 0.9,
+  "heapMB": 13.8,
+  "svgNodes": 396,
+  "gl": {
+   "frames": 29,
+   "avgDrawMs": 11.64,
+   "calls": 72,
+   "triangles": 168324,
+   "geometries": 76,
+   "textures": 1,
+   "shadow": true,
+   "pixelRatio": 2,
+   "slow": true,
+   "lod": "off",
+   "terrainMs": 229.4,
+   "syncMs": 198.1,
+   "occ": {
+    "shown": true,
+    "proxies": 3,
+    "ms": 5.1
+   }
+  }
+ }
+]

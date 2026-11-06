@@ -110,7 +110,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   await hide(false); await sleep(300);
   ok(await ev(() => !document.body.classList.contains('perf-hidden') && document.getAnimations().some((a) => a.playState === 'running')), 'back: the island animates again');
   await ev(() => { A.Perf._setLastInput(Date.now() - A.Perf.REST_MS - 1000); A.Perf.tick(); }); await sleep(100);
-  ok(await ev(() => document.body.classList.contains('perf-rest') && document.getAnimations().filter((a) => a.playState === 'running').every((a) => a.effect.target.closest('.cr-an.walk'))), 'a still island (no input for a while) pauses its ambient decoration');
+  ok(await ev(() => document.body.classList.contains('perf-rest') && document.getAnimations().filter((a) => a.playState === 'running').every((a) => a.effect.target.closest('.cr-an.walk') || (a instanceof CSSTransition && a.effect.target.classList.contains('cr-mv'))) /* a creature mid-step (its walk transition) is allowed, like its walk animation */), 'a still island (no input for a while) pauses its ambient decoration');
   await page.mouse.click(820, 120); await sleep(100);
   ok(await ev(() => !document.body.classList.contains('perf-rest')), 'any touch wakes it');
   await shot('09-island-forge-built');

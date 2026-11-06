@@ -25,7 +25,9 @@
   function extras(iid, cols) {
     if (iid !== 'starter') return [];
     const out = [], J = IA.jettyCells(), [jx, jy] = J.at, HP = 39.1918, map = D.ISLANDS.starter.map;
-    if (jy >= 0) { out.push({ kind: 'jetty', x: jx + 0.5, z: jy + 1 + 2.25 }); out.push({ kind: 'skiff', x: jx + 2.6, y: -0.55, z: jy + 4.2, bob: true }); }
+    if (jy >= 0) { out.push({ kind: 'jetty', x: jx + 0.5, z: jy + 1 + 2.25 }); out.push({ kind: 'skiff', x: jx + 2.6, y: -0.55, z: jy + 4.2, bob: true });
+      // the jetty is a working dock (Phase 2 library props): crates waiting, a barrel, sacks for the boat
+      out.push({ kind: 'crate', x: jx + 0.62, z: jy + 2.4 }); out.push({ kind: 'barrel', x: jx + 0.3, z: jy + 2.0 }); out.push({ kind: 'sacks', x: jx + 0.45, z: jy + 4.6 }); }
     let ex = null; cols.forEach((c) => { if (map[c.y] && map[c.y][c.x] && map[c.y][c.x] !== '~' && (!ex || c.x - c.y > ex.x - ex.y)) ex = c; });
     if (ex) out.push({ kind: 'lighthouse', x: ex.x + 2.6, y: -40 / HP, z: ex.y + 0.5 });
     return out;
@@ -36,21 +38,31 @@
     // open glades between them, rather than an even scatter of mixed species.
     const out = [], HP = 39.1918, hash = (x, y, s) => { let h = (x * 374761393 + y * 668265263 + s * 2147483647) | 0; h = (h ^ (h >>> 13)) * 1274126177; return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
     const vn = (x, y, s) => { const xi = Math.floor(x), yi = Math.floor(y), fx = x - xi, fy = y - yi, a = hash(xi, yi, s), b = hash(xi + 1, yi, s), c = hash(xi, yi + 1, s), d = hash(xi + 1, yi + 1, s), u = fx * fx * (3 - 2 * fx), v = fy * fy * (3 - 2 * fy); return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v; };
+    const at = new Map(); cols.forEach((c) => at.set(c.x + ',' + c.y, c));
     cols.forEach((c) => {
       const v = hash(c.x, c.y, 2), y = Math.round(c.top / HP / 0.5) * 0.5, grove = vn(c.x * 0.22, c.y * 0.22, 6), dense = vn(c.x * 0.3, c.y * 0.3, 7);
       let kind = null;
       if (c.kind === 'hill') {
-        if (dense < 0.34 && v < 0.75) kind = v < 0.25 ? 'bush' : v < 0.32 ? 'fern' : null; // a glade
-        else kind = grove < 0.4 ? (v > 0.2 ? 'pine' : 'bush') : grove < 0.68 ? (v > 0.3 ? 'oak' : v > 0.12 ? 'bush' : 'birch') : (v > 0.45 ? 'birch' : v > 0.2 ? 'blossom' : 'bush');
-      } else if (c.kind === 'chunk' && v > 0.35) kind = v > 0.75 ? 'pine' : 'oak';
-      else if (c.kind === 'ledge' && v > 0.8 && c.top >= -24) kind = v > 0.93 ? 'pine' : 'bush';
-      if (!kind || !(kind in KNOWN)) return;
-      const big = kind === 'oak' ? 0.72 + hash(c.x, c.y, 6) * 0.25 : kind === 'pine' ? 0.8 + hash(c.x, c.y, 6) * 0.35 : 0.85 + hash(c.x, c.y, 6) * 0.25;
-      out.push({ kind, seed: Math.floor(v * 1000), cx: c.x, cz: c.y, x: c.x + 0.5 + (hash(c.x, c.y, 3) - 0.5) * 0.3, y, z: c.y + 0.5 + (hash(c.x, c.y, 4) - 0.5) * 0.3, ry: Math.floor(hash(c.x, c.y, 5) * 4) * Math.PI / 2, s: c.kind === 'chunk' ? 0.75 : big });
+        // groves (Phase 2 library): pine stands; oak woods with an old oak at their heart; birch and blossom copses
+        // with flowering bushes; glades of tall grass, ferns, mushrooms and wildflowers
+        if (dense < 0.34 && v < 0.85) kind = v < 0.2 ? 'tallGrass' : v < 0.34 ? 'fernLarge' : v < 0.44 ? 'flowerPatch' : v < 0.52 ? 'mushrooms' : v < 0.62 ? 'roundBush' : null;
+        else kind = grove < 0.4 ? (v > 0.22 ? 'pine' : v > 0.1 ? 'fernLarge' : 'bush') : grove < 0.68 ? (v > 0.86 ? 'oakOld' : v > 0.3 ? 'oak' : v > 0.18 ? 'roundBush' : 'mushrooms') : (v > 0.5 ? 'birch' : v > 0.25 ? 'blossom' : 'flowerBush');
+      } else if (c.kind === 'chunk' && v > 0.35) kind = v > 0.75 ? 'pine' : v > 0.55 ? 'oak' : 'mossyRock';
+      else if (c.kind === 'ledge' && c.top >= -24) kind = v > 0.9 ? 'pine' : v > 0.8 ? 'bush' : v > 0.72 ? 'mossyRock' : v > 0.68 ? 'crystals' : v > 0.6 ? 'tallGrass' : null;
+      if (kind && kind in KNOWN) {
+        const big = kind === 'oak' ? 0.72 + hash(c.x, c.y, 6) * 0.25 : kind === 'oakOld' ? 0.8 : kind === 'pine' ? 0.8 + hash(c.x, c.y, 6) * 0.35 : 0.85 + hash(c.x, c.y, 6) * 0.25;
+        out.push({ kind, seed: Math.floor(v * 1000), cx: c.x, cz: c.y, x: c.x + 0.5 + (hash(c.x, c.y, 3) - 0.5) * 0.3, y, z: c.y + 0.5 + (hash(c.x, c.y, 4) - 0.5) * 0.3, ry: Math.floor(hash(c.x, c.y, 5) * 4) * Math.PI / 2, s: c.kind === 'chunk' ? 0.75 : big, still: STILL[kind] });
+      }
+      // hanging vines and moss under the rim on the two cliff faces that face the camera (the rim is never built on)
+      if ((c.kind === 'grass' || c.kind === 'hill' || c.kind === 'sand') && c.top >= 0) [[1, 0], [0, 1]].forEach(([dx, dz], k) => {
+        if (at.has((c.x + dx) + ',' + (c.y + dz)) || hash(c.x, c.y, 30 + k) > 0.16) return;
+        const h2 = hash(c.x, c.y, 32 + k); out.push({ kind: h2 > 0.5 ? 'vines' : 'hangingMoss', seed: Math.floor(h2 * 1000), cx: -999, cz: -999, x: c.x + 0.5 + dx * 0.53, y: -0.04, z: c.y + 0.5 + dz * 0.53, ry: dx ? Math.PI / 2 : 0, s: 1, still: true });
+      });
     });
     return out;
   }
-  const KNOWN = { oak: 1, pine: 1, birch: 1, bush: 1, blossom: 1, fern: 1 };
+  const KNOWN = { oak: 1, pine: 1, birch: 1, bush: 1, blossom: 1, fern: 1, oakOld: 1, roundBush: 1, flowerBush: 1, flowerPatch: 1, tallGrass: 1, fernLarge: 1, mushrooms: 1, mossyRock: 1, crystals: 1, vines: 1, hangingMoss: 1 };
+  const STILL = { mossyRock: true, crystals: true, mushrooms: true, flowerPatch: true, vines: true, hangingMoss: true }; // no sway
   let sceneryCache = null;
 
   // Called by UI.renderWorld whenever the island's terrain is (re)drawn.
@@ -142,4 +154,5 @@
   V.view = function (cam, view) { if (ctrl && V.on) ctrl.setView(cam, view); };
   V.redraw = () => { if (ctrl && V.on) ctrl.redraw(); };
   V.stats = () => (ctrl ? ctrl.stats() : null);
+  V.breakdown = () => (ctrl && ctrl.breakdown ? ctrl.breakdown() : null);
 })(typeof window !== 'undefined' ? window : globalThis);

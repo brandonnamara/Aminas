@@ -56,3 +56,7 @@ export const EL = {
 // Reliquary Gate), spirit (the standing stones and their quest). Hearth light (windows, torches) stays warm and is
 // not magic.
 export const MAGIC = { egg: '#a8e4ff', water: '#8fe4ff', moon: '#e2d4ff', life: '#a8ffc0', spirit: '#ffa8e6' };
+
+// Phase 2: the lighting standard (art bible section 7). The island, the asset library viewer and the exporter all
+// light with these values, so an asset looks the same wherever it is reviewed.
+export const LIGHT = { sky: '#eaf6ff', ground: '#b39a6c', hemi: 1.3, sun: '#ffe6b8', sunI: 2.2, sunDir: [-9, 22, 17], haze: '#bfe0f6' };
