@@ -30,7 +30,9 @@ let contextLost = false;
 const COARSE = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
 const PR_CAP = Math.min(window.devicePixelRatio || 1, COARSE ? 1.5 : 2);
 const Perf = () => window.A && window.A.Perf;
-const prCap = () => (Perf() && Perf().tier ? Math.min(window.devicePixelRatio || 1, Perf().tier().prCap) : Perf() && Perf().saver() ? 1 : PR_CAP); // Phase 3: quality tier
+// Phase 3: Battery saver caps at 1 and an explicit High raises phones to 2; Auto keeps the Phase 2 cap here, because the
+// device test measured the island, not battles (re-test battles before letting Auto raise this)
+const prCap = () => { const P = Perf(); if (!P) return PR_CAP; if (P.saver() || P.forceTier === 'saver') return 1; const q = P.quality ? P.quality() : ''; return q === 'high' && P.forceTier !== 'balanced' && ((A.State && A.State.state && A.State.state.settings.quality === 'high') || P.forceTier === 'high') ? Math.min(window.devicePixelRatio || 1, 2) : q === 'balanced' ? Math.min(window.devicePixelRatio || 1, 1.5) : PR_CAP; };
 let pr = PR_CAP, slow = 0, quick = 0, sampled = 0, since = 0;
 function adapt(ms, now) {
   if (ms > 28) slow++; else if (ms < 18) quick++; sampled++;

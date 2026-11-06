@@ -420,7 +420,7 @@ export function createIsland() {
   /* ---- render loop: on demand, plus a slow ambient tick ---- */
   // slow: set when the device cannot keep the ambient tick (frames arriving under ~8 per second while animating, e.g.
   // no GPU and WebGL falling back to software). The island then only redraws when something changes.
-  let raf = 0, last = 0, t0 = performance.now(), frames = 0, drawMs = 0, slow = false, prev = 0, gaps = [];
+  let lastMoveDraw = 0, raf = 0, last = 0, t0 = performance.now(), frames = 0, drawMs = 0, slow = false, prev = 0, gaps = [];
   function kick() { if (!raf) raf = requestAnimationFrame(loop); if (!occ.timer && occ.fn) occ.timer = setTimeout(pollOcc, 60); } // the occlusion poll stops while the island is away and restarts here
   function loop(now) {
     raf = 0; if (!R.domElement.isConnected) return;
@@ -440,6 +440,9 @@ export function createIsland() {
   function draw() {
     if (!state.view) return;
     const s0 = performance.now();
+    // Auto quality: report the interval between frames drawn for camera moves (not the 12 fps ambient tick)
+    if (state.moved && lastMoveDraw && s0 - lastMoveDraw < 100 && A && A.Perf && A.Perf.sample) A.Perf.sample(s0 - lastMoveDraw);
+    if (state.moved) lastMoveDraw = s0;
     const T = tier();
     if (sun.shadow.mapSize.x !== T.shadowMap) { sun.shadow.mapSize.set(T.shadowMap, T.shadowMap); if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; } state.shadowDirty = true; }
     sun.castShadow = T.shadows;

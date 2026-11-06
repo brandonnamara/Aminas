@@ -64,10 +64,13 @@
       if (prev) dts.push(now - prev); prev = now; n++;
       if (move) { const k = (now - t0) / 1000; c.x = base.x + Math.sin(k * 1.3) * 160; c.y = base.y + Math.sin(k * 2.1) * 70; c.z = z; A.UI.applyCam(); }
     }
+    // a pause (notification, app switcher, screen dimming) is one huge interval: count it, keep it out of the rates,
+    // so a single interruption does not read as thermal throttling
+    const pauses = dts.filter((d) => d > 500), pausedMs = pauses.reduce((a, b) => a + b, 0), run = dts.filter((d) => d <= 500);
     const s1 = stats(), secs = (performance.now() - t0) / 1000, draws = (s1.frames || 0) - (s0.frames || 0);
     const drawMs = draws > 0 ? ((s1.avgDrawMs || 0) * (s1.frames || 0) - (s0.avgDrawMs || 0) * (s0.frames || 0)) / draws : 0;
     return {
-      phase: name, tier: s1.tier, zoom: r1(z), seconds: r1(secs), fps: r1(dts.length / Math.max(0.001, dts.reduce((a, b) => a + b, 0) / 1000)),
+      phase: name, tier: s1.tier, zoom: r1(z), seconds: r1(secs), fps: r1(run.length / Math.max(0.001, run.reduce((a, b) => a + b, 0) / 1000)), pauses: pauses.length, pausedS: r1(pausedMs / 1000),
       p50: r1(pct(dts, 0.5)), p95: r1(pct(dts, 0.95)), p99: r1(pct(dts, 0.99)), worst: r1(dts.length ? Math.max.apply(null, dts) : 0),
       over33: dts.length ? Math.round(dts.filter((d) => d > 34).length / dts.length * 100) : 0,
       islandDraws: draws, islandCpuMs: r1(drawMs), triangles: s1.triangles, calls: s1.calls, lod: s1.lod, pixelRatio: s1.pixelRatio, canvas: s1.canvas, shadowMap: s1.shadow ? s1.shadowMap : 0,
@@ -95,9 +98,9 @@
         step.textContent = (i + 1) + '/' + script.length + ': ' + name + ' (' + secs + ' s)';
         if (name === 'sustained') {
           // thermal: the same pan for 3 minutes, reported in 15 s slices; a falling frame rate means throttling
-          const slices = []; for (let k = 0; k < B.SUSTAINED_S / 15 && !cancel; k++) { step.textContent = (i + 1) + '/' + script.length + ': sustained ' + (k * 15) + '/' + B.SUSTAINED_S + ' s'; const r = await phase('sustained ' + (k * 15) + 's', null, 'default', 15, true, base); slices.push({ t: k * 15, fps: r.fps, p95: r.p95, cpu: r.islandCpuMs }); }
+          const slices = []; for (let k = 0; k < B.SUSTAINED_S / 15 && !cancel; k++) { step.textContent = (i + 1) + '/' + script.length + ': sustained ' + (k * 15) + '/' + B.SUSTAINED_S + ' s'; const r = await phase('sustained ' + (k * 15) + 's', null, 'default', 15, true, base); slices.push({ t: k * 15, fps: r.fps, p95: r.p95, cpu: r.islandCpuMs, pauses: r.pauses }); }
           const f = slices.map((s) => s.fps); out.sustained = { slices, firstMinFps: r1(f.slice(0, 4).reduce((a, b) => a + b, 0) / Math.max(1, Math.min(4, f.length))), lastMinFps: r1(f.slice(-4).reduce((a, b) => a + b, 0) / Math.max(1, Math.min(4, f.length))) };
-          out.sustained.dropPct = out.sustained.firstMinFps ? Math.round((1 - out.sustained.lastMinFps / out.sustained.firstMinFps) * 100) : 0;
+          out.sustained.dropPct = out.sustained.firstMinFps ? Math.round((1 - out.sustained.lastMinFps / out.sustained.firstMinFps) * 100) : 0; out.sustained.pauses = slices.reduce((a, x) => a + (x.pauses || 0), 0);
         } else out.phases.push(await phase(name, tierId, zoom, secs, move, base));
       }
       P.forceTier = null; c.x = base.x; c.y = base.y; c.z = base.z; UI.applyCam(); if (A.VoxIsland) A.VoxIsland.redraw();

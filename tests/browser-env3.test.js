@@ -16,10 +16,12 @@ let pass = 0, fail = 0; const ok = (c, m) => { if (c) { pass++; console.log('  o
   ok(sv[0] === 'auto' && sv[1] === 'auto' && sv[2] === 'high' && sv[3] === 'auto', 'quality setting: old saves read as Auto, bad values are repaired, valid ones kept (' + sv.join(', ') + ')');
 
   const tiers = await page.evaluate(() => { const P = A.Perf, s = A.State.state.settings, out = {}; out.auto = P.quality(); s.quality = 'high'; out.high = P.quality(); s.quality = 'balanced'; out.bal = P.quality(); s.batterySaver = true; out.saver = P.quality(); s.batterySaver = false; s.quality = 'auto'; P.forceTier = 'high'; out.forced = P.quality(); P.forceTier = null; return out; });
-  ok(tiers.auto === 'balanced', 'Auto picks Balanced on a touch device');
+  ok(tiers.auto === 'high', 'Auto starts at High (iPhone test: 60 fps at High)');
+  const step = await page.evaluate(() => { const P = A.Perf, out = {}; for (let i = 0; i < 90; i++) P.sample(16.7); out.fast = P.quality(); for (let i = 0; i < 90; i++) P.sample(i % 10 ? 30 : 16.7); out.slow = P.quality(); out.ev = P.events.some((e) => e.autoStep === 'balanced'); P.autoStep = null; out.reset = P.quality(); return out; });
+  ok(step.fast === 'high' && step.slow === 'balanced' && step.ev && step.reset === 'high', 'Auto keeps High while camera frames are fast and steps down to Balanced when their median passes 20 ms');
   ok(tiers.high === 'high' && tiers.bal === 'balanced' && tiers.saver === 'saver' && tiers.forced === 'high', 'the chosen tier is used, Battery saver overrides it, and the test override wins');
 
-  await page.evaluate(() => { const s = A.State.newGame(), R = A.Rules; s.phase = 'play'; s.introDone = true; s.starter = 'lumifern'; s.avatar.made = true; R.addAmina(s, 'lumifern', 8); Object.keys(s.buildings).forEach((id) => { const b = s.buildings[id]; if (b.state === 'ruined' && id !== 'reliquarygate') { b.state = 'built'; b.level = 1; s.struct[id] = true; } }); s.missions = { m_hollow: 'claimed' }; R.drain(); A.State.save(); A.UI.showIsland(); });
+  await page.evaluate(() => { const s = A.State.newGame(), R = A.Rules; s.phase = 'play'; s.introDone = true; s.starter = 'lumifern'; s.avatar.made = true; s.settings.quality = 'balanced'; R.addAmina(s, 'lumifern', 8); Object.keys(s.buildings).forEach((id) => { const b = s.buildings[id]; if (b.state === 'ruined' && id !== 'reliquarygate') { b.state = 'built'; b.level = 1; s.struct[id] = true; } }); s.missions = { m_hollow: 'claimed' }; R.drain(); A.State.save(); A.UI.showIsland(); });
   await page.waitForSelector('#world.vox', { timeout: 60000 }); await page.waitForTimeout(1200);
   await page.evaluate(() => { A.UI.queue.length = 0; A.UI.busy = false; A.UI.closeAll(); A.Perf.autoSaver = false; });
   const read = () => page.evaluate(() => ({ st: A.VoxIsland.stats(), b: A.VoxIsland.breakdown() }));
@@ -30,7 +32,7 @@ let pass = 0, fail = 0; const ok = (c, m) => { if (c) { pass++; console.log('  o
   const hi = await read();
   ok(hi.st.tier === 'high' && hi.st.pixelRatio === 2 && hi.st.shadowMap === 2048 && hi.st.lod === 'off', 'Settings → 3D detail → High: pixel ratio 2, shadow map 2048, full detail');
   ok(await page.$('[data-act="benchAsk"]') !== null, 'Settings offers "Run performance test"');
-  await page.click('[data-act="setSeg"][data-k="quality"][data-v="auto"]'); await page.evaluate(() => A.UI.closeAll());
+  await page.click('[data-act="setSeg"][data-k="quality"][data-v="balanced"]'); await page.evaluate(() => A.UI.closeAll());
   await page.evaluate(() => { A.State.state.settings.batterySaver = true; A.Perf.apply(); A.UI.renderWorld(true); }); await page.waitForTimeout(1500);
   const sav = await read();
   ok(sav.st.tier === 'saver' && sav.st.pixelRatio === 1 && sav.st.lod === 'all' && sav.st.shadow && sav.st.shadowMap === 512, 'Battery saver: pixel ratio 1, LOD everywhere, shadows kept at 512');
@@ -56,7 +58,7 @@ let pass = 0, fail = 0; const ok = (c, m) => { if (c) { pass++; console.log('  o
   ok(lod.every((x) => x.lodTris < x.tris * 0.4), 'building LODs stay light (' + lod.map((x) => x.id + ' ' + x.tris + ' → ' + x.lodTris).join(', ') + ')');
 
   // the performance test: a shortened script runs end to end
-  const r = await page.evaluate(async () => { A.Bench.SCRIPT = [['idle', null, 'default', 1, false], ['pan', null, 'default', 1.5, true], ['pan, Battery saver', 'saver', 'default', 1, true]]; const out = await A.Bench.run({}); return { out, forced: A.Perf.forceTier, tier: A.VoxIsland.stats().tier, banner: !!document.querySelector('.bench-banner') }; });
+  const r = await page.evaluate(async () => { A.Perf.autoStep = null; A.Bench.SCRIPT = [['idle', null, 'default', 1, false], ['pan', null, 'default', 1.5, true], ['pan, Battery saver', 'saver', 'default', 1, true]]; const out = await A.Bench.run({}); return { out, forced: A.Perf.forceTier, tier: A.VoxIsland.stats().tier, banner: !!document.querySelector('.bench-banner') }; });
   const o = r.out;
   ok(!o.error && o.phases.length === 3 && o.phases.every((p) => p.fps > 0 && p.p95 > 0 && p.triangles > 0), 'the performance test runs every phase and records frame rate, p95 frame time and triangles' + (o.error ? ': ' + o.error : ''));
   ok(o.phases[2].tier === 'saver' && o.phases[2].pixelRatio === 1 && r.forced === null && r.tier === 'balanced' && !r.banner, 'it measures each tier and restores the player\'s tier afterwards');

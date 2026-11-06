@@ -23,8 +23,11 @@
   /* ---- graphics quality tiers (Environment Phase 3) ----
      One table read by the voxel island (src/3d/island3d.js) and the 3D creature runtime (src/3d/runtime.js).
      settings.quality: 'auto' (default), 'high' or 'balanced'. Battery saver (manual or automatic) always wins.
-     Auto picks Balanced on touch devices and High elsewhere; budgets per iPhone generation are in
-     docs/perf/PERFORMANCE_STANDARDS.md. P.forceTier is for the performance test only (never saved). */
+     Auto starts at High everywhere (the iPhone test: an A14/A15-class phone holds 60 fps at High with ~2 ms of island
+     CPU) and steps down to Balanced for the session if the island's camera-move frames run slow (median over 20 ms
+     across ~1.5 s of continuous drawing); Battery saver still switches on by itself after that if frames stay
+     bad. Budgets per iPhone generation are in docs/perf/PERFORMANCE_STANDARDS.md. P.forceTier is for the performance
+     test only (never saved). */
   const COARSE = !!(root.matchMedia && root.matchMedia('(pointer: coarse)').matches);
   P.TIERS = {
     high:     { id: 'high', label: 'High', prCap: 2, shadowMap: 2048, shadows: true, natureLod: false, buildingLod: false },
@@ -33,7 +36,20 @@
   };
   P.QUALITY = ['auto', 'high', 'balanced'];
   P.forceTier = null;
-  P.autoTier = () => (COARSE ? 'balanced' : 'high');
+  P.autoStep = null;           // 'balanced' once Auto has stepped down this session
+  P.autoTier = () => P.autoStep || 'high';
+  let samples = [];
+  // the island reports the interval between frames it draws while the camera moves (src/3d/island3d.js)
+  P.sample = function (dt) {
+    if (P.forceTier || P.saver() || P.autoStep || (settings().quality && settings().quality !== 'auto')) { samples.length = 0; return; }
+    samples.push(dt); if (samples.length < 90) return;
+    const med = samples.slice().sort((a, b) => a - b)[45]; samples = [];
+    if (med > 20) {
+      P.autoStep = 'balanced'; P.events.push({ t: Date.now(), autoStep: 'balanced', medianMs: Math.round(med) });
+      if (A.UI && A.UI.applyCam) A.UI.applyCam();
+    }
+  };
+  P._coarse = COARSE;
   P.quality = function () {
     if (P.forceTier && P.TIERS[P.forceTier]) return P.forceTier;
     if (P.saver()) return 'saver';

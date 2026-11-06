@@ -6,18 +6,19 @@
   - Godot 4.3-stable (headless and under a virtual display; Compatibility renderer on a software GPU);
   - three.js, Playwright, Node.
 - **Not used:** Meshy, Blockbench, MagicaVoxel and Figma were not operated.
-- **Device testing:** **no iPhone test has been performed yet.** Every frame rate below comes from Chromium with
-  software WebGL on a desktop CPU. The phone test is built into the dev preview and waits for the project owner
-  (`perf/DEVICE_TEST.md`). **Phase 3 is not complete until those results are in.**
+- **Device testing:** the project owner ran the built-in test on an iPhone on 6 Nov 2026, including the 3-minute
+  heat test. The phone has a 390 × 844 pt screen (iPhone 12, 13 or 14 class; A14–A15) and iOS 18.7, and the test ran
+  in the Claude app. Results are in §1b and `perf/env3-iphone-1.json`. All other frame rates in this report come from
+  Chromium with software WebGL on a desktop CPU and are only for before/after comparison.
 
 ## Status by priority
 
 | # | Priority | Status |
 |---|---|---|
-| 1 | Real-device performance | Measurement tool built and tested (Settings → Run performance test). **Waiting for iPhone results.** The software-GL bottleneck analysis is done. |
+| 1 | Real-device performance | **Measured on one iPhone (A14/A15 class): 60 fps in every case, island CPU about 2 ms, no thermal throttling.** Tool: Settings → Run performance test. |
 | 2 | Visual optimisation | Battery saver improved: better building LOD twins, shadows kept. Quality tiers added. Lighting, vegetation and water are unchanged, pending device numbers (see "Decisions"). |
 | 3 | Asset pipeline (Godot 4) | **Done and actually run.** 12 assets plus 12 LOD twins imported. Three compatibility problems found and fixed. The workflow is in `GODOT_PIPELINE.md`. |
-| 4 | Performance standards | Tiers implemented. Budgets per iPhone generation are written in `perf/PERFORMANCE_STANDARDS.md`, labelled as targets. |
+| 4 | Performance standards | Tiers implemented. Auto now starts at High and steps down if needed. The measured row is filled for A14–A15; the A12–A13 and A16+ columns remain targets. |
 | 5 | Project protection | Branch only. Gameplay, layouts and progression are unchanged. Save compatibility is tested. The full suite was run. |
 
 ## 1. The on-device performance test
@@ -59,6 +60,49 @@ These are reported as "not available". Thermal throttling shows up as frame-rate
 **Results** appear in a sheet with a **Copy results** button (JSON plus a one-line summary). The last result is kept
 in `localStorage` only. It is never written into the save.
 
+## 1b. iPhone results (project owner's device)
+
+| Step | Tier | fps | p95 ms | Island CPU ms | Triangles | Canvas px |
+|---|---|---|---|---|---|---|
+| idle | Balanced | 60 | 18 | 2.3 | 146k | 1125 × 468 |
+| pan | Balanced | 60 | 17 | 1.8 | 147k | 1125 × 468 |
+| pan, widest zoom | Balanced | 60 | 17 | 2.0 | 107k | 1125 × 468 |
+| pan, closest zoom | Balanced | 60 | 17 | 1.4 | 118k | 1125 × 468 |
+| pan, High | High | 60 | 17 | 2.2 | 147k | 1500 × 624 |
+| pan, Balanced | Balanced | 60 | 17 | 2.2 | 147k | 1125 × 468 |
+| pan, Battery saver | Battery saver | 60 | 17 | 1.9 | 82k | 750 × 312 |
+
+**Heat test.** It held 60 fps for 3 minutes except one 15 s slice, which averaged 22.5 fps. In that same slice, 95 %
+of frames still took 17 ms, and the next slices were back at 58–60 fps. That is the signature of a single
+interruption (a notification, the app switcher, the screen dimming), not of heat: throttling raises every frame time
+and does not recover in 15 s. The test reported this as a "16 % drop". It now counts intervals over 0.5 s as
+interruptions, keeps them out of the frame rate and lists them separately.
+
+**Loading.**
+
+| Measure | Time |
+|---|---|
+| Page loaded | 1.24 s |
+| Island 3D module (three.js and the island) | 0.77 s |
+| Island shown, from the start of loading | 1.0 s |
+
+The "since page start" figure (10.5 s) includes the time spent on the title screen, so it is not a load cost.
+
+**What this means:**
+
+- The island has a lot of CPU headroom: 2 ms of a 16.7 ms frame.
+- Every case sat at the display cap, so the GPU margin is unknown. Even so, High, with 1.8 × the pixels of Balanced
+  and a 4 × larger shadow map, showed no cost at all.
+- **Decisions taken from these numbers:**
+  1. **Auto now starts at High** and steps down to Balanced for the session only if camera frames run slow. A
+     software-GL run confirms the step-down works. Phase 2's phone setting was Balanced.
+  2. **Battery saver keeps its shadows.** They cost nothing measurable.
+  3. **Battles stay at the Phase 2 resolution under Auto.** They were not measured. An explicit High raises them.
+- **Not yet covered:**
+  - full-screen Safari: about 1.4 × the pixels of the Claude viewer used here;
+  - an older phone (A12–A13);
+  - battles.
+
 ## 2. Bottleneck analysis
 
 Same machine, software GL, 844 × 390 landscape, phone emulation (pixel ratio 3, touch). Raw files are
@@ -88,14 +132,14 @@ Same machine, software GL, 844 × 390 landscape, phone emulation (pixel ratio 3,
 `A.Perf.TIERS` in `src/perf.js` holds the tiers. The island and the creature runtime both read them. Settings has a
 new control, **3D detail: Auto / High / Balanced**. Battery saver stays a separate switch and overrides the tier.
 
-| | High | Balanced (Auto on phones) | Battery saver |
+| | High (Auto's starting tier) | Balanced | Battery saver |
 |---|---|---|---|
 | Pixel-ratio cap | 2 | 1.5 | 1 |
 | Shadow map | 2048 | 1024 | 512 (was: no shadows) |
 | LOD | nature at the widest zoom | nature at the widest zoom | everything, with improved twins |
 
-- **Balanced reproduces Phase 2's phone settings exactly.** Auto players on phones see no change except a better
-  Battery saver.
+- **Balanced reproduces Phase 2's phone settings exactly.**
+- **Auto** started at Balanced on phones until the iPhone test; it now starts at High with an automatic step-down (§1b).
 - **Saves:** the new `settings.quality` defaults to `auto`. Old saves without it, and invalid values, read as `auto`.
   This is tested.
 
@@ -206,7 +250,7 @@ Their 12 LOD twins were imported too.
 
 `node tests/run-all.js`: see the result in the milestone report.
 
-The new suite is `browser-env3.test.js` (18 checks). It covers:
+The new suite is `browser-env3.test.js` (19 checks). It covers:
 
 - quality-tier save compatibility;
 - tier selection;
@@ -232,7 +276,9 @@ The Battery saver frame-rate cost must be checked on an iPhone. If it is signifi
 
 ## 8. Limitations
 
-- **No iPhone measurements yet.** The per-generation budgets are targets.
+- **One phone measured** (A14/A15 class, in the Claude app's viewer). A12–A13 and A16+ are still targets. So are
+  full-screen Safari and battles.
+- Every phone case hit the 60 fps cap, so the GPU headroom is not quantified.
 - Software-GL frame rates are not phone frame rates. Use them only to compare before and after.
 - **Godot:**
   - only the Compatibility renderer was run;
@@ -242,11 +288,15 @@ The Battery saver frame-rate cost must be checked on an iPhone. If it is signifi
 - The quality tier changes resolution, shadows and LOD only. Ambient motes and effects are still sized by device type,
   not by tier.
 
-## 9. What the project owner needs to do
+## 9. Next
 
-Run Settings → **Run performance test** on your iPhone, ideally once with the heat test, and paste the results. Then:
+Phase 3 is complete on the evidence available. The headroom measured makes the deferred visual refinements
+affordable on this class of phone. They are proposed, not started:
 
-1. I fill in the "Measured on device" row of the standards.
-2. I set Auto's default tier per generation.
-3. I decide whether Battery saver keeps shadows.
-4. If the numbers leave headroom, I propose the lighting and water refinements.
+- richer water;
+- soft shadows on High;
+- denser vegetation on High;
+- warmer lighting.
+
+Optional and useful: run the test once more in full-screen Safari, and on any older iPhone, to fill the other
+columns.
