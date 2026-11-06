@@ -55,8 +55,22 @@ function banner(m, x, y, z, len, col, col2, face) { // a hanging cloth on the +z
   for (let i = 0; i < len; i++) { const c = i === len - 1 ? col2 : col; if (face === 'x') m.box(x, y - i, z, x + 1, y - i + 1, z + 2, c); else m.box(x, y - i, z, x + 2, y - i + 1, z + 1, c); }
   if (face === 'x') m.box(x, y + 1, z - 1, x + 1, y + 2, z + 3, PAL.woodDark); else m.box(x - 1, y + 1, z, x + 3, y + 2, z + 1, PAL.woodDark);
 }
-function windowZ(m, x, y, z, w, h, lit) { m.box(x - 1, y - 1, z, x + w + 1, y + h + 1, z + 1, PAL.woodDark); if (lit) m.glow(x, y, z, x + w, y + h, z + 1, PAL.glow); else m.box(x, y, z, x + w, y + h, z + 1, '#3a3a52'); }
-function windowX(m, x, y, z, w, h, lit) { m.box(x, y - 1, z - 1, x + 1, y + h + 1, z + w + 1, PAL.woodDark); if (lit) m.glow(x, y, z, x + 1, y + h, z + w, PAL.glow); else m.box(x, y, z, x + 1, y + h, z + w, '#3a3a52'); }
+// windows: a dark frame, a light stone sill that sticks out one voxel, a glazing bar on larger panes, and
+// (shutters = colour) a pair of painted shutters. The pane glows when lit.
+function windowZ(m, x, y, z, w, h, lit, shutters) {
+  m.box(x - 1, y - 1, z, x + w + 1, y + h + 1, z + 1, PAL.woodDark); m.box(x - 1, y - 2, z + 1, x + w + 1, y - 1, z + 2, PAL.pathStone);
+  if (lit) m.glow(x, y, z, x + w, y + h, z + 1, PAL.glow); else m.box(x, y, z, x + w, y + h, z + 1, '#3a3a52');
+  if (w >= 2 && h >= 3) m.box(x, y + (h >> 1), z, x + w, y + (h >> 1) + 1, z + 1, PAL.woodDark);
+  if (shutters) { m.box(x - 2, y - 1, z + 1, x - 1, y + h + 1, z + 2, shutters); m.box(x + w + 1, y - 1, z + 1, x + w + 2, y + h + 1, z + 2, shutters); }
+}
+function windowX(m, x, y, z, w, h, lit, shutters) {
+  m.box(x, y - 1, z - 1, x + 1, y + h + 1, z + w + 1, PAL.woodDark); m.box(x + 1, y - 2, z - 1, x + 2, y - 1, z + w + 1, PAL.pathStone);
+  if (lit) m.glow(x, y, z, x + 1, y + h, z + w, PAL.glow); else m.box(x, y, z, x + 1, y + h, z + w, '#3a3a52');
+  if (w >= 2 && h >= 3) m.box(x, y + (h >> 1), z, x + 1, y + (h >> 1) + 1, z + w, PAL.woodDark);
+  if (shutters) { m.box(x + 1, y - 1, z - 2, x + 2, y + h + 1, z - 1, shutters); m.box(x + 1, y - 1, z + w + 1, x + 2, y + h + 1, z + w + 2, shutters); }
+}
+// a little moss and grass at the foot of a wall run, so buildings sit in the meadow rather than on it
+function skirt(m, x0, z0, x1, z1, y, s) { for (let x = x0; x < x1; x++) for (let z = z0; z < z1; z++) { if (x !== x0 && x !== x1 - 1 && z !== z0 && z !== z1 - 1) continue; const h = H(x, s || 0, z, 15); if (h < 0.18) m.put(x, y, z, PAL.moss); else if (h < 0.24) grassTuft(m, x, z, y); } }
 // rubble and broken walls for ruined buildings (any footprint)
 function ruin(m, pal, accent) {
   const W = m.W, Hh = m.H, x0 = -W / 2 + 2, z0 = -Hh / 2 + 2, x1 = W / 2 - 2, z1 = Hh / 2 - 2;
@@ -88,7 +102,8 @@ B.hatchery = (m, lv) => {
   // arched door on the front with warm light inside
   m.clear(-2, 3, 4, 2, 9, 5); m.clear(-1, 9, 4, 1, 10, 5); m.glow(-2, 3, 3, 2, 9, 4, PAL.glowWarm); m.glow(-1, 9, 3, 1, 10, 4, PAL.glowWarm);
   m.box(-3, 3, 5, -2, 10, 6, PAL.woodDark); m.box(2, 3, 5, 3, 10, 6, PAL.woodDark); m.box(-3, 10, 5, 3, 11, 6, PAL.woodDark);
-  windowZ(m, -6, 6, 5, 2, 3, true); windowZ(m, 4, 6, 5, 2, 3, true); windowX(m, 8, 6, -5, 2, 3, true); windowX(m, 8, 6, 0, 2, 3, lv >= 2);
+  windowZ(m, -6, 5, 5, 2, 4, true, '#3f7cc8'); windowZ(m, 4, 5, 5, 2, 4, true, '#3f7cc8'); windowX(m, 8, 5, -6, 2, 4, true, '#3f7cc8'); windowX(m, 8, 5, -1, 2, 4, lv >= 2, '#3f7cc8');
+  skirt(m, -12, -12, 12, 12, 3, 1);
   torch(m, -4, 6, 6); torch(m, 3, 6, 6);
   // upper floor: plaster panels between dark timber beams, overhanging by one
   m.box(-9, 11, -10, 9, 12, 6, PAL.woodDark);
@@ -100,13 +115,24 @@ B.hatchery = (m, lv) => {
   windowZ(m, -5, 13, 6, 2, 2, true); windowZ(m, 3, 13, 6, 2, 2, true); windowX(m, 9, 13, -6, 2, 2, true);
   // tiled hip roof, deep red with a darker eave
   const top = m.hip(-11, -12, 11, 8, 17, shingles(PAL.roof.red), PAL.woodDark);
+  // a stone chimney on the right with a curl of warm light
+  m.box(6, 17, -9, 9, 27, -6, stoneWork(PAL.stone)); m.box(5, 27, -10, 10, 28, -5, PAL.stoneDark); m.glow(7, 28, -8, 8, 29, -7, PAL.glowWarm);
+  // a gabled porch over the steps: two carved posts and a red roof with a round lit window in its gable
+  [[-5, 9], [4, 9]].forEach(([x, z]) => { m.box(x, 3, z, x + 1, 11, z + 1, PAL.woodDark); m.box(x - 1, 3, z - 1, x + 2, 4, z + 2, PAL.stone); });
+  m.gable(-6, 5, 6, 11, 11, 'z', shingles(PAL.roof.red), PAL.plaster, PAL.woodDark); m.glow(-1, 12, 10, 1, 14, 11, PAL.glow);
+  // hanging lanterns under the eaves by the door
+  [[-4, 8], [3, 8]].forEach(([x, z]) => { m.glow(x, 8, z, x + 1, 10, z + 1, PAL.glowWarm); m.box(x, 10, z, x + 1, 11, z + 1, PAL.woodDark); });
   // the great egg: cream shell-stone with blue speckles and a crack, ringed with a metal band
   // the egg rests in a straw-and-gold nest crowning the roof, so it reads from across the island as "the egg house"
   const ex = 0, ez = -2, base = top - 3;
-  m.disc(ex, ez, 6, base, base + 3, (x, y, z) => pick(['#d8b860', '#c8a850', '#e8c870', '#b8964a'], H(x, y, z, 23)));
-  m.disc(ex, ez, 6.6, base + 2, base + 3, gold);
-  m.ball(ex, base + 8, ez, 5, 7.5, 5, (x, y, z) => (H(x, y, z, 21) > 0.88 ? '#5a9ae0' : H(x, y, z, 22) > 0.82 ? '#ece0c4' : '#fbf5e6'));
-  for (let y = base + 8; y < base + 14; y++) { const x = ex + 5 - Math.floor((y - base - 8) / 3); m.put(x, y, ez + 1 + ((y >> 1) % 2), '#9a8e78'); }
+  const straw = (x, y, z) => pick(['#e8c46a', '#d8b05a', '#f2d47c', '#c49a4a'], H(x, y, z, 23));
+  m.disc(ex, ez, 6.4, base, base + 4, straw); m.disc(ex, ez, 7, base + 2, base + 3, straw);
+  for (let i = 0; i < 14; i++) { const a = i / 14 * Math.PI * 2, r = 6.6; m.put(Math.round(ex + Math.cos(a) * r), base + 4, Math.round(ez + Math.sin(a) * r), i % 3 ? '#f2d47c' : '#b8964a'); } // twig tips
+  if (lv >= 3) m.disc(ex, ez, 7.4, base + 1, base + 2, gold);
+  m.ball(ex, base + 8, ez, 5.2, 7.8, 5.2, (x, y, z) => (H(x, y, z, 22) > 0.88 ? '#fff3d6' : y > base + 10 ? '#ffffff' : '#fffaf0'));
+  // the speckles glow faintly blue: the egg is alive
+  for (let y = base + 3; y < base + 15; y++) for (let z = ez - 6; z <= ez + 6; z++) for (let x = ex - 6; x <= ex + 6; x++) if (m.has(x, y, z) && H(x, y, z, 21) > 0.9 && (!m.has(x + 1, y, z) || !m.has(x, y, z + 1) || !m.has(x - 1, y, z) || !m.has(x, y, z - 1))) m.put(x, y, z, H(x, y, z, 24) > 0.5 ? '#7ad0ff' : '#a8e4ff', true);
+  for (let y = base + 8; y < base + 14; y++) { const x = ex + 5 - Math.floor((y - base - 8) / 3); m.put(x, y, ez + 1 + ((y >> 1) % 2), '#c9a86a', true); } // a golden crack of light
   if (lv >= 3) m.disc(ex, ez, 5.3, base + 5, base + 6, gold);
   m.glow(ex - 1, base + 16, ez - 1, ex + 1, base + 17, ez + 1, lv >= 2 ? PAL.glow : '#d8f4ff');
   // banners at the front corners in the island's egg-blue
@@ -226,26 +252,32 @@ B.mine = (m, lv) => {
   [[-6, 4, 3], [5, 5, 1], [3, 7, -3], [-5, 6, -1]].forEach(([x, y, z]) => m.glow(x, y, z, x + 1, y + 1, z + 1, lv >= 3 ? '#9ae8ff' : '#ffd86b'));
   if (lv >= 2) torch(m, 4, 0, 4);
 };
-// HABITATS: one cottage plan, each element with its own roof colour and feature.
+// HABITATS: one cottage plan so they read as a set, each element with its own roof, walls, shutters and a
+// silhouette feature that reads from across the island (tree, water tower, turf mound, chimney, light tower,
+// crooked spire, windmill).
 B.habitat = (m, lv, ruined, b) => {
   const el = (b.type || '').replace('hab_', ''), ec = EL[el] || EL.nature;
-  foundation(m, -11, -11, 11, 11, 1, PAL.stone);
+  foundation(m, -11, -11, 11, 11, 1, PAL.stone); skirt(m, -11, -11, 11, 11, 1, 2);
   const roofs = { nature: PAL.roof.green, water: PAL.roof.blue, earth: ['#b0824a', '#a07440', '#c0925a'], fire: PAL.roof.red, light: PAL.roof.gold.concat(['#f0c850']), dark: PAL.roof.purple, wind: ['#6ac8b8', '#5ab8a8', '#7ad8c8'] };
-  const walls = el === 'dark' ? stoneWork(['#6a6488', '#5e587a']) : el === 'fire' ? stoneWork(PAL.brick, '#7a3a28') : el === 'earth' ? planks(['#b8875a', '#a8774a']) : (x, y, z) => ((x + z) % 6 === 0 || y === 1 ? PAL.woodDark[0] : PAL.plaster[(y >> 2) % 2]);
+  const walls = el === 'dark' ? stoneWork(['#6a6488', '#5e587a']) : el === 'fire' ? stoneWork(PAL.brick, '#7a3a28') : el === 'earth' ? stoneWork(['#c9a878', '#b89868', '#d4b688']) : el === 'water' ? (x, y, z) => ((x + z) % 6 === 0 || y === 1 ? '#3f6f9a' : PAL.plaster[(y >> 2) % 2]) : (x, y, z) => ((x + z) % 6 === 0 || y === 1 ? PAL.woodDark[0] : PAL.plaster[(y >> 2) % 2]);
+  const sh = ec[1];
   m.box(-7, 1, -8, 6, 10, 4, walls); m.box(-6, 1, -7, 5, 10, 3, null);
   m.clear(-2, 1, 3, 1, 7, 4); m.box(-2, 1, 3, 1, 7, 4, PAL.woodDark); m.glow(-1, 2, 3, 0, 6, 4, PAL.glowWarm);
-  windowZ(m, -6, 5, 4, 2, 2, true); windowZ(m, 3, 5, 4, 2, 2, lv >= 2); windowX(m, 6, 5, -5, 2, 2, true);
-  const t = m.gable(-8, -9, 7, 5, 10, 'z', shingles(roofs[el] || PAL.roof.green), walls, PAL.woodDark);
-  m.box(-1, t - 1, -9, 0, t, 5, ec[1]);
-  // a porch and the element's own feature beside the house
+  windowZ(m, -6, 5, 4, 2, 2, true, sh); windowZ(m, 3, 5, 4, 2, 2, lv >= 2, sh); windowX(m, 6, 5, -5, 2, 2, true, sh);
+  // the roof: earth houses wear a turf mound, dark houses a steep crooked roof, the rest a shingled gable
+  let t;
+  if (el === 'earth') { m.ball(-0.5, 9, -2, 9, 6, 8.5, (x, y, z) => (y > 11 ? pick(PAL.grass, H(x, y, z)) : pick(PAL.moss.concat(PAL.grassSide), H(x, y, z)))); m.box(-10, 0, -12, 10, 9, 6, null); m.box(-7, 1, -8, 6, 9, 4, walls); m.box(-6, 1, -7, 5, 9, 3, null); windowZ(m, -6, 5, 4, 2, 2, true, sh); windowZ(m, 3, 5, 4, 2, 2, lv >= 2, sh); m.clear(-2, 1, 3, 1, 7, 4); m.box(-2, 1, 3, 1, 7, 4, PAL.woodDark); m.glow(-1, 2, 3, 0, 6, 4, PAL.glowWarm); m.disc(-1, 4, 2.2, 7, 8, PAL.woodDark); t = 15; }
+  else if (el === 'dark') { t = m.hip(-8, -9, 7, 5, 10, shingles(roofs.dark), '#3a2e5a'); for (let i = 0; i < 6; i++) m.box(-1 - (i > 3 ? 1 : 0), t + i, -3, 1 - (i > 3 ? 1 : 0), t + i + 1, -1, i > 3 ? '#4b3590' : pick(roofs.dark, H(i, 1, 2))); m.glow(-2, t + 6, -3, -1, t + 8, -2, '#c9b0ff'); t += 6; }
+  else { t = m.gable(-8, -9, 7, 5, 10, 'z', shingles(roofs[el] || PAL.roof.green), walls, PAL.woodDark); m.box(-1, t - 1, -9, 0, t, 5, ec[1]); }
+  // the porch, and the element's silhouette feature
   m.box(-3, 1, 4, 2, 2, 7, planks(PAL.plank));
-  if (el === 'nature') { m.box(7, 1, 6, 8, 6, 7, PAL.woodDark); m.ball(7.5, 8, 6.5, 3, 2.5, 3, PAL.leaf); m.put(6, 8, 8, PAL.fruit[0]); }
-  else if (el === 'water') { m.disc(7, 6, 3, 1, 2, PAL.stone); m.disc(7, 6, 2, 1, 2, null); m.glow(5, 1, 4, 9, 2, 8, '#5fd0ee'); }
-  else if (el === 'earth') { m.ball(7, 1, 6, 3.5, 3, 3, PAL.dirt); m.box(6, 1, 8, 8, 3, 9, '#2a2230'); }
-  else if (el === 'fire') { m.box(6, 1, 5, 9, 3, 8, PAL.stoneDark); m.glow(7, 3, 6, 8, 5, 7, '#ff7a2a'); m.glow(7, 5, 6, 8, 6, 7, '#ffd86b'); }
-  else if (el === 'light') { m.box(7, 1, 6, 8, 3, 7, PAL.stone); m.glow(6, 3, 5, 9, 4, 8, '#fff3b0'); m.glow(7, 4, 6, 8, 7, 7, '#ffd86b'); }
-  else if (el === 'dark') { m.box(7, 1, 6, 8, 3, 7, PAL.stoneDark); m.glow(7, 3, 6, 8, 7, 7, '#c9b0ff'); m.glow(6, 5, 6, 7, 6, 7, '#9a78e6'); }
-  else if (el === 'wind') { m.box(7, 1, 6, 8, 12, 7, PAL.woodDark); [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dx, dy]) => { for (let i = 1; i < 4; i++) m.put(7 + dx * i, 11 + dy * i, 7, i === 3 ? ec[1] : '#f2e6c4'); }); }
+  if (el === 'nature') { m.box(-10, 1, -10, -8, 15, -8, PAL.woodDark); m.ball(-9, 17, -9, 5, 4.5, 5, PAL.leaf); m.ball(-6, 15, -10, 3, 2.5, 3, PAL.leafDark); [[-11, 18, -7], [-7, 19, -10], [-9, 15, -5]].forEach(([x, y, z]) => m.put(x, y, z, PAL.fruit[0])); m.ball(7.5, 3, 6.5, 2.5, 2, 2.5, PAL.leaf); }
+  else if (el === 'water') { [[6, -10], [10, -10], [6, -6], [10, -6]].forEach(([x, z]) => m.box(x, 1, z, x + 1, 12, z + 1, PAL.woodDark)); m.disc(8.5, -7.5, 3.3, 12, 17, planks(['#7aa8c8', '#6a98b8'], '#3f6f9a')); m.disc(8.5, -7.5, 2.4, 16, 17, '#2f8cc8'); m.glow(7, 16, -9, 10, 17, -6, '#5fd0ee'); m.disc(8.5, -7.5, 3.6, 17, 18, PAL.roof.blue); m.disc(7, 6, 3, 1, 2, PAL.stone); m.disc(7, 6, 2, 1, 2, null); m.glow(5, 1, 4, 9, 2, 8, '#5fd0ee'); }
+  else if (el === 'earth') { m.box(6, 1, 5, 10, 3, 9, PAL.rock); m.box(7, 3, 6, 9, 4, 8, '#ffd86b'); m.put(9, 3, 5, '#ffd86b', true); m.box(-11, 1, 6, -8, 2, 9, PAL.dirt); flower(m, -10, 7, 2, PAL.flowers[4]); }
+  else if (el === 'fire') { m.box(2, 10, -7, 5, 20, -4, stoneWork(PAL.brick, '#7a3a28')); m.box(1, 20, -8, 6, 21, -3, '#5a2a1e'); m.glow(3, 21, -6, 4, 22, -5, '#ff7a2a'); m.box(6, 1, 5, 9, 3, 8, PAL.stoneDark); m.glow(7, 3, 6, 8, 5, 7, '#ff7a2a'); m.glow(7, 5, 6, 8, 6, 7, '#ffd86b'); }
+  else if (el === 'light') { m.box(6, 1, -10, 10, 18, -6, stoneWork(['#efe4c8', '#e2d4b2'])); m.box(5, 18, -11, 11, 19, -5, PAL.gold); m.glow(7, 19, -9, 9, 22, -7, '#fff3b0'); m.hip(5, -11, 11, -5, 22, PAL.roof.gold, PAL.gold); windowX(m, 10, 12, -9, 2, 3, true); m.box(7, 1, 6, 8, 3, 7, PAL.stone); m.glow(7, 3, 6, 8, 4, 7, '#ffd86b'); }
+  else if (el === 'dark') { m.box(7, 1, 5, 9, 3, 7, PAL.stoneDark); m.glow(7, 3, 5, 8, 9, 6, '#b48cff'); m.glow(8, 3, 6, 9, 6, 7, '#9a78e6'); m.glow(6, 3, 6, 7, 5, 7, '#c9b0ff'); }
+  else if (el === 'wind') { m.box(-1, t, 5, 0, t + 1, 7, PAL.woodDark); for (let i = -7; i <= 7; i++) { if (!i) continue; const a = Math.abs(i); m.box(-1 + (i > 0 ? 0 : 0), t + i, 7, 0, t + i + 1, 8, a > 2 ? (a % 2 ? '#f2e6c4' : ec[0]) : PAL.woodDark); m.box(-1 + i, t, 7, i, t + 1, 8, a > 2 ? (a % 2 ? '#f2e6c4' : ec[0]) : PAL.woodDark); } m.box(-1, t, 7, 0, t + 1, 8, PAL.gold); }
   if (lv >= 3) { m.box(-8, 1, 5, -7, 7, 6, PAL.woodDark); m.box(-8, 7, 5, -4, 10, 6, ec[0]); }
   [[-10, 9, 0], [9, -9, 3], [-9, -9, 1]].forEach(([x, z, c]) => flower(m, x, z, 1, PAL.flowers[c]));
 };

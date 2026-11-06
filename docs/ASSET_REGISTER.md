@@ -53,6 +53,10 @@ All are in `src/3d/`. "Used" means where the asset appears in the game.
 | Lighthouse | `X.lighthouse` | — | east rock |
 | Plaza with sun mosaic | `X.plaza` | — | central plaza |
 | Seven standing stones | `X.stones` | dormant / glowing | stone circle |
+| *Phase 1.1:* hanging rock root, grass drape, cliff rock formations, hanging roots | island3d.js `buildTerrain` | built from the island map | Starter Island underside and cliffs |
+| *Phase 1.1:* waterfalls (shader ribbon, churn, spring mouth) | island3d.js | 2 | camera-facing cliffs |
+| *Phase 1.1:* magic motes | island3d.js `buildSparks` | per place | Hatchery, Tidegate, Moonshrine, Reliquary Gate, stones |
+| *Phase 1.1:* window sills, bars and shutters; foundation skirts; Hatchery porch, chimney, lanterns and straw nest; habitat silhouette features | voxbuild.js | — | all buildings |
 
 Buildings without a voxel model fall back to their existing 2D picture. In Phase 1, the only such building is one
 under construction, which keeps its 2D scaffolding.

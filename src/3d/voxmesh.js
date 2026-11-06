@@ -23,7 +23,7 @@ const FACES = [
   { n: [0, 0, 1], c: [[1, 0, 1], [1, 1, 1], [0, 1, 1], [0, 0, 1]], u: [0, 1, 0], v: [-1, 0, 0], shade: 0.93 },
   { n: [0, 0, -1], c: [[0, 0, 0], [0, 1, 0], [1, 1, 0], [1, 0, 0]], u: [0, 1, 0], v: [1, 0, 0], shade: 0.93 },
 ];
-const AO = [0.5, 0.68, 0.84, 1];
+const AO = [0.6, 0.75, 0.88, 1]; // Phase 1.1: a lighter touch, so rounded voxel forms stay bright
 
 // Builds a geometry. o: { size (world units per voxel), origin [x,y,z] world offset, ao (true), solid(x,y,z) extra
 // occluder test (e.g. a neighbouring grid), shadeFaces (bake a little directional shading into the colours) }

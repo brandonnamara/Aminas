@@ -32,13 +32,12 @@ function vnoise(x, y, s) { const xi = Math.floor(x), yi = Math.floor(y), fx = x 
 
 function buildTerrain(cols) {
   const V = 1 / TV; // voxels per cell (2)
-  const byKey = new Map(); cols.forEach((c) => byKey.set(c.x + ',' + c.y, c));
-  let minX = 1e9, maxX = -1e9, minZ = 1e9, maxZ = -1e9, minY = 0, maxY = 0;
+  let minX = 1e9, maxX = -1e9, minZ = 1e9, maxZ = -1e9, maxY = 0;
   const vy = (px) => Math.round(px / HEIGHT_PX / TV);
-  cols.forEach((c) => { minX = Math.min(minX, c.x); maxX = Math.max(maxX, c.x); minZ = Math.min(minZ, c.y); maxZ = Math.max(maxZ, c.y); minY = Math.min(minY, vy(c.bot) - 5); maxY = Math.max(maxY, vy(c.top) + 2); });
-  const g = new VoxGrid((minX - 2) * V, minY, (minZ - 2) * V, (maxX - minX + 5) * V, maxY - minY + 2, (maxZ - minZ + 5) * V);
+  cols.forEach((c) => { minX = Math.min(minX, c.x); maxX = Math.max(maxX, c.x); minZ = Math.min(minZ, c.y); maxZ = Math.max(maxZ, c.y); maxY = Math.max(maxY, vy(c.top) + 2); });
   const water = [];
   const grassy = (k) => k === 'grass' || k === 'hill' || k === 'ledge' || k === 'chunk';
+  const main = (k) => k !== 'ledge' && k !== 'chunk';
   // first pass: column extents per sub-voxel
   const colAt = new Map();
   cols.forEach((c) => {
@@ -49,45 +48,78 @@ function buildTerrain(cols) {
       colAt.set(X + ',' + Z, { c, top, bot });
     }
   });
+  // distance (in voxels) from the main island's rim, so the underside tapers into a hanging rock root
+  const dist = new Map(), q = [];
+  colAt.forEach((v, k) => { if (!main(v.c.kind)) return; const [X, Z] = k.split(',').map(Number); if ([[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dz]) => { const n = colAt.get((X + dx) + ',' + (Z + dz)); return !n || !main(n.c.kind); })) { dist.set(k, 0); q.push(k); } });
+  for (let i = 0; i < q.length; i++) { const k = q[i], [X, Z] = k.split(',').map(Number), d = dist.get(k); [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dx, dz]) => { const nk = (X + dx) + ',' + (Z + dz), n = colAt.get(nk); if (n && main(n.c.kind) && !dist.has(nk)) { dist.set(nk, d + 1); q.push(nk); } }); }
+  let minY = 0;
+  colAt.forEach((v, k) => {
+    const d = dist.get(k); if (d == null) { minY = Math.min(minY, v.bot - 5); return; }
+    const [X, Z] = k.split(',').map(Number), n = vnoise(X * 0.16, Z * 0.16, 9);
+    // the root: deeper towards the middle, lumpy, with a few long spires hanging from it
+    v.bot = Math.min(v.bot, -4 - Math.floor(Math.min(d, 26) * (0.55 + n * 0.55)) - Math.round(vnoise(X * 0.5, Z * 0.5, 10) * 3));
+    if (d > 3 && hash(X, Z, 57) < 0.05) v.bot -= 3 + Math.floor(hash(X, Z, 58) * 6);
+    v.bot = Math.max(v.bot, -44); minY = Math.min(minY, v.bot - 6);
+  });
+  const g = new VoxGrid((minX - 2) * V, minY, (minZ - 2) * V, (maxX - minX + 5) * V, maxY - minY + 2, (maxZ - minZ + 5) * V);
   const exposed = (X, Z, y) => { const n = colAt.get(X + ',' + Z); return !n || y >= n.top || y < n.bot; };
   colAt.forEach((v, k) => {
     const [X, Z] = k.split(',').map(Number), { c, top, bot } = v, kind = c.kind;
     const edge = exposed(X + 1, Z, top - 1) || exposed(X - 1, Z, top - 1) || exposed(X, Z + 1, top - 1) || exposed(X, Z - 1, top - 1);
-    const vine = edge && hash(X, Z, 31) < 0.22, vineLen = 2 + Math.floor(hash(X, Z, 32) * 5);
+    const vine = edge && hash(X, Z, 31) < 0.26, vineLen = 2 + Math.floor(hash(X, Z, 32) * 7), vineCol = hash(X, Z, 33) < 0.5 ? PAL.moss : PAL.leaf;
+    const drape = edge && grassy(kind) ? 1 + Math.floor(hash(X, Z, 34) * 2.6) : 0; // grass hanging over the rim
+    const dirtD = 2 + (vnoise(X * 0.3, Z * 0.3, 12) > 0.55 ? 1 : 0);
     for (let y = bot; y < top; y++) {
       const d = top - 1 - y; let col;
       const h = hash(X * 3 + y, Z * 5 - y, 11);
       if (d === 0) {
         if (grassy(kind) && !(kind === 'ledge' && c.top < -24)) { const t = vnoise(X * 0.35, Z * 0.35, 3); col = h < 0.06 ? PAL.grass[4] : t < 0.38 ? PAL.grass[1] : t < 0.62 ? PAL.grass[0] : t < 0.8 ? PAL.grass[2] : PAL.grass[3]; }
         else if (kind === 'sand') col = pick(PAL.sand, h);
-        else if (kind === 'path') col = hash(Math.floor(X / 1), Math.floor(Z / 1), 41) < 0.2 ? pick(PAL.pathStone, h) : pick(PAL.path, h);
+        else if (kind === 'path') col = hash(X, Z, 41) < 0.2 ? pick(PAL.pathStone, h) : pick(PAL.path, h);
         else if (kind === 'plaza') col = PAL.plaza[(c.x + c.y) % 2];
         else if (kind === 'water') col = pick(PAL.bed, h);
         else col = pick(PAL.stone, h);
-      } else if (d === 1 && grassy(kind)) col = edge && h < 0.5 ? pick(PAL.grassSide, h * 2) : pick(PAL.dirt, h);
+      } else if (d <= drape) col = pick(PAL.grassSide, h);
       else if (d === 1 && kind === 'sand') col = pick(PAL.sand, h);
-      else if (d <= 2) col = pick(PAL.dirt, h);
+      else if (d <= dirtD) col = d === dirtD && h < 0.35 ? pick(PAL.clay, h) : pick(PAL.dirt, h);
       else {
-        // strata: reddish earth bands near the top, coursed grey stone below, cooler slate under the island
-        const band = Math.floor((y + vnoise(X * 0.2, Z * 0.2, 5) * 3) / 2);
-        if (y >= -4) col = band % 3 === 0 ? pick(PAL.stone, h) : pick(PAL.clay, h);
-        else if (y >= -9) col = band % 4 === 0 ? pick(PAL.clay, h) : h < 0.08 ? pick(PAL.stoneDark, h * 10) : pick(PAL.stone, h);
-        else col = h < 0.1 ? pick(PAL.stoneDark, h * 10) : pick(PAL.deep, h);
-        if (y === bot) col = pick(PAL.deep, h);
+        // strata: warm earth bands near the top, coursed stone in the middle, cool slate in the hanging root
+        const w = vnoise(X * 0.18, Z * 0.18, 5), band = Math.floor((y + w * 4) / 2);
+        if (y >= -5) col = band % 3 === 0 ? pick(PAL.stone, h) : band % 3 === 1 ? pick(PAL.clay, h) : pick(PAL.dirt, h);
+        else if (y >= -12) col = band % 4 === 0 ? pick(PAL.clay, h) : h < 0.07 ? pick(PAL.stoneDark, h * 10) : pick(PAL.stone, h);
+        else if (y >= -20) col = band % 5 === 0 ? pick(PAL.stone, h) : h < 0.08 ? pick(PAL.stoneDark, h * 10) : pick(PAL.deep, h);
+        else col = band % 4 === 0 ? pick(PAL.deep, h) : pick(PAL.deepLow, h);
+        if (y === bot) col = pick(PAL.deepLow, h);
+        // moss creeps down the stone on shaded, damp faces
+        if (y > -9 && edge && vnoise(X * 0.4 + y * 0.2, Z * 0.4, 13) > 0.72) col = pick(PAL.moss, h);
       }
-      if (vine && d >= 1 && d <= vineLen) col = pick(PAL.moss, h);
+      if (vine && d >= 1 && d <= vineLen) col = pick(vineCol, h);
       g.set(X, y, Z, col);
     }
     if (kind === 'water') water.push([X, Z]);
-    // stalactites under the island: the underside drips into points
-    if (hash(X, Z, 51) < 0.32) { const n = 1 + Math.floor(hash(X, Z, 52) * 3); for (let i = 1; i <= n; i++) g.set(X, bot - i, Z, pick(PAL.deep, hash(X, i, 53))); }
-    // rock outcrops on the cliff faces
-    if (edge && hash(X, Z, 61) < 0.07 && top - bot > 5) {
-      const y0 = top - 4 - Math.floor(hash(X, Z, 62) * (top - bot - 5));
-      [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dx, dz]) => { if (!colAt.has((X + dx) + ',' + (Z + dz))) { g.set(X + dx, y0, Z + dz, pick(PAL.stone, hash(X, Z, 63))); if (hash(X, Z, 64) > 0.5) g.set(X + dx, y0 - 1, Z + dz, pick(PAL.stoneDark, hash(X, Z, 65))); } });
+    // stalactites under the island and a few hanging roots near the rim
+    if (hash(X, Z, 51) < 0.3) { const n = 1 + Math.floor(hash(X, Z, 52) * 3); for (let i = 1; i <= n; i++) g.set(X, bot - i, Z, pick(PAL.deepLow, hash(X, i, 53))); }
+    else if (dist.get(k) === 1 && hash(X, Z, 54) < 0.12) { const n = 2 + Math.floor(hash(X, Z, 55) * 4); for (let i = 1; i <= n; i++) g.set(X, bot - i, Z, i === n ? PAL.leaf[0] : PAL.woodDark[i % 2]); }
+    // irregular rock formations bulging out of the cliff faces: small clusters, 1-3 voxels deep
+    if (edge && hash(X, Z, 61) < 0.09 && top - bot > 6) {
+      const y0 = top - 3 - Math.floor(hash(X, Z, 62) * Math.min(14, top - bot - 5)), hgt = 1 + Math.floor(hash(X, Z, 66) * 3);
+      [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dx, dz]) => { if (colAt.has((X + dx) + ',' + (Z + dz))) return; for (let yy = 0; yy < hgt; yy++) { g.set(X + dx, y0 - yy, Z + dz, pick(yy === 0 ? PAL.rock : PAL.stone, hash(X, Z + yy, 63))); if (yy === 0 && hash(X, Z, 67) < 0.4) g.set(X + dx, y0 + 1, Z + dz, pick(PAL.moss, hash(X, Z, 68))); } if (hash(X, Z, 64) > 0.55) g.set(X + 2 * dx, y0, Z + 2 * dz, pick(PAL.rockDark, 0.5)); });
     }
   });
-  return { g, water, colAt, bounds: { minX, maxX, minZ, maxZ } };
+  // waterfalls: springs on the two cliff faces that face the camera
+  const falls = [];
+  const cand = (sx, sz) => { let best = null; colAt.forEach((v, k) => { if (!main(v.c.kind) || v.c.kind === 'path' || v.top < 0) return; const [X, Z] = k.split(',').map(Number); if (X % 2 || Z % 2) return; // align to a cell
+      for (let i = 0; i < 2; i++) { if (!colAt.has((X + (sx ? 1 : i)) + ',' + (Z + (sz ? 1 : i)))) return; if (colAt.has((X + (sx ? 2 : i)) + ',' + (Z + (sz ? 2 : i)))) return; if (colAt.has((X + (sx ? 3 : i)) + ',' + (Z + (sz ? 3 : i)))) return; }
+      if (!colAt.has((X - sz) + ',' + (Z - sx)) || !colAt.has((X + 2 * sz) + ',' + (Z + 2 * sx))) return; // a straight stretch of cliff
+      const mid = sx ? (minZ + maxZ) : (minX + maxX), along = sx ? Z : X, sc = -Math.abs(along - mid + 10) / 20 + hash(X, Z, 71) * 0.25 + (v.c.kind === 'sand' ? -0.3 : 0); if (!best || sc > best.sc) best = { sc, X, Z, v }; }); return best; };
+  [[1, 0], [0, 1]].forEach(([sx, sz]) => { const b = cand(sx, sz); if (!b) return;
+    const y0 = b.v.top - 3; // the spring: a dark mouth with a mossy stone lip, two voxels below the rim
+    for (let i = 0; i < 2; i++) { const X = b.X + sz * i + (sx > 0 ? 1 : 0), Z = b.Z + sx * i + (sz > 0 ? 1 : 0); g.set(X, y0, Z, '#3f4a52'); g.set(X, y0 + 1, Z, '#3f4a52'); g.set(X + sx, y0 - 1, Z + sz, pick(PAL.rock, hash(X, Z, 72))); g.set(X + sx, y0 - 2, Z + sz, pick(PAL.moss, hash(X, Z, 73)));
+      for (let y = y0 - 3; y > y0 - 12; y--) if (g.get(X, y, Z)) g.set(X, y, Z, pick(PAL.moss, hash(X, y, 74))); }
+    const lowest = Math.min(...[0, 1].map((i) => { const c2 = colAt.get((b.X + sz * i + (sx > 0 ? 1 : 0)) + ',' + (b.Z + sx * i + (sz > 0 ? 1 : 0))); return c2 ? c2.bot : -10; }));
+    falls.push({ sx, sz, x: (b.X + (sx > 0 ? 3 : 0)) * TV, z: (b.Z + (sz > 0 ? 3 : 0)) * TV, y0: (y0 + 0.4) * TV, y1: (lowest - 10) * TV, w: 2 * TV });
+  });
+  return { g, water, colAt, falls, bounds: { minX, maxX, minZ, maxZ } };
 }
 
 /* ------------------------------------------------------------------ the scene */
@@ -95,14 +127,15 @@ export function createIsland() {
   if (!R) {
     R = new THREE.WebGLRenderer({ antialias: !COARSE, alpha: true, powerPreference: 'default' });
     R.setClearColor(0x000000, 0); R.outputColorSpace = THREE.SRGBColorSpace;
-    R.shadowMap.enabled = true; R.shadowMap.type = THREE.PCFSoftShadowMap; R.shadowMap.autoUpdate = false;
+    R.shadowMap.enabled = true; R.shadowMap.type = THREE.PCFShadowMap; R.shadowMap.autoUpdate = false;
     R.domElement.className = 'vox3d';
   }
   const scene = new THREE.Scene(), camera = new THREE.OrthographicCamera(-1, 1, 1, -1, -200, 200);
   camera.up.copy(UP);
-  const hemi = new THREE.HemisphereLight('#d8ecff', '#7a6a58', 1.15); scene.add(hemi);
-  const sun = new THREE.DirectionalLight('#fff0d8', 1.9); sun.castShadow = true;
-  sun.shadow.mapSize.set(COARSE ? 1024 : 2048, COARSE ? 1024 : 2048); sun.shadow.bias = -0.0008; sun.shadow.normalBias = 0.02; sun.shadow.radius = 2;
+  // Phase 1.1 light: warmer, brighter sun and a stronger sky fill so shadows stay soft and colourful, never murky
+  const hemi = new THREE.HemisphereLight('#eaf6ff', '#b39a6c', 1.3); scene.add(hemi);
+  const sun = new THREE.DirectionalLight('#ffe6b8', 2.2); sun.castShadow = true;
+  sun.shadow.mapSize.set(COARSE ? 1024 : 2048, COARSE ? 1024 : 2048); sun.shadow.bias = -0.0008; sun.shadow.normalBias = 0.02; sun.shadow.radius = 3; sun.shadow.blurSamples = 8;
   scene.add(sun); scene.add(sun.target);
   const groups = { terrain: new THREE.Group(), things: new THREE.Group(), fx: new THREE.Group() };
   Object.values(groups).forEach((g) => scene.add(g));
@@ -112,7 +145,7 @@ export function createIsland() {
   const matSway = new THREE.MeshLambertMaterial({ vertexColors: true });
   matSway.onBeforeCompile = (sh) => { sh.uniforms.uTime = uni.uTime; sh.vertexShader = 'uniform float uTime;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n#ifdef USE_INSTANCING\nfloat ph = instanceMatrix[3].x * 1.7 + instanceMatrix[3].z * 2.3;\n#else\nfloat ph = 0.0;\n#endif\nfloat k = max(0.0, position.y - 0.6) * 0.035;\ntransformed.x += sin(uTime * 1.3 + ph) * k;\ntransformed.z += cos(uTime * 1.1 + ph) * k * 0.6;'); };
   let state = { iid: null, key: null, built: false, view: null, dirty: true, shadowDirty: true, things: new Map(), sig: '' };
-  let terr = null, waterMesh = null, detail = null, motes = null, clouds = [];
+  let terr = null, waterMesh = null, detail = null, motes = null, sparks = null, clouds = [];
   const disposables = [];
 
   const cost = { terrainMs: 0, syncMs: 0 };
@@ -132,6 +165,23 @@ export function createIsland() {
       wm.onBeforeCompile = (sh) => { sh.uniforms.uTime = uni.uTime; sh.vertexShader = 'uniform float uTime;\nvarying vec3 vW;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\ntransformed.y += sin(uTime * 1.6 + position.x * 5.0 + position.z * 3.0) * 0.025;\nvW = position;'); sh.fragmentShader = 'uniform float uTime;\nvarying vec3 vW;\n' + sh.fragmentShader.replace('#include <dithering_fragment>', '#include <dithering_fragment>\nfloat sp = step(0.93, fract(sin(floor(vW.x * 8.0) * 12.9898 + floor(vW.z * 8.0) * 78.233 + floor(uTime * 2.0)) * 43758.5453));\ngl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(0.92, 0.98, 1.0), sp * 0.55);'); };
       disposables.push(wm); waterMesh = new THREE.Mesh(wg, wm); waterMesh.receiveShadow = true; groups.terrain.add(waterMesh);
     } else waterMesh = null;
+    // waterfalls: a pixel-stepped ribbon of falling water with white streaks that scroll down and fade into the air
+    (t.falls || []).forEach((f) => {
+      const L = f.y0 - f.y1, pos = f.sx ? [f.x, f.y0, f.z, f.x, f.y0, f.z + f.w, f.x, f.y1, f.z + f.w, f.x, f.y1, f.z] : [f.x, f.y0, f.z, f.x + f.w, f.y0, f.z, f.x + f.w, f.y1, f.z, f.x, f.y1, f.z];
+      const fg = new THREE.BufferGeometry(); fg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); fg.setAttribute('uv', new THREE.Float32BufferAttribute([0, 0, 1, 0, 1, L, 0, L], 2)); fg.setIndex([0, 1, 2, 0, 2, 3]); disposables.push(fg);
+      const fm = new THREE.ShaderMaterial({ uniforms: { uTime: uni.uTime, uLen: { value: L } }, transparent: true, depthWrite: false, side: THREE.DoubleSide,
+        vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+        fragmentShader: 'uniform float uTime; uniform float uLen; varying vec2 vUv; float h(vec2 p){ return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }\n' +
+          'void main(){ vec2 q = vec2(floor(vUv.x * 8.0), floor(vUv.y * 8.0)); float col = q.x; float lane = h(vec2(col, 3.0));\n' +
+          ' float s = fract(q.y / 9.0 - uTime * (0.9 + lane * 0.5) + lane); float streak = step(0.72, s) * (0.6 + 0.4 * h(vec2(col, floor(s * 9.0))));\n' +
+          ' float edge = (col < 0.5 || col > 6.5) ? 0.25 : 0.0; float top = 1.0 - smoothstep(0.0, 0.6, vUv.y);\n' +
+          ' vec3 c = mix(vec3(0.36, 0.74, 0.96), vec3(0.94, 0.99, 1.0), clamp(streak * 0.85 + top * 0.6 + edge, 0.0, 1.0));\n' +
+          ' float a = 0.9 * (1.0 - smoothstep(uLen * 0.45, uLen, vUv.y)); gl_FragColor = vec4(c, a); }' });
+      disposables.push(fm); const fall = new THREE.Mesh(fg, fm); fall.renderOrder = 2; groups.terrain.add(fall);
+      // a little white churn where the water leaves the lip
+      const cg = new VoxGrid(0, 0, 0, 6, 2, 6); for (let i = 0; i < 9; i++) cg.set(Math.floor(hash(i, f.x, 75) * 6), hash(i, 2, 76) < 0.5 ? 0 : 1, Math.floor(hash(i, f.z, 77) * 6), PAL.foam);
+      const foam = meshGrid(cg, { size: DV, origin: [f.sx ? f.x - 2 * DV : f.x + f.w / 2 - 3 * DV, f.y0 - DV, f.sz ? f.z - 2 * DV : f.z + f.w / 2 - 3 * DV] }); disposables.push(foam); groups.terrain.add(new THREE.Mesh(foam, matGlow));
+    });
     // fixed scenery that belongs to the island: the jetty with its skiff, the lighthouse rock
     (extras || []).forEach((e) => { const md = VB.extraModel(e.kind); if (!md) return; const g = new THREE.Group(); addModel(g, md); g.position.set(e.x, e.y || 0, e.z); if (e.ry) g.rotation.y = e.ry; g.userData.bob = e.bob ? { y0: g.position.y, ph: e.x } : null; groups.terrain.add(g); if (e.bob) clouds.push(g); });
     // mist and cloud banks drifting below and around the island
@@ -185,8 +235,21 @@ export function createIsland() {
       if (bt.mat !== matGlow) { im.castShadow = true; im.receiveShadow = true; }
       im.computeBoundingSphere(); groups.things.add(im);
     });
-    buildDetail(occupied);
+    buildDetail(occupied); buildSparks(items);
     state.shadowDirty = true; state.dirty = true;
+  }
+  // magic: slow motes of light that spiral up around the island's enchanted places (the Hatchery's egg, the
+  // Tidegate, the Moonshrine, the Reliquary Gate, the glowing standing stones). One Points object, ~10 per place.
+  const SPARK = { hatchery: ['#bfe8ff', 2.6, 1.4], tidegate: ['#9ae8ff', 1.8, 1.6], moonshrine: ['#e0d0ff', 2.2, 1.2], reliquarygate: ['#a8ffc0', 1.4, 1.4] };
+  function buildSparks(items) {
+    if (sparks) { groups.fx.remove(sparks); sparks.geometry.dispose(); sparks.material.dispose(); sparks = null; }
+    const src = []; items.forEach((it) => { const k = it.k === 'b' && it.state !== 'ruined' && it.state !== 'constructing' ? SPARK[it.type] : it.k === 'l' && it.kind === 'stones' && it.on ? ['#e0b8ff', 1, 1.6] : null; if (k) src.push([it.x + it.w / 2, it.y + it.h / 2, k]); });
+    if (!src.length) return;
+    const N = src.length * (COARSE ? 7 : 10), p = new Float32Array(N * 3), col = new Float32Array(N * 3), seed = new Float32Array(N * 4), c = new THREE.Color();
+    for (let i = 0; i < N; i++) { const [x, z, k] = src[i % src.length]; c.set(k[0]); col.set([c.r, c.g, c.b], i * 3); seed.set([x, z, k[1], hash(i, 1, 88) * 6.28 + hash(i, 2, 88) * 100], i * 4); p.set([x, k[1] * hash(i, 3, 88) * 1.5, z], i * 3); seed[i * 4 + 2] = k[2]; seed[i * 4 + 3] = hash(i, 4, 88) * 6.28; p[i * 3 + 1] = k[1] * hash(i, 5, 88) * 1.6; }
+    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(p, 3)); g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+    sparks = new THREE.Points(g, new THREE.PointsMaterial({ size: 0.09, vertexColors: true, transparent: true, opacity: 0.95, depthWrite: false })); sparks.userData = { seed, N, top: src.map((s2) => s2[2][1]) };
+    groups.fx.add(sparks);
   }
   // meadow details: grass blades, flowers and pebbles (one instanced mesh of small blocks)
   function buildDetail(occupied) {
@@ -197,9 +260,11 @@ export function createIsland() {
       const [X, Z] = k.split(',').map(Number), c = v.c; if (occupied.has(c.x + ',' + c.y)) return;
       const y0 = v.top * TV, h = hash(X, Z, 91);
       if ((c.kind === 'grass' || c.kind === 'hill') && v.top >= 0) {
-        // small clumps of 2-3 short blades, a shade lighter or darker than the turf
-        if (h < 0.16) { const bx = X * TV + 0.08 + hash(X, Z, 93) * 0.3, bz = Z * TV + 0.08 + hash(Z, X, 94) * 0.3, n = 2 + Math.floor(hash(X, Z, 92) * 2); for (let i = 0; i < n; i++) list.push([bx + (i % 2) * DV, y0, bz + (i >> 1) * DV, 1, 1 + Math.floor(hash(X + i, Z, 95) * 2), 1, pick([PAL.grass[3], PAL.grass[4], PAL.grassDark[0]], hash(i, X, Z))]); }
-        else if (h < 0.23) { const x = X * TV + 0.1 + hash(X, Z, 96) * 0.3, z = Z * TV + 0.1 + hash(Z, X, 97) * 0.3; list.push([x, y0, z, 1, 2, 1, PAL.leafDark[0]]); list.push([x - DV / 2, y0 + 2 * DV, z - DV / 2, 2, 1, 2, pick(PAL.flowers, hash(X, Z, 98))]); }
+        // Phase 1.1: flowers gather in meadow patches and grass clumps thin out in the open, so the ground reads
+        // as calm grass with a few bright drifts, instead of an even sprinkle everywhere
+        const patch = vnoise(X * 0.16, Z * 0.16, 17), tall = vnoise(X * 0.22, Z * 0.22, 18);
+        if (patch > 0.66 && h < 0.42) { const x = X * TV + 0.1 + hash(X, Z, 96) * 0.3, z = Z * TV + 0.1 + hash(Z, X, 97) * 0.3, fc = pick(PAL.flowers, vnoise(X * 0.5, Z * 0.5, 19)); list.push([x, y0, z, 1, 2, 1, PAL.leafDark[0]]); list.push([x - DV / 2, y0 + 2 * DV, z - DV / 2, 2, 1, 2, hash(X, Z, 98) < 0.75 ? fc : pick(PAL.flowers, hash(X, Z, 99))]); }
+        else if (h < (tall > 0.55 ? 0.22 : 0.07)) { const bx = X * TV + 0.08 + hash(X, Z, 93) * 0.3, bz = Z * TV + 0.08 + hash(Z, X, 94) * 0.3, n = 2 + Math.floor(hash(X, Z, 92) * 2); for (let i = 0; i < n; i++) list.push([bx + (i % 2) * DV, y0, bz + (i >> 1) * DV, 1, 1 + Math.floor(hash(X + i, Z, 95) * 2) + (tall > 0.65 ? 1 : 0), 1, pick([PAL.grass[3], PAL.grass[4], PAL.grassDark[0]], hash(i, X, Z))]); }
       } else if (c.kind === 'path' && h < 0.12) list.push([X * TV + 0.1 + hash(X, Z, 99) * 0.3, y0, Z * TV + 0.15, 2, 1, 2, pick(PAL.pathStone, h * 8)]);
       else if (c.kind === 'sand' && h < 0.08) list.push([X * TV + 0.2, y0, Z * TV + 0.2, 2, 1, 1, '#ffffff']);
     });
@@ -242,6 +307,7 @@ export function createIsland() {
   function tickAmbient(t, dt) {
     uni.uTime.value = t;
     clouds.forEach((c) => { const d = c.userData.drift; if (d) c.position.x = d.x0 + Math.sin(t * d.sp * 0.3 + d.ph) * 1.2; const b = c.userData.bob; if (b) c.position.y = b.y0 + Math.sin(t * 1.2 + b.ph) * 0.06; });
+    if (sparks) { const u = sparks.userData, p = sparks.geometry.attributes.position.array; for (let i = 0; i < u.N; i++) { const cx = u.seed[i * 4], cz = u.seed[i * 4 + 1], r = u.seed[i * 4 + 2] * 0.55, ph = u.seed[i * 4 + 3]; let y = p[i * 3 + 1] + dt * 0.35; if (y > 3.4) y = 0.3; const a = ph + t * 0.6 + y * 1.4, rr = r * (0.6 + 0.4 * Math.sin(ph * 3)); p[i * 3] = cx + Math.cos(a) * rr; p[i * 3 + 1] = y; p[i * 3 + 2] = cz + Math.sin(a) * rr; } sparks.geometry.attributes.position.needsUpdate = true; }
     if (motes) { const u = motes.userData, p = u.mp; for (let i = 0; i < u.N; i++) { p[i * 3 + 1] += dt * 0.25; p[i * 3] += Math.sin(t * 0.7 + u.seed[i]) * dt * 0.08; if (p[i * 3 + 1] > 3.2) p[i * 3 + 1] = 0.1; } motes.geometry.attributes.position.needsUpdate = true; }
   }
   function draw() {

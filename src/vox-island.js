@@ -32,18 +32,25 @@
   }
   // Trees and bushes on hills, ledges and loose chunks (scenery only: those cells are never buildable).
   function scenery(cols) {
+    // Phase 1.1 composition: trees grow in groves (a slow noise field picks pine, oak or blossom stands), with
+    // open glades between them, rather than an even scatter of mixed species.
     const out = [], HP = 39.1918, hash = (x, y, s) => { let h = (x * 374761393 + y * 668265263 + s * 2147483647) | 0; h = (h ^ (h >>> 13)) * 1274126177; return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
+    const vn = (x, y, s) => { const xi = Math.floor(x), yi = Math.floor(y), fx = x - xi, fy = y - yi, a = hash(xi, yi, s), b = hash(xi + 1, yi, s), c = hash(xi, yi + 1, s), d = hash(xi + 1, yi + 1, s), u = fx * fx * (3 - 2 * fx), v = fy * fy * (3 - 2 * fy); return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v; };
     cols.forEach((c) => {
-      const v = hash(c.x, c.y, 2), y = Math.round(c.top / HP / 0.5) * 0.5;
+      const v = hash(c.x, c.y, 2), y = Math.round(c.top / HP / 0.5) * 0.5, grove = vn(c.x * 0.22, c.y * 0.22, 6), dense = vn(c.x * 0.3, c.y * 0.3, 7);
       let kind = null;
-      if (c.kind === 'hill') kind = v > 0.7 ? 'oak' : v > 0.42 ? 'pine' : v > 0.26 ? 'birch' : v > 0.12 ? 'bush' : 'blossom';
-      else if (c.kind === 'chunk' && v > 0.35) kind = v > 0.75 ? 'pine' : 'oak';
-      else if (c.kind === 'ledge' && v > 0.78 && c.top >= -24) kind = v > 0.92 ? 'pine' : 'bush';
-      if (!kind) return;
-      out.push({ kind, seed: Math.floor(v * 1000), cx: c.x, cz: c.y, x: c.x + 0.5 + (hash(c.x, c.y, 3) - 0.5) * 0.3, y, z: c.y + 0.5 + (hash(c.x, c.y, 4) - 0.5) * 0.3, ry: Math.floor(hash(c.x, c.y, 5) * 4) * Math.PI / 2, s: c.kind === 'chunk' ? 0.75 : kind === 'oak' ? 0.8 : 0.95 });
+      if (c.kind === 'hill') {
+        if (dense < 0.34 && v < 0.75) kind = v < 0.25 ? 'bush' : v < 0.32 ? 'fern' : null; // a glade
+        else kind = grove < 0.4 ? (v > 0.2 ? 'pine' : 'bush') : grove < 0.68 ? (v > 0.3 ? 'oak' : v > 0.12 ? 'bush' : 'birch') : (v > 0.45 ? 'birch' : v > 0.2 ? 'blossom' : 'bush');
+      } else if (c.kind === 'chunk' && v > 0.35) kind = v > 0.75 ? 'pine' : 'oak';
+      else if (c.kind === 'ledge' && v > 0.8 && c.top >= -24) kind = v > 0.93 ? 'pine' : 'bush';
+      if (!kind || !(kind in KNOWN)) return;
+      const big = kind === 'oak' ? 0.72 + hash(c.x, c.y, 6) * 0.25 : kind === 'pine' ? 0.8 + hash(c.x, c.y, 6) * 0.35 : 0.85 + hash(c.x, c.y, 6) * 0.25;
+      out.push({ kind, seed: Math.floor(v * 1000), cx: c.x, cz: c.y, x: c.x + 0.5 + (hash(c.x, c.y, 3) - 0.5) * 0.3, y, z: c.y + 0.5 + (hash(c.x, c.y, 4) - 0.5) * 0.3, ry: Math.floor(hash(c.x, c.y, 5) * 4) * Math.PI / 2, s: c.kind === 'chunk' ? 0.75 : big });
     });
     return out;
   }
+  const KNOWN = { oak: 1, pine: 1, birch: 1, bush: 1, blossom: 1, fern: 1 };
   let sceneryCache = null;
 
   // Called by UI.renderWorld whenever the island's terrain is (re)drawn.

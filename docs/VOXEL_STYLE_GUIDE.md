@@ -43,6 +43,14 @@ warm light, layered cliffs, nothing photographic.
 - Saturation stays high and values stay mid-to-light on top surfaces. Dark values are kept for undersides, timber
   framing and window frames, so silhouettes stay readable at phone size.
 
+Phase 1.1 shifts colour three ways:
+
+- The meadow is a warm yellow-green.
+- Trees are a bluer green than the meadow, so the two separate.
+- Cliffs carry warm orange clay bands.
+
+Ambient occlusion is lighter (the darkest corner is 60 %).
+
 ## 4. Terrain
 
 - Grass top layer (1 terrain voxel) with grass-coloured sides, then dirt, then alternating clay and stone strata
@@ -50,7 +58,11 @@ warm light, layered cliffs, nothing photographic.
 - Cliff edges get hanging vines; the underside gets stalactites; cliff faces get occasional rock outcrops.
 - Water is a separate surface with a gentle animated ripple and sparkle (shader), over a visible lake bed.
 - Paths and the plaza are flush with the grass, in the path or plaza palettes, with stone edging where they meet grass.
-- Hills, ledges and loose chunks (never buildable) carry the trees; buildable cells carry only small detail voxels,
+- The underside tapers into a hanging rock root, deeper towards the middle, with a few long spires.
+  Grass drapes 1 to 3 voxels over the rim.
+- Waterfalls spring from mouths in the cliff faces and fade into the air. They never touch a buildable cell.
+- Hills, ledges and loose chunks (never buildable) carry the trees, in groves (pine stands, oak woods,
+  birch and blossom copses) with open glades between them; buildable cells carry only small detail voxels,
   and only where nothing stands.
 
 ## 5. Buildings
