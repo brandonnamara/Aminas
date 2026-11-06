@@ -3,3 +3,8 @@ tests/shots*/
 node_modules/
 # library glTF exports are large and regenerable: node tools/export-library.js
 assets/library/glb/
+
+# Godot validation project: import cache and run outputs (copies of the outputs are in docs/godot)
+godot/.godot/
+godot/validation_*.png
+godot/validation_report.json

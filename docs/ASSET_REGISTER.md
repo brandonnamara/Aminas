@@ -13,6 +13,7 @@ asset. Concept images from earlier sessions are reference only and are not in th
 | three.js r170 | cdn.jsdelivr.net/npm/three@0.170.0 (already used since v0.5) | MIT | "three.js authors" (licence text in the package) | none | all 3D rendering, including the voxel island |
 | three.js GLTFExporter (part of three.js r170) | same CDN, `examples/jsm/exporters` | MIT | as above | none | the library exporter only (`tools/`), not loaded by the game |
 | Playwright | npm (dev tooling) | Apache-2.0 | none needed for tooling | none | tests, screenshots, export automation; not shipped |
+| Godot Engine 4.3-stable (Phase 3) | godotengine.org official Linux build | MIT | not required for use as a tool (MIT notice applies only if Godot itself is shipped) | none | `godot/` asset-validation project only; not part of the web game |
 
 ## External resources: Phase 2 review (licences checked on the publishers' own pages, 6 Nov 2026)
 
@@ -66,6 +67,7 @@ All are in `src/3d/`. "Used" means where the asset appears in the game.
 | *Phase 1.2:* waterfall back sheets and mist puffs; sea glints and horizon mist (backdrop SVG) | island3d.js, island-art.js | — | Starter Island |
 | *Phase 1.2:* designed ruins (Fallen Nursery, Buried Hollow, Dry Tidegate, Fallen Temple, Cold Forge, abandoned cottage) and the ruin kit | voxbuild.js | — | ruined buildings |
 | *Phase 2:* environment library: 95 assets, 177 variants (terrain and geology, vegetation, architecture kit and category demonstrations, decoration, water objects, island vignettes); full list in `art-bible/02_ASSET_LIBRARY.md` | `src/3d/library/*.js` | see the library list | catalogue; on the Starter Island: old oak, round and flowering bushes, flower patches, tall grass, large ferns, mushrooms, mossy rocks, crystals, vines, hanging moss, jetty crates, barrel and sacks |
+| *Phase 3:* Godot import pipeline: voxel and glow shaders, post-import script (`godot/pipeline/`), validation script | `godot/` | — | Godot projects using Aminas assets |
 | *Phase 2:* exports (.glb for Godot 4, .vox for MagicaVoxel) | `tools/export-library.js` | all assets | `assets/library/` |
 | *Phase 1.1:* window sills, bars and shutters; foundation skirts; Hatchery porch, chimney, lanterns and straw nest; habitat silhouette features | voxbuild.js | — | all buildings |
 

@@ -1,0 +1,27 @@
+; Aminas: Godot 4 asset pipeline validation project (Environment Phase 3).
+; Not the game: a small project that imports library exports and checks them.
+config_version=5
+
+[application]
+config/name="Aminas Asset Validation"
+config/features=PackedStringArray("4.3")
+
+[display]
+window/size/viewport_width=1600
+window/size/viewport_height=900
+
+[rendering]
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+
+[importer_defaults]
+; The Aminas .glb import preset (GODOT_PIPELINE.md): our shaders through the post-import script, no generated LODs
+; (Godot's decimation smears voxel colours; use the exported _lod.glb twins), no tangents (no textures).
+scene={
+"import_script/path": "res://pipeline/aminas_import.gd",
+"meshes/ensure_tangents": false,
+"meshes/generate_lods": false,
+"meshes/create_shadow_meshes": true,
+"meshes/light_baking": 1,
+"nodes/root_scale": 1.0
+}

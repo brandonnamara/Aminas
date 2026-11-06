@@ -19,11 +19,32 @@
   let boostUntil = 0, lastInput = Date.now(), restOn = false;
   const settings = () => (A.State && A.State.state && A.State.state.settings) || {};
   P.saver = () => !!settings().batterySaver || P.autoSaver;
+
+  /* ---- graphics quality tiers (Environment Phase 3) ----
+     One table read by the voxel island (src/3d/island3d.js) and the 3D creature runtime (src/3d/runtime.js).
+     settings.quality: 'auto' (default), 'high' or 'balanced'. Battery saver (manual or automatic) always wins.
+     Auto picks Balanced on touch devices and High elsewhere; budgets per iPhone generation are in
+     docs/perf/PERFORMANCE_STANDARDS.md. P.forceTier is for the performance test only (never saved). */
+  const COARSE = !!(root.matchMedia && root.matchMedia('(pointer: coarse)').matches);
+  P.TIERS = {
+    high:     { id: 'high', label: 'High', prCap: 2, shadowMap: 2048, shadows: true, natureLod: false, buildingLod: false },
+    balanced: { id: 'balanced', label: 'Balanced', prCap: 1.5, shadowMap: 1024, shadows: true, natureLod: false, buildingLod: false },
+    saver:    { id: 'saver', label: 'Battery saver', prCap: 1, shadowMap: 512, shadows: true, natureLod: true, buildingLod: true },
+  };
+  P.QUALITY = ['auto', 'high', 'balanced'];
+  P.forceTier = null;
+  P.autoTier = () => (COARSE ? 'balanced' : 'high');
+  P.quality = function () {
+    if (P.forceTier && P.TIERS[P.forceTier]) return P.forceTier;
+    if (P.saver()) return 'saver';
+    const q = settings().quality; return q === 'high' || q === 'balanced' ? q : P.autoTier();
+  };
+  P.tier = () => P.TIERS[P.quality()];
   P.hidden = () => !!(doc && doc.hidden);
   // called by 3D views and UI when something animated starts (clips, bursts, drags)
   P.boost = (ms) => { boostUntil = Math.max(boostUntil, Date.now() + (ms || P.BOOST_MS)); };
   P.boosting = () => Date.now() < boostUntil;
-  P.targetFps = () => (P.saver() ? P.SAVER_FPS : P.boosting() ? P.ACTION_FPS : P.IDLE_FPS);
+  P.targetFps = () => (P.saver() || P.forceTier === 'saver' ? P.SAVER_FPS : P.boosting() ? P.ACTION_FPS : P.IDLE_FPS);
   // the 3D runtime reports when it is already at its lowest resolution and still slow
   P.reportSlow = function () {
     if (P.autoSaver || settings().batterySaver) return;

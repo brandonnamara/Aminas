@@ -1,0 +1,507 @@
+{
+  "assets": [
+    {
+      "asset": "b_habitat_2",
+      "centre_xz": [
+        0,
+        0
+      ],
+      "colours_ok": true,
+      "expected_footprint": [
+        3,
+        3
+      ],
+      "ground_ok": true,
+      "lod_ok": true,
+      "lod_ratio": 0.21,
+      "lod_vertices": 3140,
+      "materials": [
+        {
+          "auto_lods": 0,
+          "cast_shadow": true,
+          "class": "ShaderMaterial",
+          "node": "solid",
+          "shader": "aminas_voxel.gdshader",
+          "unshaded": false
+        },
+        {
+          "auto_lods": 0,
+          "cast_shadow": false,
+          "class": "ShaderMaterial",
+          "node": "glow",
+          "shader": "aminas_glow.gdshader",
+          "unshaded": true
+        }
+      ],
+      "materials_ok": true,
+      "min_y": 0,
+      "pivot_ok": true,
+      "scale_ok": true,
+      "size": [
+        3,
+        2.25,
+        3
+      ],
+      "surfaces": 2,
+      "vertex_colours": true,
+      "vertices": 14984
+    },
+    {
+      "asset": "b_hatchery_1",
+      "centre_xz": [
+        0,
+        0.06
+      ],
+      "colours_ok": true,
+      "expected_footprint": [
+        3,
+        3
+      ],
+      "ground_ok": true,
+      "lod_ok": true,
+      "lod_ratio": 0.22,
+      "lod_vertices": 6008,
+      "materials": [
+        {
+          "auto_lods": 0,
+          "cast_shadow": true,
+          "class": "ShaderMaterial",
+          "node": "solid",
+          "shader": "aminas_voxel.gdshader",
+          "unshaded": false
+        },
+        {
+          "auto_lods": 0,
+          "cast_shadow": false,
+          "class": "ShaderMaterial",
+          "node": "glow",
+          "shader": "aminas_glow.gdshader",
+          "unshaded": true
+        }
+      ],
+      "materials_ok": true,
+      "min_y": 0,
+      "pivot_ok": true,
+      "scale_ok": true,
+      "size": [
+        3.25,
+        5.13,
+        3.38
+      ],
+      "surfaces": 2,
+      "vertex_colours": true,
+      "vertices": 27576
+    },
+    {
+      "asset": "cliff_1",
+      "centre_xz": [
+        0,
+        0.13
+      ],
+      "colours_ok": true,
+      "expected_footprint": [
+        2,
+        1.5
+      ],
+      "ground_ok": true,
+      "lod_ok": true,
+      "lod_ratio": 0.19,
+      "lod_vertices": 1648,
+      "materials": [
+        {
+          "auto_lods": 0,
+          "cast_shadow": true,
+          "class": "ShaderMaterial",
+          "node": "solid",
+          "shader": "aminas_voxel.gdshader",
+          "unshaded": false
+        }
+      ],
+      "materials_ok": true,
+      "min_y": -0.37,
+      "pivot_ok": true,
+      "scale_ok": true,
+      "size": [
+        2,
+        2.88,
+        1.75
+      ],
+      "surfaces": 1,
+      "vertex_colours": true,
+      "vertices": 8720
+    },
+    {
+      "asset": "crystals_1",
+      "centre_xz": [
+        0,
+        0
+      ],
+      "colours_ok": true,
+      "expected_footprint": [
+        1,
+        1
+      ],
+      "ground_ok": true,
+      "lod_ok": true,
+      "lod_ratio": 0.28,
+      "lod_vertices": 376,
+      "materials": [
+        {
+          "auto_lods": 0,
+          "cast_shadow": true,
+          "class": "ShaderMaterial",
+          "node": "solid",
+          "shader": "aminas_voxel.gdshader",
+          "unshaded": false
+        },
+        {
+          "auto_lods": 0,
+          "cast_shadow": false,
+          "class": "ShaderMaterial",
+          "node": "glow",
+          "shader": "aminas_glow.gdshader",
+          "unshaded": true
+        }
+      ],
+      "materials_ok": true,
+      "min_y": -0.25,
+      "pivot_ok": true,
+      "scale_ok": true,
+      "size": [
+        1,
+        1.5,
+        1
+      ],
+      "surfaces": 2,
+      "vertex_colours": true,
+      "vertices": 1352
+    },
+    {
+      "asset": "glowcap_2",
+      "centre_xz": [
+        0.06,
+        0.06
+      ],
+      "colours_ok": true,
+      "expected_footprint": [
+        1,
+        1
+      ],
+      "ground_ok": true,
+      "lod_ok": true,
+      "lod_ratio": 0.3,
+      "lod_vertices": 800,
+      "materials": [
+        {
+          "auto_lods": 0,
+          "cast_shadow": true,
+          "class": "ShaderMaterial",
+          "node": "solid",
+          "shader": "aminas_voxel.gdshader",
+          "unshaded": false
+        },
+        {
+          "auto_lods": 0,
+          "cast_shadow": false,
+          "class": "ShaderMaterial",
+          "node": "glow",
+          "shader": "aminas_glow.gdshader",
+          "unshaded": true
+        }
+      ],
+      "materials_ok": true,
+      "min_y": 0,
+      "pivot_ok": true,
+      "scale_ok": true,
+      "size": [
+        1.63,
+        2,
+        1.63
+      ],
+      "surfaces": 2,
+      "vertex_colours": true,
+      "vertices": 2640
+    },
+    {
+      "asset": "lanternPost_1",
+      "centre_xz": [
+        0.25,
+        0.06
+      ],
+      "colours_ok": true,
+      "expected_footprint": [
+        1,
+        1
+      ],
+      "ground_ok": true,
+      "lod_ok": true,
+      "lod_ratio": 0.21,
+      "lod_vertices": 120,
+      "materials": [
+        {
+          "auto_lods": 0,
+          "cast_shadow": true,
+          "class": "ShaderMaterial",
+          "node": "solid",
+          "shader": "aminas_voxel.gdshader",
+          "unshaded": false
+        },
+        {
+          "auto_lods": 0,
+          "cast_shadow": false,
+          "class": "ShaderMaterial",
+          "node": "glow",
+          "shader": "aminas_glow.gdshader",
+          "unshaded": true
+        }
+      ],
+      "materials_ok": true,
+      "min_y": 0,
+      "pivot_ok": true,
+      "scale_ok": true,
+      "size": [
+        0.75,
+        1.63,
+        0.38
+      ],
+      "surfaces": 2,
+      "vertex_colours": true,
+      "vertices": 584
+    },
+    {
+      "asset": "mossyRock_1",
+      "centre_xz": [
+        0,
+        0
+      ],
+      "colours_ok": true,
+      "expected_footprint": [
+        1.5,
+        1.5
+      ],
+      "ground_ok": true,
+      "lod_ok": true,
+      "lod_ratio": 0.26,
+      "lod_vertices": 464,
+      "materials": [
+        {
+          "auto_lods": 0,
+          "cast_shadow": true,
+          "class": "ShaderMaterial",
+          "node": "solid",
+          "shader": "aminas_voxel.gdshader",
+          "unshaded": false
+        }
+      ],
+      "materials_ok": true,
+      "min_y": -0.12,
+      "pivot_ok": true,
+      "scale_ok": true,
+      "size": [
+        1.5,
+        1.25,
+        1
+      ],
+      "surfaces": 1,
+      "vertex_colours": true,
+      "vertices": 1784
+    },
+    {
+      "asset": "oakOld_2",
+      "centre_xz": [
+        0.06,
+        0.06
+      ],
+      "colours_ok": true,
+      "expected_footprint": [
+        1,
+        1
+      ],
+      "ground_ok": true,
+      "lod_ok": true,
+      "lod_ratio": 0.26,
+      "lod_vertices": 1088,
+      "materials": [
+        {
+          "auto_lods": 0,
+          "cast_shadow": true,
+          "class": "ShaderMaterial",
+          "node": "solid",
+          "shader": "aminas_voxel.gdshader",
+          "unshaded": false
+        }
+      ],
+      "materials_ok": true,
+      "min_y": 0,
+      "pivot_ok": true,
+      "scale_ok": true,
+      "size": [
+        2.13,
+        2.38,
+        1.88
+      ],
+      "surfaces": 1,
+      "vertex_colours": true,
+      "vertices": 4112
+    },
+    {
+      "asset": "oak_1",
+      "centre_xz": [
+        0.06,
+        0.06
+      ],
+      "colours_ok": true,
+      "expected_footprint": [
+        1,
+        1
+      ],
+      "ground_ok": true,
+      "lod_ok": true,
+      "lod_ratio": 0.27,
+      "lod_vertices": 960,
+      "materials": [
+        {
+          "auto_lods": 0,
+          "cast_shadow": true,
+          "class": "ShaderMaterial",
+          "node": "solid",
+          "shader": "aminas_voxel.gdshader",
+          "unshaded": false
+        }
+      ],
+      "materials_ok": true,
+      "min_y": 0,
+      "pivot_ok": true,
+      "scale_ok": true,
+      "size": [
+        1.63,
+        2.38,
+        1.63
+      ],
+      "surfaces": 1,
+      "vertex_colours": true,
+      "vertices": 3576
+    },
+    {
+      "asset": "pine_1",
+      "centre_xz": [
+        0.06,
+        0.06
+      ],
+      "colours_ok": true,
+      "expected_footprint": [
+        1,
+        1
+      ],
+      "ground_ok": true,
+      "lod_ok": true,
+      "lod_ratio": 0.24,
+      "lod_vertices": 392,
+      "materials": [
+        {
+          "auto_lods": 0,
+          "cast_shadow": true,
+          "class": "ShaderMaterial",
+          "node": "solid",
+          "shader": "aminas_voxel.gdshader",
+          "unshaded": false
+        }
+      ],
+      "materials_ok": true,
+      "min_y": 0,
+      "pivot_ok": true,
+      "scale_ok": true,
+      "size": [
+        1.13,
+        1.88,
+        1.13
+      ],
+      "surfaces": 1,
+      "vertex_colours": true,
+      "vertices": 1624
+    },
+    {
+      "asset": "pond_1",
+      "centre_xz": [
+        0,
+        0
+      ],
+      "colours_ok": true,
+      "expected_footprint": [
+        2,
+        2
+      ],
+      "ground_ok": true,
+      "lod_ok": true,
+      "lod_ratio": 0.22,
+      "lod_vertices": 448,
+      "materials": [
+        {
+          "auto_lods": 0,
+          "cast_shadow": true,
+          "class": "ShaderMaterial",
+          "node": "solid",
+          "shader": "aminas_voxel.gdshader",
+          "unshaded": false
+        }
+      ],
+      "materials_ok": true,
+      "min_y": 0,
+      "pivot_ok": true,
+      "scale_ok": true,
+      "size": [
+        1.75,
+        0.5,
+        1.75
+      ],
+      "surfaces": 1,
+      "vertex_colours": true,
+      "vertices": 2064
+    },
+    {
+      "asset": "r_forge",
+      "centre_xz": [
+        0,
+        0
+      ],
+      "colours_ok": true,
+      "expected_footprint": [
+        3,
+        3
+      ],
+      "ground_ok": true,
+      "lod_ok": true,
+      "lod_ratio": 0.23,
+      "lod_vertices": 2224,
+      "materials": [
+        {
+          "auto_lods": 0,
+          "cast_shadow": true,
+          "class": "ShaderMaterial",
+          "node": "solid",
+          "shader": "aminas_voxel.gdshader",
+          "unshaded": false
+        }
+      ],
+      "materials_ok": true,
+      "min_y": 0,
+      "pivot_ok": true,
+      "scale_ok": true,
+      "size": [
+        3.5,
+        2.88,
+        3.5
+      ],
+      "surfaces": 1,
+      "vertex_colours": true,
+      "vertices": 9496
+    }
+  ],
+  "godot": "4.3-stable (official)",
+  "gpu": "llvmpipe (LLVM 20.1.2, 256 bits)",
+  "grove": {
+    "multimesh_nodes": 4,
+    "trees": 400
+  },
+  "renderer": "gl_compatibility"
+}

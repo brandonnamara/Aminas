@@ -30,7 +30,7 @@ let contextLost = false;
 const COARSE = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
 const PR_CAP = Math.min(window.devicePixelRatio || 1, COARSE ? 1.5 : 2);
 const Perf = () => window.A && window.A.Perf;
-const prCap = () => (Perf() && Perf().saver() ? 1 : PR_CAP);
+const prCap = () => (Perf() && Perf().tier ? Math.min(window.devicePixelRatio || 1, Perf().tier().prCap) : Perf() && Perf().saver() ? 1 : PR_CAP); // Phase 3: quality tier
 let pr = PR_CAP, slow = 0, quick = 0, sampled = 0, since = 0;
 function adapt(ms, now) {
   if (ms > 28) slow++; else if (ms < 18) quick++; sampled++;

@@ -82,12 +82,21 @@ export function mergeGeo(a, b) {
 
 
 // half resolution copy of a grid (see Model.lod in voxbuild.js)
-export function halfGrid(src, minFill) {
+export function halfGrid(src, minFill, exposedFirst) {
   const g = new VoxGrid(Math.floor(src.x0 / 2), Math.floor(src.y0 / 2), Math.floor(src.z0 / 2), Math.ceil(src.nx / 2) + 1, Math.ceil(src.ny / 2) + 1, Math.ceil(src.nz / 2) + 1);
   if (!src.count) return g;
+  // Phase 3: with exposedFirst, the colour is voted by the voxels the player can actually see (an empty neighbour),
+  // upper ones counting double. Roof shingles, wall plaster and window frames then keep their colour at half
+  // resolution, instead of the hidden core (dark timber, interior fill) winning the vote.
+  const open = (x, y, z) => !src.get(x + 1, y, z) || !src.get(x - 1, y, z) || !src.get(x, y + 1, z) || !src.get(x, y - 1, z) || !src.get(x, y, z + 1) || !src.get(x, y, z - 1);
   for (let y = g.y0; y < g.y0 + g.ny; y++) for (let z = g.z0; z < g.z0 + g.nz; z++) for (let x = g.x0; x < g.x0 + g.nx; x++) {
-    let n = 0, best = 0, bc = 0; const seen = [];
-    for (let dy = 0; dy < 2; dy++) for (let dz = 0; dz < 2; dz++) for (let dx = 0; dx < 2; dx++) { const v = src.get(x * 2 + dx, y * 2 + dy, z * 2 + dz); if (!v) continue; n++; let c = 1; for (let k = 0; k < seen.length; k++) if (seen[k] === v) c++; seen.push(v); if (c > bc) { bc = c; best = v; } }
+    let n = 0, best = 0, bc = 0; const seen = [], wt = [];
+    for (let dy = 0; dy < 2; dy++) for (let dz = 0; dz < 2; dz++) for (let dx = 0; dx < 2; dx++) {
+      const sx = x * 2 + dx, sy = y * 2 + dy, sz = z * 2 + dz, v = src.get(sx, sy, sz); if (!v) continue; n++;
+      const w = exposedFirst ? (open(sx, sy, sz) ? 2 : 0.25) * (1 + dy) : 1;
+      let k = seen.indexOf(v); if (k < 0) { k = seen.length; seen.push(v); wt.push(0); } wt[k] += w;
+      if (wt[k] > bc) { bc = wt[k]; best = v; }
+    }
     if (n >= minFill) { g.d[g.idx(x, y, z)] = best; g.count++; }
   }
   return g;

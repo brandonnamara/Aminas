@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-06T17:19:22.607Z",
+ "generated": "2026-11-06T18:42:26.906Z",
  "unit": "1 unit = 1 island cell (glb); 1 voxel = 1/8 cell (vox)",
  "assets": [
   {
@@ -16,6 +16,7 @@
    "note": "the island ground uses this layering at terrain scale",
    "files": [
     "glb/terrain/grassBlock.glb",
+    "glb/terrain/grassBlock_lod.glb",
     "vox/terrain/grassBlock.vox"
    ],
    "stats": [
@@ -49,6 +50,7 @@
    "note": "",
    "files": [
     "glb/terrain/soilBlock.glb",
+    "glb/terrain/soilBlock_lod.glb",
     "vox/terrain/soilBlock.vox"
    ],
    "stats": [
@@ -82,10 +84,13 @@
    "note": "",
    "files": [
     "glb/terrain/cliff_1.glb",
+    "glb/terrain/cliff_1_lod.glb",
     "vox/terrain/cliff_1.vox",
     "glb/terrain/cliff_2.glb",
+    "glb/terrain/cliff_2_lod.glb",
     "vox/terrain/cliff_2.vox",
     "glb/terrain/cliff_3.glb",
+    "glb/terrain/cliff_3_lod.glb",
     "vox/terrain/cliff_3.vox"
    ],
    "stats": [
@@ -101,7 +106,7 @@
      "voxels": 4008,
      "glow": 0,
      "tris": 4360,
-     "lodTris": 824
+     "lodTris": 872
     },
     {
      "variant": 2,
@@ -115,7 +120,7 @@
      "voxels": 4068,
      "glow": 0,
      "tris": 4192,
-     "lodTris": 836
+     "lodTris": 908
     },
     {
      "variant": 3,
@@ -129,7 +134,7 @@
      "voxels": 4041,
      "glow": 0,
      "tris": 4068,
-     "lodTris": 836
+     "lodTris": 856
     }
    ]
   },
@@ -147,6 +152,7 @@
    "note": "",
    "files": [
     "glb/terrain/islandEdge.glb",
+    "glb/terrain/islandEdge_lod.glb",
     "vox/terrain/islandEdge.vox"
    ],
    "stats": [
@@ -162,7 +168,7 @@
      "voxels": 3614,
      "glow": 0,
      "tris": 3984,
-     "lodTris": 960
+     "lodTris": 984
     }
    ]
   },
@@ -180,8 +186,10 @@
    "note": "",
    "files": [
     "glb/terrain/stonePillars_1.glb",
+    "glb/terrain/stonePillars_1_lod.glb",
     "vox/terrain/stonePillars_1.vox",
     "glb/terrain/stonePillars_2.glb",
+    "glb/terrain/stonePillars_2_lod.glb",
     "vox/terrain/stonePillars_2.vox"
    ],
    "stats": [
@@ -197,7 +205,7 @@
      "voxels": 416,
      "glow": 0,
      "tris": 1216,
-     "lodTris": 324
+     "lodTris": 376
     },
     {
      "variant": 2,
@@ -211,7 +219,7 @@
      "voxels": 416,
      "glow": 0,
      "tris": 1216,
-     "lodTris": 324
+     "lodTris": 376
     }
    ]
   },
@@ -229,8 +237,10 @@
    "note": "",
    "files": [
     "glb/terrain/outcrop_1.glb",
+    "glb/terrain/outcrop_1_lod.glb",
     "vox/terrain/outcrop_1.vox",
     "glb/terrain/outcrop_2.glb",
+    "glb/terrain/outcrop_2_lod.glb",
     "vox/terrain/outcrop_2.vox"
    ],
    "stats": [
@@ -246,7 +256,7 @@
      "voxels": 506,
      "glow": 0,
      "tris": 1324,
-     "lodTris": 316
+     "lodTris": 344
     },
     {
      "variant": 2,
@@ -260,7 +270,7 @@
      "voxels": 498,
      "glow": 0,
      "tris": 1348,
-     "lodTris": 312
+     "lodTris": 336
     }
    ]
   },
@@ -278,8 +288,10 @@
    "note": "",
    "files": [
     "glb/terrain/mossyRock_1.glb",
+    "glb/terrain/mossyRock_1_lod.glb",
     "vox/terrain/mossyRock_1.vox",
     "glb/terrain/mossyRock_2.glb",
+    "glb/terrain/mossyRock_2_lod.glb",
     "vox/terrain/mossyRock_2.vox"
    ],
    "stats": [
@@ -295,7 +307,7 @@
      "voxels": 451,
      "glow": 0,
      "tris": 892,
-     "lodTris": 232
+     "lodTris": 252
     },
     {
      "variant": 2,
@@ -309,7 +321,7 @@
      "voxels": 515,
      "glow": 0,
      "tris": 956,
-     "lodTris": 272
+     "lodTris": 276
     }
    ]
   },
@@ -327,6 +339,7 @@
    "note": "",
    "files": [
     "glb/terrain/boulder.glb",
+    "glb/terrain/boulder_lod.glb",
     "vox/terrain/boulder.vox"
    ],
    "stats": [
@@ -342,7 +355,7 @@
      "voxels": 631,
      "glow": 0,
      "tris": 1076,
-     "lodTris": 312
+     "lodTris": 340
     }
    ]
   },
@@ -360,6 +373,7 @@
    "note": "",
    "files": [
     "glb/terrain/pebble.glb",
+    "glb/terrain/pebble_lod.glb",
     "vox/terrain/pebble.vox"
    ],
    "stats": [
@@ -393,14 +407,19 @@
    "note": "one per magic hue",
    "files": [
     "glb/terrain/crystals_1.glb",
+    "glb/terrain/crystals_1_lod.glb",
     "vox/terrain/crystals_1.vox",
     "glb/terrain/crystals_2.glb",
+    "glb/terrain/crystals_2_lod.glb",
     "vox/terrain/crystals_2.vox",
     "glb/terrain/crystals_3.glb",
+    "glb/terrain/crystals_3_lod.glb",
     "vox/terrain/crystals_3.vox",
     "glb/terrain/crystals_4.glb",
+    "glb/terrain/crystals_4_lod.glb",
     "vox/terrain/crystals_4.vox",
     "glb/terrain/crystals_5.glb",
+    "glb/terrain/crystals_5_lod.glb",
     "vox/terrain/crystals_5.vox"
    ],
    "stats": [
@@ -416,7 +435,7 @@
      "voxels": 187,
      "glow": 36,
      "tris": 676,
-     "lodTris": 188
+     "lodTris": 164
     },
     {
      "variant": 2,
@@ -430,7 +449,7 @@
      "voxels": 187,
      "glow": 36,
      "tris": 676,
-     "lodTris": 188
+     "lodTris": 164
     },
     {
      "variant": 3,
@@ -444,7 +463,7 @@
      "voxels": 187,
      "glow": 36,
      "tris": 676,
-     "lodTris": 188
+     "lodTris": 164
     },
     {
      "variant": 4,
@@ -458,7 +477,7 @@
      "voxels": 187,
      "glow": 36,
      "tris": 676,
-     "lodTris": 188
+     "lodTris": 164
     },
     {
      "variant": 5,
@@ -472,7 +491,7 @@
      "voxels": 187,
      "glow": 36,
      "tris": 676,
-     "lodTris": 188
+     "lodTris": 164
     }
    ]
   },
@@ -490,6 +509,7 @@
    "note": "",
    "files": [
     "glb/terrain/caveMouth.glb",
+    "glb/terrain/caveMouth_lod.glb",
     "vox/terrain/caveMouth.vox"
    ],
    "stats": [
@@ -505,7 +525,7 @@
      "voxels": 1505,
      "glow": 4,
      "tris": 2244,
-     "lodTris": 588
+     "lodTris": 608
     }
    ]
   },
@@ -523,6 +543,7 @@
    "note": "",
    "files": [
     "glb/terrain/arch.glb",
+    "glb/terrain/arch_lod.glb",
     "vox/terrain/arch.vox"
    ],
    "stats": [
@@ -556,6 +577,7 @@
    "note": "",
    "files": [
     "glb/terrain/basalt.glb",
+    "glb/terrain/basalt_lod.glb",
     "vox/terrain/basalt.vox"
    ],
    "stats": [
@@ -571,7 +593,7 @@
      "voxels": 1084,
      "glow": 0,
      "tris": 3204,
-     "lodTris": 640
+     "lodTris": 608
     }
    ]
   },
@@ -589,6 +611,7 @@
    "note": "",
    "files": [
     "glb/terrain/monolithRing.glb",
+    "glb/terrain/monolithRing_lod.glb",
     "vox/terrain/monolithRing.vox"
    ],
    "stats": [
@@ -604,7 +627,7 @@
      "voxels": 184,
      "glow": 0,
      "tris": 832,
-     "lodTris": 184
+     "lodTris": 356
     }
    ]
   },
@@ -622,10 +645,13 @@
    "note": "",
    "files": [
     "glb/vegetation/oak_1.glb",
+    "glb/vegetation/oak_1_lod.glb",
     "vox/vegetation/oak_1.vox",
     "glb/vegetation/oak_2.glb",
+    "glb/vegetation/oak_2_lod.glb",
     "vox/vegetation/oak_2.vox",
     "glb/vegetation/oak_3.glb",
+    "glb/vegetation/oak_3_lod.glb",
     "vox/vegetation/oak_3.vox"
    ],
    "stats": [
@@ -641,7 +667,7 @@
      "voxels": 1114,
      "glow": 0,
      "tris": 1788,
-     "lodTris": 480
+     "lodTris": 536
     },
     {
      "variant": 2,
@@ -655,7 +681,7 @@
      "voxels": 647,
      "glow": 0,
      "tris": 1260,
-     "lodTris": 332
+     "lodTris": 380
     },
     {
      "variant": 3,
@@ -669,7 +695,7 @@
      "voxels": 1130,
      "glow": 0,
      "tris": 1804,
-     "lodTris": 480
+     "lodTris": 536
     }
    ]
   },
@@ -687,10 +713,13 @@
    "note": "",
    "files": [
     "glb/vegetation/oakOld_1.glb",
+    "glb/vegetation/oakOld_1_lod.glb",
     "vox/vegetation/oakOld_1.vox",
     "glb/vegetation/oakOld_2.glb",
+    "glb/vegetation/oakOld_2_lod.glb",
     "vox/vegetation/oakOld_2.vox",
     "glb/vegetation/oakOld_3.glb",
+    "glb/vegetation/oakOld_3_lod.glb",
     "vox/vegetation/oakOld_3.vox"
    ],
    "stats": [
@@ -706,7 +735,7 @@
      "voxels": 1310,
      "glow": 0,
      "tris": 2028,
-     "lodTris": 540
+     "lodTris": 592
     },
     {
      "variant": 2,
@@ -720,7 +749,7 @@
      "voxels": 1347,
      "glow": 0,
      "tris": 2056,
-     "lodTris": 544
+     "lodTris": 596
     },
     {
      "variant": 3,
@@ -734,7 +763,7 @@
      "voxels": 1360,
      "glow": 0,
      "tris": 2088,
-     "lodTris": 560
+     "lodTris": 596
     }
    ]
   },
@@ -752,10 +781,13 @@
    "note": "",
    "files": [
     "glb/vegetation/pine_1.glb",
+    "glb/vegetation/pine_1_lod.glb",
     "vox/vegetation/pine_1.vox",
     "glb/vegetation/pine_2.glb",
+    "glb/vegetation/pine_2_lod.glb",
     "vox/vegetation/pine_2.vox",
     "glb/vegetation/pine_3.glb",
+    "glb/vegetation/pine_3_lod.glb",
     "vox/vegetation/pine_3.vox"
    ],
    "stats": [
@@ -771,7 +803,7 @@
      "voxels": 327,
      "glow": 0,
      "tris": 812,
-     "lodTris": 196
+     "lodTris": 248
     },
     {
      "variant": 2,
@@ -785,7 +817,7 @@
      "voxels": 222,
      "glow": 0,
      "tris": 612,
-     "lodTris": 164
+     "lodTris": 196
     },
     {
      "variant": 3,
@@ -799,7 +831,7 @@
      "voxels": 351,
      "glow": 0,
      "tris": 812,
-     "lodTris": 212
+     "lodTris": 248
     }
    ]
   },
@@ -817,10 +849,13 @@
    "note": "",
    "files": [
     "glb/vegetation/birch_1.glb",
+    "glb/vegetation/birch_1_lod.glb",
     "vox/vegetation/birch_1.vox",
     "glb/vegetation/birch_2.glb",
+    "glb/vegetation/birch_2_lod.glb",
     "vox/vegetation/birch_2.vox",
     "glb/vegetation/birch_3.glb",
+    "glb/vegetation/birch_3_lod.glb",
     "vox/vegetation/birch_3.vox"
    ],
    "stats": [
@@ -836,7 +871,7 @@
      "voxels": 229,
      "glow": 0,
      "tris": 624,
-     "lodTris": 144
+     "lodTris": 208
     },
     {
      "variant": 2,
@@ -850,7 +885,7 @@
      "voxels": 194,
      "glow": 0,
      "tris": 548,
-     "lodTris": 112
+     "lodTris": 196
     },
     {
      "variant": 3,
@@ -864,7 +899,7 @@
      "voxels": 272,
      "glow": 0,
      "tris": 764,
-     "lodTris": 180
+     "lodTris": 252
     }
    ]
   },
@@ -882,10 +917,13 @@
    "note": "",
    "files": [
     "glb/vegetation/blossom_1.glb",
+    "glb/vegetation/blossom_1_lod.glb",
     "vox/vegetation/blossom_1.vox",
     "glb/vegetation/blossom_2.glb",
+    "glb/vegetation/blossom_2_lod.glb",
     "vox/vegetation/blossom_2.vox",
     "glb/vegetation/blossom_3.glb",
+    "glb/vegetation/blossom_3_lod.glb",
     "vox/vegetation/blossom_3.vox"
    ],
    "stats": [
@@ -901,7 +939,7 @@
      "voxels": 199,
      "glow": 0,
      "tris": 564,
-     "lodTris": 144
+     "lodTris": 180
     },
     {
      "variant": 2,
@@ -915,7 +953,7 @@
      "voxels": 179,
      "glow": 0,
      "tris": 572,
-     "lodTris": 136
+     "lodTris": 168
     },
     {
      "variant": 3,
@@ -929,7 +967,7 @@
      "voxels": 204,
      "glow": 0,
      "tris": 668,
-     "lodTris": 140
+     "lodTris": 216
     }
    ]
   },
@@ -947,10 +985,13 @@
    "note": "",
    "files": [
     "glb/vegetation/willow_1.glb",
+    "glb/vegetation/willow_1_lod.glb",
     "vox/vegetation/willow_1.vox",
     "glb/vegetation/willow_2.glb",
+    "glb/vegetation/willow_2_lod.glb",
     "vox/vegetation/willow_2.vox",
     "glb/vegetation/willow_3.glb",
+    "glb/vegetation/willow_3_lod.glb",
     "vox/vegetation/willow_3.vox"
    ],
    "stats": [
@@ -966,7 +1007,7 @@
      "voxels": 622,
      "glow": 0,
      "tris": 1672,
-     "lodTris": 300
+     "lodTris": 452
     },
     {
      "variant": 2,
@@ -980,7 +1021,7 @@
      "voxels": 622,
      "glow": 0,
      "tris": 1672,
-     "lodTris": 300
+     "lodTris": 436
     },
     {
      "variant": 3,
@@ -994,7 +1035,7 @@
      "voxels": 627,
      "glow": 0,
      "tris": 1712,
-     "lodTris": 308
+     "lodTris": 464
     }
    ]
   },
@@ -1012,10 +1053,13 @@
    "note": "",
    "files": [
     "glb/vegetation/glowcap_1.glb",
+    "glb/vegetation/glowcap_1_lod.glb",
     "vox/vegetation/glowcap_1.vox",
     "glb/vegetation/glowcap_2.glb",
+    "glb/vegetation/glowcap_2_lod.glb",
     "vox/vegetation/glowcap_2.vox",
     "glb/vegetation/glowcap_3.glb",
+    "glb/vegetation/glowcap_3_lod.glb",
     "vox/vegetation/glowcap_3.vox"
    ],
    "stats": [
@@ -1031,7 +1075,7 @@
      "voxels": 417,
      "glow": 97,
      "tris": 1260,
-     "lodTris": 390
+     "lodTris": 434
     },
     {
      "variant": 2,
@@ -1045,7 +1089,7 @@
      "voxels": 428,
      "glow": 97,
      "tris": 1320,
-     "lodTris": 400
+     "lodTris": 452
     },
     {
      "variant": 3,
@@ -1059,7 +1103,7 @@
      "voxels": 437,
      "glow": 97,
      "tris": 1368,
-     "lodTris": 414
+     "lodTris": 466
     }
    ]
   },
@@ -1077,10 +1121,13 @@
    "note": "",
    "files": [
     "glb/vegetation/crystalwood_1.glb",
+    "glb/vegetation/crystalwood_1_lod.glb",
     "vox/vegetation/crystalwood_1.vox",
     "glb/vegetation/crystalwood_2.glb",
+    "glb/vegetation/crystalwood_2_lod.glb",
     "vox/vegetation/crystalwood_2.vox",
     "glb/vegetation/crystalwood_3.glb",
+    "glb/vegetation/crystalwood_3_lod.glb",
     "vox/vegetation/crystalwood_3.vox"
    ],
    "stats": [
@@ -1096,7 +1143,7 @@
      "voxels": 234,
      "glow": 174,
      "tris": 652,
-     "lodTris": 204
+     "lodTris": 222
     },
     {
      "variant": 2,
@@ -1110,7 +1157,7 @@
      "voxels": 235,
      "glow": 138,
      "tris": 660,
-     "lodTris": 186
+     "lodTris": 224
     },
     {
      "variant": 3,
@@ -1124,7 +1171,7 @@
      "voxels": 236,
      "glow": 84,
      "tris": 668,
-     "lodTris": 186
+     "lodTris": 236
     }
    ]
   },
@@ -1142,10 +1189,13 @@
    "note": "",
    "files": [
     "glb/vegetation/charredTree_1.glb",
+    "glb/vegetation/charredTree_1_lod.glb",
     "vox/vegetation/charredTree_1.vox",
     "glb/vegetation/charredTree_2.glb",
+    "glb/vegetation/charredTree_2_lod.glb",
     "vox/vegetation/charredTree_2.vox",
     "glb/vegetation/charredTree_3.glb",
+    "glb/vegetation/charredTree_3_lod.glb",
     "vox/vegetation/charredTree_3.vox"
    ],
    "stats": [
@@ -1161,7 +1211,7 @@
      "voxels": 19,
      "glow": 1,
      "tris": 156,
-     "lodTris": 28
+     "lodTris": 60
     },
     {
      "variant": 2,
@@ -1175,7 +1225,7 @@
      "voxels": 21,
      "glow": 2,
      "tris": 172,
-     "lodTris": 36
+     "lodTris": 64
     },
     {
      "variant": 3,
@@ -1189,7 +1239,7 @@
      "voxels": 21,
      "glow": 1,
      "tris": 172,
-     "lodTris": 28
+     "lodTris": 68
     }
    ]
   },
@@ -1207,10 +1257,13 @@
    "note": "",
    "files": [
     "glb/vegetation/sapling_1.glb",
+    "glb/vegetation/sapling_1_lod.glb",
     "vox/vegetation/sapling_1.vox",
     "glb/vegetation/sapling_2.glb",
+    "glb/vegetation/sapling_2_lod.glb",
     "vox/vegetation/sapling_2.vox",
     "glb/vegetation/sapling_3.glb",
+    "glb/vegetation/sapling_3_lod.glb",
     "vox/vegetation/sapling_3.vox"
    ],
    "stats": [
@@ -1226,7 +1279,7 @@
      "voxels": 31,
      "glow": 0,
      "tris": 156,
-     "lodTris": 44
+     "lodTris": 56
     },
     {
      "variant": 2,
@@ -1240,7 +1293,7 @@
      "voxels": 48,
      "glow": 0,
      "tris": 212,
-     "lodTris": 44
+     "lodTris": 64
     },
     {
      "variant": 3,
@@ -1254,7 +1307,7 @@
      "voxels": 65,
      "glow": 0,
      "tris": 252,
-     "lodTris": 64
+     "lodTris": 104
     }
    ]
   },
@@ -1272,10 +1325,13 @@
    "note": "",
    "files": [
     "glb/vegetation/bush_1.glb",
+    "glb/vegetation/bush_1_lod.glb",
     "vox/vegetation/bush_1.vox",
     "glb/vegetation/bush_2.glb",
+    "glb/vegetation/bush_2_lod.glb",
     "vox/vegetation/bush_2.vox",
     "glb/vegetation/bush_3.glb",
+    "glb/vegetation/bush_3_lod.glb",
     "vox/vegetation/bush_3.vox"
    ],
    "stats": [
@@ -1291,7 +1347,7 @@
      "voxels": 124,
      "glow": 0,
      "tris": 388,
-     "lodTris": 112
+     "lodTris": 120
     },
     {
      "variant": 2,
@@ -1305,7 +1361,7 @@
      "voxels": 122,
      "glow": 0,
      "tris": 372,
-     "lodTris": 112
+     "lodTris": 120
     },
     {
      "variant": 3,
@@ -1319,7 +1375,7 @@
      "voxels": 123,
      "glow": 0,
      "tris": 376,
-     "lodTris": 112
+     "lodTris": 120
     }
    ]
   },
@@ -1337,10 +1393,13 @@
    "note": "",
    "files": [
     "glb/vegetation/roundBush_1.glb",
+    "glb/vegetation/roundBush_1_lod.glb",
     "vox/vegetation/roundBush_1.vox",
     "glb/vegetation/roundBush_2.glb",
+    "glb/vegetation/roundBush_2_lod.glb",
     "vox/vegetation/roundBush_2.vox",
     "glb/vegetation/roundBush_3.glb",
+    "glb/vegetation/roundBush_3_lod.glb",
     "vox/vegetation/roundBush_3.vox"
    ],
    "stats": [
@@ -1356,7 +1415,7 @@
      "voxels": 123,
      "glow": 0,
      "tris": 364,
-     "lodTris": 88
+     "lodTris": 116
     },
     {
      "variant": 2,
@@ -1370,7 +1429,7 @@
      "voxels": 129,
      "glow": 0,
      "tris": 384,
-     "lodTris": 88
+     "lodTris": 116
     },
     {
      "variant": 3,
@@ -1384,7 +1443,7 @@
      "voxels": 142,
      "glow": 0,
      "tris": 396,
-     "lodTris": 88
+     "lodTris": 116
     }
    ]
   },
@@ -1402,10 +1461,13 @@
    "note": "",
    "files": [
     "glb/vegetation/flowerBush_1.glb",
+    "glb/vegetation/flowerBush_1_lod.glb",
     "vox/vegetation/flowerBush_1.vox",
     "glb/vegetation/flowerBush_2.glb",
+    "glb/vegetation/flowerBush_2_lod.glb",
     "vox/vegetation/flowerBush_2.vox",
     "glb/vegetation/flowerBush_3.glb",
+    "glb/vegetation/flowerBush_3_lod.glb",
     "vox/vegetation/flowerBush_3.vox"
    ],
    "stats": [
@@ -1467,10 +1529,13 @@
    "note": "",
    "files": [
     "glb/vegetation/flowerPatch_1.glb",
+    "glb/vegetation/flowerPatch_1_lod.glb",
     "vox/vegetation/flowerPatch_1.vox",
     "glb/vegetation/flowerPatch_2.glb",
+    "glb/vegetation/flowerPatch_2_lod.glb",
     "vox/vegetation/flowerPatch_2.vox",
     "glb/vegetation/flowerPatch_3.glb",
+    "glb/vegetation/flowerPatch_3_lod.glb",
     "vox/vegetation/flowerPatch_3.vox"
    ],
    "stats": [
@@ -1486,7 +1551,7 @@
      "voxels": 24,
      "glow": 0,
      "tris": 200,
-     "lodTris": 12
+     "lodTris": 76
     },
     {
      "variant": 2,
@@ -1500,7 +1565,7 @@
      "voxels": 27,
      "glow": 0,
      "tris": 220,
-     "lodTris": 36
+     "lodTris": 84
     },
     {
      "variant": 3,
@@ -1514,7 +1579,7 @@
      "voxels": 24,
      "glow": 0,
      "tris": 224,
-     "lodTris": 12
+     "lodTris": 92
     }
    ]
   },
@@ -1532,10 +1597,13 @@
    "note": "",
    "files": [
     "glb/vegetation/tallGrass_1.glb",
+    "glb/vegetation/tallGrass_1_lod.glb",
     "vox/vegetation/tallGrass_1.vox",
     "glb/vegetation/tallGrass_2.glb",
+    "glb/vegetation/tallGrass_2_lod.glb",
     "vox/vegetation/tallGrass_2.vox",
     "glb/vegetation/tallGrass_3.glb",
+    "glb/vegetation/tallGrass_3_lod.glb",
     "vox/vegetation/tallGrass_3.vox"
    ],
    "stats": [
@@ -1551,7 +1619,7 @@
      "voxels": 24,
      "glow": 0,
      "tris": 152,
-     "lodTris": 20
+     "lodTris": 56
     },
     {
      "variant": 2,
@@ -1565,7 +1633,7 @@
      "voxels": 30,
      "glow": 0,
      "tris": 248,
-     "lodTris": 20
+     "lodTris": 64
     },
     {
      "variant": 3,
@@ -1579,7 +1647,7 @@
      "voxels": 29,
      "glow": 0,
      "tris": 208,
-     "lodTris": 36
+     "lodTris": 60
     }
    ]
   },
@@ -1597,10 +1665,13 @@
    "note": "",
    "files": [
     "glb/vegetation/fern_1.glb",
+    "glb/vegetation/fern_1_lod.glb",
     "vox/vegetation/fern_1.vox",
     "glb/vegetation/fern_2.glb",
+    "glb/vegetation/fern_2_lod.glb",
     "vox/vegetation/fern_2.vox",
     "glb/vegetation/fern_3.glb",
+    "glb/vegetation/fern_3_lod.glb",
     "vox/vegetation/fern_3.vox"
    ],
    "stats": [
@@ -1616,7 +1687,7 @@
      "voxels": 8,
      "glow": 0,
      "tris": 92,
-     "lodTris": 0
+     "lodTris": 12
     },
     {
      "variant": 2,
@@ -1630,7 +1701,7 @@
      "voxels": 8,
      "glow": 0,
      "tris": 92,
-     "lodTris": 0
+     "lodTris": 12
     },
     {
      "variant": 3,
@@ -1644,7 +1715,7 @@
      "voxels": 8,
      "glow": 0,
      "tris": 92,
-     "lodTris": 0
+     "lodTris": 12
     }
    ]
   },
@@ -1662,10 +1733,13 @@
    "note": "",
    "files": [
     "glb/vegetation/fernLarge_1.glb",
+    "glb/vegetation/fernLarge_1_lod.glb",
     "vox/vegetation/fernLarge_1.vox",
     "glb/vegetation/fernLarge_2.glb",
+    "glb/vegetation/fernLarge_2_lod.glb",
     "vox/vegetation/fernLarge_2.vox",
     "glb/vegetation/fernLarge_3.glb",
+    "glb/vegetation/fernLarge_3_lod.glb",
     "vox/vegetation/fernLarge_3.vox"
    ],
    "stats": [
@@ -1681,7 +1755,7 @@
      "voxels": 32,
      "glow": 0,
      "tris": 304,
-     "lodTris": 12
+     "lodTris": 52
     },
     {
      "variant": 2,
@@ -1695,7 +1769,7 @@
      "voxels": 31,
      "glow": 0,
      "tris": 300,
-     "lodTris": 12
+     "lodTris": 72
     },
     {
      "variant": 3,
@@ -1709,7 +1783,7 @@
      "voxels": 32,
      "glow": 0,
      "tris": 304,
-     "lodTris": 12
+     "lodTris": 80
     }
    ]
   },
@@ -1727,10 +1801,13 @@
    "note": "",
    "files": [
     "glb/vegetation/mushrooms_1.glb",
+    "glb/vegetation/mushrooms_1_lod.glb",
     "vox/vegetation/mushrooms_1.vox",
     "glb/vegetation/mushrooms_2.glb",
+    "glb/vegetation/mushrooms_2_lod.glb",
     "vox/vegetation/mushrooms_2.vox",
     "glb/vegetation/mushrooms_3.glb",
+    "glb/vegetation/mushrooms_3_lod.glb",
     "vox/vegetation/mushrooms_3.vox"
    ],
    "stats": [
@@ -1746,7 +1823,7 @@
      "voxels": 39,
      "glow": 0,
      "tris": 248,
-     "lodTris": 28
+     "lodTris": 80
     },
     {
      "variant": 2,
@@ -1760,7 +1837,7 @@
      "voxels": 36,
      "glow": 0,
      "tris": 232,
-     "lodTris": 28
+     "lodTris": 80
     },
     {
      "variant": 3,
@@ -1792,10 +1869,13 @@
    "note": "",
    "files": [
     "glb/vegetation/roots_1.glb",
+    "glb/vegetation/roots_1_lod.glb",
     "vox/vegetation/roots_1.vox",
     "glb/vegetation/roots_2.glb",
+    "glb/vegetation/roots_2_lod.glb",
     "vox/vegetation/roots_2.vox",
     "glb/vegetation/roots_3.glb",
+    "glb/vegetation/roots_3_lod.glb",
     "vox/vegetation/roots_3.vox"
    ],
    "stats": [
@@ -1811,7 +1891,7 @@
      "voxels": 34,
      "glow": 0,
      "tris": 276,
-     "lodTris": 20
+     "lodTris": 72
     },
     {
      "variant": 2,
@@ -1825,7 +1905,7 @@
      "voxels": 34,
      "glow": 0,
      "tris": 276,
-     "lodTris": 24
+     "lodTris": 72
     },
     {
      "variant": 3,
@@ -1839,7 +1919,7 @@
      "voxels": 32,
      "glow": 0,
      "tris": 260,
-     "lodTris": 20
+     "lodTris": 68
     }
    ]
   },
@@ -1857,6 +1937,7 @@
    "note": "",
    "files": [
     "glb/vegetation/stump.glb",
+    "glb/vegetation/stump_lod.glb",
     "vox/vegetation/stump.vox"
    ],
    "stats": [
@@ -1872,7 +1953,7 @@
      "voxels": 86,
      "glow": 0,
      "tris": 280,
-     "lodTris": 56
+     "lodTris": 96
     }
    ]
   },
@@ -1890,10 +1971,13 @@
    "note": "",
    "files": [
     "glb/vegetation/vines_1.glb",
+    "glb/vegetation/vines_1_lod.glb",
     "vox/vegetation/vines_1.vox",
     "glb/vegetation/vines_2.glb",
+    "glb/vegetation/vines_2_lod.glb",
     "vox/vegetation/vines_2.vox",
     "glb/vegetation/vines_3.glb",
+    "glb/vegetation/vines_3_lod.glb",
     "vox/vegetation/vines_3.vox"
    ],
    "stats": [
@@ -1909,7 +1993,7 @@
      "voxels": 35,
      "glow": 0,
      "tris": 384,
-     "lodTris": 0
+     "lodTris": 100
     },
     {
      "variant": 2,
@@ -1923,7 +2007,7 @@
      "voxels": 26,
      "glow": 0,
      "tris": 284,
-     "lodTris": 0
+     "lodTris": 72
     },
     {
      "variant": 3,
@@ -1937,7 +2021,7 @@
      "voxels": 33,
      "glow": 0,
      "tris": 364,
-     "lodTris": 0
+     "lodTris": 88
     }
    ]
   },
@@ -1955,8 +2039,10 @@
    "note": "",
    "files": [
     "glb/vegetation/hangingMoss_1.glb",
+    "glb/vegetation/hangingMoss_1_lod.glb",
     "vox/vegetation/hangingMoss_1.vox",
     "glb/vegetation/hangingMoss_2.glb",
+    "glb/vegetation/hangingMoss_2_lod.glb",
     "vox/vegetation/hangingMoss_2.vox"
    ],
    "stats": [
@@ -1972,7 +2058,7 @@
      "voxels": 58,
      "glow": 0,
      "tris": 356,
-     "lodTris": 80
+     "lodTris": 116
     },
     {
      "variant": 2,
@@ -1986,7 +2072,7 @@
      "voxels": 54,
      "glow": 0,
      "tris": 360,
-     "lodTris": 72
+     "lodTris": 112
     }
    ]
   },
@@ -2004,6 +2090,7 @@
    "note": "",
    "files": [
     "glb/architecture/materialBoard.glb",
+    "glb/architecture/materialBoard_lod.glb",
     "vox/architecture/materialBoard.vox"
    ],
    "stats": [
@@ -2037,6 +2124,7 @@
    "note": "",
    "files": [
     "glb/architecture/kitSampler.glb",
+    "glb/architecture/kitSampler_lod.glb",
     "vox/architecture/kitSampler.vox"
    ],
    "stats": [
@@ -2052,7 +2140,7 @@
      "voxels": 4483,
      "glow": 142,
      "tris": 14916,
-     "lodTris": 3624
+     "lodTris": 4342
     }
    ]
   },
@@ -2070,6 +2158,7 @@
    "note": "",
    "files": [
     "glb/architecture/habitatCottage.glb",
+    "glb/architecture/habitatCottage_lod.glb",
     "vox/architecture/habitatCottage.vox"
    ],
    "stats": [
@@ -2085,7 +2174,7 @@
      "voxels": 1689,
      "glow": 39,
      "tris": 7464,
-     "lodTris": 1246
+     "lodTris": 1622
     }
    ]
   },
@@ -2103,6 +2192,7 @@
    "note": "",
    "files": [
     "glb/architecture/resourceGranary.glb",
+    "glb/architecture/resourceGranary_lod.glb",
     "vox/architecture/resourceGranary.vox"
    ],
    "stats": [
@@ -2118,7 +2208,7 @@
      "voxels": 1641,
      "glow": 46,
      "tris": 7684,
-     "lodTris": 1712
+     "lodTris": 1874
     }
    ]
   },
@@ -2136,6 +2226,7 @@
    "note": "",
    "files": [
     "glb/architecture/breedingLodge.glb",
+    "glb/architecture/breedingLodge_lod.glb",
     "vox/architecture/breedingLodge.vox"
    ],
    "stats": [
@@ -2151,7 +2242,7 @@
      "voxels": 2444,
      "glow": 38,
      "tris": 4312,
-     "lodTris": 996
+     "lodTris": 1046
     }
    ]
   },
@@ -2169,6 +2260,7 @@
    "note": "",
    "files": [
     "glb/architecture/craftWorkshop.glb",
+    "glb/architecture/craftWorkshop_lod.glb",
     "vox/architecture/craftWorkshop.vox"
    ],
    "stats": [
@@ -2184,7 +2276,7 @@
      "voxels": 2788,
      "glow": 61,
      "tris": 6868,
-     "lodTris": 1646
+     "lodTris": 1762
     }
    ]
   },
@@ -2202,6 +2294,7 @@
    "note": "",
    "files": [
     "glb/architecture/decorGazebo.glb",
+    "glb/architecture/decorGazebo_lod.glb",
     "vox/architecture/decorGazebo.vox"
    ],
    "stats": [
@@ -2217,7 +2310,7 @@
      "voxels": 2165,
      "glow": 8,
      "tris": 3892,
-     "lodTris": 960
+     "lodTris": 1100
     }
    ]
   },
@@ -2235,6 +2328,7 @@
    "note": "",
    "files": [
     "glb/architecture/magicSpire.glb",
+    "glb/architecture/magicSpire_lod.glb",
     "vox/architecture/magicSpire.vox"
    ],
    "stats": [
@@ -2250,7 +2344,7 @@
      "voxels": 3056,
      "glow": 51,
      "tris": 4584,
-     "lodTris": 1180
+     "lodTris": 1310
     }
    ]
   },
@@ -2268,10 +2362,13 @@
    "note": "variants are levels 1-3",
    "files": [
     "glb/buildings/b_hatchery_1.glb",
+    "glb/buildings/b_hatchery_1_lod.glb",
     "vox/buildings/b_hatchery_1.vox",
     "glb/buildings/b_hatchery_2.glb",
+    "glb/buildings/b_hatchery_2_lod.glb",
     "vox/buildings/b_hatchery_2.vox",
     "glb/buildings/b_hatchery_3.glb",
+    "glb/buildings/b_hatchery_3_lod.glb",
     "vox/buildings/b_hatchery_3.vox"
    ],
    "stats": [
@@ -2287,7 +2384,7 @@
      "voxels": 6452,
      "glow": 954,
      "tris": 13788,
-     "lodTris": 3004
+     "lodTris": 3176
     },
     {
      "variant": 2,
@@ -2301,7 +2398,7 @@
      "voxels": 6489,
      "glow": 960,
      "tris": 13904,
-     "lodTris": 3050
+     "lodTris": 3176
     },
     {
      "variant": 3,
@@ -2315,7 +2412,7 @@
      "voxels": 6549,
      "glow": 884,
      "tris": 14008,
-     "lodTris": 3106
+     "lodTris": 3212
     }
    ]
   },
@@ -2333,6 +2430,7 @@
    "note": "",
    "files": [
     "glb/ruins/r_hatchery.glb",
+    "glb/ruins/r_hatchery_lod.glb",
     "vox/ruins/r_hatchery.vox"
    ],
    "stats": [
@@ -2348,7 +2446,7 @@
      "voxels": 1821,
      "glow": 4,
      "tris": 4596,
-     "lodTris": 1028
+     "lodTris": 1220
     }
    ]
   },
@@ -2366,10 +2464,13 @@
    "note": "variants are levels 1-3",
    "files": [
     "glb/buildings/b_hollow_1.glb",
+    "glb/buildings/b_hollow_1_lod.glb",
     "vox/buildings/b_hollow_1.vox",
     "glb/buildings/b_hollow_2.glb",
+    "glb/buildings/b_hollow_2_lod.glb",
     "vox/buildings/b_hollow_2.vox",
     "glb/buildings/b_hollow_3.glb",
+    "glb/buildings/b_hollow_3_lod.glb",
     "vox/buildings/b_hollow_3.vox"
    ],
    "stats": [
@@ -2385,7 +2486,7 @@
      "voxels": 2990,
      "glow": 55,
      "tris": 5200,
-     "lodTris": 1182
+     "lodTris": 1388
     },
     {
      "variant": 2,
@@ -2399,7 +2500,7 @@
      "voxels": 2994,
      "glow": 56,
      "tris": 5232,
-     "lodTris": 1194
+     "lodTris": 1392
     },
     {
      "variant": 3,
@@ -2413,7 +2514,7 @@
      "voxels": 2994,
      "glow": 56,
      "tris": 5232,
-     "lodTris": 1194
+     "lodTris": 1392
     }
    ]
   },
@@ -2431,6 +2532,7 @@
    "note": "",
    "files": [
     "glb/ruins/r_hollow.glb",
+    "glb/ruins/r_hollow_lod.glb",
     "vox/ruins/r_hollow.vox"
    ],
    "stats": [
@@ -2446,7 +2548,7 @@
      "voxels": 1550,
      "glow": 0,
      "tris": 3860,
-     "lodTris": 880
+     "lodTris": 1024
     }
    ]
   },
@@ -2464,10 +2566,13 @@
    "note": "variants are levels 1-3",
    "files": [
     "glb/buildings/b_tidegate_1.glb",
+    "glb/buildings/b_tidegate_1_lod.glb",
     "vox/buildings/b_tidegate_1.vox",
     "glb/buildings/b_tidegate_2.glb",
+    "glb/buildings/b_tidegate_2_lod.glb",
     "vox/buildings/b_tidegate_2.vox",
     "glb/buildings/b_tidegate_3.glb",
+    "glb/buildings/b_tidegate_3_lod.glb",
     "vox/buildings/b_tidegate_3.vox"
    ],
    "stats": [
@@ -2483,7 +2588,7 @@
      "voxels": 2422,
      "glow": 288,
      "tris": 5104,
-     "lodTris": 1304
+     "lodTris": 1332
     },
     {
      "variant": 2,
@@ -2497,7 +2602,7 @@
      "voxels": 2430,
      "glow": 290,
      "tris": 5168,
-     "lodTris": 1328
+     "lodTris": 1348
     },
     {
      "variant": 3,
@@ -2511,7 +2616,7 @@
      "voxels": 2430,
      "glow": 290,
      "tris": 5168,
-     "lodTris": 1328
+     "lodTris": 1348
     }
    ]
   },
@@ -2529,6 +2634,7 @@
    "note": "",
    "files": [
     "glb/ruins/r_tidegate.glb",
+    "glb/ruins/r_tidegate_lod.glb",
     "vox/ruins/r_tidegate.vox"
    ],
    "stats": [
@@ -2544,7 +2650,7 @@
      "voxels": 1249,
      "glow": 12,
      "tris": 3068,
-     "lodTris": 744
+     "lodTris": 750
     }
    ]
   },
@@ -2562,10 +2668,13 @@
    "note": "variants are levels 1-3",
    "files": [
     "glb/buildings/b_moonshrine_1.glb",
+    "glb/buildings/b_moonshrine_1_lod.glb",
     "vox/buildings/b_moonshrine_1.vox",
     "glb/buildings/b_moonshrine_2.glb",
+    "glb/buildings/b_moonshrine_2_lod.glb",
     "vox/buildings/b_moonshrine_2.vox",
     "glb/buildings/b_moonshrine_3.glb",
+    "glb/buildings/b_moonshrine_3_lod.glb",
     "vox/buildings/b_moonshrine_3.vox"
    ],
    "stats": [
@@ -2581,7 +2690,7 @@
      "voxels": 1971,
      "glow": 54,
      "tris": 4260,
-     "lodTris": 912
+     "lodTris": 1276
     },
     {
      "variant": 2,
@@ -2595,7 +2704,7 @@
      "voxels": 1979,
      "glow": 56,
      "tris": 4324,
-     "lodTris": 936
+     "lodTris": 1276
     },
     {
      "variant": 3,
@@ -2609,7 +2718,7 @@
      "voxels": 1979,
      "glow": 56,
      "tris": 4324,
-     "lodTris": 936
+     "lodTris": 1276
     }
    ]
   },
@@ -2627,6 +2736,7 @@
    "note": "",
    "files": [
     "glb/ruins/r_moonshrine.glb",
+    "glb/ruins/r_moonshrine_lod.glb",
     "vox/ruins/r_moonshrine.vox"
    ],
    "stats": [
@@ -2642,7 +2752,7 @@
      "voxels": 1082,
      "glow": 2,
      "tris": 2556,
-     "lodTris": 460
+     "lodTris": 780
     }
    ]
   },
@@ -2660,10 +2770,13 @@
    "note": "variants are levels 1-3",
    "files": [
     "glb/buildings/b_reliquarygate_1.glb",
+    "glb/buildings/b_reliquarygate_1_lod.glb",
     "vox/buildings/b_reliquarygate_1.vox",
     "glb/buildings/b_reliquarygate_2.glb",
+    "glb/buildings/b_reliquarygate_2_lod.glb",
     "vox/buildings/b_reliquarygate_2.vox",
     "glb/buildings/b_reliquarygate_3.glb",
+    "glb/buildings/b_reliquarygate_3_lod.glb",
     "vox/buildings/b_reliquarygate_3.vox"
    ],
    "stats": [
@@ -2679,7 +2792,7 @@
      "voxels": 3616,
      "glow": 10,
      "tris": 4024,
-     "lodTris": 996
+     "lodTris": 1076
     },
     {
      "variant": 2,
@@ -2693,7 +2806,7 @@
      "voxels": 3616,
      "glow": 10,
      "tris": 4024,
-     "lodTris": 996
+     "lodTris": 1076
     },
     {
      "variant": 3,
@@ -2707,7 +2820,7 @@
      "voxels": 3616,
      "glow": 10,
      "tris": 4024,
-     "lodTris": 996
+     "lodTris": 1076
     }
    ]
   },
@@ -2725,6 +2838,7 @@
    "note": "",
    "files": [
     "glb/ruins/r_reliquarygate.glb",
+    "glb/ruins/r_reliquarygate_lod.glb",
     "vox/ruins/r_reliquarygate.vox"
    ],
    "stats": [
@@ -2740,7 +2854,7 @@
      "voxels": 3606,
      "glow": 0,
      "tris": 3964,
-     "lodTris": 960
+     "lodTris": 1068
     }
    ]
   },
@@ -2758,10 +2872,13 @@
    "note": "variants are levels 1-3",
    "files": [
     "glb/buildings/b_forge_1.glb",
+    "glb/buildings/b_forge_1_lod.glb",
     "vox/buildings/b_forge_1.vox",
     "glb/buildings/b_forge_2.glb",
+    "glb/buildings/b_forge_2_lod.glb",
     "vox/buildings/b_forge_2.vox",
     "glb/buildings/b_forge_3.glb",
+    "glb/buildings/b_forge_3_lod.glb",
     "vox/buildings/b_forge_3.vox"
    ],
    "stats": [
@@ -2777,7 +2894,7 @@
      "voxels": 2183,
      "glow": 41,
      "tris": 8764,
-     "lodTris": 1612
+     "lodTris": 2094
     },
     {
      "variant": 2,
@@ -2791,7 +2908,7 @@
      "voxels": 2205,
      "glow": 42,
      "tris": 8820,
-     "lodTris": 1624
+     "lodTris": 2102
     },
     {
      "variant": 3,
@@ -2805,7 +2922,7 @@
      "voxels": 2205,
      "glow": 42,
      "tris": 8820,
-     "lodTris": 1624
+     "lodTris": 2102
     }
    ]
   },
@@ -2823,6 +2940,7 @@
    "note": "",
    "files": [
     "glb/ruins/r_forge.glb",
+    "glb/ruins/r_forge_lod.glb",
     "vox/ruins/r_forge.vox"
    ],
    "stats": [
@@ -2838,7 +2956,7 @@
      "voxels": 1302,
      "glow": 0,
      "tris": 4748,
-     "lodTris": 1112
+     "lodTris": 1304
     }
    ]
   },
@@ -2856,10 +2974,13 @@
    "note": "variants are levels 1-3",
    "files": [
     "glb/buildings/b_farm_1.glb",
+    "glb/buildings/b_farm_1_lod.glb",
     "vox/buildings/b_farm_1.vox",
     "glb/buildings/b_farm_2.glb",
+    "glb/buildings/b_farm_2_lod.glb",
     "vox/buildings/b_farm_2.vox",
     "glb/buildings/b_farm_3.glb",
+    "glb/buildings/b_farm_3_lod.glb",
     "vox/buildings/b_farm_3.vox"
    ],
    "stats": [
@@ -2875,7 +2996,7 @@
      "voxels": 897,
      "glow": 0,
      "tris": 4080,
-     "lodTris": 720
+     "lodTris": 804
     },
     {
      "variant": 2,
@@ -2889,7 +3010,7 @@
      "voxels": 897,
      "glow": 0,
      "tris": 4080,
-     "lodTris": 720
+     "lodTris": 804
     },
     {
      "variant": 3,
@@ -2903,7 +3024,7 @@
      "voxels": 897,
      "glow": 0,
      "tris": 4080,
-     "lodTris": 720
+     "lodTris": 804
     }
    ]
   },
@@ -2921,10 +3042,13 @@
    "note": "variants are levels 1-3",
    "files": [
     "glb/buildings/b_mine_1.glb",
+    "glb/buildings/b_mine_1_lod.glb",
     "vox/buildings/b_mine_1.vox",
     "glb/buildings/b_mine_2.glb",
+    "glb/buildings/b_mine_2_lod.glb",
     "vox/buildings/b_mine_2.vox",
     "glb/buildings/b_mine_3.glb",
+    "glb/buildings/b_mine_3_lod.glb",
     "vox/buildings/b_mine_3.vox"
    ],
    "stats": [
@@ -2940,7 +3064,7 @@
      "voxels": 1084,
      "glow": 4,
      "tris": 1792,
-     "lodTris": 478
+     "lodTris": 520
     },
     {
      "variant": 2,
@@ -2954,7 +3078,7 @@
      "voxels": 1088,
      "glow": 5,
      "tris": 1828,
-     "lodTris": 490
+     "lodTris": 528
     },
     {
      "variant": 3,
@@ -2968,7 +3092,7 @@
      "voxels": 1088,
      "glow": 5,
      "tris": 1828,
-     "lodTris": 490
+     "lodTris": 528
     }
    ]
   },
@@ -2986,18 +3110,25 @@
    "note": "variants are elements",
    "files": [
     "glb/buildings/b_habitat_1.glb",
+    "glb/buildings/b_habitat_1_lod.glb",
     "vox/buildings/b_habitat_1.vox",
     "glb/buildings/b_habitat_2.glb",
+    "glb/buildings/b_habitat_2_lod.glb",
     "vox/buildings/b_habitat_2.vox",
     "glb/buildings/b_habitat_3.glb",
+    "glb/buildings/b_habitat_3_lod.glb",
     "vox/buildings/b_habitat_3.vox",
     "glb/buildings/b_habitat_4.glb",
+    "glb/buildings/b_habitat_4_lod.glb",
     "vox/buildings/b_habitat_4.vox",
     "glb/buildings/b_habitat_5.glb",
+    "glb/buildings/b_habitat_5_lod.glb",
     "vox/buildings/b_habitat_5.vox",
     "glb/buildings/b_habitat_6.glb",
+    "glb/buildings/b_habitat_6_lod.glb",
     "vox/buildings/b_habitat_6.vox",
     "glb/buildings/b_habitat_7.glb",
+    "glb/buildings/b_habitat_7_lod.glb",
     "vox/buildings/b_habitat_7.vox"
    ],
    "stats": [
@@ -3013,7 +3144,7 @@
      "voxels": 2026,
      "glow": 16,
      "tris": 7936,
-     "lodTris": 1684
+     "lodTris": 1826
     },
     {
      "variant": 2,
@@ -3027,7 +3158,7 @@
      "voxels": 1718,
      "glow": 41,
      "tris": 7492,
-     "lodTris": 1570
+     "lodTris": 1778
     },
     {
      "variant": 3,
@@ -3041,7 +3172,7 @@
      "voxels": 1702,
      "glow": 14,
      "tris": 4892,
-     "lodTris": 1144
+     "lodTris": 1256
     },
     {
      "variant": 4,
@@ -3055,7 +3186,7 @@
      "voxels": 1556,
      "glow": 20,
      "tris": 7080,
-     "lodTris": 1490
+     "lodTris": 1614
     },
     {
      "variant": 5,
@@ -3069,7 +3200,7 @@
      "voxels": 1822,
      "glow": 33,
      "tris": 7600,
-     "lodTris": 1588
+     "lodTris": 1778
     },
     {
      "variant": 6,
@@ -3083,7 +3214,7 @@
      "voxels": 1781,
      "glow": 29,
      "tris": 6148,
-     "lodTris": 1396
+     "lodTris": 1494
     },
     {
      "variant": 7,
@@ -3097,7 +3228,7 @@
      "voxels": 1459,
      "glow": 16,
      "tris": 7016,
-     "lodTris": 1392
+     "lodTris": 1638
     }
    ]
   },
@@ -3115,6 +3246,7 @@
    "note": "",
    "files": [
     "glb/ruins/r_habitat.glb",
+    "glb/ruins/r_habitat_lod.glb",
     "vox/ruins/r_habitat.vox"
    ],
    "stats": [
@@ -3130,7 +3262,7 @@
      "voxels": 717,
      "glow": 0,
      "tris": 3280,
-     "lodTris": 732
+     "lodTris": 832
     }
    ]
   },
@@ -3148,6 +3280,7 @@
    "note": "variants are levels 1-3",
    "files": [
     "glb/buildings/b_lantern.glb",
+    "glb/buildings/b_lantern_lod.glb",
     "vox/buildings/b_lantern.vox"
    ],
    "stats": [
@@ -3163,7 +3296,7 @@
      "voxels": 60,
      "glow": 27,
      "tris": 272,
-     "lodTris": 62
+     "lodTris": 132
     }
    ]
   },
@@ -3181,6 +3314,7 @@
    "note": "variants are levels 1-3",
    "files": [
     "glb/buildings/b_festlantern.glb",
+    "glb/buildings/b_festlantern_lod.glb",
     "vox/buildings/b_festlantern.vox"
    ],
    "stats": [
@@ -3196,7 +3330,7 @@
      "voxels": 59,
      "glow": 36,
      "tris": 252,
-     "lodTris": 76
+     "lodTris": 128
     }
    ]
   },
@@ -3214,6 +3348,7 @@
    "note": "variants are levels 1-3",
    "files": [
     "glb/buildings/b_flowerbed.glb",
+    "glb/buildings/b_flowerbed_lod.glb",
     "vox/buildings/b_flowerbed.vox"
    ],
    "stats": [
@@ -3229,7 +3364,7 @@
      "voxels": 106,
      "glow": 0,
      "tris": 448,
-     "lodTris": 80
+     "lodTris": 120
     }
    ]
   },
@@ -3247,6 +3382,7 @@
    "note": "variants are levels 1-3",
    "files": [
     "glb/buildings/b_bench.glb",
+    "glb/buildings/b_bench_lod.glb",
     "vox/buildings/b_bench.vox"
    ],
    "stats": [
@@ -3262,7 +3398,7 @@
      "voxels": 113,
      "glow": 0,
      "tris": 564,
-     "lodTris": 120
+     "lodTris": 192
     }
    ]
   },
@@ -3280,6 +3416,7 @@
    "note": "variants are levels 1-3",
    "files": [
     "glb/buildings/b_statue.glb",
+    "glb/buildings/b_statue_lod.glb",
     "vox/buildings/b_statue.vox"
    ],
    "stats": [
@@ -3295,7 +3432,7 @@
      "voxels": 978,
      "glow": 0,
      "tris": 1972,
-     "lodTris": 416
+     "lodTris": 552
     }
    ]
   },
@@ -3313,6 +3450,7 @@
    "note": "variants are levels 1-3",
    "files": [
     "glb/buildings/b_fountain.glb",
+    "glb/buildings/b_fountain_lod.glb",
     "vox/buildings/b_fountain.vox"
    ],
    "stats": [
@@ -3328,7 +3466,7 @@
      "voxels": 536,
      "glow": 104,
      "tris": 1328,
-     "lodTris": 392
+     "lodTris": 384
     }
    ]
   },
@@ -3346,8 +3484,10 @@
    "note": "",
    "files": [
     "glb/decor/lanternPost_1.glb",
+    "glb/decor/lanternPost_1_lod.glb",
     "vox/decor/lanternPost_1.vox",
     "glb/decor/lanternPost_2.glb",
+    "glb/decor/lanternPost_2_lod.glb",
     "vox/decor/lanternPost_2.vox"
    ],
    "stats": [
@@ -3363,7 +3503,7 @@
      "voxels": 58,
      "glow": 18,
      "tris": 292,
-     "lodTris": 60
+     "lodTris": 128
     },
     {
      "variant": 2,
@@ -3377,7 +3517,7 @@
      "voxels": 58,
      "glow": 18,
      "tris": 292,
-     "lodTris": 60
+     "lodTris": 128
     }
    ]
   },
@@ -3395,6 +3535,7 @@
    "note": "",
    "files": [
     "glb/decor/torch.glb",
+    "glb/decor/torch_lod.glb",
     "vox/decor/torch.vox"
    ],
    "stats": [
@@ -3410,7 +3551,7 @@
      "voxels": 17,
      "glow": 3,
      "tris": 120,
-     "lodTris": 28
+     "lodTris": 52
     }
    ]
   },
@@ -3428,6 +3569,7 @@
    "note": "",
    "files": [
     "glb/decor/statue.glb",
+    "glb/decor/statue_lod.glb",
     "vox/decor/statue.vox"
    ],
    "stats": [
@@ -3443,7 +3585,7 @@
      "voxels": 978,
      "glow": 0,
      "tris": 1972,
-     "lodTris": 416
+     "lodTris": 552
     }
    ]
   },
@@ -3461,6 +3603,7 @@
    "note": "",
    "files": [
     "glb/decor/obelisk.glb",
+    "glb/decor/obelisk_lod.glb",
     "vox/decor/obelisk.vox"
    ],
    "stats": [
@@ -3476,7 +3619,7 @@
      "voxels": 408,
      "glow": 48,
      "tris": 992,
-     "lodTris": 280
+     "lodTris": 320
     }
    ]
   },
@@ -3494,8 +3637,10 @@
    "note": "",
    "files": [
     "glb/decor/columnRuin_1.glb",
+    "glb/decor/columnRuin_1_lod.glb",
     "vox/decor/columnRuin_1.vox",
     "glb/decor/columnRuin_2.glb",
+    "glb/decor/columnRuin_2_lod.glb",
     "vox/decor/columnRuin_2.vox"
    ],
    "stats": [
@@ -3511,7 +3656,7 @@
      "voxels": 201,
      "glow": 0,
      "tris": 544,
-     "lodTris": 128
+     "lodTris": 160
     },
     {
      "variant": 2,
@@ -3525,7 +3670,7 @@
      "voxels": 142,
      "glow": 0,
      "tris": 532,
-     "lodTris": 148
+     "lodTris": 168
     }
    ]
   },
@@ -3543,10 +3688,13 @@
    "note": "",
    "files": [
     "glb/decor/runeStone_1.glb",
+    "glb/decor/runeStone_1_lod.glb",
     "vox/decor/runeStone_1.vox",
     "glb/decor/runeStone_2.glb",
+    "glb/decor/runeStone_2_lod.glb",
     "vox/decor/runeStone_2.vox",
     "glb/decor/runeStone_3.glb",
+    "glb/decor/runeStone_3_lod.glb",
     "vox/decor/runeStone_3.vox"
    ],
    "stats": [
@@ -3562,7 +3710,7 @@
      "voxels": 134,
      "glow": 5,
      "tris": 436,
-     "lodTris": 118
+     "lodTris": 168
     },
     {
      "variant": 2,
@@ -3576,7 +3724,7 @@
      "voxels": 134,
      "glow": 5,
      "tris": 436,
-     "lodTris": 118
+     "lodTris": 168
     },
     {
      "variant": 3,
@@ -3590,7 +3738,7 @@
      "voxels": 134,
      "glow": 5,
      "tris": 436,
-     "lodTris": 118
+     "lodTris": 168
     }
    ]
   },
@@ -3608,6 +3756,7 @@
    "note": "",
    "files": [
     "glb/decor/orbPedestal.glb",
+    "glb/decor/orbPedestal_lod.glb",
     "vox/decor/orbPedestal.vox"
    ],
    "stats": [
@@ -3623,7 +3772,7 @@
      "voxels": 208,
      "glow": 56,
      "tris": 672,
-     "lodTris": 112
+     "lodTris": 208
     }
    ]
   },
@@ -3641,6 +3790,7 @@
    "note": "",
    "files": [
     "glb/decor/crystalPylon.glb",
+    "glb/decor/crystalPylon_lod.glb",
     "vox/decor/crystalPylon.vox"
    ],
    "stats": [
@@ -3656,7 +3806,7 @@
      "voxels": 149,
      "glow": 85,
      "tris": 480,
-     "lodTris": 144
+     "lodTris": 140
     }
    ]
   },
@@ -3674,6 +3824,7 @@
    "note": "",
    "files": [
     "glb/decor/barrel.glb",
+    "glb/decor/barrel_lod.glb",
     "vox/decor/barrel.vox"
    ],
    "stats": [
@@ -3689,7 +3840,7 @@
      "voxels": 144,
      "glow": 0,
      "tris": 384,
-     "lodTris": 64
+     "lodTris": 144
     }
    ]
   },
@@ -3707,10 +3858,13 @@
    "note": "",
    "files": [
     "glb/decor/crate_1.glb",
+    "glb/decor/crate_1_lod.glb",
     "vox/decor/crate_1.vox",
     "glb/decor/crate_2.glb",
+    "glb/decor/crate_2_lod.glb",
     "vox/decor/crate_2.vox",
     "glb/decor/crate_3.glb",
+    "glb/decor/crate_3_lod.glb",
     "vox/decor/crate_3.vox"
    ],
    "stats": [
@@ -3772,6 +3926,7 @@
    "note": "",
    "files": [
     "glb/decor/sacks.glb",
+    "glb/decor/sacks_lod.glb",
     "vox/decor/sacks.vox"
    ],
    "stats": [
@@ -3787,7 +3942,7 @@
      "voxels": 59,
      "glow": 0,
      "tris": 308,
-     "lodTris": 68
+     "lodTris": 92
     }
    ]
   },
@@ -3805,6 +3960,7 @@
    "note": "",
    "files": [
     "glb/decor/pots.glb",
+    "glb/decor/pots_lod.glb",
     "vox/decor/pots.vox"
    ],
    "stats": [
@@ -3820,7 +3976,7 @@
      "voxels": 28,
      "glow": 0,
      "tris": 160,
-     "lodTris": 24
+     "lodTris": 60
     }
    ]
   },
@@ -3838,6 +3994,7 @@
    "note": "",
    "files": [
     "glb/decor/bucket.glb",
+    "glb/decor/bucket_lod.glb",
     "vox/decor/bucket.vox"
    ],
    "stats": [
@@ -3871,6 +4028,7 @@
    "note": "",
    "files": [
     "glb/decor/logPile.glb",
+    "glb/decor/logPile_lod.glb",
     "vox/decor/logPile.vox"
    ],
    "stats": [
@@ -3904,6 +4062,7 @@
    "note": "",
    "files": [
     "glb/decor/cartWheel.glb",
+    "glb/decor/cartWheel_lod.glb",
     "vox/decor/cartWheel.vox"
    ],
    "stats": [
@@ -3919,7 +4078,7 @@
      "voxels": 30,
      "glow": 0,
      "tris": 292,
-     "lodTris": 12
+     "lodTris": 76
     }
    ]
   },
@@ -3937,6 +4096,7 @@
    "note": "",
    "files": [
     "glb/decor/haystack.glb",
+    "glb/decor/haystack_lod.glb",
     "vox/decor/haystack.vox"
    ],
    "stats": [
@@ -3952,7 +4112,7 @@
      "voxels": 208,
      "glow": 0,
      "tris": 512,
-     "lodTris": 128
+     "lodTris": 136
     }
    ]
   },
@@ -3970,6 +4130,7 @@
    "note": "",
    "files": [
     "glb/decor/signpost.glb",
+    "glb/decor/signpost_lod.glb",
     "vox/decor/signpost.vox"
    ],
    "stats": [
@@ -3985,7 +4146,7 @@
      "voxels": 35,
      "glow": 0,
      "tris": 244,
-     "lodTris": 40
+     "lodTris": 92
     }
    ]
   },
@@ -4003,6 +4164,7 @@
    "note": "",
    "files": [
     "glb/decor/bench.glb",
+    "glb/decor/bench_lod.glb",
     "vox/decor/bench.vox"
    ],
    "stats": [
@@ -4018,7 +4180,7 @@
      "voxels": 113,
      "glow": 0,
      "tris": 564,
-     "lodTris": 120
+     "lodTris": 192
     }
    ]
   },
@@ -4036,8 +4198,10 @@
    "note": "",
    "files": [
     "glb/water/pond_1.glb",
+    "glb/water/pond_1_lod.glb",
     "vox/water/pond_1.vox",
     "glb/water/pond_2.glb",
+    "glb/water/pond_2_lod.glb",
     "vox/water/pond_2.vox"
    ],
    "stats": [
@@ -4053,7 +4217,7 @@
      "voxels": 218,
      "glow": 0,
      "tris": 1032,
-     "lodTris": 224
+     "lodTris": 280
     },
     {
      "variant": 2,
@@ -4067,7 +4231,7 @@
      "voxels": 215,
      "glow": 0,
      "tris": 1008,
-     "lodTris": 224
+     "lodTris": 280
     }
    ]
   },
@@ -4085,8 +4249,10 @@
    "note": "",
    "files": [
     "glb/water/stream_1.glb",
+    "glb/water/stream_1_lod.glb",
     "vox/water/stream_1.vox",
     "glb/water/stream_2.glb",
+    "glb/water/stream_2_lod.glb",
     "vox/water/stream_2.vox"
    ],
    "stats": [
@@ -4134,6 +4300,7 @@
    "note": "",
    "files": [
     "glb/water/trough.glb",
+    "glb/water/trough_lod.glb",
     "vox/water/trough.vox"
    ],
    "stats": [
@@ -4167,6 +4334,7 @@
    "note": "",
    "files": [
     "glb/water/fountain.glb",
+    "glb/water/fountain_lod.glb",
     "vox/water/fountain.vox"
    ],
    "stats": [
@@ -4182,7 +4350,7 @@
      "voxels": 536,
      "glow": 104,
      "tris": 1328,
-     "lodTris": 392
+     "lodTris": 384
     }
    ]
   },
@@ -4200,10 +4368,13 @@
    "note": "",
    "files": [
     "glb/water/cloud_1.glb",
+    "glb/water/cloud_1_lod.glb",
     "vox/water/cloud_1.vox",
     "glb/water/cloud_2.glb",
+    "glb/water/cloud_2_lod.glb",
     "vox/water/cloud_2.vox",
     "glb/water/cloud_3.glb",
+    "glb/water/cloud_3_lod.glb",
     "vox/water/cloud_3.vox"
    ],
    "stats": [
@@ -4219,7 +4390,7 @@
      "voxels": 306,
      "glow": 0,
      "tris": 732,
-     "lodTris": 172
+     "lodTris": 204
     },
     {
      "variant": 2,
@@ -4233,7 +4404,7 @@
      "voxels": 244,
      "glow": 0,
      "tris": 712,
-     "lodTris": 184
+     "lodTris": 212
     },
     {
      "variant": 3,
@@ -4247,7 +4418,7 @@
      "voxels": 286,
      "glow": 0,
      "tris": 732,
-     "lodTris": 160
+     "lodTris": 208
     }
    ]
   },
@@ -4265,6 +4436,7 @@
    "note": "",
    "files": [
     "glb/water/jetty.glb",
+    "glb/water/jetty_lod.glb",
     "vox/water/jetty.vox"
    ],
    "stats": [
@@ -4280,7 +4452,7 @@
      "voxels": 437,
      "glow": 18,
      "tris": 2516,
-     "lodTris": 460
+     "lodTris": 836
     }
    ]
   },
@@ -4298,6 +4470,7 @@
    "note": "",
    "files": [
     "glb/water/skiff.glb",
+    "glb/water/skiff_lod.glb",
     "vox/water/skiff.vox"
    ],
    "stats": [
@@ -4313,7 +4486,7 @@
      "voxels": 1080,
      "glow": 0,
      "tris": 2116,
-     "lodTris": 484
+     "lodTris": 640
     }
    ]
   },
@@ -4331,6 +4504,7 @@
    "note": "",
    "files": [
     "glb/biomes/v_starter.glb",
+    "glb/biomes/v_starter_lod.glb",
     "vox/biomes/v_starter.vox"
    ],
    "stats": [
@@ -4346,7 +4520,7 @@
      "voxels": 22714,
      "glow": 50,
      "tris": 23080,
-     "lodTris": 4958
+     "lodTris": 5410
     }
    ]
   },
@@ -4364,6 +4538,7 @@
    "note": "",
    "files": [
     "glb/biomes/v_verdant.glb",
+    "glb/biomes/v_verdant_lod.glb",
     "vox/biomes/v_verdant.vox"
    ],
    "stats": [
@@ -4379,7 +4554,7 @@
      "voxels": 24212,
      "glow": 37,
      "tris": 23800,
-     "lodTris": 5194
+     "lodTris": 5556
     }
    ]
   },
@@ -4397,6 +4572,7 @@
    "note": "",
    "files": [
     "glb/biomes/v_obsidian.glb",
+    "glb/biomes/v_obsidian_lod.glb",
     "vox/biomes/v_obsidian.vox"
    ],
    "stats": [
@@ -4412,7 +4588,7 @@
      "voxels": 21902,
      "glow": 80,
      "tris": 22368,
-     "lodTris": 4718
+     "lodTris": 4876
     }
    ]
   },
@@ -4430,6 +4606,7 @@
    "note": "",
    "files": [
     "glb/biomes/v_celestial.glb",
+    "glb/biomes/v_celestial_lod.glb",
     "vox/biomes/v_celestial.vox"
    ],
    "stats": [
@@ -4445,7 +4622,7 @@
      "voxels": 22190,
      "glow": 658,
      "tris": 21448,
-     "lodTris": 4962
+     "lodTris": 5360
     }
    ]
   }

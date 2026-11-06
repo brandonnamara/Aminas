@@ -1,0 +1,105 @@
+{
+ "label": "before",
+ "runs": [
+  {
+   "z": 0.52,
+   "panFps": 1.9,
+   "drawMs": 5.6,
+   "tris": 169888,
+   "b": {
+    "terrain": 48116,
+    "buildings": 47720,
+    "nature": 62072,
+    "detail": 7584,
+    "far": 4396,
+    "fx": 0
+   },
+   "calls": 68,
+   "pr": 2,
+   "shadow": true,
+   "shadowMap": null,
+   "tier": null,
+   "lod": "off",
+   "terrainMs": 335.2,
+   "syncMs": 160.6,
+   "shownMs": 5610,
+   "errors": 0,
+   "scenario": "desktop default"
+  },
+  {
+   "z": 0.52,
+   "panFps": 3.4,
+   "drawMs": 4.2,
+   "tris": 169888,
+   "b": {
+    "terrain": 48116,
+    "buildings": 47720,
+    "nature": 62072,
+    "detail": 7584,
+    "far": 4396,
+    "fx": 0
+   },
+   "calls": 68,
+   "pr": 1.5,
+   "shadow": true,
+   "shadowMap": null,
+   "tier": null,
+   "lod": "off",
+   "terrainMs": 300.2,
+   "syncMs": 208.1,
+   "shownMs": 6269,
+   "errors": 0,
+   "scenario": "phone default"
+  },
+  {
+   "z": 0.38,
+   "panFps": 3.1,
+   "drawMs": 3.6,
+   "tris": 124988,
+   "b": {
+    "terrain": 48116,
+    "buildings": 47720,
+    "nature": 17172,
+    "detail": 7584,
+    "far": 4396,
+    "fx": 0
+   },
+   "calls": 73,
+   "pr": 1.5,
+   "shadow": true,
+   "shadowMap": null,
+   "tier": null,
+   "lod": "nature",
+   "terrainMs": 271.4,
+   "syncMs": 288.7,
+   "shownMs": 5938,
+   "errors": 0,
+   "scenario": "phone widest"
+  },
+  {
+   "z": 0.52,
+   "panFps": 9.5,
+   "drawMs": 3.7,
+   "tris": 88130,
+   "b": {
+    "terrain": 48116,
+    "buildings": 10862,
+    "nature": 17172,
+    "detail": 7584,
+    "far": 4396,
+    "fx": 0
+   },
+   "calls": 68,
+   "pr": 1,
+   "shadow": false,
+   "shadowMap": null,
+   "tier": null,
+   "lod": "all",
+   "terrainMs": 182.4,
+   "syncMs": 147.7,
+   "shownMs": 5815,
+   "errors": 0,
+   "scenario": "phone battery saver"
+  }
+ ]
+}

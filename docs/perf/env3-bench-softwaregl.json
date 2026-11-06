@@ -1,0 +1,203 @@
+{
+ "test": "Aminas island performance test",
+ "version": "0.7.0-dev",
+ "when": "2026-11-06T18:24:35.269Z",
+ "device": {
+  "ua": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.8010.12 Safari/537.36",
+  "dpr": 2,
+  "screen": [
+   844,
+   390
+  ],
+  "viewport": [
+   844,
+   390
+  ],
+  "cores": 2,
+  "memoryGB": 8,
+  "gpu": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+  "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+  "maxTexture": 8192,
+  "standalone": false
+ },
+ "loading": {
+  "pageInteractiveMs": 125,
+  "pageLoadedMs": 136,
+  "island3dModuleMs": 4501,
+  "island3dFirstShownMs": 4990,
+  "island3dShownSincePageStartMs": 5406
+ },
+ "phases": [
+  {
+   "phase": "idle",
+   "tier": "high",
+   "zoom": 0.5,
+   "seconds": 4.3,
+   "fps": 10.9,
+   "p50": 16.7,
+   "p95": 666.5,
+   "p99": 1866.7,
+   "worst": 1866.7,
+   "over33": 6,
+   "islandDraws": 14,
+   "islandCpuMs": 2.4,
+   "triangles": 165632,
+   "calls": 68,
+   "lod": "off",
+   "pixelRatio": 2,
+   "canvas": [
+    1688,
+    780
+   ],
+   "shadowMap": 2048
+  },
+  {
+   "phase": "pan",
+   "tier": "high",
+   "zoom": 0.5,
+   "seconds": 7,
+   "fps": 1,
+   "p50": 1133.3,
+   "p95": 2299.9,
+   "p99": 2299.9,
+   "worst": 2299.9,
+   "over33": 71,
+   "islandDraws": 7,
+   "islandCpuMs": 6,
+   "triangles": 165884,
+   "calls": 67,
+   "lod": "off",
+   "pixelRatio": 2,
+   "canvas": [
+    1688,
+    780
+   ],
+   "shadowMap": 2048
+  },
+  {
+   "phase": "pan, widest zoom",
+   "tier": "high",
+   "zoom": 0,
+   "seconds": 5.5,
+   "fps": 0.8,
+   "p50": 1183.3,
+   "p95": 2649.8,
+   "p99": 2649.8,
+   "worst": 2649.8,
+   "over33": 100,
+   "islandDraws": 5,
+   "islandCpuMs": 531.2,
+   "triangles": 125588,
+   "calls": 73,
+   "lod": "nature",
+   "pixelRatio": 2,
+   "canvas": [
+    1688,
+    780
+   ],
+   "shadowMap": 2048
+  },
+  {
+   "phase": "pan, closest zoom",
+   "tier": "high",
+   "zoom": 9,
+   "seconds": 5.5,
+   "fps": 1.7,
+   "p50": 799.9,
+   "p95": 1000,
+   "p99": 1000,
+   "worst": 1000,
+   "over33": 89,
+   "islandDraws": 10,
+   "islandCpuMs": 5.1,
+   "triangles": 136234,
+   "calls": 35,
+   "lod": "off",
+   "pixelRatio": 2,
+   "canvas": [
+    1688,
+    780
+   ],
+   "shadowMap": 2048
+  },
+  {
+   "phase": "pan, High",
+   "tier": "high",
+   "zoom": 0.5,
+   "seconds": 5.3,
+   "fps": 1.5,
+   "p50": 683.3,
+   "p95": 1199.9,
+   "p99": 1199.9,
+   "worst": 1199.9,
+   "over33": 100,
+   "islandDraws": 7,
+   "islandCpuMs": 4.6,
+   "triangles": 165884,
+   "calls": 67,
+   "lod": "off",
+   "pixelRatio": 2,
+   "canvas": [
+    1688,
+    780
+   ],
+   "shadowMap": 2048
+  },
+  {
+   "phase": "pan, Balanced",
+   "tier": "balanced",
+   "zoom": 0.5,
+   "seconds": 5.7,
+   "fps": 1.8,
+   "p50": 783.3,
+   "p95": 883.2,
+   "p99": 883.2,
+   "worst": 883.2,
+   "over33": 80,
+   "islandDraws": 9,
+   "islandCpuMs": 4,
+   "triangles": 165884,
+   "calls": 67,
+   "lod": "off",
+   "pixelRatio": 1.5,
+   "canvas": [
+    1266,
+    585
+   ],
+   "shadowMap": 1024
+  },
+  {
+   "phase": "pan, Battery saver",
+   "tier": "saver",
+   "zoom": 0.5,
+   "seconds": 5.7,
+   "fps": 2.1,
+   "p50": 616.7,
+   "p95": 1083.4,
+   "p99": 1083.4,
+   "worst": 1083.4,
+   "over33": 73,
+   "islandDraws": 10,
+   "islandCpuMs": 4.4,
+   "triangles": 88286,
+   "calls": 69,
+   "lod": "all",
+   "pixelRatio": 1,
+   "canvas": [
+    844,
+    390
+   ],
+   "shadowMap": 512
+  }
+ ],
+ "settings": {
+  "quality": "auto",
+  "batterySaver": false,
+  "autoSaver": false,
+  "autoTier": "high"
+ },
+ "heapStartMB": 26.3,
+ "heapEndMB": 26.3,
+ "cancelled": false,
+ "summary": "Aminas perf 0.7.0-dev · ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver), DPR 2, 844x390 · idle display 10.9 fps · pan 1 fps (p95 2299.9 ms, island CPU 6 ms) · widest 0.8, closest 1.7 · High 1.5 / Balanced 1.8 / Saver 2.1 fps · load: page 136 ms, island first shown 4990 ms"
+}

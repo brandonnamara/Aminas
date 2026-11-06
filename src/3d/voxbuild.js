@@ -47,7 +47,7 @@ class Model {
   // are filled, in its most common colour; glow survives if any of the block glows). About a quarter of the faces,
   // used at far zoom and in Battery saver.
   lod() {
-    const g = halfGrid(this.g, 3), l = halfGrid(this.l, 1), u = halfGrid(this.u, 3), any = (x, y, z) => g.get(x, y, z) !== 0 || l.get(x, y, z) !== 0 || u.get(x, y, z) !== 0;
+    const g = halfGrid(this.g, 2, true), l = halfGrid(this.l, 2), u = halfGrid(this.u, 3, true), any = (x, y, z) => g.get(x, y, z) !== 0 || l.get(x, y, z) !== 0 || u.get(x, y, z) !== 0;
     return { geo: g.count ? meshGrid(g, { size: PV * 2, solid: (x, y, z) => l.get(x, y, z) !== 0 || u.get(x, y, z) !== 0 }) : null, glow: mergeGeo(l.count ? meshGrid(l, { size: PV * 2, ao: false, shadeFaces: false, solid: any }) : null, u.count ? meshGrid(u, { size: PV * 2, solid: any }) : null) };
   }
 }

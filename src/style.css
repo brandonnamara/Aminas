@@ -1057,3 +1057,11 @@ body.perf-rest .avatar-btn .av-head, body.perf-covered .avatar-btn .av-head, bod
 @keyframes seaGlint { 0% { opacity: 0; } 33% { opacity: .85; } 66% { opacity: .25; } 100% { opacity: 0; } }
 body.calm .backdrop .sea-glint .sg0 { opacity: .5; }
 #world.vox .backdrop .fi { display: none; }
+
+/* Environment Phase 3: performance test (src/bench.js) */
+.bench-banner { position: fixed; left: 50%; top: calc(.5rem + var(--sat, 0px)); transform: translateX(-50%); z-index: 9999; display: flex; gap: .6rem; align-items: center; padding: .35rem .8rem; border-radius: 999px; background: rgba(28, 20, 48, .9); color: #fff; font-size: .8rem; pointer-events: auto; }
+body.bench-on #world { pointer-events: none; }
+.bench-table { width: 100%; border-collapse: collapse; font-size: .74rem; margin: .3rem 0; }
+.bench-table th, .bench-table td { padding: .15rem .3rem; text-align: right; border-bottom: 1px solid rgba(255, 255, 255, .12); }
+.bench-table th:first-child, .bench-table td:first-child { text-align: left; }
+.bench-out { width: 100%; font: .62rem/1.3 ui-monospace, monospace; resize: none; }

@@ -15,7 +15,9 @@
   V.ISLANDS = ['starter'];
   function load() {
     if (mod) return Promise.resolve(mod);
-    if (!loading) loading = import(new URL('src/3d/island3d.js', document.baseURI).href).then((m) => (mod = m)).catch((e) => { failed = true; if (root.console) console.warn('Voxel island unavailable, using the 2D island:', e && e.message); return null; });
+    // Phase 3: load timings for the performance test (src/bench.js)
+    if (!loading) { V.t0 = V.t0 || performance.now(); }
+    if (!loading) loading = import(new URL('src/3d/island3d.js', document.baseURI).href).then((m) => { V.moduleMs = Math.round(performance.now() - V.t0); return (mod = m); }).catch((e) => { failed = true; if (root.console) console.warn('Voxel island unavailable, using the 2D island:', e && e.message); return null; });
     return loading;
   }
   // which objects the 3D layer draws (the 2D layer then hides only their pictures)
@@ -82,6 +84,7 @@
       if (A.UI.applyCam) A.UI.applyCam();
       if (A.UI.renderObjects) A.UI.renderObjects();
       world.classList.add('vox');
+      if (!V.firstMs && V.t0) { V.firstMs = Math.round(performance.now() - V.t0); V.firstAt = Math.round(performance.now()); }
     });
   };
   // Called after every object redraw: the 3D layer mirrors the buildings and obstacles on this island.

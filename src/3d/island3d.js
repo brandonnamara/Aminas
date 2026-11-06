@@ -21,6 +21,10 @@ const A = window.A;
 const COARSE = !!(window.matchMedia && matchMedia('(pointer: coarse)').matches);
 const AMBIENT_FPS = 12;
 let R = null; // shared renderer (kept between visits to the island)
+// Phase 3: graphics quality tier (A.Perf.tier in src/perf.js): pixel-ratio cap, shadow map, LOD rules
+const FALLBACK_TIER = { id: COARSE ? 'balanced' : 'high', prCap: COARSE ? 1.5 : 2, shadowMap: COARSE ? 1024 : 2048, shadows: true, natureLod: false, buildingLod: false };
+const tier = () => (A && A.Perf && A.Perf.tier ? A.Perf.tier() : FALLBACK_TIER);
+const saver = () => !!(A && A.Perf && (A.Perf.saver() || A.Perf.forceTier === 'saver'));
 
 // camera basis: screen-right = (1,0,-1)/√2, screen-up = (-16, 39.19, -16)/45.25, toward the viewer = r × u
 const RIGHT = new THREE.Vector3(1, 0, -1).normalize(), UP = new THREE.Vector3(-16, HEIGHT_PX, -16).normalize();
@@ -166,7 +170,7 @@ export function createIsland() {
   // Phase 1.1 light: warmer, brighter sun and a stronger sky fill so shadows stay soft and colourful, never murky
   const hemi = new THREE.HemisphereLight(LIGHT.sky, LIGHT.ground, LIGHT.hemi); scene.add(hemi);
   const sun = new THREE.DirectionalLight(LIGHT.sun, LIGHT.sunI); sun.castShadow = true;
-  sun.shadow.mapSize.set(COARSE ? 1024 : 2048, COARSE ? 1024 : 2048); sun.shadow.bias = -0.0008; sun.shadow.normalBias = 0.02; sun.shadow.radius = 3; sun.shadow.blurSamples = 8;
+  sun.shadow.mapSize.set(tier().shadowMap, tier().shadowMap); sun.shadow.bias = -0.0008; sun.shadow.normalBias = 0.02; sun.shadow.radius = 3; sun.shadow.blurSamples = 8;
   scene.add(sun); scene.add(sun.target);
   const groups = { terrain: new THREE.Group(), things: new THREE.Group(), fx: new THREE.Group() };
   const farGroup = new THREE.Group(); scene.add(farGroup); let farBase = null;
@@ -387,11 +391,12 @@ export function createIsland() {
   /* ---- level of detail (Phase 2) ----
      Every building, tree and rock has a half-resolution twin (Model.lod in voxbuild.js). Nature switches to it when
      the camera is near its widest zoom (a prop voxel is then about 2 screen pixels); buildings keep full detail,
-     because their silhouettes carry the island's identity. In Battery saver everything uses the twins. Same draw
+     because their silhouettes carry the island's identity. In Battery saver everything uses the twins (Phase 3: the twins
+     keep the visible colours and thin roofs, see halfGrid). The rules come from the quality tier. Same draw
      calls either way; the twins have roughly a quarter of the triangles. */
   const LOD_Z = 0.4; let lodPairs = [], lodOn = null;
   function applyLod(force) {
-    const v = state.view, far = !!(v && v.z < LOD_Z), sv = saver(), key = (far ? 1 : 0) + (sv ? 2 : 0);
+    const T = tier(), v = state.view, far = !!(v && (v.z < LOD_Z || T.natureLod)), sv = T.buildingLod, key = (far ? 1 : 0) + (sv ? 2 : 0);
     if (!force && key === lodOn) return; lodOn = key;
     lodPairs.forEach(([full, lo, nature]) => { const on = sv || (far && nature); full.visible = !on; lo.visible = on; }); state.shadowDirty = true;
   }
@@ -404,12 +409,11 @@ export function createIsland() {
     camera.position.copy(t).addScaledVector(BACK, 60); camera.lookAt(t); camera.updateProjectionMatrix();
     // parallax: the distant islands follow the camera part of the way, so they drift more slowly than the island
     if (farBase) farGroup.children.forEach((m) => { const k = m.userData.far.k; m.position.copy(m.userData.base).addScaledVector(new THREE.Vector3(t.x - farBase.x, 0, t.z - farBase.z), 1 - k); });
-    const pr = Math.min(window.devicePixelRatio || 1, saver() ? 1 : COARSE ? 1.5 : 2);
+    const pr = Math.min(window.devicePixelRatio || 1, tier().prCap);
     if (R.getPixelRatio() !== pr) R.setPixelRatio(pr);
     const sz = R.getSize(new THREE.Vector2()); if (sz.x !== view.w || sz.y !== view.h) R.setSize(view.w, view.h, true);
     applyLod(false); state.dirty = true; state.moved = true; kick();
   }
-  const saver = () => !!(A && A.Perf && A.Perf.saver());
   const resting = () => !!(A && A.Perf && (A.Perf.resting() || A.Perf.hidden())) || document.body.classList.contains('perf-covered');
   const calm = () => !!(A && A.State && A.State.state && A.State.state.settings && A.State.state.settings.reduceMotion);
 
@@ -436,7 +440,9 @@ export function createIsland() {
   function draw() {
     if (!state.view) return;
     const s0 = performance.now();
-    sun.castShadow = !saver();
+    const T = tier();
+    if (sun.shadow.mapSize.x !== T.shadowMap) { sun.shadow.mapSize.set(T.shadowMap, T.shadowMap); if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; } state.shadowDirty = true; }
+    sun.castShadow = T.shadows;
     if (state.shadowDirty && sun.castShadow) { R.shadowMap.needsUpdate = true; state.shadowDirty = false; }
     let region = null;
     if ((occ.dirty || state.moved) && occ.fn) {
@@ -462,7 +468,7 @@ export function createIsland() {
     breakdown() { const t = (o) => (o.geometry && o.geometry.index ? o.geometry.index.count / 3 : 0) * (o.isInstancedMesh ? o.count : 1); const out = { terrain: 0, buildings: 0, nature: 0, detail: 0, far: 0, fx: 0 };
       groups.terrain.traverse((o) => { if (o.isMesh) out.terrain += t(o); }); farGroup.traverse((o) => { if (o.isMesh) out.far += t(o); });
       groups.things.children.forEach((o) => { if (!o.isMesh || !o.visible) return; if (o === detail) out.detail += t(o); else if (o.material === matSway || o.userData.nature) out.nature += t(o); else out.buildings += t(o); }); Object.keys(out).forEach((k) => (out[k] = Math.round(out[k]))); return out; },
-    stats() { const i = R.info; return { frames, avgDrawMs: frames ? +(drawMs / frames).toFixed(2) : 0, calls: i.render.calls, triangles: i.render.triangles, geometries: i.memory.geometries, textures: i.memory.textures, shadow: sun.castShadow, pixelRatio: R.getPixelRatio(), slow, lod: lodOn === 0 ? 'off' : lodOn === 1 ? 'nature' : 'all', terrainMs: cost.terrainMs, syncMs: cost.syncMs, occ: { shown: occ.shown, proxies: occ.data ? occ.data.up.length + occ.data.flat.length : 0, ms: +occ.cost.toFixed(1) } }; },
+    stats() { const i = R.info; return { frames, avgDrawMs: frames ? +(drawMs / frames).toFixed(2) : 0, calls: i.render.calls, triangles: i.render.triangles, geometries: i.memory.geometries, textures: i.memory.textures, shadow: sun.castShadow, shadowMap: sun.shadow.mapSize.x, tier: tier().id, canvas: [R.domElement.width, R.domElement.height], pixelRatio: R.getPixelRatio(), slow, lod: lodOn === 0 ? 'off' : lodOn === 1 ? 'nature' : 'all', terrainMs: cost.terrainMs, syncMs: cost.syncMs, occ: { shown: occ.shown, proxies: occ.data ? occ.data.up.length + occ.data.flat.length : 0, ms: +occ.cost.toFixed(1) } }; },
     dispose() { if (raf) cancelAnimationFrame(raf); raf = 0; clearGroup(groups.terrain); groups.things.children.slice().forEach((c) => { groups.things.remove(c); if (c.isInstancedMesh) c.dispose(); }); state = { things: new Map(), sig: '' }; },
   };
 }
