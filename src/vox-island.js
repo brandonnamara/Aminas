@@ -57,7 +57,7 @@
   V.terrain = function (iid, key, t) {
     V.on = false; const w = document.getElementById('world'); if (w) w.classList.remove('vox');
     // Phase 1 covers the Starter Island; the other islands keep their 2D art until their own phase
-    if (!V.wanted() || iid !== 'starter') { IA.voxHas = null; if (ctrl && ctrl.canvas.parentNode) ctrl.canvas.parentNode.removeChild(ctrl.canvas); return; }
+    if (!V.wanted() || iid !== 'starter') { IA.voxHas = null; if (ctrl && ctrl.canvas.parentNode) ctrl.canvas.parentNode.removeChild(ctrl.canvas); if (ctrl && ctrl.occCanvas.parentNode) ctrl.occCanvas.parentNode.removeChild(ctrl.occCanvas); return; }
     load().then((m) => {
       if (!m || !V.wanted()) return;
       const world = document.getElementById('world'); if (!world || !t || !t.cols) return;
@@ -65,6 +65,8 @@
       const cv = ctrl.canvas; if (cv.parentNode !== world) world.insertBefore(cv, document.getElementById('iso'));
       if (lastTerrainKey !== key) { ctrl.setTerrain(iid, key, t.cols, extras(iid, t.cols)); sceneryCache = scenery(t.cols); lastTerrainKey = key; }
       V.on = true; IA.voxHas = voxHas;
+      if (ctrl.occCanvas.parentNode !== world) world.insertBefore(ctrl.occCanvas, document.getElementById('iso').nextSibling);
+      ctrl.setOverlay(overlay);
       if (A.UI.applyCam) A.UI.applyCam();
       if (A.UI.renderObjects) A.UI.renderObjects();
       world.classList.add('vox');
@@ -84,6 +86,59 @@
     V.items = items.map((i) => i.k + ":" + (i.id || i.kind));
     ctrl.sync(items.map((i) => (i.k === 'b' && !i.draw ? Object.assign({}, i, { k: 'l' }) : i)), sceneryCache);
   };
+  /* ---- depth for the 2D overlay (Phase 1.2) ----
+     The island's creatures, landmark markers and ground rings are SVG drawn above the 3D canvas, so on their own they
+     always cover the buildings. For each of them we hand the 3D layer a proxy in world space: an upright card
+     standing at the sprite's feet (creatures, pillars, floating markers) or a flat card on the ground (rings and
+     glows). The 3D layer then repaints, on a thin canvas above the SVG, exactly the pixels of 3D objects that are in
+     front of those proxies. Interface parts (bubbles, timers, tags, the ghost, quest highlights) are cut out of that
+     canvas so they always stay on top. Taps are unchanged: everything interactive is still the SVG. */
+  const occludable = () => [...document.querySelectorAll('#objs .creature, #objs .lm, #objs .bld > ellipse.pulse')];
+  function worldRect(el) { const r = el.getBoundingClientRect(); if (!r.width || !r.height) return null; const a = A.UI.toWorld(r.left, r.top), b = A.UI.toWorld(r.right, r.bottom); return { r, x0: a[0], y0: a[1], x1: b[0], y1: b[1] }; }
+  const visibleFill = (e) => { const f = (e.getAttribute('fill') || '').toLowerCase(); return f !== 'transparent' && f !== 'none' || !!e.getAttribute('stroke'); };
+  function overlay() {
+    // only on the playable island screen (not behind story dialogue or the arrival scene)
+    const world = document.getElementById('world'); if (!world || !V.on || !A.UI.toWorld || A.UI.screen !== 'island' || !A.UI.wv) return null;
+    const wr = world.getBoundingClientRect(), up = [], flat = [], cut = []; let ux0 = 1e9, uy0 = 1e9, ux1 = -1e9, uy1 = -1e9;
+    const grow = (r) => { ux0 = Math.min(ux0, r.left - wr.left); uy0 = Math.min(uy0, r.top - wr.top); ux1 = Math.max(ux1, r.right - wr.left); uy1 = Math.max(uy1, r.bottom - wr.top); };
+    const onScreen = (r) => r.right > wr.left && r.left < wr.right && r.bottom > wr.top && r.top < wr.bottom;
+    occludable().forEach((el) => {
+      if (el.classList.contains('creature')) {
+        // from the creature's logical place (its anchor plus the current walk offset) and its art box, measured once:
+        // the idle bob and breathing animations then never count as movement
+        const tm = /translate\(([-\d.]+)[ ,]+([-\d.]+)\)(?:\s*scale\(([-\d.]+))?/.exec(el.getAttribute('transform') || ''); // the group's own placement is the truth
+        const ax = tm ? +tm[1] : +el.dataset.ax, ay = tm ? +tm[2] : +el.dataset.ay, sc = tm && tm[3] ? +tm[3] : +el.dataset.sc || 1, mv = el.querySelector('.cr-mv'), bob = el.querySelector('.cr-bob');
+        if (!mv || !bob || isNaN(ax)) return;
+        let box = el._occBox; if (!box) { try { const b = bob.getBBox(); box = el._occBox = [b.x, b.y - 6, b.x + b.width, b.y + b.height]; } catch (e) { return; } }
+        const m = new DOMMatrixReadOnly(getComputedStyle(mv).transform === 'none' ? undefined : getComputedStyle(mv).transform), fx = ax + m.e * sc, fy = ay + m.f * sc;
+        const x0 = fx + box[0] * sc, x1 = fx + box[2] * sc, y0 = fy + box[1] * sc, y1 = Math.max(fy, fy + box[3] * sc);
+        const r = el.querySelector('.cr-mv').getBoundingClientRect(); if (!onScreen(r)) return;
+        up.push([x0, x1, y0, y1, fx, 1]); grow(r); return; // 1 = a creature, measured exactly
+      }
+      if (el.tagName.toLowerCase() === 'ellipse') { const q = worldRect(el); if (q && onScreen(q.r)) { flat.push([q.x0, q.y0, q.x1, q.y1]); grow(q.r); } return; }
+      // a landmark: its glows and rings lie on the ground; its pillars and floating marker stand at its centre
+      const m = /translate\(([-\d.]+)[ ,]+([-\d.]+)\)/.exec(el.getAttribute('transform') || ''), fx = m ? +m[1] : 0, fy = m ? +m[2] : 0;
+      let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9, any = false;
+      [...el.children].forEach((c) => {
+        const tag = c.tagName.toLowerCase(); if (tag === 'ellipse' || tag === 'circle') { if (!visibleFill(c)) return; const q = worldRect(c); if (q && onScreen(q.r)) { flat.push([q.x0, q.y0, q.x1, q.y1]); grow(q.r); } return; }
+        if ((tag === 'polygon' || tag === 'rect' || tag === 'path') && !visibleFill(c)) return;
+        const q = worldRect(c); if (!q || !onScreen(q.r)) return; any = true; x0 = Math.min(x0, q.x0); y0 = Math.min(y0, q.y0); x1 = Math.max(x1, q.x1); y1 = Math.max(y1, q.y1); grow(q.r);
+      });
+      if (any) up.push([x0, x1, y0, Math.max(y1, fy), fx]);
+    });
+    if (!up.length && !flat.length) return { sig: '', up, flat, cut, rect: null };
+    // interface parts that must never be covered
+    document.querySelectorAll('#objs .bld > g:not(.artg), #objs .obs > g:not(.artg), #ghost > *, #hlx > *, #objs .creature .zz, #objs .creature .cr-heart').forEach((e) => { const r = e.getBoundingClientRect(); if (r.width && r.height && onScreen(r)) cut.push([r.left - wr.left, r.top - wr.top, r.width, r.height]); });
+    const pad = 10, rect = [Math.max(0, Math.floor(ux0 - pad)), Math.max(0, Math.floor(uy0 - pad)), 0, 0]; rect[2] = Math.min(Math.ceil(ux1 + pad), Math.round(wr.width)) - rect[0]; rect[3] = Math.min(Math.ceil(uy1 + pad), Math.round(wr.height)) - rect[1];
+    // the signature ignores small wobbles (bobbing markers, pulsing rings, floating z's): creatures are measured
+    // exactly, everything else to the nearest 8 px, interface cut-outs to 16 px
+    const r1 = (n) => Math.round(n * 2) / 2, r8 = (n) => Math.round(n / 8), r16 = (n) => Math.round(n / 16);
+    return { sig: JSON.stringify([up.map((a) => a.slice(0, 5).map(a[5] ? r1 : r8)), flat.map((a) => a.map(r8))]) + '|' + cut.map((c) => c.map(r16).join(',')).join(';'), up, flat, cut, rect: rect[2] > 0 && rect[3] > 0 ? rect : null };
+  }
+  V.overlay = overlay;
+  // true when the 3D layer covers the overlay at this screen point (a tap there belongs to the building, not to
+  // the creature hidden behind it)
+  V.occludedAt = (x, y) => !!(ctrl && V.on && ctrl.occludedAt(x, y));
   V.view = function (cam, view) { if (ctrl && V.on) ctrl.setView(cam, view); };
   V.redraw = () => { if (ctrl && V.on) ctrl.redraw(); };
   V.stats = () => (ctrl ? ctrl.stats() : null);

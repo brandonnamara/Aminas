@@ -13,7 +13,7 @@
    in the background and in Battery saver. */
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.170.0/+esm';
 import { VoxGrid, meshGrid, hash, pick } from './voxmesh.js';
-import { PAL, TV, DV, UNIT_PX, HEIGHT_PX } from './voxstyle.js';
+import { PAL, TV, DV, UNIT_PX, HEIGHT_PX, MAGIC } from './voxstyle.js';
 import * as VB from './voxbuild.js';
 
 const A = window.A;
@@ -30,7 +30,7 @@ const fromIso = (wx, wy) => { const a = wx / 32, b = wy / 16; return new THREE.V
 /* ------------------------------------------------------------------ terrain */
 function vnoise(x, y, s) { const xi = Math.floor(x), yi = Math.floor(y), fx = x - xi, fy = y - yi, a = hash(xi, yi, s), b = hash(xi + 1, yi, s), c = hash(xi, yi + 1, s), d = hash(xi + 1, yi + 1, s), u = fx * fx * (3 - 2 * fx), v = fy * fy * (3 - 2 * fy); return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v; }
 
-function buildTerrain(cols) {
+function buildTerrain(cols, avoid) {
   const V = 1 / TV; // voxels per cell (2)
   let minX = 1e9, maxX = -1e9, minZ = 1e9, maxZ = -1e9, maxY = 0;
   const vy = (px) => Math.round(px / HEIGHT_PX / TV);
@@ -109,6 +109,7 @@ function buildTerrain(cols) {
   // waterfalls: springs on the two cliff faces that face the camera
   const falls = [];
   const cand = (sx, sz) => { let best = null; colAt.forEach((v, k) => { if (!main(v.c.kind) || v.c.kind === 'path' || v.top < 0) return; const [X, Z] = k.split(',').map(Number); if (X % 2 || Z % 2) return; // align to a cell
+      if ((avoid || []).some(([ax, az]) => Math.abs(X / 2 - ax) + Math.abs(Z / 2 - az) < 7)) return; // keep clear of the jetty, so the fall is not hidden behind it
       for (let i = 0; i < 2; i++) { if (!colAt.has((X + (sx ? 1 : i)) + ',' + (Z + (sz ? 1 : i)))) return; if (colAt.has((X + (sx ? 2 : i)) + ',' + (Z + (sz ? 2 : i)))) return; if (colAt.has((X + (sx ? 3 : i)) + ',' + (Z + (sz ? 3 : i)))) return; }
       if (!colAt.has((X - sz) + ',' + (Z - sx)) || !colAt.has((X + 2 * sz) + ',' + (Z + 2 * sx))) return; // a straight stretch of cliff
       const mid = sx ? (minZ + maxZ) : (minX + maxX), along = sx ? Z : X, sc = -Math.abs(along - mid + 10) / 20 + hash(X, Z, 71) * 0.25 + (v.c.kind === 'sand' ? -0.3 : 0); if (!best || sc > best.sc) best = { sc, X, Z, v }; }); return best; };
@@ -122,10 +123,39 @@ function buildTerrain(cols) {
   return { g, water, colAt, falls, bounds: { minX, maxX, minZ, maxZ } };
 }
 
+/* ------------------------------------------------------------------ distant islands (Phase 1.2) */
+// Small voxel islands floating in the distance: grass cap, earth, a tapering rock root, a tree or two, and on some
+// a broken tower or a thread of falling water. Their colours are baked part-way towards the sky haze so they read
+// as far away, and the group pans more slowly than the island (parallax). One mesh each, no shadows.
+const HAZE = new THREE.Color('#bfe0f6');
+function farIslet(seed, r, opt) {
+  const R0 = Math.ceil(r) + 2, g = new VoxGrid(-R0, -Math.ceil(r * 2.6) - 2, -R0, R0 * 2 + 1, Math.ceil(r * 2.6) + 14, R0 * 2 + 1);
+  for (let z = -R0; z <= R0; z++) for (let x = -R0; x <= R0; x++) {
+    const d = Math.hypot(x, z) / (r * (0.85 + vnoise(x * 0.5 + seed, z * 0.5, 31) * 0.3)); if (d > 1) continue;
+    const depth = Math.max(1, Math.round((1 - d) * r * 1.5 + vnoise(x * 0.7, z * 0.7 + seed, 32) * 2));
+    for (let y = -depth; y < 1; y++) { const h = hash(x + seed, z * 3 + y, 33); g.set(x, y, z, y === 0 ? pick(PAL.grass, h) : y === -1 ? (d > 0.8 ? pick(PAL.grassSide, h) : pick(PAL.dirt, h)) : y > -3 ? pick(PAL.dirt.concat(PAL.clay), h) : y > -depth + 1 ? pick(PAL.stone, h) : pick(PAL.deepLow, h)); }
+  }
+  const trees = opt.trees == null ? 1 + Math.floor(hash(seed, 1, 34) * 2) : opt.trees;
+  for (let i = 0; i < trees; i++) { const tx = Math.round((hash(seed, i, 35) - 0.5) * r), tz = Math.round((hash(seed, i, 36) - 0.5) * r), th = 2 + Math.floor(hash(seed, i, 37) * 2), pine = hash(seed, i, 38) < 0.5;
+    for (let y = 1; y <= th; y++) g.set(tx, y, tz, PAL.woodDark[0]);
+    for (let y = 0; y < (pine ? 4 : 3); y++) { const rr = pine ? 2 - Math.floor(y / 2) : y === 1 ? 2 : 1; for (let dz = -rr; dz <= rr; dz++) for (let dx = -rr; dx <= rr; dx++) if (Math.abs(dx) + Math.abs(dz) <= rr + (pine ? 0 : 1)) g.set(tx + dx, th + 1 + y, tz + dz, pick(pine ? PAL.pine : PAL.leaf, hash(dx, dz + y, seed))); } }
+  if (opt.tower) { const tx = -Math.round(r * 0.3), tz = Math.round(r * 0.2); for (let y = 1; y < 7; y++) for (let dz = 0; dz < 2; dz++) for (let dx = 0; dx < 2; dx++) if (y < 5 || hash(dx, y, dz + seed) > 0.4) g.set(tx + dx, y, tz + dz, pick(PAL.stone, hash(dx + y, dz, seed))); }
+  if (opt.fall) { const fx = Math.round(r * 0.75), fz = 0; for (let y = 0; y > -Math.ceil(r * 2.6) - 1; y--) { g.set(fx + 1, y, fz, y % 3 ? '#bfe8ff' : '#f2fbff'); } }
+  const geo = meshGrid(g, { size: opt.size || 0.5 }), c = geo.attributes.color, k = opt.haze == null ? 0.42 : opt.haze, tmp = new THREE.Color(); const linHaze = HAZE.clone(); // colours are linear in the buffer
+  for (let i = 0; i < c.count; i++) { tmp.setRGB(c.getX(i), c.getY(i), c.getZ(i)).lerp(linHaze, k); c.setXYZ(i, tmp.r, tmp.g, tmp.b); }
+  return geo;
+}
+// where they float, in island-centred screen px at zoom 1 (x right, y down), their size, haze and parallax
+const FAR = [
+  { sx: -820, sy: -330, r: 5, s: 0.5, k: 0.45, trees: 2 }, { sx: -520, sy: -470, r: 3.5, s: 0.34, k: 0.6, tower: true },
+  { sx: 600, sy: -480, r: 4.5, s: 0.4, k: 0.55, fall: true }, { sx: 930, sy: -330, r: 3.5, s: 0.34, k: 0.6, trees: 1 },
+  { sx: -930, sy: 260, r: 3.5, s: 0.45, k: 0.45, fall: true }, { sx: 880, sy: 340, r: 3, s: 0.36, k: 0.5, tower: true, trees: 0 },
+];
+
 /* ------------------------------------------------------------------ the scene */
 export function createIsland() {
   if (!R) {
-    R = new THREE.WebGLRenderer({ antialias: !COARSE, alpha: true, powerPreference: 'default' });
+    R = new THREE.WebGLRenderer({ antialias: !COARSE, alpha: true, stencil: true, powerPreference: 'default' });
     R.setClearColor(0x000000, 0); R.outputColorSpace = THREE.SRGBColorSpace;
     R.shadowMap.enabled = true; R.shadowMap.type = THREE.PCFShadowMap; R.shadowMap.autoUpdate = false;
     R.domElement.className = 'vox3d';
@@ -138,8 +168,10 @@ export function createIsland() {
   sun.shadow.mapSize.set(COARSE ? 1024 : 2048, COARSE ? 1024 : 2048); sun.shadow.bias = -0.0008; sun.shadow.normalBias = 0.02; sun.shadow.radius = 3; sun.shadow.blurSamples = 8;
   scene.add(sun); scene.add(sun.target);
   const groups = { terrain: new THREE.Group(), things: new THREE.Group(), fx: new THREE.Group() };
+  const farGroup = new THREE.Group(); scene.add(farGroup); let farBase = null;
   Object.values(groups).forEach((g) => scene.add(g));
   const matSolid = new THREE.MeshLambertMaterial({ vertexColors: true }), matGlow = new THREE.MeshBasicMaterial({ vertexColors: true });
+  const matMist = new THREE.MeshBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.38, depthWrite: false });
   const uni = { uTime: { value: 0 } };
   // leaves sway a little (a vertex nudge proportional to height inside each tree instance)
   const matSway = new THREE.MeshLambertMaterial({ vertexColors: true });
@@ -153,7 +185,7 @@ export function createIsland() {
   function setTerrain0(iid, key, cols, extras) {
     if (state.key === key && terr) return;
     clearGroup(groups.terrain); clouds = [];
-    const t = buildTerrain(cols); terr = t;
+    const t = buildTerrain(cols, (extras || []).filter((e) => e.kind === 'jetty' || e.kind === 'skiff').map((e) => [e.x, e.z])); terr = t;
     const geo = meshGrid(t.g, { size: TV, shadeFaces: false }); disposables.push(geo);
     const m = new THREE.Mesh(geo, matSolid); m.castShadow = true; m.receiveShadow = true; groups.terrain.add(m);
     // water: subdivided quads that ripple (vertex shader) with a sheen
@@ -178,6 +210,8 @@ export function createIsland() {
           ' vec3 c = mix(vec3(0.36, 0.74, 0.96), vec3(0.94, 0.99, 1.0), clamp(streak * 0.85 + top * 0.6 + edge, 0.0, 1.0));\n' +
           ' float a = 0.9 * (1.0 - smoothstep(uLen * 0.45, uLen, vUv.y)); gl_FragColor = vec4(c, a); }' });
       disposables.push(fm); const fall = new THREE.Mesh(fg, fm); fall.renderOrder = 2; groups.terrain.add(fall);
+      // a darker sheet just behind gives the falling water some body
+      const back = new THREE.Mesh(fg, new THREE.MeshBasicMaterial({ color: '#3d8fc4', transparent: true, opacity: 0.35, depthWrite: false })); disposables.push(back.material); back.position.set(f.sx ? -0.04 : 0, 0, f.sz ? -0.04 : 0); back.renderOrder = 1; groups.terrain.add(back);
       // a little white churn where the water leaves the lip
       const cg = new VoxGrid(0, 0, 0, 6, 2, 6); for (let i = 0; i < 9; i++) cg.set(Math.floor(hash(i, f.x, 75) * 6), hash(i, 2, 76) < 0.5 ? 0 : 1, Math.floor(hash(i, f.z, 77) * 6), PAL.foam);
       const foam = meshGrid(cg, { size: DV, origin: [f.sx ? f.x - 2 * DV : f.x + f.w / 2 - 3 * DV, f.y0 - DV, f.sz ? f.z - 2 * DV : f.z + f.w / 2 - 3 * DV] }); disposables.push(foam); groups.terrain.add(new THREE.Mesh(foam, matGlow));
@@ -193,6 +227,13 @@ export function createIsland() {
       const geo2 = meshGrid(cg, { size: TV * s * 0.7 }); disposables.push(geo2);
       const cm = new THREE.Mesh(geo2, matSolid); cm.position.set(x, y, z); cm.userData.drift = { x0: x, ph: i * 1.7, sp: 0.15 + i * 0.03 }; groups.terrain.add(cm); clouds.push(cm);
     });
+    // distant islands (their own group, moved with the camera for parallax in setView)
+    farGroup.clear(); farBase = new THREE.Vector3(cx, 0, cz);
+    FAR.forEach((f, i) => { const geo3 = farIslet(i * 17 + 5, f.r, f); disposables.push(geo3); const mm2 = new THREE.Mesh(geo3, matSolid); const p = farBase.clone().addScaledVector(RIGHT, f.sx / UNIT_PX).addScaledVector(UP, -f.sy / UNIT_PX).addScaledVector(BACK, -40 - i * 3);
+      mm2.position.copy(p); mm2.scale.setScalar(f.s); mm2.userData.far = f; mm2.userData.base = p.clone(); mm2.userData.ph = i * 1.3; farGroup.add(mm2); });
+    // mist where each waterfall thins into the air
+    (t.falls || []).forEach((f, i) => { const cg = new VoxGrid(-6, 0, -6, 13, 5, 13); for (let k = 0; k < 6; k++) { const px = Math.round((hash(i, k, 78) - 0.5) * 6), pz = Math.round((hash(k, i, 79) - 0.5) * 6), rr = 2 + Math.floor(hash(i + k, 3, 80) * 2); for (let y = 0; y < 3; y++) for (let z = -rr; z <= rr; z++) for (let x = -rr; x <= rr; x++) if (x * x + z * z + y * y * 2 <= rr * rr) cg.set(px + x, y, pz + z, pick(PAL.cloud, hash(x, z, y + k))); }
+      const mg2 = meshGrid(cg, { size: TV * 0.3 }); disposables.push(mg2); const mist = new THREE.Mesh(mg2, matMist); mist.position.set(f.x + (f.sx ? 0.6 : f.w / 2), f.y1 + (f.y0 - f.y1) * 0.42, f.z + (f.sz ? 0.6 : f.w / 2)); mist.userData.bob = { y0: mist.position.y, ph: i * 2.1 }; groups.terrain.add(mist); clouds.push(mist); });
     // living-pixel motes: pollen and sparkles rising slowly over the meadow
     const N = COARSE ? 28 : 44, mp = new Float32Array(N * 3), seed = new Float32Array(N);
     for (let i = 0; i < N; i++) { mp[i * 3] = b.minX + hash(i, 1, 81) * (b.maxX - b.minX); mp[i * 3 + 1] = hash(i, 2, 81) * 3; mp[i * 3 + 2] = b.minZ + hash(i, 3, 81) * (b.maxZ - b.minZ); seed[i] = hash(i, 4, 81) * 6.28; }
@@ -203,7 +244,7 @@ export function createIsland() {
     const span = Math.max(b.maxX - b.minX, b.maxZ - b.minZ) * 0.8 + 6;
     sun.target.position.set(cx, 0, cz); sun.position.set(cx - 9, 22, cz + 17);
     Object.assign(sun.shadow.camera, { left: -span, right: span, top: span, bottom: -span, near: 1, far: 70 }); sun.shadow.camera.updateProjectionMatrix();
-    state.iid = iid; state.key = key; state.sig = ''; state.shadowDirty = true; state.dirty = true;
+    state.iid = iid; state.key = key; state.sig = ''; state.shadowDirty = true; state.dirty = true; state.moved = true;
   }
   function addModel(group, md) {
     if (md.geo) { const m = new THREE.Mesh(md.geo, matSolid); m.castShadow = true; m.receiveShadow = true; group.add(m); }
@@ -236,14 +277,14 @@ export function createIsland() {
       im.computeBoundingSphere(); groups.things.add(im);
     });
     buildDetail(occupied); buildSparks(items);
-    state.shadowDirty = true; state.dirty = true;
+    state.shadowDirty = true; state.dirty = true; state.moved = true;
   }
   // magic: slow motes of light that spiral up around the island's enchanted places (the Hatchery's egg, the
   // Tidegate, the Moonshrine, the Reliquary Gate, the glowing standing stones). One Points object, ~10 per place.
-  const SPARK = { hatchery: ['#bfe8ff', 2.6, 1.4], tidegate: ['#9ae8ff', 1.8, 1.6], moonshrine: ['#e0d0ff', 2.2, 1.2], reliquarygate: ['#a8ffc0', 1.4, 1.4] };
+  const SPARK = { hatchery: [MAGIC.egg, 2.6, 1.4], tidegate: [MAGIC.water, 1.8, 1.6], moonshrine: [MAGIC.moon, 2.2, 1.2], reliquarygate: [MAGIC.life, 1.4, 1.4] };
   function buildSparks(items) {
     if (sparks) { groups.fx.remove(sparks); sparks.geometry.dispose(); sparks.material.dispose(); sparks = null; }
-    const src = []; items.forEach((it) => { const k = it.k === 'b' && it.state !== 'ruined' && it.state !== 'constructing' ? SPARK[it.type] : it.k === 'l' && it.kind === 'stones' && it.on ? ['#e0b8ff', 1, 1.6] : null; if (k) src.push([it.x + it.w / 2, it.y + it.h / 2, k]); });
+    const src = []; items.forEach((it) => { const k = it.k === 'b' && it.state !== 'ruined' && it.state !== 'constructing' ? SPARK[it.type] : it.k === 'l' && it.kind === 'stones' && it.on ? [MAGIC.spirit, 1, 1.6] : null; if (k) src.push([it.x + it.w / 2, it.y + it.h / 2, k]); });
     if (!src.length) return;
     const N = src.length * (COARSE ? 7 : 10), p = new Float32Array(N * 3), col = new Float32Array(N * 3), seed = new Float32Array(N * 4), c = new THREE.Color();
     for (let i = 0; i < N; i++) { const [x, z, k] = src[i % src.length]; c.set(k[0]); col.set([c.r, c.g, c.b], i * 3); seed.set([x, z, k[1], hash(i, 1, 88) * 6.28 + hash(i, 2, 88) * 100], i * 4); p.set([x, k[1] * hash(i, 3, 88) * 1.5, z], i * 3); seed[i * 4 + 2] = k[2]; seed[i * 4 + 3] = hash(i, 4, 88) * 6.28; p[i * 3 + 1] = k[1] * hash(i, 5, 88) * 1.6; }
@@ -275,16 +316,83 @@ export function createIsland() {
     im.instanceMatrix.needsUpdate = true; im.instanceColor.needsUpdate = true; im.receiveShadow = true; detail = im; groups.things.add(im);
   }
 
+  /* ---- depth for the 2D overlay (Phase 1.2) ----
+     The overlay (creatures, markers, ground rings) is SVG above this canvas. vox-island.js describes each overlay
+     sprite as a world-space proxy card; here we
+       1. clear the overlay's screen region, draw the proxies into depth + stencil only (nearest card wins),
+       2. draw the opaque scene where the stencil is set: only fragments nearer than the card survive,
+       3. copy that region onto a 2D canvas that sits above the SVG, cut out the interface rectangles,
+       4. redraw the normal scene into the region.
+     The result: a building, tree or cliff in front of a creature covers it, and one behind it does not, using the
+     real depth of every voxel. The proxies are re-read on a light poll (no work while nothing moves). */
+  const occCanvas = document.createElement('canvas'); occCanvas.className = 'vox-occ'; const occCtx = occCanvas.getContext('2d');
+  const proxyScene = new THREE.Scene(), proxyMat = new THREE.MeshBasicMaterial({ colorWrite: false, side: THREE.DoubleSide, stencilWrite: true, stencilRef: 1, stencilFunc: THREE.AlwaysStencilFunc, stencilZPass: THREE.ReplaceStencilOp });
+  const proxyGeo = new THREE.BufferGeometry(), proxyMesh = new THREE.Mesh(proxyGeo, proxyMat); proxyMesh.frustumCulled = false; proxyScene.add(proxyMesh);
+  const occ = { fn: null, data: null, sig: null, dirty: false, timer: 0, cost: 0, shown: false, cam: null, last: 0, stale: false };
+  const YV = new THREE.Vector3(0, 1, 0);
+  function setOverlay(fn) { occ.fn = fn; occ.sig = null; pollOcc(); }
+  function pollOcc() {
+    clearTimeout(occ.timer); occ.timer = 0;
+    if (!occ.fn || !R.domElement.isConnected) return;
+    // on a device too slow for the ambient tick (no GPU), a moving creature does not trigger a redraw on every step:
+    // the occlusion catches up once the overlay has held still for one poll (or with the next camera change)
+    if (occ.stale && !(A && A.UI && A.UI.dragging)) { occ.dirty = true; kick(); } // the drag ended: one exact pass
+    if (!(A && A.Perf && A.Perf.hidden())) { const d = occ.fn(); const sig = d ? d.sig : ''; if (sig !== occ.sig) { if (!slow || sig === occ.pending) { occ.sig = sig; occ.data = d; occ.dirty = true; kick(); } occ.pending = sig; } }
+    // a light poll: ~9 reads a second, slower on devices where the pass is expensive
+    // Battery saver and a still island poll less often (creatures still walk, but rarely)
+    occ.timer = setTimeout(pollOcc, slow ? 1000 : Math.min(1000, Math.max(saver() || resting() ? 400 : 110, occ.cost * 5)));
+  }
+  function proxies(d) {
+    const pos = [], idx = []; let n = 0;
+    const quad = (a, b, c, e) => { pos.push(a.x, a.y, a.z, b.x, b.y, b.z, c.x, c.y, c.z, e.x, e.y, e.z); idx.push(n, n + 1, n + 2, n, n + 2, n + 3); n += 4; };
+    d.up.forEach(([x0, x1, y0, y1, fx]) => { const g = fromIso(fx, y1), h = (y1 - y0) / HEIGHT_PX, a = (x0 - fx) / UNIT_PX, b = (x1 - fx) / UNIT_PX;
+      const p0 = g.clone().addScaledVector(RIGHT, a), p1 = g.clone().addScaledVector(RIGHT, b); quad(p0, p1, p1.clone().addScaledVector(YV, h), p0.clone().addScaledVector(YV, h)); });
+    d.flat.forEach(([x0, y0, x1, y1]) => { const c = [fromIso(x0, y0), fromIso(x1, y0), fromIso(x1, y1), fromIso(x0, y1)].map((v) => (v.y = 0.04, v)); quad(c[0], c[1], c[2], c[3]); });
+    proxyGeo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); proxyGeo.setIndex(idx); proxyGeo.computeBoundingSphere();
+  }
+  function sizeOcc() { const c = R.domElement; if (occCanvas.width !== c.width || occCanvas.height !== c.height) { occCanvas.width = c.width; occCanvas.height = c.height; } occCanvas.style.width = c.style.width || '100%'; occCanvas.style.height = c.style.height || '100%'; }
+  // returns the region it used (css px), or null
+  function drawOcc() {
+    // read the overlay fresh at draw time, so the proxies match what is on screen in this very frame
+    occ.dirty = false; occ.stale = false; occ.last = performance.now(); occCanvas.style.transform = ''; const d = (occ.data = occ.fn ? occ.fn() : null), v = state.view; occ.sig = d ? d.sig : ''; sizeOcc();
+    if (v) occ.cam = { x: v.x, y: v.y, z: v.z };
+    if (occ.shown) { occCtx.clearRect(0, 0, occCanvas.width, occCanvas.height); occ.shown = false; }
+    if (!d || !d.rect || !v || !(d.up.length + d.flat.length)) return null;
+    const t0 = performance.now(), pr = R.getPixelRatio(), [rx, ry, rw, rh] = d.rect;
+    proxies(d);
+    R.autoClear = false; R.setScissorTest(true); R.setScissor(rx, v.h - ry - rh, rw, rh); R.setClearColor(0x000000, 0); R.clear(true, true, true);
+    R.render(proxyScene, camera);
+    // only opaque scenery takes part (water, waterfalls, motes and clouds never hide a creature)
+    const hidden = [], mats = new Set();
+    [waterMesh, motes, sparks, farGroup].concat(clouds).forEach((o) => { if (o && o.visible) { o.visible = false; hidden.push(o); } });
+    scene.traverseVisible((o) => { if (o.isMesh && o.material && !o.material.transparent) mats.add(o.material); });
+    mats.forEach((m) => { m.stencilWrite = true; m.stencilFunc = THREE.EqualStencilFunc; m.stencilRef = 1; m.stencilZPass = THREE.KeepStencilOp; });
+    R.render(scene, camera);
+    mats.forEach((m) => { m.stencilWrite = false; m.stencilFunc = THREE.AlwaysStencilFunc; });
+    hidden.forEach((o) => { o.visible = true; });
+    occCtx.drawImage(R.domElement, rx * pr, ry * pr, rw * pr, rh * pr, rx * pr, ry * pr, rw * pr, rh * pr);
+    if (d.cut.length) { occCtx.globalCompositeOperation = 'destination-out'; d.cut.forEach(([x, y, w, h]) => occCtx.fillRect(x * pr - 1, y * pr - 1, w * pr + 2, h * pr + 2)); occCtx.globalCompositeOperation = 'source-over'; }
+    occ.shown = true; occ.cost = occ.cost * 0.7 + (performance.now() - t0) * 0.3;
+    return [rx, ry, rw, rh];
+  }
+  function occludedAt(x, y) {
+    if (!occ.shown) return false; const r = occCanvas.getBoundingClientRect(), pr = occCanvas.width / Math.max(1, r.width);
+    const px = Math.floor((x - r.left) * pr), py = Math.floor((y - r.top) * pr); if (px < 0 || py < 0 || px >= occCanvas.width || py >= occCanvas.height) return false;
+    try { return occCtx.getImageData(px, py, 1, 1).data[3] > 40; } catch (e) { return false; }
+  }
+
   /* ---- camera: same view as the 2D layer ---- */
   function setView(cam, view) {
     state.view = { x: cam.x, y: cam.y, z: cam.z, w: view.w, h: view.h };
     const t = fromIso(cam.x, cam.y), k = 1 / (UNIT_PX * cam.z);
     camera.left = -view.w / 2 * k; camera.right = view.w / 2 * k; camera.top = view.h / 2 * k; camera.bottom = -view.h / 2 * k;
     camera.position.copy(t).addScaledVector(BACK, 60); camera.lookAt(t); camera.updateProjectionMatrix();
+    // parallax: the distant islands follow the camera part of the way, so they drift more slowly than the island
+    if (farBase) farGroup.children.forEach((m) => { const k = m.userData.far.k; m.position.copy(m.userData.base).addScaledVector(new THREE.Vector3(t.x - farBase.x, 0, t.z - farBase.z), 1 - k); });
     const pr = Math.min(window.devicePixelRatio || 1, saver() ? 1 : COARSE ? 1.5 : 2);
     if (R.getPixelRatio() !== pr) R.setPixelRatio(pr);
     const sz = R.getSize(new THREE.Vector2()); if (sz.x !== view.w || sz.y !== view.h) R.setSize(view.w, view.h, true);
-    state.dirty = true; kick();
+    state.dirty = true; state.moved = true; kick();
   }
   const saver = () => !!(A && A.Perf && A.Perf.saver());
   const resting = () => !!(A && A.Perf && (A.Perf.resting() || A.Perf.hidden())) || document.body.classList.contains('perf-covered');
@@ -294,14 +402,14 @@ export function createIsland() {
   // slow: set when the device cannot keep the ambient tick (frames arriving under ~8 per second while animating, e.g.
   // no GPU and WebGL falling back to software). The island then only redraws when something changes.
   let raf = 0, last = 0, t0 = performance.now(), frames = 0, drawMs = 0, slow = false, prev = 0, gaps = [];
-  function kick() { if (!raf) raf = requestAnimationFrame(loop); }
+  function kick() { if (!raf) raf = requestAnimationFrame(loop); if (!occ.timer && occ.fn) occ.timer = setTimeout(pollOcc, 60); } // the occlusion poll stops while the island is away and restarts here
   function loop(now) {
     raf = 0; if (!R.domElement.isConnected) return;
     const animate = !slow && !saver() && !resting() && !calm();
     if (animate && prev && now - prev < 2000) { gaps.push(now - prev); if (gaps.length > 6) gaps.shift(); if (gaps.length >= 6 && gaps.reduce((a, b) => a + b, 0) / gaps.length > 125) { slow = true; if (window.console) console.info('Voxel island: slow frames, ambient animation off'); } }
     prev = animate ? now : 0;
     if (animate && now - last >= 1000 / AMBIENT_FPS - 2) { tickAmbient((now - t0) / 1000, Math.min(0.2, (now - last) / 1000)); last = now; state.dirty = true; }
-    if (state.dirty) draw();
+    if (state.dirty || occ.dirty) draw();
     if (animate) raf = requestAnimationFrame(loop);
   }
   function tickAmbient(t, dt) {
@@ -315,14 +423,27 @@ export function createIsland() {
     const s0 = performance.now();
     sun.castShadow = !saver();
     if (state.shadowDirty && sun.castShadow) { R.shadowMap.needsUpdate = true; state.shadowDirty = false; }
-    R.render(scene, camera); state.dirty = false; frames++; drawMs += performance.now() - s0;
+    let region = null;
+    if ((occ.dirty || state.moved) && occ.fn) {
+      // while the player drags the island, the exact pass runs at most ~8 times a second; in between, the last
+      // occlusion image is slid along with the camera (same zoom), and an exact pass follows when the drag ends
+      const v = state.view, c0 = occ.cam, dragging = !!(A && A.UI && A.UI.dragging);
+      if (!occ.dirty && dragging && c0 && c0.z === v.z && performance.now() - occ.last < 120) { occCanvas.style.transform = 'translate(' + ((c0.x - v.x) * v.z).toFixed(1) + 'px,' + ((c0.y - v.y) * v.z).toFixed(1) + 'px)'; occ.stale = true; }
+      else region = drawOcc();
+    }
+    const full = state.dirty; state.moved = false; // ambient-only frames keep the last occlusion
+    // always a whole frame: the browser discards the drawing buffer after each composite, so a partial redraw
+    // would leave the rest of the canvas empty
+    if (full || region) { R.setScissorTest(false); R.autoClear = true; R.setClearColor(0x000000, 0); R.render(scene, camera); }
+    R.setScissorTest(false); R.autoClear = true;
+    state.dirty = false; frames++; drawMs += performance.now() - s0;
   }
   return {
-    canvas: R.domElement,
-    setTerrain, sync, setView, kick,
+    canvas: R.domElement, occCanvas,
+    setTerrain, sync, setView, kick, setOverlay, occludedAt,
     redraw() { state.dirty = true; kick(); },
     has: (k, art, cat, st) => (k === 'b' ? VB.hasBuilding(art, cat) && st !== 'constructing' : k === 'l' ? VB.hasExtra(art) : VB.hasNature(art)),
-    stats() { const i = R.info; return { frames, avgDrawMs: frames ? +(drawMs / frames).toFixed(2) : 0, calls: i.render.calls, triangles: i.render.triangles, geometries: i.memory.geometries, textures: i.memory.textures, shadow: sun.castShadow, pixelRatio: R.getPixelRatio(), slow, terrainMs: cost.terrainMs, syncMs: cost.syncMs }; },
+    stats() { const i = R.info; return { frames, avgDrawMs: frames ? +(drawMs / frames).toFixed(2) : 0, calls: i.render.calls, triangles: i.render.triangles, geometries: i.memory.geometries, textures: i.memory.textures, shadow: sun.castShadow, pixelRatio: R.getPixelRatio(), slow, terrainMs: cost.terrainMs, syncMs: cost.syncMs, occ: { shown: occ.shown, proxies: occ.data ? occ.data.up.length + occ.data.flat.length : 0, ms: +occ.cost.toFixed(1) } }; },
     dispose() { if (raf) cancelAnimationFrame(raf); raf = 0; clearGroup(groups.terrain); groups.things.children.slice().forEach((c) => { groups.things.remove(c); if (c.isInstancedMesh) c.dispose(); }); state = { things: new Map(), sig: '' }; },
   };
 }

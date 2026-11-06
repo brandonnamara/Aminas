@@ -1046,3 +1046,14 @@ body.perf-rest .avatar-btn .av-head, body.perf-covered .avatar-btn .av-head, bod
 #world > canvas.vox3d { position: absolute; left: 0; top: 0; width: 100% !important; height: 100% !important; pointer-events: none; image-rendering: auto; }
 #world.vox #terrain { display: none; }
 #world.vox .vx > .artg { opacity: 0; }
+
+/* Environment Phase 1.2: the 3D pixels that stand in front of creatures and markers (see src/vox-island.js) */
+#world canvas.vox-occ { position: absolute; left: 0; top: 0; pointer-events: none; }
+#world:not(.vox) canvas.vox-occ { display: none; }
+
+/* Environment Phase 1.2: sea glints (three sets twinkling in turn) and the 3D far islands replacing the painted ones */
+.backdrop .sea-glint .sg { opacity: 0; animation: seaGlint 4.5s steps(3, end) infinite; }
+.backdrop .sea-glint .sg1 { animation-delay: -1.5s; } .backdrop .sea-glint .sg2 { animation-delay: -3s; }
+@keyframes seaGlint { 0% { opacity: 0; } 33% { opacity: .85; } 66% { opacity: .25; } 100% { opacity: 0; } }
+body.calm .backdrop .sea-glint .sg0 { opacity: .5; }
+#world.vox .backdrop .fi { display: none; }

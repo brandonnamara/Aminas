@@ -511,12 +511,17 @@
       s += vcloud(160, 70, 1, 0.8, 'cl c1') + vcloud(620, 46, 0.8, 0.65, 'cl c2') + vcloud(900, 150, 0.6, 0.55, 'cl c3');
       // the sea far below, with a misty horizon
       s += '<rect y="230" width="1000" height="270" fill="url(#bk-sea)"/><rect y="226" width="1000" height="10" fill="#e8f6ff" opacity=".8"/>';
+      // Phase 1.2: layered depth over the sea: a low cloud bank on the horizon, two bands of mist, and pixel glints
+      // that twinkle on the water in three staggered sets (paused with the rest of the island when it is still)
+      s += '<g class="sea-deep">' + vcloud(80, 226, 1.4, 0.55, 'cl c2') + vcloud(470, 222, 1.1, 0.5, 'cl c3') + vcloud(980, 228, 1.5, 0.5, 'cl c1') + '</g>' +
+        '<rect y="236" width="1000" height="16" fill="#e8f6ff" opacity=".35"/><rect y="252" width="1000" height="22" fill="#cfeefa" opacity=".18"/>' +
+        '<g class="sea-glint">' + [0, 1, 2].map((k) => '<g class="sg sg' + k + '">' + [...Array(16)].map((_, i) => { const x = hash(i, k, 61) * 1000, y = 262 + Math.pow(hash(i, k, 62), 1.4) * 230, w = 4 + Math.round(y / 60) * 2; return '<rect x="' + f1(x) + '" y="' + f1(y) + '" width="' + w + '" height="2" fill="#f2fbff"/>'; }).join('') + '</g>').join('') + '</g>';
       // the Dormant Spire on its own distant floating rock
       const on = !!fl.r2;
       s += '<g transform="translate(540 168)">' + farIsle(0, 18, 0.55, '#8fd46a', '#9a7a5a', '#7e7a85') + '<g class="spire' + (on ? ' awake' : '') + '">' + (on ? circ(0, -70, 70, 'url(#bk-sun)') + stroke('M-6 -70L-60 -170M6 -70L60 -170M0 -70V-180', '#fff6c0', 2.5, ' opacity=".5"') : '') +
         path('M-14 14V-40h4v-20h4v-20h4v-14h4v14h4v20h4v20h4v54z', on ? '#dcd6f4' : '#8a90a8') + path('M2 14V-40h4v-20h4v-20h-4v-14h-4v14h-4z', on ? '#b8b0dc' : '#717895') + '<rect x="-3" y="-60" width="6" height="8" fill="' + (on ? '#fff6c0' : '#5a6078') + '"/></g></g>';
       // other islands floating at the horizon hint at what lies beyond
-      s += farIsle(120, 206, 0.6, '#5fbf62', '#7a5a3c', '#5e5a62', '#3f9a4a') + farIsle(890, 200, 0.5, '#6c5a86', '#4a3e5a', '#2a2236') + '<g class="drift-far">' + farIsle(330, 120, 0.38, '#c0c8f4', '#8a88b8', '#5d5a9a') + '</g>' + farIsle(720, 250, 0.3, '#7fd35a', '#9a6a3f', '#7e7a75', '#4fae3c');
+      s += '<g class="fi">' + farIsle(120, 206, 0.6, '#5fbf62', '#7a5a3c', '#5e5a62', '#3f9a4a') + farIsle(890, 200, 0.5, '#6c5a86', '#4a3e5a', '#2a2236') + '<g class="drift-far">' + farIsle(330, 120, 0.38, '#c0c8f4', '#8a88b8', '#5d5a9a') + '</g>' + farIsle(720, 250, 0.3, '#7fd35a', '#9a6a3f', '#7e7a75', '#4fae3c') + '</g>';
       if (fl.r2) s += '<g transform="translate(120 96)"><g class="float">' + farIsle(0, 0, 0.5, '#8fdc78', '#8c6a48', '#6c6a72', '#6fcf6a') + '</g></g>';
     } else if (iid === 'verdant') {
       s += '<linearGradient id="bk-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3fa0b8"/><stop offset=".55" stop-color="#a8f0d8"/><stop offset="1" stop-color="#f4ffe0"/></linearGradient><linearGradient id="bk-sea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7fe8dc"/><stop offset=".3" stop-color="#40c8c0"/><stop offset="1" stop-color="#0f7d8c"/></linearGradient></defs>';

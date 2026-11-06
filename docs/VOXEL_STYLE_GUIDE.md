@@ -90,6 +90,17 @@ one feature (water trough, lava brazier, crystal lamp and so on).
 - Fixed set pieces: the jetty and its bobbing skiff, the lighthouse rock, the plaza with its sun mosaic, the seven
   standing stones (they glow violet while the Tidegate quest is active), and cloud banks drifting below the island.
 
+## 6b. Depth and magic (Phase 1.2)
+
+- **Depth:** creatures and markers are SVG above the 3D layer. They get depth from proxy cards, so any voxel in front
+  of them covers them. Interface parts are never covered. New overlay elements that stand in the world should be
+  added to `occludable()` in `src/vox-island.js`.
+- **Magic lights:** use `MAGIC` (`egg`, `water`, `moon`, `life`, `spirit`) for anything enchanted, and the warm
+  `glow` / `glowWarm` colours for hearth light only.
+- **Self-lit blocks** (`m.put(..., 'u')`) are for things that must keep their colour in any light, such as the white
+  egg. Use them sparingly.
+- **Ruins** use the ruin kit (`tower`, `crack`, `scatter`, `overgrow`). Each ruin keeps one clue to what it becomes.
+
 ## 7. Motion
 
 Motion is subtle and stops when unseen. Water ripple, tree sway, cloud drift, skiff bob and drifting motes all run

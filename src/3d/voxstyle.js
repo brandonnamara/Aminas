@@ -50,3 +50,9 @@ export const EL = {
   nature: ['#5fbf5a', '#3f8a3c'], water: ['#4aa8f0', '#2a72b8'], earth: ['#c49a68', '#7a5632'], fire: ['#ff7a48', '#c4401c'],
   light: ['#ffd86b', '#c9951f'], dark: ['#9a78e6', '#4b3590'], wind: ['#8fe6d6', '#3d9c8c'], resonance: ['#ff86d6', '#a8338a'], metal: ['#b8c4d4', '#6a7888'],
 };
+
+// Phase 1.2: one family of magical lights, shared by glowing blocks, motes and 2D glows, so every enchanted place reads
+// as the same magic in its own hue: egg (life-to-be), water (the Tidegate), moon (the Moonshrine), life (the
+// Reliquary Gate), spirit (the standing stones and their quest). Hearth light (windows, torches) stays warm and is
+// not magic.
+export const MAGIC = { egg: '#a8e4ff', water: '#8fe4ff', moon: '#e2d4ff', life: '#a8ffc0', spirit: '#ffa8e6' };

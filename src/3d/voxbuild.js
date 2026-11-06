@@ -4,7 +4,7 @@
    Coordinates: x and z run across the footprint (centred on 0), y up from the ground. The entrance side of a
    building faces +z (the lit, lower-left side on screen). rot = 1 swaps x and z, like the 2D art's mirror. */
 import { VoxGrid, meshGrid, hash, pick } from './voxmesh.js';
-import { PAL, EL, PV } from './voxstyle.js';
+import { PAL, EL, PV, MAGIC } from './voxstyle.js';
 
 class Model {
   constructor(w, h, maxY, rot, seed, minY) {
@@ -12,14 +12,17 @@ class Model {
     const m = 8, X = (rot ? this.H : this.W), Z = (rot ? this.W : this.H), y0 = minY == null ? -2 : minY;
     this.g = new VoxGrid(-Math.ceil(X / 2) - m, y0, -Math.ceil(Z / 2) - m, X + 2 * m, maxY - y0 + 2, Z + 2 * m);
     this.l = new VoxGrid(-Math.ceil(X / 2) - m, y0, -Math.ceil(Z / 2) - m, X + 2 * m, maxY - y0 + 2, Z + 2 * m);
+    // u: 'self-lit' blocks: drawn unlit like glow, but with the usual face shading and corner darkening baked in,
+    // for things that must stay their own colour in any light (the Hatchery's white egg)
+    this.u = new VoxGrid(-Math.ceil(X / 2) - m, y0, -Math.ceil(Z / 2) - m, X + 2 * m, maxY - y0 + 2, Z + 2 * m);
   }
   // colour spec: '#hex' | [palette] (hashed per voxel) | fn(x,y,z)
   col(c, x, y, z) { return typeof c === 'function' ? c(x, y, z) : Array.isArray(c) ? pick(c, hash(x * 7 + y * 131, z * 13 + y, this.seed)) : c; }
-  put(x, y, z, c, glow) { const [X, Z] = this.rot ? [z, x] : [x, z]; const col = c == null ? 0 : this.col(c, x, y, z); (glow ? this.l : this.g).set(X, y, Z, col); if (!glow && col) this.l.set(X, y, Z, 0); }
+  put(x, y, z, c, glow) { const [X, Z] = this.rot ? [z, x] : [x, z]; const col = c == null ? 0 : this.col(c, x, y, z); (glow === 'u' ? this.u : glow ? this.l : this.g).set(X, y, Z, col); if (col) { if (glow !== 'u') this.u.set(X, y, Z, 0); if (!glow) this.l.set(X, y, Z, 0); if (glow) this.g.set(X, y, Z, 0); } }
   box(x0, y0, z0, x1, y1, z1, c, glow) { for (let y = y0; y < y1; y++) for (let z = z0; z < z1; z++) for (let x = x0; x < x1; x++) this.put(x, y, z, c, glow); return this; }
   clear(x0, y0, z0, x1, y1, z1) { for (let y = y0; y < y1; y++) for (let z = z0; z < z1; z++) for (let x = x0; x < x1; x++) { const [X, Z] = this.rot ? [z, x] : [x, z]; this.g.set(X, y, Z, 0); this.l.set(X, y, Z, 0); } return this; }
   glow(x0, y0, z0, x1, y1, z1, c) { return this.box(x0, y0, z0, x1, y1, z1, c, true); }
-  has(x, y, z) { const [X, Z] = this.rot ? [z, x] : [x, z]; return this.g.get(X, y, Z) !== 0; }
+  has(x, y, z) { const [X, Z] = this.rot ? [z, x] : [x, z]; return this.g.get(X, y, Z) !== 0 || this.u.get(X, y, Z) !== 0; }
   // hollow walls of a box (no top/bottom)
   walls(x0, y0, z0, x1, y1, z1, c) { this.box(x0, y0, z0, x1, y1, z0 + 1, c); this.box(x0, y0, z1 - 1, x1, y1, z1, c); this.box(x0, y0, z0, x0 + 1, y1, z1, c); this.box(x1 - 1, y0, z0, x1, y1, z1, c); return this; }
   // stepped hip roof: each layer one voxel in from the last, until it closes
@@ -36,9 +39,19 @@ class Model {
   disc(cx, cz, r, y0, y1, c) { for (let z = Math.floor(cz - r); z <= Math.ceil(cz + r); z++) for (let x = Math.floor(cx - r); x <= Math.ceil(cx + r); x++) if ((x + 0.5 - cx) ** 2 + (z + 0.5 - cz) ** 2 <= r * r) this.box(x, y0, z, x + 1, y1, z + 1, c); return this; }
   ball(cx, cy, cz, rx, ry, rz, c, glow) { for (let y = Math.floor(cy - ry); y <= Math.ceil(cy + ry); y++) for (let z = Math.floor(cz - rz); z <= Math.ceil(cz + rz); z++) for (let x = Math.floor(cx - rx); x <= Math.ceil(cx + rx); x++) if (((x + 0.5 - cx) / rx) ** 2 + ((y + 0.5 - cy) / ry) ** 2 + ((z + 0.5 - cz) / rz) ** 2 <= 1) this.put(x, y, z, c, glow); return this; }
   build() {
-    const g = this.g, l = this.l;
-    return { geo: g.count ? meshGrid(g, { size: PV, solid: (x, y, z) => l.get(x, y, z) !== 0 }) : null, glow: l.count ? meshGrid(l, { size: PV, ao: false, shadeFaces: false }) : null, h: g.ny * PV };
+    const g = this.g, l = this.l, u = this.u, any = (x, y, z) => g.get(x, y, z) !== 0 || l.get(x, y, z) !== 0 || u.get(x, y, z) !== 0;
+    const glow = l.count ? meshGrid(l, { size: PV, ao: false, shadeFaces: false, solid: any }) : null, self = u.count ? meshGrid(u, { size: PV, solid: any }) : null;
+    return { geo: g.count ? meshGrid(g, { size: PV, solid: (x, y, z) => l.get(x, y, z) !== 0 || u.get(x, y, z) !== 0 }) : null, glow: mergeGeo(glow, self), h: g.ny * PV };
   }
+}
+
+// joins two indexed geometries with the same attributes (position, normal, color) into one
+function mergeGeo(a, b) {
+  if (!a || !b) return a || b;
+  const out = new a.constructor(), n = a.attributes.position.count;
+  ['position', 'normal', 'color'].forEach((k) => { const A1 = a.attributes[k].array, B1 = b.attributes[k].array, arr = new Float32Array(A1.length + B1.length); arr.set(A1); arr.set(B1, A1.length); out.setAttribute(k, new a.attributes[k].constructor(arr, 3)); });
+  const ia = a.index.array, ib = b.index.array, tot = n + b.attributes.position.count, idx = tot > 65535 ? new Uint32Array(ia.length + ib.length) : new Uint16Array(ia.length + ib.length); idx.set(ia); for (let i = 0; i < ib.length; i++) idx[ia.length + i] = ib[i] + n;
+  out.setIndex(new a.index.constructor(idx, 1)); out.computeBoundingSphere(); out.computeBoundingBox(); a.dispose(); b.dispose(); return out;
 }
 
 /* ---------------------------------------------------------------- shared parts */
@@ -85,6 +98,28 @@ function ruin(m, pal, accent) {
   for (let i = 0; i < 8; i++) grassTuft(m, Math.floor(x0 - 1 + H(i, 9, 5) * (x1 - x0 + 2)), Math.floor(z0 - 1 + H(i, 10, 6) * (z1 - z0 + 2)), 0);
 }
 
+// --- ruin kit (Phase 1.2) ---
+// a square tower with a jagged, broken top; open = hollow inside
+function tower(m, x, z, w, h, pal, seed, open) {
+  for (let dx = 0; dx < w; dx++) for (let dz = 0; dz < w; dz++) { if (open && dx > 0 && dx < w - 1 && dz > 0 && dz < w - 1) continue; const top = h - Math.floor(H(dx, seed, dz, 61) * 4) - ((dx + dz) % 2); m.box(x + dx, 2, z + dz, x + dx + 1, Math.max(3, top), z + dz + 1, stoneWork(pal)); }
+}
+// cracks across a floor: a few dark lines and missing stones
+function crack(m, x0, z0, x1, z1, y, seed) { for (let i = 0; i < 3; i++) { let x = Math.floor(x0 + 2 + H(i, seed, 1, 62) * (x1 - x0 - 4)), z = Math.floor(z0 + 2 + H(i, seed, 2, 62) * (z1 - z0 - 4)); for (let k = 0; k < 6; k++) { if (m.has(x, y - 1, z)) m.put(x, y - 1, z, PAL.stoneDark[1]); x += H(i, k, seed, 63) > 0.5 ? 1 : 0; z += H(k, i, seed, 64) > 0.5 ? 1 : -1; } } }
+// loose blocks scattered around the footprint
+function scatter(m, n, pal, y, seed) { const W = m.W / 2, Hh = m.H / 2; for (let i = 0; i < n; i++) { const x = Math.floor(-W + 1 + H(i, seed, 3, 65) * (2 * W - 2)), z = Math.floor(-Hh + 1 + H(i, seed, 4, 65) * (2 * Hh - 2)); let yy = y; while (m.has(x, yy, z) && yy < 30) yy++; m.put(x, yy, z, pick(pal, H(i, seed, 5, 65))); } }
+// nature taking back the ruin: moss on exposed tops, grass tufts at the foot, a few vines down the walls
+function overgrow(m, seed) {
+  const W = m.W / 2 + 2, Hh = m.H / 2 + 2, g = m.g;
+  for (let x = -W; x < W; x++) for (let z = -Hh; z < Hh; z++) {
+    let top = -1; for (let y = 30; y >= 0; y--) if (m.has(x, y, z)) { top = y; break; }
+    const h = H(x, seed, z, 66);
+    const [X, Z] = m.rot ? [z, x] : [x, z], plain = top >= 0 && g.get(X, top, Z) !== 0; // never paint over self-lit or glowing blocks
+    if (plain && h < 0.2 && H(x >> 2, seed, z >> 2, 68) < 0.6) m.put(x, top, z, pick(PAL.moss, h * 5)); // in patches, not a sprinkle
+    else if (top < 0 && h < 0.07) grassTuft(m, x, z, 0);
+    if (plain && top > 4 && h > 0.9) for (let y = top - 1; y > top - 4 && y > 1; y--) if (g.get(X, y, Z)) m.put(x, y, z, pick(PAL.leaf, H(x, y, z, 67)));
+  }
+}
+
 /* ---------------------------------------------------------------- buildings */
 const B = {};
 // THE OLD HATCHERY (benchmark): a stone hall on a stepped platform, a timber-framed upper floor, a tiled hip roof,
@@ -129,9 +164,9 @@ B.hatchery = (m, lv) => {
   m.disc(ex, ez, 6.4, base, base + 4, straw); m.disc(ex, ez, 7, base + 2, base + 3, straw);
   for (let i = 0; i < 14; i++) { const a = i / 14 * Math.PI * 2, r = 6.6; m.put(Math.round(ex + Math.cos(a) * r), base + 4, Math.round(ez + Math.sin(a) * r), i % 3 ? '#f2d47c' : '#b8964a'); } // twig tips
   if (lv >= 3) m.disc(ex, ez, 7.4, base + 1, base + 2, gold);
-  m.ball(ex, base + 8, ez, 5.2, 7.8, 5.2, (x, y, z) => (H(x, y, z, 22) > 0.88 ? '#fff3d6' : y > base + 10 ? '#ffffff' : '#fffaf0'));
+  m.ball(ex, base + 8, ez, 5.2, 7.8, 5.2, (x, y, z) => (H(x, y, z, 22) > 0.88 ? '#f4f8ff' : y > base + 10 ? '#ffffff' : '#fbfdff'), 'u'); // self-lit: white on its shaded side too
   // the speckles glow faintly blue: the egg is alive
-  for (let y = base + 3; y < base + 15; y++) for (let z = ez - 6; z <= ez + 6; z++) for (let x = ex - 6; x <= ex + 6; x++) if (m.has(x, y, z) && H(x, y, z, 21) > 0.9 && (!m.has(x + 1, y, z) || !m.has(x, y, z + 1) || !m.has(x - 1, y, z) || !m.has(x, y, z - 1))) m.put(x, y, z, H(x, y, z, 24) > 0.5 ? '#7ad0ff' : '#a8e4ff', true);
+  for (let y = base + 3; y < base + 15; y++) for (let z = ez - 6; z <= ez + 6; z++) for (let x = ex - 6; x <= ex + 6; x++) if (m.has(x, y, z) && H(x, y, z, 21) > 0.9 && (!m.has(x + 1, y, z) || !m.has(x, y, z + 1) || !m.has(x - 1, y, z) || !m.has(x, y, z - 1))) m.put(x, y, z, H(x, y, z, 24) > 0.5 ? '#7ad0ff' : MAGIC.egg, true);
   for (let y = base + 8; y < base + 14; y++) { const x = ex + 5 - Math.floor((y - base - 8) / 3); m.put(x, y, ez + 1 + ((y >> 1) % 2), '#c9a86a', true); } // a golden crack of light
   if (lv >= 3) m.disc(ex, ez, 5.3, base + 5, base + 6, gold);
   m.glow(ex - 1, base + 16, ez - 1, ex + 1, base + 17, ez + 1, lv >= 2 ? PAL.glow : '#d8f4ff');
@@ -146,9 +181,20 @@ B.hatchery = (m, lv) => {
   // plants and a crate
   m.box(-11, 3, 8, -8, 6, 11, planks(PAL.wood)); m.box(-11, 6, 8, -8, 7, 11, PAL.woodDark);
   flower(m, -6, 10, 3, PAL.flowers[2]); flower(m, -5, 9, 3, PAL.flowers[1]); grassTuft(m, 10, -10, 3); grassTuft(m, -10, -9, 3);
-  if (lv >= 5) m.ball(ex, base + 8, ez, 5, 7.5, 5, (x, y, z) => (H(x, y, z, 21) > 0.88 ? '#f2c440' : '#fff8ea'));
+  if (lv >= 5) m.ball(ex, base + 8, ez, 5.2, 7.8, 5.2, (x, y, z) => (H(x, y, z, 21) > 0.88 ? '#f2c440' : '#fff8ea'), 'u');
 };
-B.hatchery.ruin = (m) => { ruin(m, ['#c9c1b2', '#bdb4a3'], '#f6efdd'); m.ball(2, 3, -2, 3, 2.5, 3, (x, y, z) => (H(x, y, z) > 0.5 ? '#f6efdd' : '#e8dcc0')); m.ball(2, 4.2, -2, 2.4, 2.2, 2.4, null); };
+// THE FALLEN NURSERY: the hatchery's old round tower, broken off halfway; a toppled drum of it lies in the grass,
+// and on the cracked platform the great egg-stone sits split open in its broken cradle, straw blown about.
+B.hatchery.ruin = (m) => {
+  const sw = ['#c9c1b2', '#bdb4a3', '#d3ccbe']; foundation(m, -12, -12, 12, 12, 2, PAL.stoneDark.concat(PAL.stone)); crack(m, -12, -12, 12, 12, 2, 1);
+  tower(m, -6, -6, 5, 16, sw, 3); m.box(-9, 2, 4, -3, 4, 6, stoneWork(sw)); // the fallen drum
+  for (let i = 0; i < 4; i++) m.box(-2 + i * 2, 2, 7 + (i % 2), 0 + i * 2, 3 + (i % 2), 9 + (i % 2), stoneWork(sw));
+  m.disc(4, 2, 5, 2, 4, stoneWork(sw)); m.disc(4, 2, 4, 3, 4, null); // the broken cradle
+  m.ball(4, 4, 2, 4, 5, 4, (x, y, z) => (H(x, y, z, 22) > 0.86 ? '#dfe4ee' : y > 6 ? '#f4f6fa' : '#e9edf4')); m.ball(4.5, 6.5, 1.5, 3.4, 5, 3.4, null); // the split shell, open to the sky
+  [[7, 6, 2], [2, 6, 4], [6, 5, 6]].forEach(([x, z, y]) => m.box(x, y, z, x + 2, y + 1, z + 1, '#eef1f6'));
+  m.glow(3, 4, 1, 5, 5, 3, '#bfe8ff'); // a faint light still inside the shell
+  scatter(m, 14, ['#e8c46a', '#d8b05a'], 2, 11); scatter(m, 6, PAL.roof.red, 2, 12); overgrow(m, 13);
+};
 
 // SUNLIT HOLLOW: the companion's home: a grassy stone mound with a glowing arched hollow, a round window, a
 // little porch roof and flowers at the door.
@@ -168,7 +214,16 @@ B.hollow = (m, lv) => {
   if (lv >= 2) torch(m, 6, 1, 9);
   if (lv >= 4) { m.box(-1, 19, -2, 0, 26, -1, PAL.woodDark); m.box(0, 23, -2, 4, 26, -1, PAL.gold); }
 };
-B.hollow.ruin = (m) => { ruin(m, ['#a9a39a', '#9a948b'], null); m.ball(-2, 2, -2, 6, 5, 5, stoneWork(['#a9a39a', '#9a948b'])); m.clear(-3, 2, 1, 1, 6, 6); };
+// THE BURIED HOLLOW: the mound has slumped; only its stone arch still stands, propped by two boulders, a fallen
+// chimney beside it and grass reclaiming everything.
+B.hollow.ruin = (m) => {
+  foundation(m, -11, -11, 11, 11, 1, PAL.stoneDark.concat(PAL.stone)); const sw = ['#d9cfb6', '#c4b998', '#cfc4a8'];
+  m.ball(-2, 1, -4, 8, 5, 6, (x, y, z) => (y > 4 ? pick(PAL.grass, H(x, y, z)) : stoneWork(sw)(x, y, z)));
+  m.box(-5, 1, 3, -3, 10, 5, stoneWork(sw)); m.box(3, 1, 3, 5, 8, 5, stoneWork(sw)); m.box(-5, 10, 3, 1, 11, 5, stoneWork(sw)); // the arch, its right side broken
+  m.ball(-7, 2, 5, 2.5, 2, 2.5, PAL.rock); m.ball(6, 2, 6, 2, 1.8, 2, PAL.rock);
+  m.box(4, 1, -8, 12, 3, -5, stoneWork(PAL.stone)); // the fallen chimney
+  overgrow(m, 21); scatter(m, 8, PAL.rock, 1, 22);
+};
 
 // TIDE GATE: a stone basin of sea water between two towers, a sheet of water falling through the arch.
 B.tidegate = (m, lv) => {
@@ -176,26 +231,43 @@ B.tidegate = (m, lv) => {
   foundation(m, -W + 1, -Hh + 1, W - 1, Hh - 1, 3, ['#b7c4cf', '#a8b6c2', '#c2ced8']);
   m.box(-W + 3, 2, -Hh + 3, W - 3, 3, Hh - 3, '#2f8cc8'); m.glow(-W + 4, 2, -Hh + 4, W - 4, 3, Hh - 4, '#5fd0ee');
   const tw = stoneWork(['#a4afc2', '#97a3b8', '#b0bacb']);
-  [-W + 2, W - 6].forEach((x) => { m.box(x, 3, -3, x + 4, 22, 3, tw); m.box(x - 1, 22, -4, x + 5, 23, 4, lv >= 3 ? PAL.gold : '#8e98ae'); m.box(x, 23, -3, x + 4, 25, 3, tw); m.glow(x + 1, 25, -1, x + 3, 27, 1, '#9ae8ff'); });
+  [-W + 2, W - 6].forEach((x) => { m.box(x, 3, -3, x + 4, 22, 3, tw); m.box(x - 1, 22, -4, x + 5, 23, 4, lv >= 3 ? PAL.gold : '#8e98ae'); m.box(x, 23, -3, x + 4, 25, 3, tw); m.glow(x + 1, 25, -1, x + 3, 27, 1, MAGIC.water); });
   m.box(-W + 2, 18, -2, W - 2, 22, 2, tw); m.clear(-W + 6, 18, -2, W - 6, 19, 2);
   for (let x = -W + 6; x < W - 6; x++) for (let y = 3; y < 18; y++) if ((x + y) % 5 !== 0) m.glow(x, y, 0, x + 1, y + 1, 1, (x + y) % 3 ? '#8ad8f8' : '#d8f4ff');
   m.box(-W + 6, 3, 1, W - 6, 4, 2, '#d8f4ff');
   [[-8, 6], [8, -6]].forEach(([x, z]) => m.box(x, 3, z, x + 1, 4, z + 1, '#ffe0b0'));
   if (lv >= 2) [[-W + 1, Hh - 2], [W - 2, Hh - 2]].forEach(([x, z]) => torch(m, x, 3, z));
 };
-B.tidegate.ruin = (m) => { ruin(m, ['#8590a4', '#7a8498'], '#5fd0ee'); };
+// THE DRY TIDEGATE: two weathered towers, one snapped low, their lintel fallen into a cracked, dry basin where a
+// last puddle of sea-water still glows.
+B.tidegate.ruin = (m) => {
+  const W = m.W / 2, Hh = m.H / 2, tw = ['#a4afc2', '#97a3b8', '#b0bacb'];
+  foundation(m, -W + 1, -Hh + 1, W - 1, Hh - 1, 3, ['#9aa6b4', '#8e9aa8']); crack(m, -W + 1, -Hh + 1, W - 1, Hh - 1, 3, 2);
+  m.box(-W + 3, 2, -Hh + 3, W - 3, 3, Hh - 3, '#7a8292'); m.glow(-3, 2, 1, 1, 3, 3, '#5fd0ee');
+  tower(m, -W + 2, -3, 4, 17, tw, 4, true); tower(m, W - 6, -3, 4, 8, tw, 5, true);
+  m.box(-4, 3, Hh - 6, 6, 5, Hh - 4, stoneWork(tw)); // the fallen lintel
+  m.glow(W - 5, 8, -1, W - 3, 9, 1, '#4a9ab8'); scatter(m, 10, tw, 3, 23); overgrow(m, 24);
+};
 
 // MOON SHRINE: a violet stepped roof on four slim pillars, a glowing moon block above an altar.
 B.moonshrine = (m, lv) => {
   foundation(m, -8, -8, 8, 8, 3, ['#c7c1e4', '#b4acd8', '#d0cbea']); m.box(-6, 3, -6, 6, 4, 6, '#b4acd8');
   [[-6, -6], [5, -6], [-6, 5], [5, 5]].forEach(([x, z]) => m.box(x, 4, z, x + 1, 17, z + 1, stoneWork(['#bcb6dc', '#aaa3cc'])));
-  m.box(-2, 4, -2, 2, 7, 2, '#9a90d0'); m.glow(-1, 7, -1, 1, 9, 1, '#e8dcff');
+  m.box(-2, 4, -2, 2, 7, 2, '#9a90d0'); m.glow(-1, 7, -1, 1, 9, 1, MAGIC.moon);
   const t = m.hip(-8, -8, 8, 8, 17, shingles(PAL.roof.purple), lv >= 3 ? PAL.gold : '#5a4a8a');
   m.ball(0, t + 3, 0, 2.5, 2.5, 2.5, '#f4ecff', true); m.clear(1, t + 2, -3, 4, t + 6, 3);
   if (lv >= 2) [[-8, 9], [7, 9]].forEach(([x, z]) => torch(m, x, 0, z));
   for (let i = 0; i < 6; i++) m.box(-8 + i * 3, 3, 7, -7 + i * 3, 6 + (i % 2), 8, PAL.moss);
 };
-B.moonshrine.ruin = (m) => { ruin(m, ['#8e8aa8', '#7e7a98'], '#d8caff'); };
+// THE FALLEN TEMPLE: the moonshrine's platform with its pillars at four heights, one lying where it fell, the
+// violet roof come down in a heap and the moon-crystal dimmed to a sliver.
+B.moonshrine.ruin = (m) => {
+  const pw = ['#bcb6dc', '#aaa3cc']; foundation(m, -8, -8, 8, 8, 3, ['#a8a2c8', '#9a94ba']); crack(m, -8, -8, 8, 8, 3, 3);
+  [[-7, -7, 15], [5, -7, 10], [-7, 5, 6], [5, 5, 2]].forEach(([x, z, h]) => { m.box(x, 3, z, x + 2, 3 + h - (H(x, h, z) > 0.5 ? 1 : 0), z + 2, stoneWork(pw)); m.box(x, 3 + h - 1, z, x + 1, 3 + h, z + 1, h > 3 ? stoneWork(pw) : null); m.box(x - 1, 3, z - 1, x + 3, 4, z + 3, stoneWork(pw)); });
+  m.box(-2, 3, 6, 9, 5, 8, stoneWork(pw)); // the toppled pillar
+  for (let i = 0; i < 9; i++) { const x = -5 + Math.floor(H(i, 1, 31) * 9), z = -5 + Math.floor(H(i, 2, 31) * 7); m.box(x, 3, z, x + 2, 4 + (i % 3 ? 0 : 1), z + 1, pick(PAL.roof.purple, H(i, 3, 31))); }
+  m.box(-1, 3, -1, 1, 5, 1, '#9a90d0'); m.glow(0, 5, 0, 1, 7, 1, '#b8a8e8'); overgrow(m, 32);
+};
 
 // RELIQUARY GATE: a great carved door set into a grassy rock mound, vines across it, runes that glow.
 B.reliquarygate = (m, lv, ruined) => {
@@ -204,7 +276,7 @@ B.reliquarygate = (m, lv, ruined) => {
   m.box(-6, 0, 3, 6, 15, 6, stoneWork(['#aaa49a', '#9c968c', '#b6b0a6'])); m.clear(-4, 0, 4, 4, 12, 6);
   m.box(-4, 0, 4, 4, 12, 5, ruined ? planks(PAL.woodDark) : planks(['#8a5a34', '#7a4e2c'], '#5e3f26'));
   m.box(-6, 15, 2, 6, 17, 6, stoneWork(PAL.stoneDark.concat(['#8a857c'])));
-  if (!ruined) { m.glow(-1, 5, 6, 1, 9, 7, lv >= 2 ? '#7aff9a' : '#ffd86b'); [[-3, 13], [2, 13]].forEach(([x, y]) => m.glow(x, y, 6, x + 1, y + 1, 7, '#7aff9a')); }
+  if (!ruined) { m.glow(-1, 5, 6, 1, 9, 7, lv >= 2 ? '#7aff9a' : '#ffd86b'); [[-3, 13], [2, 13]].forEach(([x, y]) => m.glow(x, y, 6, x + 1, y + 1, 7, MAGIC.life)); }
   for (let i = 0; i < 9; i++) { const x = -5 + Math.floor(H(i, 1, 2) * 10); for (let y = 15 - Math.floor(H(i, 2, 3) * 10); y < 15; y++) m.put(x, y, 6, PAL.leafDark); }
   m.box(-8, 0, 6, -6, 1, 9, PAL.stone); m.box(6, 0, 6, 8, 1, 9, PAL.stone);
 };
@@ -229,7 +301,16 @@ B.forge = (m, lv) => {
   if (lv >= 2) { m.box(-11, 1, -11, -8, 4, -8, planks(PAL.wood)); torch(m, 7, 1, 2); }
   if (lv >= 3) m.box(-9, 26, -9, -5, 27, -5, PAL.gold);
 };
-B.forge.ruin = (m) => { ruin(m, PAL.brick, '#5a2a1e'); m.box(-9, 2, -9, -5, 12, -5, stoneWork(PAL.brick, '#7a3a28')); };
+// THE COLD FORGE: brick walls fallen to knee height except one corner, the great chimney still standing (cracked),
+// a cold anvil and a rusted rack among scattered bricks.
+B.forge.ruin = (m) => {
+  const br = stoneWork(PAL.brick, '#7a3a28'); foundation(m, -12, -12, 12, 12, 1, PAL.stone); crack(m, -12, -12, 12, 12, 1, 4);
+  for (let x = -10; x < 6; x++) for (let z = -10; z < 2; z++) { if (x !== -10 && x !== 5 && z !== -10 && z !== 1) continue; const h = x < -6 && z < -6 ? 9 - ((x + z) & 1) : 1 + Math.floor(H(x, 0, z, 41) * 3); m.box(x, 1, z, x + 1, 1 + h, z + 1, br); }
+  m.box(-9, 1, -9, -5, 22, -5, br); m.box(-9, 18, -5, -8, 21, -4, null); m.box(-10, 22, -10, -4, 23, -4, '#5a2a1e');
+  m.box(7, 1, 4, 10, 3, 6, PAL.stoneDark); m.box(6, 3, 4, 11, 5, 6, '#6a5a50');
+  m.box(-11, 1, 5, -10, 6, 11, '#6e4a2c'); for (let z = 5; z < 11; z += 3) m.box(-10, 2, z, -9, 6, z + 1, '#8a6a5a');
+  scatter(m, 18, PAL.brick, 1, 42); overgrow(m, 43);
+};
 
 // BERRY FARM: tilled rows of berry bushes inside a low fence, a small shed and a scarecrow.
 B.farm = (m, lv) => {
@@ -281,7 +362,13 @@ B.habitat = (m, lv, ruined, b) => {
   if (lv >= 3) { m.box(-8, 1, 5, -7, 7, 6, PAL.woodDark); m.box(-8, 7, 5, -4, 10, 6, ec[0]); }
   [[-10, 9, 0], [9, -9, 3], [-9, -9, 1]].forEach(([x, z, c]) => flower(m, x, z, 1, PAL.flowers[c]));
 };
-B.habitat.ruin = (m, b) => ruin(m, PAL.stone, (EL[(b.type || '').replace('hab_', '')] || EL.nature)[0]);
+// AN ABANDONED COTTAGE: foundations, one standing corner of wall with its window hole, a fallen beam and roof tiles
+// in the habitat's colour, half buried in grass.
+B.habitat.ruin = (m, b) => {
+  const ec = EL[(b.type || '').replace('hab_', '')] || EL.nature; foundation(m, -11, -11, 11, 11, 1, PAL.stone);
+  for (let x = -7; x < 6; x++) for (let z = -8; z < 4; z++) { if (x !== -7 && x !== 5 && z !== -8 && z !== 3) continue; const corner = x < -3 && z < -4; m.box(x, 1, z, x + 1, corner ? 9 : 1 + Math.floor(H(x, 0, z, 51) * 3), z + 1, corner ? PAL.plaster : stoneWork(PAL.stone)); }
+  m.clear(-7, 5, -6, -6, 7, -5); m.box(-6, 1, 0, 6, 2, 1, PAL.woodDark); scatter(m, 10, [ec[0], ec[1]], 1, 52); overgrow(m, 53);
+};
 
 // DECOR
 B.lantern = (m) => { m.box(-1, 0, -1, 1, 1, 1, PAL.stoneDark); m.box(0, 1, 0, 1, 12, 1, PAL.woodDark); m.box(-1, 12, -1, 2, 13, 2, PAL.woodDark); m.glow(-1, 13, -1, 2, 16, 2, PAL.glow); m.box(-1, 16, -1, 2, 17, 2, '#5a4a3a'); };
@@ -340,9 +427,9 @@ X.plaza = (m) => {
 // THE STANDING STONES: a ring of seven pale stones; when the island hums they glow violet
 X.stones = (m, on) => {
   for (let i = 0; i < 7; i++) { const a = (i * Math.PI * 2) / 7, x = Math.round(Math.cos(a) * 7), z = Math.round(Math.sin(a) * 7), h = 9 + (i % 3) * 3;
-    m.box(x - 1, 0, z - 1, x + 1, h, z + 1, (xx, y) => (on && y > h - 5 && y < h - 2 ? '#f0e4ff' : on ? (y % 3 ? '#dccaf4' : '#c8b6e6') : (y % 3 ? '#aaa6ba' : '#9a96aa'))); m.box(x - 1, h, z - 1, x + 1, h + 1, z + 1, on ? '#f0e4ff' : '#c4c0d2');
-    if (on) m.glow(x - 1, h - 4, z + 1, x + 1, h - 2, z + 2, '#ff9ee0'); }
-  m.disc(0, 0, 2.5, 0, 1, on ? '#ff9ee0' : '#8a8698', on);
+    m.box(x - 1, 0, z - 1, x + 1, h, z + 1, (xx, y) => (on ? (y % 3 ? '#e2d2ee' : '#d0bede') : (y % 3 ? '#aaa6ba' : '#9a96aa'))); m.box(x - 1, h, z - 1, x + 1, h + 1, z + 1, on ? '#f4e8f8' : '#c4c0d2');
+    if (on) m.glow(x - 1, h - 4, z + 1, x + 1, h - 2, z + 2, MAGIC.spirit); }
+  m.disc(0, 0, 2.5, 0, 1, on ? MAGIC.spirit : '#8a8698', on);
 };
 
 /* ---------------------------------------------------------------- public */

@@ -56,6 +56,9 @@ All are in `src/3d/`. "Used" means where the asset appears in the game.
 | *Phase 1.1:* hanging rock root, grass drape, cliff rock formations, hanging roots | island3d.js `buildTerrain` | built from the island map | Starter Island underside and cliffs |
 | *Phase 1.1:* waterfalls (shader ribbon, churn, spring mouth) | island3d.js | 2 | camera-facing cliffs |
 | *Phase 1.1:* magic motes | island3d.js `buildSparks` | per place | Hatchery, Tidegate, Moonshrine, Reliquary Gate, stones |
+| *Phase 1.2:* distant voxel islands (6, hazed, parallax) | island3d.js `farIslet` | 6 | Starter Island sky |
+| *Phase 1.2:* waterfall back sheets and mist puffs; sea glints and horizon mist (backdrop SVG) | island3d.js, island-art.js | — | Starter Island |
+| *Phase 1.2:* designed ruins (Fallen Nursery, Buried Hollow, Dry Tidegate, Fallen Temple, Cold Forge, abandoned cottage) and the ruin kit | voxbuild.js | — | ruined buildings |
 | *Phase 1.1:* window sills, bars and shutters; foundation skirts; Hatchery porch, chimney, lanterns and straw nest; habitat silhouette features | voxbuild.js | — | all buildings |
 
 Buildings without a voxel model fall back to their existing 2D picture. In Phase 1, the only such building is one

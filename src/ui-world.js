@@ -247,6 +247,10 @@
 
   function tap(target, px, py) {
     if (UI.screen !== 'island' || UI.busy || UI.modalOpen()) return;
+    // voxel island: a creature or marker hidden behind a 3D building does not take the tap; the building does
+    if (target && target.closest && (target.closest('[data-cr]') || target.closest('.lm')) && A.VoxIsland && A.VoxIsland.occludedAt(px, py)) {
+      target = document.elementsFromPoint(px, py).find((e) => e.closest && e.closest('#objs') && !e.closest('[data-cr]') && !e.closest('.lm')) || null;
+    }
     const s = st(), el = target && target.closest ? target : null;
     const col = el && el.closest('[data-collect]'), ob = el && el.closest('[data-oid]'), bl = el && el.closest('[data-bid]'), hit = el && el.closest('[data-hit]'), gh = el && el.closest('[data-ghost]');
     if (UI.bm) {
