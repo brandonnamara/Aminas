@@ -382,7 +382,9 @@
       if (!url) url = terrainCache[key] = svgUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="' + ex.x + ' ' + ex.y + ' ' + ex.w + ' ' + ex.h + '" width="' + ex.w + '" height="' + ex.h + '">' + stat + '</svg>');
       svg = '<image class="terrain-img" pointer-events="none" href="' + url + '" x="' + ex.x + '" y="' + ex.y + '" width="' + ex.w + '" height="' + ex.h + '"/>';
     }
-    return { svg: svg + extra.live, bounds, live: extra.live, stat };
+    // Environment Phase 1: the column data, so the voxel island (src/3d/island3d.js) builds the same land in 3D
+    const colList = Object.values(cols).map((c) => ({ x: c.x, y: c.y, kind: c.kind, top: c.top, bot: c.bot }));
+    return { svg: svg + extra.live, bounds, live: extra.live, stat, cols: colList };
   }
   // Cells the starter jetty occupies (kept clear of ledges and chunks).
   Art.jettyCells = function () {
@@ -950,8 +952,10 @@
     const tiles = [];
     for (let i = 0; i < 6; i++) for (let j = 0; j < 6; j++) { const u = -1.8 + i * 0.6, v = -1.8 + j * 0.6, r = Math.hypot(u + 0.3, v + 0.3); tiles.push([u, v, r < 0.7 ? '#ffd86b' : r < 1.3 ? ((i + j) % 2 ? '#f4ead0' : '#ebdfc0') : (i + j) % 2 ? '#e7dab9' : '#ddcfaa']); }
     const by = {}; tiles.forEach(([u, v, c]) => { by[c] = (by[c] || '') + dq(quadT(1, u + 0.02, v + 0.02, u + 0.58, v + 0.58)); });
-    g += poly(quadT(0, -1.8, -1.8, 1.8, 1.8), '#cbb48a') + Object.keys(by).map((c) => path(by[c], c)).join('');
-    g += vbox(-1.8, 1.72, 0, 3.6, 0.08, 3, '#cbb48a') + vbox(1.72, -1.8, 0, 0.08, 3.6, 3, '#cbb48a');
+    if (!(Art.voxHas && Art.voxHas('l', 'plaza'))) {
+      g += poly(quadT(0, -1.8, -1.8, 1.8, 1.8), '#cbb48a') + Object.keys(by).map((c) => path(by[c], c)).join('');
+      g += vbox(-1.8, 1.72, 0, 3.6, 0.08, 3, '#cbb48a') + vbox(1.72, -1.8, 0, 0.08, 3.6, 3, '#cbb48a');
+    }
     const ma = Math.min(0.9, 0.35 + ((st && st.rank) || 1) * 0.08);
     g += '<g data-hit="mark">' + ell(0, 0, 22, 11, '#fff2a8', ' opacity="' + ma + '" class="glow-soft"') + ell(0, 0, 40, 20, 'none', ' stroke="#fff2a8" stroke-width="2" stroke-dasharray="6 5" opacity="' + ma + '" class="mark-ring"') + ell(0, 0, 60, 30, 'transparent') + '</g>';
     return g;
@@ -965,7 +969,7 @@
     let g = '<g class="stones' + (on ? ' hum' : ' calm') + '" data-hit="' + (on ? 'disturbance' : 'stones') + '" data-hl="hit:disturbance">';
     g += on ? ell(0, 0, 70, 36, '#ff9ee0', ' opacity=".28" class="glow-soft"') : ell(0, 0, 50, 25, '#ff9ee0', ' opacity=".1"');
     const pts = [...Array(7)].map((_, i) => { const a = (i * Math.PI * 2) / 7; return [Math.cos(a) * 1.0, Math.sin(a) * 1.0, i]; }).sort((p, q) => p[0] + p[1] - (q[0] + q[1]));
-    pts.forEach(([u, v, i]) => { const h = 22 + (i % 3) * 6; g += vc(u, v, 0, 0.22, 0.2, h, on ? '#dccaf4' : '#aaa6ba', { t: on ? '#f0e4ff' : '#c4c0d2' }) + (on ? poly(onV(v + 0.1, [[u - 0.03, h - 6], [u + 0.03, h - 6], [u + 0.03, h - 14], [u - 0.03, h - 14]]), '#ff9ee0', ' class="twk"') : ''); });
+    if (!(Art.voxHas && Art.voxHas('l', 'stones'))) pts.forEach(([u, v, i]) => { const h = 22 + (i % 3) * 6; g += vc(u, v, 0, 0.22, 0.2, h, on ? '#dccaf4' : '#aaa6ba', { t: on ? '#f0e4ff' : '#c4c0d2' }) + (on ? poly(onV(v + 0.1, [[u - 0.03, h - 6], [u + 0.03, h - 6], [u + 0.03, h - 14], [u - 0.03, h - 14]]), '#ff9ee0', ' class="twk"') : ''); });
     g += ell(0, -10, 70, 50, 'transparent');
     if (on) g += '<g transform="translate(0 -60)"><g class="tagq">' + circ(0, 0, 13, '#2b2147', ' stroke="#ff9ee0" stroke-width="2"') + '<text y="6" text-anchor="middle" font-size="18" font-weight="800" fill="#ffd0f0">!</text></g></g>';
     return g + '</g>';
@@ -1111,7 +1115,8 @@
     W.obstaclesOn(st, iid).forEach((o) => {
       if (o.state === 'cleared') return;
       const t = D.OBSTACLE_TYPES[o.type], [cx, cy] = at(o.x, o.y, t.w, t.h), removing = o.state === 'removing';
-      let g = '<g class="obs' + (removing ? ' removing' : '') + '" data-oid="' + o.id + '" data-hl="obs:' + o.id + '" transform="translate(' + f1(cx) + ' ' + f1(cy) + ')">' + Art.obstacleSprite(o);
+      const vx = Art.voxHas && Art.voxHas('o', o.type) ? ' vx' : '';
+      let g = '<g class="obs' + vx + (removing ? ' removing' : '') + '" data-oid="' + o.id + '" data-hl="obs:' + o.id + '" transform="translate(' + f1(cx) + ' ' + f1(cy) + ')"><g class="artg">' + Art.obstacleSprite(o) + '</g>';
       const hgt = Art.obstacleHeight(o.type);
       g += poly(foot(t.w, t.h).map((p) => [p[0] * 1.05, p[1] * 1.05 - 2]), 'transparent') + '<rect x="' + (-t.w * 18) + '" y="' + (-hgt) + '" width="' + (t.w * 36) + '" height="' + hgt + '" fill="transparent"/>';
       if (removing) { const r = o.rec, tot = Math.max(1, r.endAt - (r.startAt || r.endAt - 1000)), left = Math.max(0, r.endAt - now); g += '<g transform="translate(0 ' + (-hgt - 14) + ')">' + Art.timerBar(1 - left / tot, Art.fmtTime(Math.ceil(left / 1000))) + '</g>'; }
@@ -1121,9 +1126,10 @@
       if (b.id === opts.hide || b.x == null) return;
       const s = W.size(b.type, b.rot), [cx, cy] = at(b.x, b.y, s.w, s.h), d = D.BUILDINGS[b.type], hgt = Art.heightOf(b);
       const state = b.state === 'ruined' ? (R.reqMet(st, d.req) ? 'available' : 'hidden') : b.state;
-      let g = '<g class="bld ' + state + (opts.selected === b.id ? ' sel' : '') + '" data-bid="' + b.id + '" data-hl="bld:' + b.id + '" transform="translate(' + f1(cx) + ' ' + f1(cy) + ')">';
+      const vx = Art.voxHas && Art.voxHas('b', d.art || d.id, d.cat, b.state) ? ' vx' : '';
+      let g = '<g class="bld ' + state + vx + (opts.selected === b.id ? ' sel' : '') + '" data-bid="' + b.id + '" data-hl="bld:' + b.id + '" transform="translate(' + f1(cx) + ' ' + f1(cy) + ')">';
       if (state === 'available') g += ell(0, 0, s.w * 30, s.h * 15 + 6, 'none', ' class="pulse" stroke="#fff2a8" stroke-width="3"');
-      g += '<g' + (state === 'hidden' ? ' opacity=".55"' : '') + '>' + Art.buildingSprite(b, st) + '</g>';
+      g += '<g class="artg"' + (state === 'hidden' ? ' opacity=".55"' : '') + '>' + Art.buildingSprite(b, st) + '</g>';
       // generous invisible hit area: footprint + sprite box
       g += poly(foot(s.w, s.h), 'transparent') + '<rect x="' + (-(s.w + s.h) * 15) + '" y="' + (-hgt) + '" width="' + ((s.w + s.h) * 30) + '" height="' + hgt + '" fill="transparent"/>';
       if (state === 'available') g += '<g transform="translate(0 ' + (-hgt - 12) + ')"><g class="tag"><rect x="-30" y="-13" width="60" height="26" rx="13" fill="#2b2147" stroke="#ffd86b" stroke-width="2"/>' + circ(-16, 0, 7, '#ffd86b') + '<text x="6" y="5" text-anchor="middle" font-size="14" font-weight="800" fill="#fff">' + d.levels[0].cost.gold + '</text></g></g>';

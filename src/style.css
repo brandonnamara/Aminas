@@ -1039,3 +1039,10 @@ body.perf-rest .avatar-btn .av-head, body.perf-covered .avatar-btn .av-head, bod
 .lp-bld { display: flex; align-items: center; gap: .5rem; } .lp-svg { width: 9rem; height: 8rem; } .lp-av { width: 4.5rem; height: 4.5rem; } .lp-av .ico { width: 100%; height: 100%; }
 .lp-sps { display: flex; flex-wrap: wrap; gap: .3rem; } .lp-sp .ico { width: 1.9rem; height: 1.9rem; }
 .lp-stats { font-size: .68rem; color: var(--muted); min-height: 1.6rem; }
+
+/* =====================================================================================================
+   Environment Phase 1 — the voxel island draws on a canvas between the sky and the 2D layer
+   ===================================================================================================== */
+#world > canvas.vox3d { position: absolute; left: 0; top: 0; width: 100% !important; height: 100% !important; pointer-events: none; image-rendering: auto; }
+#world.vox #terrain { display: none; }
+#world.vox .vx > .artg { opacity: 0; }

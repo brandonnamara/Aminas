@@ -57,7 +57,7 @@
       party: [],                 // last chosen party uids
       run: null,                 // active dungeon run
       recipes: {},               // breeding recipes discovered
-      settings: { music: true, sfx: true, eggSpeed: 'fast', textSpeed: 'normal', timers: 'normal', grid: true, reduceMotion: false, creatures3d: true, dayNight: true, batterySaver: false },
+      settings: { music: true, sfx: true, eggSpeed: 'fast', textSpeed: 'normal', timers: 'normal', grid: true, reduceMotion: false, creatures3d: true, dayNight: true, batterySaver: false, voxIsland: true },
       story: { used: {}, slips: {}, asked: {}, scenes: {} },
       lastSaved: 0,
     };
@@ -219,6 +219,7 @@
     av.made = !!av.made; av.name = String(av.name || '').replace(/[<>]/g, '').slice(0, 14);
     if (A.Pixel && A.Pixel.avatarLook) av.look = A.Pixel.avatarLook(av.look);
     st.ach = st.ach && typeof st.ach === 'object' ? st.ach : {};
+    if (st.settings && st.settings.voxIsland == null) st.settings.voxIsland = true; // Environment Phase 1
     st.nextUid = Math.max(st.nextUid | 0, 1 + st.aminas.reduce((m, a) => Math.max(m, a.uid | 0), 0));
     if (!st.aminas.find((a) => a.uid === st.active)) st.active = st.aminas.length ? st.aminas[0].uid : null;
     ['gold', 'food', 'gems'].forEach((k) => { st.res[k] = Math.max(0, Math.floor(+st.res[k] || 0)); });

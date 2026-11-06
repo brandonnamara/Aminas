@@ -39,6 +39,7 @@
       camRaf = 0; const svg = $('#iso'); if (!svg || !UI.wv) return;
       const c = clampCam(camFor(UI.wv.iid)), v = view(), o = UI.wv.o;
       svg.style.transform = 'translate(' + (v.w / 2 - (c.x - o.x) * c.z).toFixed(1) + 'px,' + (v.h / 2 - (c.y - o.y) * c.z).toFixed(1) + 'px) scale(' + c.z.toFixed(4) + ')';
+      if (A.VoxIsland) A.VoxIsland.view(c, v);
       // gentle parallax on the backdrop
       const bd = $('#backdrop-wrap'); if (bd) bd.style.transform = 'translate(' + (-(c.x - (UI.wv.cx0 || 0)) * 0.03).toFixed(1) + 'px,' + (-(c.y - (UI.wv.cy0 || 0)) * 0.02).toFixed(1) + 'px) scale(1.06)';
     });
@@ -72,6 +73,7 @@
       UI.wv = { iid, key, bounds: b, cx0: c[0], cy0: c[1], o };
       svg.setAttribute('viewBox', o.x + ' ' + o.y + ' ' + o.w + ' ' + o.h); svg.setAttribute('width', o.w); svg.setAttribute('height', o.h);
       $('#terrain').innerHTML = t.svg;
+      if (A.VoxIsland) A.VoxIsland.terrain(iid, key, t); // Environment Phase 1: the voxel island draws underneath
       $('#gridl').innerHTML = IA.grid(iid);
       $('#amb').innerHTML = IA.ambient(iid);
       $('#backdrop-wrap').innerHTML = IA.backdrop(iid, s);
@@ -91,6 +93,7 @@
       items.forEach((it, i) => { if (it.svg === prev[i].svg) return; const t = document.createElementNS(NS, 'g'); t.innerHTML = it.svg; if (t.firstElementChild) g.replaceChild(t.firstElementChild, g.children[i]); });
     } else g.innerHTML = items.map((i) => i.svg).join('');
     g._items = items;
+    if (A.VoxIsland) A.VoxIsland.sync();
     if (A.Life) A.Life.apply();
     UI.applyHl();
   };
