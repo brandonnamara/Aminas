@@ -1,0 +1,163 @@
+<title>Aminas Phase 6 Review</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+  /* Layout: a stacked review sheet; each comparison is a pair of phone screenshots, Before then After, with a view switch. */
+  :root {
+    color-scheme: dark;
+    --ink: #120e2e; --glass: #231b55; --glass-hi: #2f2470; --line: rgba(190, 170, 255, .28);
+    --text: #fff9f0; --muted: #cfc6ee; --gold: #ffd978; --cyan: #8ff0ff; --pink: #ff9ee0;
+    --spectrum: linear-gradient(100deg, #ff9ee0, #b49bff 22%, #86b4ff 42%, #8ff0ff 60%, #fff0b0 80%, #ff9ee0);
+    --display: "Baloo 2", "Trebuchet MS", system-ui, sans-serif;
+    --body: "Atkinson Hyperlegible", -apple-system, "Segoe UI", system-ui, sans-serif;
+    --cut: polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px), 0 10px);
+  }
+  * { box-sizing: border-box; }
+  body { background: radial-gradient(120% 70% at 20% 0%, #3a2c7e, var(--ink) 65%) fixed, var(--ink); color: var(--text); font-family: var(--body); font-size: 15px; line-height: 1.5;
+    padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 1.6rem 3rem; }
+  main { max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 2.2rem; }
+  h1, h2, h3 { font-family: var(--display); line-height: 1.1; margin: 0; text-wrap: balance; }
+  h1 { font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 800; background: linear-gradient(180deg, #fffbe8 20%, var(--gold) 60%, #ffb6e6); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .lede { color: var(--muted); max-width: 65ch; margin: .4rem 0 0; }
+  .meta { display: flex; flex-wrap: wrap; gap: .4rem .6rem; margin-top: .8rem; font-size: .78rem; }
+  .meta span { padding: .2rem .6rem; background: rgba(255, 255, 255, .07); clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%); color: var(--muted); }
+  .meta b { color: var(--text); }
+  .bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1rem; padding: .55rem .8rem; background: rgba(18, 14, 46, .92); border: 1px solid var(--line); clip-path: var(--cut); }
+  body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--ink); }
+  .bar nav { display: flex; flex-wrap: wrap; gap: .3rem .8rem; font-size: .82rem; }
+  .bar nav a { color: var(--muted); text-decoration: none; } .bar nav a:hover, .bar nav a:focus-visible { color: var(--cyan); }
+  .seg { margin-left: auto; display: flex; gap: 2px; padding: 2px; background: rgba(0, 0, 0, .3); clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 50%, calc(100% - 6px) 100%, 6px 100%, 0 50%); }
+  .seg button { font: 700 .78rem var(--body); color: var(--muted); background: none; border: 0; padding: .35rem .8rem; cursor: pointer; }
+  .seg button[aria-pressed="true"] { color: #10204a; background: linear-gradient(180deg, #f2fdff, #a9eeff 55%, #7ec9ff); }
+  .seg button:focus-visible, .shot:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+  section { display: flex; flex-direction: column; gap: 1rem; scroll-margin-top: 4.5rem; }
+  section > header { display: flex; flex-direction: column; gap: .2rem; }
+  h2 { font-size: 1.6rem; font-weight: 800; color: var(--gold); }
+  section > header p { margin: 0; color: var(--muted); max-width: 70ch; }
+  .pair { display: flex; flex-direction: column; gap: .5rem; padding: .9rem; background: linear-gradient(170deg, rgba(48, 36, 108, .7), rgba(18, 13, 48, .8)); clip-path: var(--cut); border: 1px solid var(--line); }
+  .pair h3 { font-size: 1.15rem; font-weight: 600; }
+  .pair p { margin: 0; color: var(--muted); font-size: .88rem; max-width: 80ch; }
+  .shots { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem; margin-top: .3rem; }
+  body[data-view="before"] .shots, body[data-view="after"] .shots { grid-template-columns: minmax(0, 1fr); }
+  body[data-view="before"] .after, body[data-view="after"] .before { display: none; }
+  .shots.solo { grid-template-columns: minmax(0, 1fr); }
+  figure { margin: 0; display: flex; flex-direction: column; gap: .3rem; min-width: 0; }
+  figcaption { font-size: .7rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); }
+  .after figcaption { color: var(--cyan); }
+  .shot { display: block; width: 100%; padding: 0; border: 0; background: none; cursor: zoom-in; }
+  .shot img { display: block; width: 100%; height: auto; aspect-ratio: 1266 / 585; object-fit: cover; border: 1px solid rgba(255, 255, 255, .12); }
+  .tall img { aspect-ratio: auto; }
+  .notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: .7rem; }
+  .note { padding: .8rem .9rem; background: rgba(255, 255, 255, .05); border-left: 3px solid var(--gold); }
+  .note b { display: block; color: var(--text); font-family: var(--display); font-size: 1rem; }
+  .note span { color: var(--muted); font-size: .86rem; }
+  .ladder { display: flex; flex-wrap: wrap; gap: .4rem; font-size: .75rem; font-weight: 700; }
+  .ladder i { font-style: normal; padding: .15rem .55rem; clip-path: polygon(5px 0, 100% 0, calc(100% - 5px) 100%, 0 100%); color: #1a1240; }
+  dialog { padding: 0; border: 0; background: transparent; max-width: 96vw; max-height: 94vh; }
+  dialog::backdrop { background: rgba(6, 4, 20, .88); }
+  dialog img { display: block; max-width: 96vw; max-height: 90vh; width: auto; height: auto; }
+  dialog form { text-align: right; } dialog button { font: 700 .85rem var(--body); color: var(--text); background: var(--glass-hi); border: 1px solid var(--line); padding: .4rem .9rem; margin-top: .4rem; cursor: pointer; }
+  @media (max-width: 720px) { .shots { grid-template-columns: minmax(0, 1fr); } .seg { margin-left: 0; } }
+  @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+
+<main>
+  <header>
+    <h1>Aminas · Phase 6 review</h1>
+    <p class="lede">Combat interface, the prismatic icon collection and unified rewards, Phase 5 against Phase 6, captured from the same scripted game states. Tap any screenshot to see it full size.</p>
+    <div class="meta"><span>Branch <b>ui6-combat</b> from <b>ui5-prismatic</b> (6a6b8fd)</span><span>Tests <b>477 passed, 0 failed</b></span><span>Screens: desktop Chromium at <b>844 × 390</b> (iPhone 13/14 landscape size), not a real phone</span></div>
+  </header>
+
+  <div class="bar" role="toolbar" aria-label="Sections and view">
+    <nav aria-label="Sections"><a href="#combat">Combat</a><a href="#results">Results</a><a href="#rewards">Rewards</a><a href="#icons">Icons</a><a href="#moments">Special moments</a><a href="#gallery">Component gallery</a></nav>
+    <div class="seg" role="group" aria-label="Show"><button id="v-both" type="button" data-v="both" aria-pressed="true">Both</button><button id="v-before" type="button" data-v="before" aria-pressed="false">Before</button><button id="v-after" type="button" data-v="after" aria-pressed="false">After</button></div>
+  </div>
+
+  <section id="combat">
+    <header><h2>Combat</h2><p>The battle now speaks the same prismatic language as the island: crystal health bars that show the size of every hit, a turn indicator, element-coloured moves with clear states, and conditions you can tap to understand.</p></header>
+    <div class="notes">
+      <div class="note"><b>Health you can read</b><span>Segmented crystal bars; a pale band holds what was just lost, then drains. Below 25% the panel turns red and says Critical.</span></div>
+      <div class="note"><b>Whose turn</b><span>Turn number, "Your move" or who is acting, and who acts first, read from the game's own speed rule.</span></div>
+      <div class="note"><b>Moves</b><span>Element gem and colour, power, and the cost in words ("Special · every 3"). Recharging moves show the turns left.</span></div>
+      <div class="note"><b>Conditions</b><span>Buffs ▲ and debuffs ▼ with turns left, including attack down and guarding, which were invisible before. Tap one for an explanation.</span></div>
+    </div>
+    <div id="combat-pairs"></div>
+  </section>
+
+  <section id="results">
+    <header><h2>Victory and defeat</h2><p>One result card for every win: where it happened, progress, rewards grouped by where they came from, then the party. Guardians get gold, the Island Boss gets the full spectrum, and defeat stays quiet.</p></header>
+    <div id="results-pairs"></div>
+  </section>
+
+  <section id="rewards">
+    <header><h2>Rewards and the rarity ladder</h2><p>Every reward uses one tile and one card. Rarity is readable at a glance and the celebration grows with it, while common rewards stay calm.</p>
+      <div class="ladder" aria-label="Rarity ladder"><i style="background:#cdc7e2">Common</i><i style="background:#8fe39a">Uncommon</i><i style="background:#7fc6ff">Rare</i><i style="background:#cf9bff">Epic</i><i style="background:linear-gradient(118deg,#fff6d0,#ffd978)">Legendary</i><i style="background:var(--spectrum)">Mythic</i></div></header>
+    <div id="rewards-pairs"></div>
+  </section>
+
+  <section id="icons">
+    <header><h2>Prismatic icons</h2><p>52 voxel-crystal sprites with one outline and one light direction replace the thin line icons for every "thing" in the game. Control glyphs (close, back, plus) and the Dev 8 currency sprites were already clear and stay.</p></header>
+    <div id="icons-pairs"></div>
+  </section>
+
+  <section id="moments">
+    <header><h2>Special moments</h2><p>A new Amina keeps the creature as the hero, with a quiet line showing its place in your collection. A new island gets its own spectrum card.</p></header>
+    <div id="moments-pairs"></div>
+  </section>
+
+  <section id="gallery">
+    <header><h2>Component gallery</h2><p>Every new component in its states, rendered by the game's own code (also in the preview at tools/ui6-gallery.html).</p></header>
+    <div class="pair"><div class="shots solo tall"><figure class="after-only"><button class="shot" type="button" data-full="img/gallery6.jpg"><img src="img/gallery6.jpg" alt="Phase 6 component gallery: icons, health bars, panels, turn indicator, moves, conditions, numbers, reward tiles, cards, results and special moments" loading="lazy"></button></figure></div></div>
+  </section>
+</main>
+
+<dialog id="zoom" aria-label="Full-size screenshot"><img id="zoom-img" alt=""><form method="dialog"><button id="zoom-close">Close</button></form></dialog>
+
+<script>
+  const P = {
+    combat: [
+      ['battle', 'A normal battle', 'Panels, health bars and moves rebuilt as crystal; the turn indicator sits at the top.'],
+      ['battle-status', 'Critical health and conditions', 'Burn, soak and regen chips with turns left; the critical panel. (The Phase 5 capture could not show conditions in this state.)'],
+      ['battle-boss', 'A guardian battle', 'The Waywarden with its Guardian tag.'],
+      ['battle-boss-charge', 'The Island Boss telegraph', 'The Heartwood Stag shifting colour, with the warning plate and turn order.'],
+      ['battle-island-3d', 'The live 3D stage', 'The interface over the 3D arena (software rendering here, so the camera is lower quality than on a phone).'],
+      ['battle-team', 'Another dungeon (Cold Kiln)', 'The same system in a different arena: element gems, power and special labels on the moves.'],
+    ],
+    results: [
+      ['victory', 'Victory', 'Battle spoils as reward tiles; the party hops; where it happened in the kicker.'],
+      ['victory-boss', 'Guardian defeated, dungeon cleared', 'Gold crown banner and frame. Equipment found now sits on the result; in Phase 5 its card covered the title.'],
+      ['victory-island', 'The Island Boss defeated', 'Full spectrum banner and frame, and the new island as its own highlighted moment.'],
+      ['defeat', 'Defeat', 'What you keep comes first, then one tip. No celebration effects.'],
+    ],
+    rewards: [
+      ['reward-common', 'Common find', 'Calm: plain rim, no burst. Now names where it came from.'],
+      ['reward-rare', 'Rare find', 'Blue rim, glow and a small burst.'],
+      ['reward-epic', 'Epic find', 'Violet rim, stronger glow, one light sweep.'],
+      ['reward-mythic', 'Mythic find', 'The top of the ladder: full spectrum, turning rays, and its own name (it used to read "Legendary find").'],
+      ['task-reward', 'Task reward', 'Phase 5 floated "+150 gold" text. Now a card names the task, the amounts and the rank XP. (Before shows the HUD with no card.)'],
+    ],
+    icons: [
+      ['icons', 'The icon set', 'Before: thin single-colour line icons. After: the prismatic sprites; control glyphs stay as clean lines.'],
+      ['hud', 'The island HUD and navigation', 'The new icons in place on the bottom bar and the HUD.'],
+      ['collection', 'Element chips', 'Every element chip now carries its glyph, so colour is never the only cue.'],
+    ],
+    moments: [
+      ['reveal', 'A new Amina', 'The creature stays the hero; a quiet collection line and a rare frame.'],
+      ['reward-legendary', 'A legendary Amina', 'The gold legendary step of the ladder (the spectrum is kept for mythic).'],
+      ['island-unlock', 'A new island', 'The spectrum frame and a "New island unlocked" kicker.'],
+    ],
+  };
+  const fig = (side, id, label) => '<figure class="' + side + '"><figcaption>' + (side === 'before' ? 'Before · Phase 5' : 'After · Phase 6') + '</figcaption><button class="shot" type="button" data-full="img/' + side + '/' + id + '.jpg" aria-label="' + label + ', ' + side + ', full size"><img src="img/' + side + '/' + id + '.jpg" alt="' + label + ' (' + side + ')" loading="lazy" width="1266" height="585"></button></figure>';
+  Object.keys(P).forEach((k) => {
+    document.getElementById(k + '-pairs').outerHTML = P[k].map(([id, t, d]) => '<div class="pair"><h3>' + t + '</h3><p>' + d + '</p><div class="shots">' + fig('before', id, t) + fig('after', id, t) + '</div></div>').join('');
+  });
+  // view switch: both, only before, only after (remembered for this viewer)
+  const setView = (v) => { document.body.dataset.view = v; document.querySelectorAll('.seg button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === v))); try { localStorage.setItem('p6-view', v); } catch (e) {} };
+  document.querySelectorAll('.seg button').forEach((b) => b.addEventListener('click', () => setView(b.dataset.v)));
+  try { const v = localStorage.getItem('p6-view'); if (v) setView(v); } catch (e) {}
+  // full-size view
+  const dlg = document.getElementById('zoom'), zi = document.getElementById('zoom-img');
+  document.addEventListener('click', (e) => { const s = e.target.closest('.shot'); if (!s) return; zi.src = s.dataset.full; zi.alt = s.querySelector('img').alt; if (dlg.showModal) dlg.showModal(); });
+  dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
+</script>
