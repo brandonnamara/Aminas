@@ -53,7 +53,7 @@ const ratio = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) +
   // rarity reward cards
   const rw = await page.evaluate(() => { const common = Object.keys(A.Data.ITEMS).find((k) => A.Data.ITEMS[k].rarity === 'common'); const c1 = A.UI.itemFound(common); const r1 = c1.className, sp1 = document.querySelectorAll('.spark, .pxb-wrap i').length; const c2 = A.UI.itemFound('coralaegis'); return { r1, sp1, r2: c2.className, sp2: document.querySelectorAll('.spark, .pxb-wrap i').length, txt: c2.textContent }; });
   ok(/r-common/.test(rw.r1) && rw.sp1 === 0, 'a common find gets a calm card with no burst');
-  ok(/r-mythic/.test(rw.r2) && rw.sp2 >= 25 && /Legendary find/.test(rw.txt), 'a unique mythic find gets the spectrum card and the full burst (' + rw.sp2 + ' sparks)');
+  ok(/r-mythic/.test(rw.r2) && rw.sp2 >= 25 && /Mythic find/.test(rw.txt), 'a unique mythic find gets the spectrum card and the full burst (' + rw.sp2 + ' sparks)');
   await page.waitForTimeout(7000);
   ok(await page.evaluate(() => !document.querySelector('.reward-card')), 'reward cards leave by themselves');
   // the game's own discovery path now uses the card (equipment from a dungeon, not from the Forge)

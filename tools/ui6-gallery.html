@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<base href="../">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Aminas UI Gallery 6</title>
+<!-- Phase 6: combat interface, prismatic icons and unified rewards, rendered by the game's own code and stylesheets
+     (no copies): the page loads every game script except the boot, builds real battles, result cards and reward
+     cards off-screen, and shows them here in their states. Open over the dev server: /tools/ui6-gallery.html. -->
+<link rel="stylesheet" href="src/style.css">
+<link rel="stylesheet" href="src/ui-prism.css">
+<link rel="stylesheet" href="src/ui-combat.css">
+<style>
+  html, body { position: static; overflow: auto; height: auto; -webkit-user-select: text; user-select: text; }
+  body { background: radial-gradient(120% 90% at 30% 0%, #3a2c7e, #120e2e 70%); padding: 1rem 1.2rem 2rem; font-size: 15px; }
+  #app { position: fixed; left: -4000px; top: 0; width: 844px; height: 390px; visibility: hidden; }
+  #rotate { display: none !important; }
+  h1.g { font-size: 1.3rem; margin: 0 0 .2rem; background: linear-gradient(180deg, #fffaf0, #ffd978 60%, #ffb6e6); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .g-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .9rem; }
+  .g-sec { display: block; padding: .7rem .8rem .8rem; }
+  .g-sec.wide { grid-column: 1 / -1; }
+  .g-sec > b { display: block; font-size: .72rem; letter-spacing: .16em; text-transform: uppercase; color: var(--pz-gold); margin-bottom: .45rem; }
+  .g-row { display: flex; flex-wrap: wrap; gap: .55rem; align-items: flex-start; margin: .35rem 0; }
+  .g-cap { font-size: .62rem; color: var(--pz-muted); text-align: center; margin-top: .2rem; max-width: 14rem; }
+  .g-it { display: flex; flex-direction: column; align-items: center; }
+  .g-ic { display: grid; grid-template-columns: repeat(auto-fill, minmax(5.2rem, 1fr)); gap: .4rem; }
+  .g-ic > div { text-align: center; font-size: .6rem; color: var(--pz-muted); padding: .35rem .1rem; background: rgba(10, 6, 30, .3); }
+  .g-ic .ico { width: 2rem; height: 2rem; display: block; margin: 0 auto .2rem; }
+  .g-cat { font-size: .64rem; letter-spacing: .14em; text-transform: uppercase; color: #cfc6ee; margin: .6rem 0 .25rem; }
+  .g-sec .b-panel, .g-sec .b-turn, .g-sec .b-tip { position: relative !important; left: auto !important; top: auto !important; bottom: auto !important; transform: none !important; }
+  .g-sec .b-panel.fp { width: 12.5rem; }
+  .g-sec .abtn { width: 13rem; }
+  .g-sec .b-actions { position: static; width: 27rem; }
+  .g-sec .float { position: relative !important; left: auto !important; top: auto !important; animation: none !important; transform: none !important; }
+  .g-sec .sheet { position: relative; max-height: none; width: 30rem; animation: none; margin: 0; }
+  .g-sec .sheet .sh-body { max-height: none; overflow: visible; }
+  .g-sec .reward-card { animation: none; filter: none; width: 22rem; }
+  .g-sec .rtile, .g-sec .rtile::after { animation: none !important; }
+  .g-sec .vcard.reveal { width: 18rem; }
+  .g-fit { display: flex; gap: .8rem; flex-wrap: wrap; align-items: flex-start; }
+  .g-dark { background: #2a2062; padding: .5rem; }
+</style>
+</head>
+<body>
+<h1 class="g">Aminas · Phase 6 · Combat, icons and rewards</h1>
+<p class="muted" style="margin:.1rem 0 .8rem;font-size:.8rem">Live components rendered by the game’s own code (<code>src/ui2.js</code>, <code>src/ui-rewards.js</code>, <code>src/icons-prism.js</code>) with its stylesheets. Rules: <code>docs/ui/UI_PHASE6.md</code>.</p>
+<div class="g-grid" id="gallery"></div>
+<div id="app"><div id="stage"></div><div id="modal-root"></div><div id="toast-root"></div></div>
+<div id="rotate"></div>
+<script src="src/data.js"></script>
+<script src="src/roster.js"></script>
+<script src="src/gear-data.js"></script>
+<script src="src/world-maps.js"></script>
+<script src="src/world-data.js"></script>
+<script src="src/campaign-data.js"></script>
+<script src="src/world.js"></script>
+<script src="src/state.js"></script>
+<script src="src/rules.js"></script>
+<script src="src/forge.js"></script>
+<script src="src/essence.js"></script>
+<script src="src/achievements.js"></script>
+<script src="src/quests.js"></script>
+<script src="src/events.js"></script>
+<script src="src/story.js"></script>
+<script src="src/scenes.js"></script>
+<script src="src/voxel.js"></script>
+<script src="src/voxel-kit.js"></script>
+<script src="src/voxel-species.js"></script>
+<script src="src/voxel-species-primates.js"></script>
+<script src="src/voxel-species-quads.js"></script>
+<script src="src/voxel-species-dragons.js"></script>
+<script src="src/voxel-species-misc.js"></script>
+<script src="src/art.js"></script>
+<script src="src/pixel-art.js"></script>
+<script src="src/icons-prism.js"></script>
+<script src="src/dungeon-art.js"></script>
+<script src="src/c3d.js"></script>
+<script src="src/island-art.js"></script>
+<script src="src/island-life.js"></script>
+<script src="src/vox-island.js"></script>
+<script src="src/audio.js"></script>
+<script src="src/perf.js"></script>
+<script src="src/ui.js"></script>
+<script src="src/ui-world.js"></script>
+<script src="src/ui2.js"></script>
+<script src="src/ui-scene.js"></script>
+<script src="src/ui-pve.js"></script>
+<script src="src/ui-v07.js"></script>
+<script src="src/ui-forge.js"></script>
+<script src="src/ui-dev8.js"></script>
+<script src="src/bench.js"></script>
+<script src="src/ui-prism.js"></script>
+<script src="src/ui-rewards.js"></script>
+
+<script src="tools/ui6-gallery.js"></script>
+</body>
+</html>

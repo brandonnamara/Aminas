@@ -8,7 +8,8 @@
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const pct = (a, b) => Math.max(0, Math.min(100, b ? (a / b) * 100 : 0));
   const I = Art.icon;
-  const chip = (el) => '<span class="chip ' + el + '">' + D.ELEMENTS[el].name + '</span>';
+  // Phase 6: every element chip carries its glyph as well as its colour and name (colour alone is never the only cue)
+  const chip = (el) => '<span class="chip ' + el + '">' + (Art.elIcon ? Art.elIcon(el, 'chip-el') : '') + D.ELEMENTS[el].name + '</span>';
   const artBox = (sp, cls) => '<div class="art ' + (cls || '') + '">' + Art.portrait(sp) + '</div>';
   const silBox = (sp, cls) => '<div class="art sil ' + (cls || '') + '">' + Art.portrait(sp) + '</div>';
   UI.h = { esc, pct, chip, artBox, silBox };

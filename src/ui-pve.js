@@ -99,8 +99,8 @@
     UI.afterAction(); Au.play('ok');
     const ov = el.closest('.overlay');
     const art = r.artefact ? '<div class="panel" style="padding:.5rem;margin:.4rem 0"><b>' + I('scroll') + ' ' + esc(D.LORE[r.artefact].title) + '</b><p class="muted small-t" style="margin:.2rem 0">' + esc(D.LORE[r.artefact].text) + '</p><small class="muted">Added to your Journal.</small></div>' : '';
-    const m = UI.modal(UI.sheet('You searched ' + esc(D.RUINS[id].name), '<div class="vcard"><div class="rw" style="justify-content:center;font-size:1.05rem">' + UI.rewardRow(r.loot) + (r.essence && r.essence.n ? '<span>' + Art.essIcon(r.essence.el) + ' +' + r.essence.n + ' ' + esc(D.ELEMENTS[r.essence.el].name) + ' Essence</span>' : '') + '</div>' + art + '</div>', '<button class="btn gold" data-act="close">Good</button>', 'narrow'), { onClose: () => { if (ov && ov.parentNode) UI.ruins(ov); } });
-    UI.sparkles($('.rw', m), 14);
+    const m = UI.modal(UI.sheet('You searched ' + esc(D.RUINS[id].name), '<div class="vcard vic v-win"><div class="v-spoils">' + UI.Rewards.group({ title: 'Found in the ruins', icon: 'box', list: UI.Rewards.fromRes(r.loot).concat(r.essence && r.essence.n ? [{ k: 'essence', el: r.essence.el, n: r.essence.n }] : []) }) + '</div>' + art + '</div>', '<button class="btn gold" data-act="close">Good</button>', 'narrow res-sheet'), { onClose: () => { if (ov && ov.parentNode) UI.ruins(ov); } });
+    UI.Rewards.celebrate(m); if (!UI.calm()) UI.sparkles($('.rgrid', m), 12);
   });
 
   /* ---------- Survival ---------- */
@@ -125,9 +125,9 @@
         const out = R.Survival.resolve(st(), U.b); R.after(st()); S.save();
         if (out.win) {
           Au.play('win');
-          const ov = UI.modal(UI.sheet('Wave ' + out.wave + ' cleared', '<div class="vcard"><h1>Wave ' + out.wave + '!</h1>' + (out.milestone ? '<div class="panel reward-first" style="padding:.45rem;margin:.4rem 0"><b>' + I('star') + ' Milestone: wave ' + out.milestone.wave + '</b><div class="rw" style="display:flex;justify-content:center">' + UI.rewardRow(out.milestone.reward) + '</div></div>' : '') + '' + (out.essence && out.essence.n ? '<p>' + Art.essIcon(out.essence.el) + ' +' + out.essence.n + ' ' + esc(D.ELEMENTS[out.essence.el].name) + ' Essence</p>' : '') + '<p>Earned so far: <b>' + UI.rwInline(out.earned) + '</b></p><p class="muted small-t">Your party recovers a little. Next: wave ' + out.next + (out.next % 5 === 0 ? ' (a Champion)' : '') + '.</p></div>',
-            '<button class="btn ghost" id="sv-stop">Collect and stop</button><button class="btn gold" id="sv-next">Next wave</button>', 'narrow'), { dismiss: false });
-          $('.x', ov).remove();
+          const ov = UI.modal(UI.sheet('Wave ' + out.wave + ' cleared', '<div class="vcard vic v-win"><div class="v-banner"><span class="v-crest">' + I('swords') + '</span><small class="v-kick">Survival</small><h1>Wave ' + out.wave + '!</h1></div><div class="v-spoils">' + (out.milestone ? UI.Rewards.group({ title: 'Milestone: wave ' + out.milestone.wave, icon: 'star', list: UI.Rewards.fromRes(out.milestone.reward) }) : '') + (out.essence && out.essence.n ? UI.Rewards.group({ title: 'Battle spoils', list: [{ k: 'essence', el: out.essence.el, n: out.essence.n }] }) : '') + '</div><p>Earned so far: <b>' + UI.rwInline(out.earned) + '</b></p><p class="muted small-t">Your party recovers a little. Next: wave ' + out.next + (out.next % 5 === 0 ? ' (a Champion)' : '') + '.</p></div>',
+            '<button class="btn ghost" id="sv-stop">Collect and stop</button><button class="btn gold" id="sv-next">Next wave</button>', 'narrow res-sheet'), { dismiss: false });
+          $('.x', ov).remove(); UI.Rewards.celebrate(ov);
           $('#sv-next', ov).onclick = () => { UI.close(ov); UI.leaveBattle(() => svBattle()); };
           $('#sv-stop', ov).onclick = () => { UI.close(ov); const o2 = R.Survival.cashOut(st()); UI.afterAction(); UI.leaveBattle(() => { UI.showIsland(); svSummary(o2); }); };
         } else { Au.play('lose'); UI.leaveBattle(() => { UI.showIsland(); svSummary(out); }); }
@@ -135,7 +135,7 @@
   }
   function svSummary(out) {
     if (!out) return;
-    UI.modal(UI.sheet('Survival run over', '<div class="vcard"><h1>' + out.waves + ' wave' + (out.waves === 1 ? '' : 's') + '</h1>' + (out.newBest ? '<div class="good">A new best!</div>' : '') + '<div class="rw" style="justify-content:center;font-size:1rem">' + (UI.rewardRow(out.paid) || '<span class="muted">Nothing earned this time.</span>') + '</div></div>', '<button class="btn gold" data-act="close">Done</button>', 'narrow'));
+    UI.modal(UI.sheet('Survival run over', '<div class="vcard vic v-win"><div class="v-banner"><span class="v-crest">' + I('trophy') + '</span><small class="v-kick">Survival run over' + (out.newBest ? ' · a new best!' : '') + '</small><h1>' + out.waves + ' wave' + (out.waves === 1 ? '' : 's') + '</h1></div><div class="v-spoils">' + (UI.Rewards.fromRes(out.paid).length ? UI.Rewards.group({ title: 'Collected', list: UI.Rewards.fromRes(out.paid) }) : '<p class="muted">Nothing earned this time.</p>') + '</div></div>', '<button class="btn gold" data-act="close">Done</button>', 'narrow res-sheet'));
   }
 
   /* ---------- PvP: 5v5 practice ---------- */
@@ -159,7 +159,7 @@
       finish: (U) => { const out = R.PvP.resolvePractice(st(), U.b); S.save(); Au.play(out.win ? 'win' : 'lose'); pvpResult(out.win ? 'You won the practice match' : 'The computer won this one', out, () => UI.pvp5()); } });
   });
   function pvpResult(title, out, again) {
-    const ov = UI.modal(UI.sheet('Practice result', '<div class="vcard"><h1>' + esc(title) + '</h1>' + (out.reward ? '<div class="rw" style="justify-content:center">' + UI.rewardRow(out.reward) + '</div>' : out.win ? '<p class="muted small-t">No reward: today’s practice rewards are used up.</p>' : '') + (out.record ? '<p>Practice record: ' + out.record.w + '–' + out.record.l + '</p>' : '') + '<p class="muted small-t">Local practice against the computer. Nothing here is ranked.</p></div>', '<button class="btn gold" id="pr-ok">Continue</button>', 'narrow'), { dismiss: false });
+    const ov = UI.modal(UI.sheet('Practice result', '<div class="vcard vic ' + (out.win ? 'v-win' : 'defeat') + '"><div class="v-banner"><span class="v-crest">' + I(out.win ? 'swords' : 'el_dark') + '</span><small class="v-kick">Practice</small><h1>' + esc(title) + '</h1></div>' + (out.reward ? '<div class="v-spoils">' + UI.Rewards.group({ title: 'Practice reward', list: UI.Rewards.fromRes(out.reward) }) + '</div>' : out.win ? '<p class="muted small-t">No reward: today’s practice rewards are used up.</p>' : '') + (out.record ? '<p>Practice record: ' + out.record.w + '–' + out.record.l + '</p>' : '') + '<p class="muted small-t">Local practice against the computer. Nothing here is ranked.</p></div>', '<button class="btn gold" id="pr-ok">Continue</button>', 'narrow res-sheet'), { dismiss: false });
     $('.x', ov).remove(); $('#pr-ok', ov).onclick = () => { UI.close(ov); UI.leaveBattle(() => { UI.showIsland(); again(); }); };
   }
 

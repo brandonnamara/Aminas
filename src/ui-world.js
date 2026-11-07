@@ -726,7 +726,10 @@
     if (el.dataset.busy) return; el.dataset.busy = '1';
     const ov = panelOf(el), r = Q.claim(st(), el.dataset.id);
     if (!r.ok) return; Au.play('ok'); UI.sparkles(el, 14);
-    const rc = el.getBoundingClientRect(); floatAt(rc.left, rc.top, '+' + ['gold', 'food', 'gems'].filter((k) => r.reward[k]).map((k) => fmt(r.reward[k] + ((r.bonus && r.bonus[k]) || 0)) + ' ' + k).join(' '), '#ffd86b');
+    // Phase 6: the shared reward card (what, how much, from which task). Amounts are exactly what Q.claim paid.
+    const q = Q.get(el.dataset.id), tot = {}; ['gold', 'food', 'gems'].forEach((k) => { const n = (r.reward[k] || 0) + ((r.bonus && r.bonus[k]) || 0); if (n) tot[k] = n; });
+    const list = UI.Rewards.fromRes(tot).concat([{ k: 'rankxp', n: q && q.side ? 15 : 25 }]);
+    UI.Rewards.card({ rarity: tot.gems ? 'rare' : 'common', kicker: r.bonus ? 'Task complete · bonus' : 'Task complete', title: q ? q.title : 'Reward', icon: I('scroll'), list });
     UI.clearGuide(); UI.afterAction(); if (ov && ov.parentNode) UI.missions(ov);
   });
   UI.act('questGo', (el) => {

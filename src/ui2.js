@@ -120,7 +120,8 @@
   function syncDisp() {
     const b = UI.B.b, p = B.cur(b), e = b.enemy;
     UI.B.disp = { pName: p.name, pSp: p.sp, pLv: p.lv, pHp: p.hp, pMax: p.hpMax, pEl: p.el, eName: e.name, eSp: e.sp, eLv: e.lv, eHp: e.hp, eMax: e.hpMax, eEl: e.el,
-      pSt: Object.assign({}, p.st), eSt: Object.assign({}, e.st), charging: !!e.charging, eShield: e.shield || 0, eShieldMax: e.shieldMax || 0 };
+      pSt: Object.assign({}, p.st), eSt: Object.assign({}, e.st), charging: !!e.charging, eShield: e.shield || 0, eShieldMax: e.shieldMax || 0,
+      pWeak: p.weak || 0, eWeak: e.weak || 0, pGuard: !!p.guard, eGuard: !!e.guard };
   }
   const hpCls = (a, m) => (a / m < 0.25 ? 'low' : a / m < 0.5 ? 'mid' : '');
 
@@ -198,53 +199,147 @@
     UI.setScreen('battle');
     Au.setMode('battle');
     const b = ctx.b, e0 = b.enemy;
-    const U = (UI.B = { b, busy: true, log: '', over: false, enc: ctx.enc || { spec: { boss: !!e0.boss } }, d: ctx.d || 'reliquary', stage: null, ctx });
+    const U = (UI.B = { b, busy: true, log: '', over: false, enc: ctx.enc || { spec: { boss: !!e0.boss } }, d: ctx.d || 'reliquary', stage: null, ctx, hp: {}, html: {}, acting: null, chosen: null });
     syncDisp();
     const boss = !!e0.boss, isl = !!e0.islandBoss, envBg = ctx.env && Art.hasEnv(ctx.env) ? Art.envBg(ctx.env, { boss }) : '';
+    // Phase 6: each fighter panel is a fixed skeleton; its health bar element lives for the whole battle so damage and
+    // healing can animate (see setBar). Only the text parts are re-rendered.
+    const fp = (w) => '<div class="b-panel fp fp-' + w + (w === 'p' ? ' pp' : '') + '" id="pan-' + w + '"><div class="fp-head" id="fh-' + w + '"></div>' +
+      (w === 'e' ? '<div class="hpb shieldb" id="sb-' + w + '" hidden><i class="hpb-ghost"></i><i class="hpb-fill"></i></div>' : '') +
+      '<div class="hpb" id="hb-' + w + '" role="meter" aria-label="Health"><i class="hpb-ghost"></i><i class="hpb-fill"></i><i class="hpb-ticks"></i></div><div class="fp-foot" id="ff-' + w + '"></div><div class="sts" id="fs-' + w + '"></div></div>';
     $('#stage').innerHTML = '<div class="battle d-' + U.d + (boss ? ' boss' : '') + (isl ? ' islandboss' : '') + (b.foes.length > 1 ? ' team' : '') + (b.party.length > 3 ? ' many' : '') + '" id="battle">' + (envBg || Art.battleBg(boss ? 'boss' : '', U.d)) + '<div class="b-3d" id="b-3d"></div>' +
       '<div class="b-field" id="b-field"><div class="b-spr e in' + (isl ? ' prism' : '') + '" id="spr-e" style="--sc:' + (e0.scale || 1) + '"></div><div class="b-spr p in" id="spr-p"></div></div>' +
-      '<div class="b-top"><div class="b-panel" id="pan-e"></div><div style="display:flex;gap:.5rem;align-items:center;pointer-events:auto"><span class="pill b-label" style="font-size:.78rem">' + esc(ctx.label || '') + '</span>' + (ctx.retreat ? '<button class="round" data-act="bRetreat" aria-label="Leave the battle">' + I('close') + '</button>' : '') + '</div></div>' +
+      '<div class="b-top">' + fp('e') + '<div class="b-topr" style="display:flex;gap:.5rem;align-items:center;pointer-events:auto"><span class="pill b-label" style="font-size:.78rem">' + esc(ctx.label || '') + '</span>' + (ctx.retreat ? '<button class="round" data-act="bRetreat" aria-label="Leave the battle">' + I('close') + '</button>' : '') + '</div></div>' +
+      '<div class="b-turn" id="b-turn" role="status" aria-live="polite"><span class="bt-n"></span><span class="bt-w"></span><span class="bt-f"></span></div>' +
       '<div class="b-tele" id="b-tele" hidden role="status" aria-live="polite"></div>' +
-      '<div class="b-log" id="b-log" aria-live="polite"></div><div class="b-panel pp" id="pan-p"></div><div class="b-party" id="b-party"></div><div class="b-actions" id="b-actions"></div></div>';
+      '<div class="b-log" id="b-log" aria-live="polite"></div>' + fp('p') + '<div class="b-party" id="b-party"></div><div class="b-actions" id="b-actions"></div>' +
+      '<div class="b-tip" id="b-tip" hidden role="tooltip"></div>' + (calmNow() ? '' : '<div class="b-wipe' + (isl ? ' isle' : boss ? ' boss' : '') + '" aria-hidden="true"><i></i><i></i><i></i></div>') +
+      (boss ? '<div class="b-bossin' + (isl ? ' isle' : '') + '" aria-hidden="true"><small>' + (isl ? 'The Island Boss' : 'Guardian') + '</small><b>' + esc(e0.name) + '</b></div>' : '') + '</div>';
     $('#spr-e').innerHTML = Art.portrait(e0.sp); $('#spr-p').innerHTML = Art.portrait(B.cur(b).sp);
     UI.cleanups.push(() => endStage(U));
+    const wipe = $('.b-wipe'); if (wipe) setTimeout(() => wipe.remove(), 900);
+    const bin = $('.b-bossin'); if (bin) setTimeout(() => bin.remove(), calmNow() ? 1600 : 2000);
     bLog(ctx.intro || (e0.name !== D.SPECIES[e0.sp].name ? (/^The /.test(e0.name) ? '' : 'The ') + e0.name + (b.foes.length > 1 ? ' leads the other team!' : ' rises!') : 'A wild ' + e0.name + ' appears!'));
     bRender();
     Promise.all([mountStage(U), sleep(700)]).then(() => { if (UI.B !== U || U.dead) return; U.busy = false; bRender(); if (isl) setTele({ t: 'intro' }); });
   };
-  function bLog(t) { const l = $('#b-log'); if (l) l.textContent = t; }
-  const stBadges = (o) => Object.keys(o || {}).filter((k) => D.STATUS[k] && o[k] > 0).map((k) => '<span class="stx" style="--c:' + D.STATUS[k].color + '" title="' + esc(D.STATUS[k].name + ': ' + D.STATUS[k].desc) + '">' + I(k) + esc(D.STATUS[k].short) + (k === 'stun' ? '' : ' ' + o[k]) + '</span>').join('');
-  const fxNote = (ab) => { const f = ab.fx; if (!f || f.self) return f && f.k === 'regen' ? ' +Regen' : ''; return ' · ' + D.STATUS[f.k].short + (f.p < 1 ? ' ' + Math.round(f.p * 100) + '%' : ''); };
+  function bLog(t) { const l = $('#b-log'); if (l) { l.textContent = t; l.classList.toggle('empty', !t); } }
+
+  /* ---------- Phase 6 combat presentation ---------- */
+  const calmNow = () => !!(UI.calm && UI.calm()) || document.body.classList.contains('perf-saver');
+  const elIco = (el) => (Art.elIcon ? Art.elIcon(el) : '');
+  const elVars = (el) => { const E = D.ELEMENTS[el] || D.ELEMENTS.light; return '--ec:' + E.color + ';--ed:' + E.dark; };
+  // Every condition a fighter can carry, in one table: buffs help, debuffs hurt, specials are boss traits.
+  const COND = {
+    burn: { kind: 'debuff' }, stun: { kind: 'debuff' }, soak: { kind: 'debuff' }, silence: { kind: 'debuff' }, regen: { kind: 'buff' },
+    weak: { kind: 'debuff', icon: 'weak', name: 'Attack down', short: 'ATK', color: '#ff8a7a', desc: 'Attack lowered by 20% for each stack, up to three stacks. It lasts for the rest of this battle.' },
+    guard: { kind: 'buff', icon: 'shield', name: 'Guarding', short: 'Guard', color: '#8fd0ff', desc: 'Braced: the next hit it takes is mostly blocked.' },
+    guardian: { kind: 'boss', icon: 'crown', name: 'Guardian', short: 'Guardian', color: '#ffd86b', desc: 'Telegraphs a powerful move one turn ahead and cannot be stunned, except while it is charging.' },
+    islandboss: { kind: 'boss isle', icon: 'boss', name: 'Island Boss', short: 'Island Boss', color: '#ff9ee0', desc: 'Shifts its element every few turns and telegraphs a powerful move. Read its colour and guard the big one.' },
+  };
+  const condInfo = (k) => { const s = D.STATUS[k], c = COND[k] || {}; return { name: c.name || (s && s.name) || k, short: c.short || (s && s.short) || k, color: c.color || (s && s.color) || '#fff', desc: c.desc || (s && s.desc) || '', icon: c.icon || k, kind: c.kind || 'debuff' }; };
+  function chipsFor(stMap, weak, guard, extra) {
+    const list = Object.keys(stMap || {}).filter((k) => D.STATUS[k] && stMap[k] > 0).map((k) => [k, k === 'stun' ? 0 : stMap[k]]);
+    if (weak > 0) list.push(['weak', weak]); if (guard) list.push(['guard', 0]);
+    (extra || []).forEach((k) => list.unshift([k, 0]));
+    return list.map(([k, n]) => { const c = condInfo(k); const turns = k === 'weak' ? '×' + n : n;
+      return '<button class="stx ' + c.kind + '" data-act="bStx" data-k="' + k + '" data-n="' + n + '" style="--c:' + c.color + '" aria-label="' + esc(c.name + (n && k !== 'weak' ? ', ' + n + ' turn' + (n > 1 ? 's' : '') + ' left' : '') + '. ' + c.desc) + '">' + I(c.icon) + '<span>' + esc(c.short) + '</span>' + (n ? '<em>' + turns + '</em>' : '') + '</button>'; }).join('');
+  }
+  const fxNote = (ab) => { const f = ab.fx; if (!f || f.self) return f && f.k === 'regen' ? 'Regen' : ''; return D.STATUS[f.k].short + (f.p < 1 ? ' ' + Math.round(f.p * 100) + '%' : ''); };
+  // Health bars: the fill moves at once; a pale "lost health" band holds for a moment and then drains after it, so
+  // the size of a hit stays readable. Healing shows a bright band first and the fill grows into it.
+  function setBar(el, key, frac) {
+    const U = UI.B; if (!el || !U) return; frac = Math.max(0, Math.min(1, frac));
+    const f = el.querySelector('.hpb-fill'), g = el.querySelector('.hpb-ghost'), prev = U.hp[key];
+    U.hp[key] = frac; el.setAttribute('aria-valuenow', Math.round(frac * 100));
+    const set = (n, v) => { n.style.transform = 'scaleX(' + v.toFixed(4) + ')'; };
+    if (el.dataset.k !== key || prev == null || Math.abs(prev - frac) < 1e-4 || calmNow()) { el.dataset.k = key; el.classList.remove('dmg', 'heal'); set(f, frac); set(g, frac); return; }
+    clearTimeout(el._t); el.classList.remove('dmg', 'heal'); void el.offsetWidth;
+    if (frac < prev) { el.classList.add('dmg'); set(f, frac); set(g, frac); }
+    else { el.classList.add('heal'); set(g, frac); set(f, frac); }
+    el._t = setTimeout(() => el.classList.remove('dmg', 'heal'), 1100);
+  }
+  const lvl = (frac) => (frac <= 0 ? 'ko' : frac < 0.25 ? 'low' : frac < 0.5 ? 'mid' : 'ok');
+  function putHtml(id, html) { const U = UI.B, el = $('#' + id); if (!el || U.html[id] === html) return el; U.html[id] = html; el.innerHTML = html; return el; }
+  function panel(w) {
+    const U = UI.B, b = U.b, d = U.disp, e = w === 'e', pan = $('#pan-' + w); if (!pan) return;
+    const name = e ? d.eName : d.pName, el = e ? d.eEl : d.pEl, lv = e ? d.eLv : d.pLv, hp = Math.max(0, e ? d.eHp : d.pHp), max = e ? d.eMax : d.pMax, frac = hp / max;
+    pan.setAttribute('style', elVars(el));
+    putHtml('fh-' + w, '<span class="fp-el" title="' + esc(D.ELEMENTS[el].name) + '">' + elIco(el) + '</span><b class="fp-nm">' + esc(name) + '</b><span class="fp-lv">Lv ' + lv + '</span>');
+    if (e) {
+      const sb = $('#sb-e'); sb.hidden = !(d.eShield > 0); if (d.eShield > 0) setBar(sb, 'sh' + b.ei, d.eShield / Math.max(1, d.eShieldMax));
+    }
+    const hb = $('#hb-' + w); hb.className = 'hpb ' + lvl(frac); setBar(hb, w + (e ? b.ei : b.pi), frac);
+    const foot = '<span class="hpn"><b>' + hp + '</b> / ' + max + '</span>' + (frac > 0 && frac < 0.25 ? '<span class="crit-t">' + I('warn') + 'Critical</span>' : '') +
+      (e && b.foes.length > 1 ? '<span class="foedots" aria-label="' + B.foesLeft(b) + ' foes left">' + b.foes.map((f, i) => '<i class="' + (f.hp <= 0 ? 'ko' : i === b.ei ? 'cur' : '') + '"></i>').join('') + '</span>' : '');
+    putHtml('ff-' + w, foot);
+    const extra = e ? (b.enemy.islandBoss ? ['islandboss'] : b.enemy.boss ? ['guardian'] : []) : [];
+    const sts = chipsFor(e ? d.eSt : d.pSt, e ? d.eWeak : d.pWeak, e ? d.eGuard : d.pGuard, extra) + (e ? '' : synChips(b.syn));
+    putHtml('fs-' + w, sts);
+    pan.classList.toggle('crit', frac > 0 && frac < 0.25); pan.classList.toggle('acting', U.acting === w);
+    pan.classList.toggle('mine', w === 'p' && !U.busy && !b.over && !b.pending);
+  }
+  function turnBadge() {
+    const U = UI.B, b = U.b, t = $('#b-turn'); if (!t) return;
+    const mine = !U.busy && !b.over && !b.pending;
+    t.className = 'b-turn ' + (b.over ? 'done' : b.pending ? 'pick' : mine ? 'mine' : U.acting === 'e' ? 'foe' : U.acting === 'p' ? 'ally' : 'wait');
+    t.querySelector('.bt-n').textContent = 'Turn ' + b.turn;
+    // turn order is the game's own rule (the faster Amina acts first; a switch always comes first); shown, never changed
+    const first = B.speed(B.cur(b)) >= B.speed(b.enemy), tf = t.querySelector('.bt-f');
+    tf.textContent = mine ? (first ? 'You act first' : 'Foe acts first') : ''; tf.className = 'bt-f ' + (first ? 'first' : 'second');
+    t.querySelector('.bt-w').textContent = b.over ? (b.result === 'win' ? 'Victory' : 'Defeat') : b.pending ? 'Choose an Amina' : mine ? 'Your move' : U.acting === 'e' ? U.disp.eName + ' acts' : U.acting === 'p' ? U.disp.pName + ' acts' : '…';
+  }
+  function abilityBtn(a, off, d, en, mvl) {
+    const ab = D.ABILITIES[a.id], mlv = mvl[a.id] || 1, U = UI.B;
+    const pw = ab.power ? (D.MOVE_LEVELS && mlv > 1 ? Math.round(ab.power * D.MOVE_LEVELS.power[mlv]) : ab.power) : 0;
+    const eff = ab.type === 'dmg' || ab.type === 'drain' || ab.type === 'weaken' ? (ab.neutral ? 1 : R.elMult(ab.el, en.el)) : 1;
+    const kind = ab.type === 'heal' ? 'heal' : ab.type === 'guard' ? 'guard' : 'atk';
+    const hint = d.charging && ab.type === 'guard' ? '<span class="ab-hint good">▲ Blocks the charge</span>' : d.eShield > 0 && ab.cd > 0 && ab.power ? '<span class="ab-hint good">▲ Cracks barrier</span>' : eff > 1.01 ? '<span class="ab-hint good">▲ Strong</span>' : eff < 0.99 ? '<span class="ab-hint bad">▼ Weak</span>' : '';
+    const sug = a.ready && ((d.charging && ab.type === 'guard') || (d.eShield > 0 && ab.cd > 0 && ab.power));
+    const chosen = U.chosen === a.id, fx = fxNote(ab);
+    const what = kind === 'atk' ? 'Pow ' + pw : kind === 'heal' ? 'Heal · self' : 'Guard · self';
+    const cost = a.silenced ? '<span class="ab-cd hush" aria-label="Silenced">' + I('silence') + '</span>'
+      : a.cd ? '<span class="ab-cd" aria-label="Ready in ' + a.cd + ' turn' + (a.cd > 1 ? 's' : '') + '">' + I('hourglass') + '<b>' + a.cd + '</b><i>turn' + (a.cd > 1 ? 's' : '') + '</i></span>' : '';
+    // a special move's cost is its recharge: shown in words on the move itself
+    const every = ab.cd > 0 ? '<span class="ab-sp" title="Special move: after use it recharges for ' + ab.cd + ' turn' + (ab.cd > 1 ? 's' : '') + '">Special · every ' + (ab.cd + 1) + '</span>' : '';
+    const state = chosen ? ' chosen' + (U.fired === a.id && Date.now() < U.firedUntil ? ' fire' : '') : off || !a.ready ? ' off' : ' ready';
+    return '<button class="abtn k-' + kind + state + (a.cd && !a.silenced ? ' cool' : '') + (a.silenced ? ' hushed' : '') + (ab.cd > 0 ? ' special' : '') + (sug ? ' suggest' : '') + '" style="' + elVars(ab.el) + '" data-act="bAbility" data-id="' + a.id + '"' + (off || !a.ready ? ' aria-disabled="true"' : '') + '>' +
+      '<span class="ab-gem">' + elIco(ab.el) + '</span><span class="ab-main"><b>' + esc(ab.name) + (mlv > 1 ? '<span class="mlv">Lv' + mlv + '</span>' : '') + '</b><small><span class="ab-pow">' + what + '</span>' + every + (fx ? '<span class="ab-fx">' + esc(fx) + '</span>' : '') + hint + '</small></span>' + cost + '</button>';
+  }
   function bRender() {
     const U = UI.B; if (!U || !$('#battle')) return;
     const b = U.b, d = U.disp, en = b.enemy;
-    const eSts = stBadges(d.eSt) + (en.islandBoss ? '<span class="stx prism-t" title="Island Boss: shifts its element and telegraphs a powerful move.">' + I('star') + 'Island Boss</span>' : en.boss ? '<span class="stx guardian" style="--c:#ffd86b" title="Guardian: telegraphs a powerful move and cannot be stunned except while charging.">' + I('star') + 'Guardian</span>' : '');
-    const foes = b.foes.length > 1 ? '<div class="foedots">' + b.foes.map((f, i) => '<i class="' + (f.hp <= 0 ? 'ko' : i === b.ei ? 'cur' : '') + '"></i>').join('') + '</div>' : '';
-    const shield = d.eShield > 0 ? '<div class="bar shield"><i style="width:' + pct(d.eShield, d.eShieldMax) + '%"></i></div><div class="hpn">Barrier ' + d.eShield + '</div>' : '';
-    $('#pan-e').innerHTML = '<div class="nm">' + esc(d.eName) + ' ' + chip(d.eEl) + ' <span class="muted">Lv ' + d.eLv + '</span></div>' + shield + '<div class="bar hp ' + hpCls(d.eHp, d.eMax) + '"><i style="width:' + pct(d.eHp, d.eMax) + '%"></i></div><div class="hpn">' + Math.max(0, d.eHp) + ' / ' + d.eMax + '</div>' + (eSts ? '<div class="sts">' + eSts + '</div>' : '') + foes;
-    const pSts = stBadges(d.pSt), syn = synChips(b.syn);
-    $('#pan-p').innerHTML = '<div class="nm">' + esc(d.pName) + ' ' + chip(d.pEl) + ' <span class="muted">Lv ' + d.pLv + '</span></div><div class="bar hp ' + hpCls(d.pHp, d.pMax) + '"><i style="width:' + pct(d.pHp, d.pMax) + '%"></i></div><div class="hpn">' + Math.max(0, d.pHp) + ' / ' + d.pMax + '</div>' + (pSts || syn ? '<div class="sts">' + pSts + syn + '</div>' : '');
-    $('#b-party').innerHTML = b.party.map((f, i) => '<button class="pm ' + (i === b.pi && !b.pending ? 'cur' : '') + (f.hp <= 0 ? ' ko' : '') + (b.pending && f.hp > 0 ? ' tapme' : '') + '" data-act="bSwitch" data-i="' + i + '"><div class="art">' + Art.portrait(f.sp) + '</div>' + esc(f.name.slice(0, 8)) + '<div class="bar hp ' + hpCls(f.hp, f.hpMax) + '"><i style="width:' + pct(f.hp, f.hpMax) + '%"></i></div></button>').join('');
+    panel('e'); panel('p'); turnBadge();
+    $('#b-party').innerHTML = b.party.map((f, i) => '<button class="pm ' + (i === b.pi && !b.pending ? 'cur' : '') + (f.hp <= 0 ? ' ko' : '') + (b.pending && f.hp > 0 ? ' tapme' : '') + (f.hp > 0 && f.hp / f.hpMax < 0.25 ? ' low' : '') + '" style="' + elVars(f.el) + '" data-act="bSwitch" data-i="' + i + '" aria-label="' + esc(f.name) + ', ' + Math.max(0, f.hp) + ' of ' + f.hpMax + ' health' + (i === b.pi ? ', in battle' : '') + '"><div class="art">' + Art.portrait(f.sp) + '</div><span class="pm-n">' + esc(f.name.slice(0, 8)) + '</span><div class="bar hp ' + hpCls(f.hp, f.hpMax) + '"><i style="width:' + pct(f.hp, f.hpMax) + '%"></i></div></button>').join('');
     const off = U.busy || b.over;
-    if (b.pending) $('#b-actions').innerHTML = '<div class="pill" style="grid-column:span 2;justify-content:center">Choose your next Amina</div>';
+    if (b.pending) putHtml('b-actions', '<div class="b-pick" style="grid-column:span 2">' + I('swap') + ' Choose your next Amina</div>');
     else {
-      const el = (id) => D.ABILITIES[id];
       const cf = B.cur(b), mvl = (cf && cf.mvl) || {};
-      $('#b-actions').innerHTML = B.legal(b).map((a) => {
-        const mlv = mvl[a.id] || 1, pw = (id) => (D.MOVE_LEVELS && mlv > 1 ? Math.round(D.ABILITIES[id].power * D.MOVE_LEVELS.power[mlv]) : D.ABILITIES[id].power);
-        const ab = el(a.id), eff = ab.type === 'dmg' || ab.type === 'drain' || ab.type === 'weaken' ? (ab.neutral ? 1 : R.elMult(ab.el, en.el)) : 1;
-        const hint = d.charging && ab.type === 'guard' ? ' <span class="good">▲ blocks the charge</span>' : d.eShield > 0 && ab.cd > 0 && ab.power ? ' <span class="good">▲ cracks the barrier</span>' : eff > 1.01 ? ' <span class="good">▲ strong</span>' : eff < 0.99 ? ' <span class="bad">▼ weak</span>' : '';
-        return '<button class="abtn ' + (off || !a.ready ? 'off' : '') + (a.silenced ? ' hushed' : '') + ((d.charging && ab.type === 'guard' && a.ready) || (d.eShield > 0 && ab.cd > 0 && ab.power && a.ready) ? ' suggest' : '') + '" data-act="bAbility" data-id="' + a.id + '"><b>' + ab.name + (mlv > 1 ? ' <span class="mlv">Lv' + mlv + '</span>' : '') + '</b><small>' + chip(ab.el) + (ab.power ? 'Pow ' + pw(a.id) : ab.type === 'heal' ? 'Heal' : 'Guard') + esc(fxNote(ab)) + hint + '</small>' + (a.silenced ? '<span class="cd">' + I('silence') + '</span>' : a.cd ? '<span class="cd">' + (a.cd + 0) + '</span>' : '') + '</button>';
-      }).join('') + '<button class="abtn swap ' + (off || B.alive(b) < 2 ? 'off' : '') + '" data-act="bSwapOpen" style="grid-column:span 2;min-height:2.6rem"><b>' + I('swap') + ' Switch Amina</b><small>Uses your turn' + (pSts ? ' · clears status effects' : '') + '</small></button>';
+      const pSts = Object.keys(d.pSt || {}).some((k) => d.pSt[k] > 0);
+      // only rebuilt when something on the buttons changed, so the activation flash is never cut short
+      putHtml('b-actions', B.legal(b).map((a) => abilityBtn(a, off, d, en, mvl)).join('') +
+        '<button class="abtn swap ' + (off || B.alive(b) < 2 ? 'off' : '') + '" data-act="bSwapOpen" style="grid-column:span 2"><span class="ab-main"><b>' + I('swap') + ' Switch Amina</b><small>Uses your turn' + (pSts ? ' · clears status effects' : '') + '</small></span></button>');
     }
   }
-  function floatAt(side, text, kind) {
+  UI.bRender = bRender;
+  function floatAt(side, text, kind, tag) {
     const fld = $('#b-field'), U = UI.B, a = U && U.stage && U.stage.anchor(side); if (!fld || !a) return;
     const f = fld.getBoundingClientRect();
-    const d = document.createElement('div'); d.className = 'float ' + kind; d.textContent = text;
-    d.style.cssText = 'left:' + (a.x - f.left - 14) + 'px;top:' + (a.y - f.top - (U.stage.is3d ? 24 : 0)) + 'px';
-    fld.appendChild(d); setTimeout(() => d.remove(), 1100);
+    const d = document.createElement('div'); d.className = 'float ' + kind + ' s-' + side;
+    d.innerHTML = '<b>' + esc(text) + '</b>' + (tag ? '<small>' + esc(tag) + '</small>' : '');
+    d.style.cssText = 'left:' + (a.x - f.left) + 'px;top:' + (a.y - f.top - (U.stage.is3d ? 24 : 0)) + 'px';
+    fld.appendChild(d); setTimeout(() => d.remove(), 1200);
   }
+  // tap a status chip: a small explanation next to it
+  UI.act('bStx', (el) => {
+    const t = $('#b-tip'), bt = $('#battle'); if (!t || !bt) return; const c = condInfo(el.dataset.k), n = +el.dataset.n;
+    t.innerHTML = '<b style="color:' + c.color + '">' + I(c.icon) + esc(c.name) + '</b><span>' + esc(c.desc) + '</span>' + (n && el.dataset.k !== 'weak' ? '<em>' + n + ' turn' + (n > 1 ? 's' : '') + ' left</em>' : el.dataset.k === 'stun' ? '<em>Loses its next action</em>' : '');
+    t.className = 'b-tip ' + c.kind; t.hidden = false;
+    const r = el.getBoundingClientRect(), br = bt.getBoundingClientRect(), w = Math.min(240, br.width - 16);
+    t.style.width = w + 'px'; t.style.left = Math.max(8, Math.min(br.width - w - 8, r.left - br.left)) + 'px';
+    const below = r.top - br.top < br.height / 2; t.style.top = below ? (r.bottom - br.top + 6) + 'px' : ''; t.style.bottom = below ? '' : (br.bottom - r.top + 6) + 'px';
+    clearTimeout(t._t); t._t = setTimeout(() => { t.hidden = true; }, 3400);
+  });
   function burstAt(side, el) {
     const spr = $('#spr-' + side), fld = $('#b-field'); if (!spr || !fld) return;
     const r = spr.getBoundingClientRect(), f = fld.getBoundingClientRect(), c = D.ELEMENTS[el].color;
@@ -290,6 +385,7 @@
         case 'use': {
           const ty = D.ABILITIES[e.abil].type;
           bLog(e.name + ' used ' + e.abName + '!');
+          U.acting = e.who; bRender();
           stg.use(e.who, ty === 'guard' || ty === 'heal' ? 'cast' : 'attack');
           if (ty === 'guard') { Au.play('guard'); stg.guard(e.who); }
           if (e.boss) setTele(null);
@@ -300,19 +396,19 @@
           Au.play(e.broke ? 'super' : 'guard'); if (e.broke) { stg.setBarrier(false); bLog('The barrier shatters!'); } else bLog(e.special ? 'The special ability cracks the barrier hard!' : 'The barrier absorbs the blow.');
           bRender(); await sleep(e.broke ? 700 : 420); break;
         case 'hit': {
-          const side = e.who; if (!e.blocked) { stg.hit(side, e.el, e.eff); floatAt(side, '-' + e.dmg, e.eff + (e.big ? ' big' : '')); }
-          if (side === 'e') d.eHp = e.hp; else d.pHp = e.hp;
+          const side = e.who; if (!e.blocked) { stg.hit(side, e.el, e.eff); floatAt(side, '-' + e.dmg, e.eff + (e.big ? ' big' : ''), e.eff === 'super' ? 'Super effective' : e.eff === 'weak' ? 'Resisted' : e.guarded ? 'Guarded' : e.big ? 'Heavy blow' : ''); }
+          if (side === 'e') { d.eHp = e.hp; d.eGuard = false; } else { d.pHp = e.hp; d.pGuard = false; }
           if (!e.blocked) Au.play(e.eff === 'super' || e.big ? 'super' : e.eff === 'weak' ? 'weak' : 'hit');
           if (!e.blocked) bLog(e.eff === 'super' ? 'It’s super effective!' : e.eff === 'weak' ? 'It’s not very effective…' : (e.guarded ? (e.big ? 'The guard absorbed most of the blow!' : 'The guard softened the blow.') : ''));
           bRender(); await sleep(e.blocked ? 120 : e.eff === 'super' || e.big ? 800 : 620); break;
         }
         case 'heal':
           if (e.who === 'p') d.pHp = e.hp; else d.eHp = e.hp;
-          floatAt(e.who === 'p' ? 'p' : 'e', '+' + e.amt, 'heal'); stg.heal(e.who); Au.play('heal');
+          floatAt(e.who === 'p' ? 'p' : 'e', '+' + e.amt, 'heal', e.k === 'regen' ? 'Regen' : ''); stg.heal(e.who); Au.play('heal');
           bLog(e.k === 'regen' ? nameOf(e.who) + ' regenerates.' : e.k === 'twilight' ? 'The Twilight Pact mends ' + nameOf(e.who) + '.' : 'Recovered ' + e.amt + ' health.');
           bRender(); await sleep(e.k ? 440 : 560); break;
-        case 'guard': bLog(nameOf(e.who) + ' braces for impact.'); await sleep(450); break;
-        case 'weak': bLog(nameOf(e.who) + '’s attack fell!'); await sleep(450); break;
+        case 'guard': if (e.who === 'p') d.pGuard = true; else d.eGuard = true; bLog(nameOf(e.who) + ' braces for impact.'); bRender(); await sleep(450); break;
+        case 'weak': if (e.who === 'p') d.pWeak = (d.pWeak || 0) + 1; else d.eWeak = (d.eWeak || 0) + 1; floatAt(e.who, 'ATK down', 'status'); bLog(nameOf(e.who) + '’s attack fell!'); bRender(); await sleep(450); break;
         case 'status': {
           stSet(e.who)[e.k] = e.n; stg.status(e.who, D.STATUS[e.k].color);
           if (e.k !== 'regen') floatAt(e.who, D.STATUS[e.k].short + '!', 'status');
@@ -347,14 +443,14 @@
         }
         case 'foeIn': {
           const f = U.b.foes[e.idx];
-          d.eName = f.name; d.eSp = f.sp; d.eLv = f.lv; d.eHp = e.hp; d.eMax = e.hpMax; d.eEl = f.el; d.eSt = {}; d.eShield = 0; d.charging = false;
+          d.eName = f.name; d.eSp = f.sp; d.eLv = f.lv; d.eHp = e.hp; d.eMax = e.hpMax; d.eEl = f.el; d.eSt = {}; d.eShield = 0; d.charging = false; d.eWeak = f.weak || 0; d.eGuard = !!f.guard;
           const sp = $('#spr-e'); if (sp) { sp.classList.remove('faint'); sp.innerHTML = Art.portrait(f.sp); if (!stg.is3d) cls('e', 'in', 500); }
           if (stg.is3d) { const p = stg.swap('e', f.sp); await Promise.race([p || Promise.resolve(), sleep(560)]); }
           bLog(f.name + ' steps in! (' + B.foesLeft(U.b) + ' left)'); bRender(); await sleep(620); break;
         }
         case 'switch': {
           const f = U.b.party[e.idx];
-          d.pName = f.name; d.pSp = f.sp; d.pLv = f.lv; d.pHp = e.hp; d.pMax = f.hpMax; d.pEl = f.el; d.pSt = {};
+          d.pName = f.name; d.pSp = f.sp; d.pLv = f.lv; d.pHp = e.hp; d.pMax = f.hpMax; d.pEl = f.el; d.pSt = {}; d.pWeak = f.weak || 0; d.pGuard = !!f.guard;
           const sp = $('#spr-p'); if (sp) { sp.classList.remove('faint'); sp.innerHTML = Art.portrait(f.sp); if (!stg.is3d) cls('p', 'in', 500); }
           if (stg.is3d) { const p = stg.swap('p', f.sp); await Promise.race([p || Promise.resolve(), sleep(560)]); } else await sleep(0);
           Au.play('ok'); bLog('Go, ' + f.name + '!'); bRender(); await sleep(stg.is3d ? 260 : 560); break;
@@ -364,16 +460,17 @@
       }
     }
     // the event list is complete for this action: line the display up with the real battle state
-    if (UI.B === U) { const b = U.b; d.pSt = Object.assign({}, B.cur(b).st); d.eSt = Object.assign({}, b.enemy.st); d.eShield = b.enemy.shield || 0; d.eEl = b.enemy.el; if (!b.enemy.charging && d.charging) setTele(null); }
+    if (UI.B === U) { const b = U.b, cp = B.cur(b); d.pSt = Object.assign({}, cp.st); d.eSt = Object.assign({}, b.enemy.st); d.eShield = b.enemy.shield || 0; d.eEl = b.enemy.el; d.pWeak = cp.weak || 0; d.eWeak = b.enemy.weak || 0; d.pGuard = !!cp.guard; d.eGuard = !!b.enemy.guard; if (!b.enemy.charging && d.charging) setTele(null); }
+    U.acting = null;
   }
   async function bAct(action) {
     const U = UI.B; if (!U || U.busy || U.over) return;
-    U.busy = true; bRender();
+    U.busy = true; if (action.t === 'ab') { U.chosen = action.id; U.fired = action.id; U.firedUntil = Date.now() + 420; } bRender();
     const ev = B.act(U.b, action);
     await playEvents(ev);
     if (UI.B !== U) return;
-    if (U.b.over) { U.over = true; return bFinish(); }
-    U.busy = false; bRender();
+    if (U.b.over) { U.over = true; U.chosen = null; bRender(); return bFinish(); }
+    U.busy = false; U.chosen = null; bRender();
   }
   UI.act('bAbility', (el) => bAct({ t: 'ab', id: el.dataset.id }));
   UI.act('bSwitch', (el) => {
@@ -392,30 +489,51 @@
   }
   function dungeonFinish(U) {
     const s = st(); if (!s.run) return;
-    const out = R.resolveBattle(s, U.b); R.after(s); S.save();
+    // equipment found in this battle is shown on the result card itself (not as a separate card on top of it)
+    const sink = (UI.rewardSink = []);
+    let out; try { out = R.resolveBattle(s, U.b); } finally { UI.rewardSink = null; }
+    out.items = sink; R.after(s); S.save();
     if (out.win) { Au.play('win'); UI.victory(out); } else { Au.play('lose'); UI.defeat(out); }
   }
   const rewardRow = (r) => ['gold', 'food', 'gems'].filter((k) => r && r[k]).map((k) => '<span>' + I(k === 'gems' ? 'gem' : k) + ' +' + r[k].toLocaleString('en-GB') + '</span>').join('');
   UI.rewardRow = rewardRow;
+  // Phase 6: one result card for every battle win. Header (the banner) → progress → what you received (reward tiles,
+  // grouped by where it came from) → special moments (new Aminas, a new island) → the party's experience.
   UI.victory = function (out) {
-    const s = st(), dn = D.DUNGEONS[out.dungeon || (UI.B && UI.B.d) || 'reliquary'];
-    const rows = out.xp.map((x) => {
-      const lvl = x.levels.length ? '<div class="lvlup">LEVEL UP! Lv ' + x.levels[0].from + ' → ' + x.levels[x.levels.length - 1].to + '</div>' : '';
-      const evo = x.evoReady ? '<div class="lvlup">Ready to evolve! (you choose when)</div>' : '';
-      return '<div class="xprow"><div class="art">' + Art.portrait(x.sp) + '</div><div class="grow"><b>' + esc(D.SPECIES[x.sp].name) + '</b> <span class="muted">+' + x.gained + ' xp' + (x.alive ? '' : ' (fainted: half)') + '</span>' + lvl + evo + '</div></div>';
+    const s = st(), dn = D.DUNGEONS[out.dungeon || (UI.B && UI.B.d) || 'reliquary'], RW = UI.Rewards;
+    const foe = UI.B && UI.B.b ? UI.B.b.enemy : null, cleared = out.cleared, isl = !!out.islandBoss, boss = !!out.boss;
+    const dname = dn.name.replace(/^The /, '');
+    const rows = out.xp.map((x, i) => {
+      const lvl = x.levels.length ? '<div class="lvlup">' + I('xp') + ' Level up! Lv ' + x.levels[0].from + ' → ' + x.levels[x.levels.length - 1].to + '</div>' : '';
+      const evo = x.evoReady ? '<div class="lvlup evo">' + I('spark') + ' Ready to evolve (you choose when)</div>' : '';
+      return '<div class="xprow' + (x.alive ? ' cheer' : ' down') + '" style="--i:' + i + '"><div class="art">' + Art.portrait(x.sp) + '</div><div class="grow"><b>' + esc(D.SPECIES[x.sp].name) + '</b> <span class="muted">+' + x.gained + ' xp' + (x.alive ? '' : ' (fainted: half)') + '</span>' + lvl + evo + '</div></div>';
     }).join('');
-    const cleared = out.cleared;
-    const first = out.sectionFirst ? '<div class="panel reward-first" style="padding:.45rem;margin:.4rem 0"><b>' + I('star') + ' ' + esc(out.sectionFirst.name) + ' cleared for the first time</b><div class="rw" style="display:flex;justify-content:center;font-size:1rem">' + rewardRow(out.sectionFirst.reward) + '</div></div>' : '';
-    const lore = out.lore && out.lore.length ? '<div class="muted small-t" style="margin:.25rem 0">' + I('scroll') + ' New journal entr' + (out.lore.length > 1 ? 'ies' : 'y') + ': ' + out.lore.map((k) => '<b>' + esc(D.LORE[k].title) + '</b>').join(', ') + '</div>' : '';
-    const prog = '<div class="pips big">' + dn.battles.map((x, i) => '<i class="' + (i <= out.battle ? 'on' : '') + (x.boss ? ' b' : '') + '"></i>').join('') + '</div>';
-    const head = cleared ? (out.islandBoss ? 'Island Boss defeated!' : 'Dungeon cleared!') : out.boss ? 'Guardian defeated!' : 'Victory! · Battle ' + (out.battle + 1) + ' of 10';
-    const body = '<div class="vcard"><h1>' + head + '</h1>' + prog + '<div class="rw" style="justify-content:center;font-size:1rem;margin-bottom:.4rem"><span>' + I('gold') + ' +' + out.gold + '</span><span>' + I('food') + ' +' + out.food + '</span>' + (out.essence && out.essence.n ? '<span title="' + esc(D.ELEMENTS[out.essence.el].name) + ' Essence">' + Art.essIcon(out.essence.el) + ' +' + out.essence.n + '</span>' : '') + '</div>' + first + lore +
-      (cleared ? '<div class="panel" style="padding:.5rem;margin:.4rem 0"><b>' + esc(dn.name.replace(/^The /, '')) + (out.first ? ' · first clear' : '') + '</b><div class="rw" style="display:flex;justify-content:center;font-size:1rem">' + rewardRow(out.reward) + '</div>' + (out.newSp.length ? '<div class="good" style="margin-top:.3rem">' + out.newSp.map((x) => esc(D.SPECIES[x].name)).join(', ') + ' joined your sanctuary!</div>' : '') +
-        (out.unlockedIsland ? '<div class="good unlock-note" style="margin-top:.3rem">' + I('map') + ' ' + esc(D.ISLANDS[out.unlockedIsland].name) + ' is now part of the sanctuary.</div>' : '') + '</div>' : (out.sectionDone ? '<div class="muted">The party rests at a glowing spring and recovers some health.</div>' : '')) + rows + '</div>';
+    const groups = [];
+    const spoils = [{ k: 'gold', n: out.gold }, { k: 'food', n: out.food }];
+    if (out.essence && out.essence.n) spoils.push({ k: 'essence', el: out.essence.el, n: out.essence.n });
+    groups.push({ title: 'Battle spoils', list: spoils });
+    if (out.sectionFirst) groups.push({ title: out.sectionFirst.name + ' · first clear', icon: 'star', list: RW.fromRes(out.sectionFirst.reward) });
+    if (cleared) {
+      const list = RW.fromRes(out.reward);
+      (out.newSp || []).forEach((sp) => list.push({ k: 'amina', id: sp }));
+      groups.push({ title: dname + (out.first ? ' · first clear' : ' cleared'), icon: isl ? 'boss' : 'gate', list });
+    }
+    if (out.items && out.items.length) groups.push({ title: 'Equipment found', icon: 'anvil', list: out.items.map((id) => ({ k: 'item', id })) });
+    const spoilsHtml = groups.filter((g) => g.list.length).map((g) => RW.group(g)).join('');
+    const lore = out.lore && out.lore.length ? '<div class="v-note">' + I('book') + ' New journal entr' + (out.lore.length > 1 ? 'ies' : 'y') + ': ' + out.lore.map((k) => '<b>' + esc(D.LORE[k].title) + '</b>') .join(', ') + '</div>' : '';
+    const rest = !cleared && out.sectionDone ? '<div class="v-note">' + I('heart') + ' The party rests at a glowing spring and recovers some health.</div>' : '';
+    const unlock = out.unlockedIsland ? '<div class="v-unlock">' + I('island') + '<div><small>New island unlocked</small><b>' + esc(D.ISLANDS[out.unlockedIsland].name) + '</b><span>It is now part of the sanctuary.</span></div></div>' : '';
+    const prog = '<div class="pips big" aria-label="Battle ' + (out.battle + 1) + ' of ' + dn.battles.length + '">' + dn.battles.map((x, i) => '<i class="' + (i <= out.battle ? 'on' : '') + (x.boss ? ' b' : '') + '"></i>').join('') + '</div>';
+    const title = cleared ? (isl ? 'Island Boss defeated!' : 'Dungeon cleared!') : boss ? 'Guardian defeated!' : 'Victory!';
+    const kicker = isl ? (foe ? foe.name : 'The Island Boss') + ' · ' + dname : boss ? (foe ? foe.name : 'The guardian') + ' · ' + dname : dname + ' · battle ' + (out.battle + 1) + ' of ' + dn.battles.length;
+    const tier = isl ? 'isle' : boss || cleared ? 'boss' : 'win';
+    const body = '<div class="vcard vic v-' + tier + '"><div class="v-banner"><span class="v-crest">' + I(isl ? 'boss' : boss || cleared ? 'crown' : 'swords') + '</span><small class="v-kick">' + esc(kicker) + '</small><h1>' + title + '</h1></div>' + prog +
+      '<div class="v-spoils">' + spoilsHtml + '</div>' + unlock + lore + rest + '<div class="v-party">' + rows + '</div></div>';
     const nextLbl = cleared ? (out.scene ? 'Continue' : 'Return to the sanctuary') : 'Next: battle ' + (out.battle + 2) + (out.battle + 1 === 9 ? ' · the boss' : '');
-    const ov = UI.modal(UI.sheet('Battle result', body, (cleared ? '' : '<button class="btn ghost" id="v-leave">Leave for now</button>') + '<button class="btn gold" id="v-go">' + nextLbl + '</button>', 'narrow'), { dismiss: false });
+    const ov = UI.modal(UI.sheet('Battle result', body, (cleared ? '' : '<button class="btn ghost" id="v-leave">Leave for now</button>') + '<button class="btn gold" id="v-go">' + nextLbl + '</button>', 'narrow res-sheet r-' + tier), { dismiss: false });
     $('.x', ov).remove();
-    UI.sparkles($('.vcard h1', ov), out.islandBoss ? 40 : 20, out.islandBoss ? ['#ff86d6', '#8fe6d6', '#ffd86b', '#9a78e6'] : null);
+    if (!UI.calm()) UI.sparkles($('.v-banner h1', ov), isl ? 40 : boss || cleared ? 28 : 16, isl ? ['#ff86d6', '#8fe6d6', '#ffd86b', '#9a78e6'] : boss || cleared ? ['#ffd86b', '#fff3c0', '#ffffff', '#ffb46b'] : null);
+    RW.celebrate(ov);
     const lv = $('#v-leave', ov); if (lv) lv.onclick = () => { UI.close(ov); R.abandonRun(st()); S.save(); UI.leaveBattle(); };
     $('#v-go', ov).onclick = () => {
       UI.close(ov); endStage(UI.B); UI.B = null;
@@ -423,12 +541,19 @@
       const after = () => { UI.showIsland(); if (out.unlockedIsland) setTimeout(() => UI.islandUnlockedFx(out.unlockedIsland), 400); else if (!out.scene && out.first && A.Scenes.after[out.dungeon]) UI.toast(A.Scenes.after[out.dungeon], 'n'); };
       if (out.scene) UI.playScene(out.scene, after); else after();
     };
+    return ov;
   };
+  // Defeat: quiet and atmospheric, never a punishment screen. What is kept comes first, then one useful tip.
   UI.defeat = function (out) {
     const dn = D.DUNGEONS[out.dungeon];
-    const ov = UI.modal(UI.sheet('Defeated', '<div class="vcard"><h1 style="color:#c9b8ff">Your party was overwhelmed</h1><p class="muted">You retreat to the sanctuary. Your progress in ' + esc(dn.name) + ' is kept: next time you start at <b>battle ' + (out.battle + 1) + '</b>. You keep every level you earned, and a little food (+' + out.food + ') for the trouble.</p><p class="muted" style="font-size:.85rem">Tip: feed your Aminas, bring three, and use elements. Fire beats Nature. When a guardian starts charging, guard or switch. Barriers crack faster under special abilities.</p></div>', '<button class="btn ghost" id="v-home">Return to the sanctuary</button><button class="btn gold" id="v-retry">Try again</button>', 'narrow'), { dismiss: false });
+    const prog = '<div class="pips big dim">' + dn.battles.map((x, i) => '<i class="' + (i < out.battle ? 'on' : i === out.battle ? 'here' : '') + (x.boss ? ' b' : '') + '"></i>').join('') + '</div>';
+    const body = '<div class="vcard defeat"><div class="v-banner"><span class="v-crest">' + I('el_dark') + '</span><small class="v-kick">' + esc(dn.name.replace(/^The /, '')) + ' · battle ' + (out.battle + 1) + '</small><h1>Your party was overwhelmed</h1></div>' + prog +
+      '<div class="v-kept"><div>' + I('check') + ' Progress kept: next time you start at <b>battle ' + (out.battle + 1) + '</b></div><div>' + I('check') + ' Every level your Aminas earned stays</div><div class="v-kept-rw">' + I('food') + ' +' + out.food + ' food for the trouble</div></div>' +
+      '<p class="v-tip">' + I('info') + '<span>Feed your Aminas, bring three, and use elements: Fire beats Nature. When a guardian starts charging, guard or switch. Barriers crack faster under special abilities.</span></p></div>';
+    const ov = UI.modal(UI.sheet('Defeated', body, '<button class="btn ghost" id="v-home">Return to the sanctuary</button><button class="btn gold" id="v-retry">Try again</button>', 'narrow res-sheet r-defeat'), { dismiss: false });
     $('.x', ov).remove(); $('#v-home', ov).onclick = () => { UI.close(ov); UI.leaveBattle(); };
     $('#v-retry', ov).onclick = () => { UI.close(ov); UI.leaveBattle(() => { UI.showIsland(); setTimeout(() => UI.acts.enterDungeon({ dataset: { id: out.dungeon }, closest: () => null }), 200); }); };
+    return ov;
   };
 
   /* ---------- hatchery ---------- */

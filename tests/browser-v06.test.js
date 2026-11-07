@@ -49,7 +49,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   ok(!(await page.$eval('#b-tele', (e) => e.hidden)) || (await S()).run && (await page.evaluate(() => A.UI.B.b.enemy.shield > 0 || A.UI.B.b.enemy.barrierDue)), 'crossing the threshold warns that a barrier is coming');
   await shot('11-barrier-warning');
   for (let i = 0; i < 3 && !(await page.evaluate(() => A.UI.B && A.UI.B.b.enemy.shield > 0)); i++) { await page.waitForSelector('.abtn:not(.off):not(.swap)', { timeout: 8000 }).catch(() => {}); await page.click('.abtn:not(.off):not(.swap)').catch(() => {}); await sleep(3200); }
-  ok(await page.evaluate(() => A.UI.B && A.UI.B.b.enemy.shield > 0), 'the Waywarden raises its Stone Barrier'); ok(!!(await page.$('#pan-e .bar.shield')), 'the barrier shows as a bar over its health'); await shot('12-barrier-up');
+  ok(await page.evaluate(() => A.UI.B && A.UI.B.b.enemy.shield > 0), 'the Waywarden raises its Stone Barrier'); ok(!!(await page.$('#pan-e .hpb.shieldb:not([hidden])')), 'the barrier shows as a bar over its health'); await shot('12-barrier-up');
   await page.evaluate(() => { const b = A.UI.B.b; b.enemy.shield = 0; b.enemy.hp = 1; b.enemy.mechDone = [true, true]; });
   await page.waitForSelector('.abtn:not(.off):not(.swap)', { timeout: 8000 }); await page.click('.abtn:not(.off):not(.swap)'); await page.waitForSelector('#v-go', { timeout: 12000 });
   let s = await S(); ok(s.dungeon.forgottenroad.clears === 1 && !s.run, 'beating the Waywarden clears the dungeon'); ok(/Dungeon cleared/.test(await page.textContent('.vcard')), 'result screen says the dungeon is cleared'); await shot('13-cleared');
