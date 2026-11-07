@@ -1,0 +1,143 @@
+{
+  "environment": "Desktop Linux container, headless Chromium (Playwright), SwiftShader software WebGL, 844x390 @3x phone-sized viewport. NOT an iPhone. Median of 3 runs.",
+  "results": {
+    "2d before": [
+      {
+        "label": "battle idle (waiting for a move)",
+        "taskMsPerS": 154.7,
+        "scriptMsPerS": 4.2,
+        "styleMsPerS": 60.7,
+        "layoutMsPerS": 5.2,
+        "frameP50": 16.7,
+        "frameP95": 16.7,
+        "frameMax": 16.8
+      },
+      {
+        "label": "four turns of combat",
+        "taskMsPerS": 165.5,
+        "scriptMsPerS": 5.6,
+        "styleMsPerS": 67,
+        "layoutMsPerS": 3.3,
+        "frameP50": 16.7,
+        "frameP95": 16.8,
+        "frameMax": 50
+      },
+      {
+        "label": "victory screen idle",
+        "taskMsPerS": 15.3,
+        "scriptMsPerS": 1.8,
+        "styleMsPerS": 1.6,
+        "layoutMsPerS": 0.1,
+        "frameP50": 16.7,
+        "frameP95": 16.8,
+        "frameMax": 16.8
+      }
+    ],
+    "2d after": [
+      {
+        "label": "battle idle (waiting for a move)",
+        "taskMsPerS": 159.6,
+        "scriptMsPerS": 2.8,
+        "styleMsPerS": 76.2,
+        "layoutMsPerS": 3,
+        "frameP50": 16.7,
+        "frameP95": 16.7,
+        "frameMax": 16.8
+      },
+      {
+        "label": "four turns of combat",
+        "taskMsPerS": 195,
+        "scriptMsPerS": 5.5,
+        "styleMsPerS": 93.8,
+        "layoutMsPerS": 4.1,
+        "frameP50": 16.7,
+        "frameP95": 16.7,
+        "frameMax": 16.8
+      },
+      {
+        "label": "victory screen idle",
+        "taskMsPerS": 15.6,
+        "scriptMsPerS": 1.9,
+        "styleMsPerS": 1.6,
+        "layoutMsPerS": 0.1,
+        "frameP50": 16.7,
+        "frameP95": 16.7,
+        "frameMax": 16.8
+      }
+    ],
+    "3d before": [
+      {
+        "label": "battle idle (waiting for a move)",
+        "c3d": {
+          "drawCalls": 21,
+          "triangles": 9558,
+          "geometries": 17
+        },
+        "taskMsPerS": 1039.4,
+        "scriptMsPerS": 19.3,
+        "styleMsPerS": 2.7,
+        "layoutMsPerS": 0.8,
+        "frameP50": 50,
+        "frameP95": 66.7,
+        "frameMax": 66.8
+      },
+      {
+        "label": "four turns of combat",
+        "taskMsPerS": 1007.1,
+        "scriptMsPerS": 20.9,
+        "styleMsPerS": 12.5,
+        "layoutMsPerS": 1.8,
+        "frameP50": 66.6,
+        "frameP95": 66.7,
+        "frameMax": 100
+      },
+      {
+        "label": "victory screen idle",
+        "taskMsPerS": 1042.3,
+        "scriptMsPerS": 18.9,
+        "styleMsPerS": 0.5,
+        "layoutMsPerS": 0.1,
+        "frameP50": 66.7,
+        "frameP95": 116.6,
+        "frameMax": 116.7
+      }
+    ],
+    "3d after": [
+      {
+        "label": "battle idle (waiting for a move)",
+        "c3d": {
+          "drawCalls": 30,
+          "triangles": 11654,
+          "geometries": 23
+        },
+        "taskMsPerS": 1018.5,
+        "scriptMsPerS": 22.1,
+        "styleMsPerS": 2.2,
+        "layoutMsPerS": 0.7,
+        "frameP50": 66.6,
+        "frameP95": 66.7,
+        "frameMax": 83.4
+      },
+      {
+        "label": "four turns of combat",
+        "taskMsPerS": 1011.4,
+        "scriptMsPerS": 22.6,
+        "styleMsPerS": 11.3,
+        "layoutMsPerS": 1.7,
+        "frameP50": 66.7,
+        "frameP95": 83.4,
+        "frameMax": 133.3
+      },
+      {
+        "label": "victory screen idle",
+        "taskMsPerS": 1047.7,
+        "scriptMsPerS": 15.7,
+        "styleMsPerS": 0.4,
+        "layoutMsPerS": 0.1,
+        "frameP50": 66.7,
+        "frameP95": 116.7,
+        "frameMax": 150
+      }
+    ]
+  }
+}
