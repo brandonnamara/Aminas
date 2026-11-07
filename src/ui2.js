@@ -135,9 +135,12 @@
     return {
       is3d: false,
       anchor(w) { const e = spr(w); if (!e) return null; const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height * 0.2 }; },
-      use(w) { cls(w, 'lunge-' + w, 450); },
-      hit(w, el) { burstAt(w, el); cls(w, 'hurt', 450); },
-      heal() {}, guard() {}, victory() {},
+      use(w, kind, info) { cls(w, kind === 'attack' ? 'lunge-' + w : 'cast', 450); if (kind === 'attack' && info && info.el) setTimeout(() => streak2d(w, info.el, !!(info.special || info.boss)), 200); },
+      hit(w, el, eff) { burstAt(w, el); cls(w, eff === 'super' ? 'hurt big' : 'hurt', 450); },
+      heal(w) { cls(w, 'healed', 700); }, guard(w) { cls(w, 'guarding', 600); }, victory(w) { const e = spr(w); if (e) e.classList.add('cheer'); },
+      // Phase 7: the same turn cues as the 3D arena (an outline glow and a ground ring for the active Amina, a reticle on the target)
+      focus(f) { f = f || {}; ['p', 'e'].forEach((x) => { const e = spr(x); if (!e) return; e.classList.toggle('is-active', f.active === x); e.classList.toggle('is-turn', f.active === x && f.mode === 'turn'); e.classList.toggle('is-target', f.target === x); }); },
+      preview(kind) { const e = spr('e'), p = spr('p'); if (e) e.classList.toggle('is-aim', kind === 'foe'); if (p) p.classList.toggle('is-aim', kind === 'self'); },
       status(w, color) { const e = spr(w); if (e) { e.style.setProperty('--fx', color); cls(w, 'fxflash', 520); } },
       faint(w) { const e = spr(w); if (e) e.classList.add('faint'); },
       swap(w, sp) { const e = spr(w); if (e) { e.classList.remove('faint'); e.innerHTML = Art.portrait(sp); cls(w, 'in', 500); } return Promise.resolve(); },
@@ -154,7 +157,7 @@
       if (typeof s3[k] !== 'function') { out[k] = s3[k]; return; }
       out[k] = function () { try { return s3[k].apply(s3, arguments); } catch (err) { if (root.console) console.warn('3D stage error, switching to 2D:', err && err.message); fallback2d(U); return null; } };
     });
-    ['setBarrier', 'setElement'].forEach((k) => { if (!out[k]) out[k] = () => {}; });
+    ['setBarrier', 'setElement', 'focus', 'preview', 'debug'].forEach((k) => { if (!out[k]) out[k] = () => {}; });
     return out;
   }
   function fallback2d(U) {
@@ -309,7 +312,7 @@
   function bRender() {
     const U = UI.B; if (!U || !$('#battle')) return;
     const b = U.b, d = U.disp, en = b.enemy;
-    panel('e'); panel('p'); turnBadge();
+    panel('e'); panel('p'); turnBadge(); syncArena();
     $('#b-party').innerHTML = b.party.map((f, i) => '<button class="pm ' + (i === b.pi && !b.pending ? 'cur' : '') + (f.hp <= 0 ? ' ko' : '') + (b.pending && f.hp > 0 ? ' tapme' : '') + (f.hp > 0 && f.hp / f.hpMax < 0.25 ? ' low' : '') + '" style="' + elVars(f.el) + '" data-act="bSwitch" data-i="' + i + '" aria-label="' + esc(f.name) + ', ' + Math.max(0, f.hp) + ' of ' + f.hpMax + ' health' + (i === b.pi ? ', in battle' : '') + '"><div class="art">' + Art.portrait(f.sp) + '</div><span class="pm-n">' + esc(f.name.slice(0, 8)) + '</span><div class="bar hp ' + hpCls(f.hp, f.hpMax) + '"><i style="width:' + pct(f.hp, f.hpMax) + '%"></i></div></button>').join('');
     const off = U.busy || b.over;
     if (b.pending) putHtml('b-actions', '<div class="b-pick" style="grid-column:span 2">' + I('swap') + ' Choose your next Amina</div>');
@@ -322,6 +325,28 @@
     }
   }
   UI.bRender = bRender;
+  // Phase 7: the arena follows the interface. Your move → your Amina is active (ring, outline, battle-ready move) and
+  // the foe is targeted; while a move resolves → whoever is acting is active and the other is targeted. The same
+  // state lights the panels, so the interface and the arena always point at the same creatures.
+  function syncArena() {
+    const U = UI.B; if (!U) return; const b = U.b;
+    // the rules resolve a whole turn at once and the interface plays it back, so while it plays back the arena follows
+    // the playback (who is acting now), never the final state
+    let f = null;
+    if (U.busy) { if (U.acting) f = { active: U.acting, target: U.acting === 'p' ? 'e' : 'p', mode: 'act' }; }
+    else if (b.over || b.pending) f = {};
+    else f = { active: 'p', target: 'e', mode: 'turn' };
+    if (!f) return;
+    U.focus = f;
+    ['p', 'e'].forEach((w) => { const pan = $('#pan-' + w); if (pan) pan.classList.toggle('targeted', f.target === w && f.mode === 'act'); });
+    if (U.stage && U.stage.focus) U.stage.focus(f);
+  }
+  // pressing a move previews what it aims at: the foe for attacks, yourself for heals and guards
+  const previewOf = (btn) => { const ab = btn && D.ABILITIES[btn.dataset.id]; return !ab ? null : ab.type === 'heal' || ab.type === 'guard' ? 'self' : 'foe'; };
+  const setPreview = (k) => { const U = UI.B; if (U && U.stage && U.stage.preview) U.stage.preview(k); };
+  document.addEventListener('pointerdown', (e) => { const btn = e.target.closest && e.target.closest('#b-actions .abtn.ready'); if (btn) setPreview(previewOf(btn)); }, true);
+  document.addEventListener('pointerover', (e) => { if (e.pointerType !== 'mouse') return; const btn = e.target.closest && e.target.closest('#b-actions .abtn.ready'); setPreview(btn ? previewOf(btn) : null); }, true);
+  ['pointerup', 'pointercancel'].forEach((t) => document.addEventListener(t, () => setTimeout(() => setPreview(null), 320), true));
   function floatAt(side, text, kind, tag) {
     const fld = $('#b-field'), U = UI.B, a = U && U.stage && U.stage.anchor(side); if (!fld || !a) return;
     const f = fld.getBoundingClientRect();
@@ -346,6 +371,15 @@
     const d = document.createElement('div'); d.className = 'fxburst';
     d.style.cssText = 'left:' + (r.left - f.left + r.width / 2 - 56) + 'px;top:' + (r.top - f.top + r.height / 2 - 56) + 'px;background:radial-gradient(circle,#fff 0%,' + c + ' 40%,transparent 70%)';
     fld.appendChild(d); setTimeout(() => d.remove(), 600);
+  }
+  // Phase 7 (2D stage): a short element-coloured streak from attacker to target
+  function streak2d(from, el, big) {
+    const fld = $('#b-field'), a = $('#spr-' + from), b = $('#spr-' + (from === 'p' ? 'e' : 'p')); if (!fld || !a || !b || UI.calm()) return;
+    const f = fld.getBoundingClientRect(), ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
+    const x0 = ra.left + ra.width / 2 - f.left, y0 = ra.top + ra.height * 0.45 - f.top, x1 = rb.left + rb.width / 2 - f.left, y1 = rb.top + rb.height * 0.45 - f.top;
+    const d = document.createElement('i'); d.className = 'streak2d' + (big ? ' big' : ''); const E = D.ELEMENTS[el] || D.ELEMENTS.light;
+    d.style.cssText = 'left:' + x0 + 'px;top:' + y0 + 'px;--dx:' + (x1 - x0) + 'px;--dy:' + (y1 - y0) + 'px;--c:' + E.color;
+    fld.appendChild(d); setTimeout(() => d.remove(), 420);
   }
   function cls(side, c, ms) { const e = $('#spr-' + side); if (!e) return; e.classList.remove(c); void e.offsetWidth; e.classList.add(c); setTimeout(() => e.classList.remove(c), ms || 500); }
   // Telegraph banner: what is coming and what the player can do about it, worked out from the real party.
@@ -386,7 +420,8 @@
           const ty = D.ABILITIES[e.abil].type;
           bLog(e.name + ' used ' + e.abName + '!');
           U.acting = e.who; bRender();
-          stg.use(e.who, ty === 'guard' || ty === 'heal' ? 'cast' : 'attack');
+          const ab = D.ABILITIES[e.abil];
+          stg.use(e.who, ty === 'guard' || ty === 'heal' ? 'cast' : 'attack', { el: e.el, type: ty, special: ab.cd > 0, boss: !!e.boss, power: ab.power || 0 });
           if (ty === 'guard') { Au.play('guard'); stg.guard(e.who); }
           if (e.boss) setTele(null);
           await sleep(e.boss ? 620 : 480); break;
@@ -396,7 +431,7 @@
           Au.play(e.broke ? 'super' : 'guard'); if (e.broke) { stg.setBarrier(false); bLog('The barrier shatters!'); } else bLog(e.special ? 'The special ability cracks the barrier hard!' : 'The barrier absorbs the blow.');
           bRender(); await sleep(e.broke ? 700 : 420); break;
         case 'hit': {
-          const side = e.who; if (!e.blocked) { stg.hit(side, e.el, e.eff); floatAt(side, '-' + e.dmg, e.eff + (e.big ? ' big' : ''), e.eff === 'super' ? 'Super effective' : e.eff === 'weak' ? 'Resisted' : e.guarded ? 'Guarded' : e.big ? 'Heavy blow' : ''); }
+          const side = e.who; if (!e.blocked) { stg.hit(side, e.el, e.eff, { big: !!e.big }); floatAt(side, '-' + e.dmg, e.eff + (e.big ? ' big' : ''), e.eff === 'super' ? 'Super effective' : e.eff === 'weak' ? 'Resisted' : e.guarded ? 'Guarded' : e.big ? 'Heavy blow' : ''); }
           if (side === 'e') { d.eHp = e.hp; d.eGuard = false; } else { d.pHp = e.hp; d.pGuard = false; }
           if (!e.blocked) Au.play(e.eff === 'super' || e.big ? 'super' : e.eff === 'weak' ? 'weak' : 'hit');
           if (!e.blocked) bLog(e.eff === 'super' ? 'It’s super effective!' : e.eff === 'weak' ? 'It’s not very effective…' : (e.guarded ? (e.big ? 'The guard absorbed most of the blow!' : 'The guard softened the blow.') : ''));
@@ -456,7 +491,7 @@
           Au.play('ok'); bLog('Go, ' + f.name + '!'); bRender(); await sleep(stg.is3d ? 260 : 560); break;
         }
         case 'needSwitch': bLog('Choose your next Amina.'); break;
-        case 'end': if (e.result === 'win') stg.victory('p'); break;
+        case 'end': if (e.result === 'win') stg.victory('p'); else if (stg.is3d && U.b.enemy && U.b.enemy.hp > 0) stg.victory('e'); break;
       }
     }
     // the event list is complete for this action: line the display up with the real battle state

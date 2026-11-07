@@ -254,10 +254,112 @@ export function motes(T, color, n) {
   pts.userData = { pos, seed, n };
   return pts;
 }
+/* ------------------------------------------------------------------ Phase 7: atmospheres
+   Each arena gets its own air: a light rig (key, rim and sky colours), fog distance, an ambient particle behaviour
+   built from small cubes (embers in the kiln, bubbles on the drowned steps, fireflies in the orchard, falling leaves
+   in the Heartwood…), soft light shafts where the place has an open sky or a high window, and two layers of distant
+   voxel silhouettes so the arena has depth behind it. Guardians and the Island Boss change the light: dimmer key,
+   a coloured rim, a pool of light under the boss; for the Island Boss the rim slowly cycles through the spectrum.
+   Cost: one instanced mesh for the particles, one merged mesh for the shafts, two instanced meshes for the
+   silhouettes. Battery saver halves the particles and stills the shafts; Reduce motion stills everything. */
+export const ATMOS = {
+  forgottenroad:  { light: { key: ['#fff1d6', 2.4], rim: ['#ffffff', 1.5], hemi: ['#d6ecff', '#7a8a5a', 1.3] }, fog: [8, 18], particles: { kind: 'pollen', colors: ['#fffbe0', '#fff2a8', '#ffffff'], n: 30 }, shafts: { color: '#fff4c8', n: 3, op: 0.16 }, backdrop: { kind: 'trees', colors: ['#4f8a44', '#7aa8a0'] } },
+  gatheringhall:  { light: { key: ['#ffd9a8', 2.2], rim: ['#ffc070', 1.7], hemi: ['#c8a890', '#3a2a22', 1.1] }, fog: [6, 15], particles: { kind: 'dust', colors: ['#ffe2b0', '#ffd890', '#fff3d8'], n: 26 }, shafts: { color: '#ffd28a', n: 2, op: 0.18 }, backdrop: { kind: 'hall', colors: ['#3a2a24', '#2a1e1a'] } },
+  reliquary:      { light: { key: ['#f2ffe0', 2.2], rim: ['#c8ffd0', 1.6], hemi: ['#d8ffe0', '#3a5a3a', 1.25] }, fog: [7, 16], particles: { kind: 'spores', colors: ['#d8ffb0', '#a8ff9a', '#ffffff'], n: 32 }, shafts: { color: '#e0ffd0', n: 4, op: 0.17 }, backdrop: { kind: 'pillars', colors: ['#4a6a4a', '#5a8a7a'] } },
+  drownedsteps:   { light: { key: ['#e8f4ff', 2.1], rim: ['#8fdcff', 1.8], hemi: ['#a8d8ff', '#1a3a5a', 1.3] }, fog: [7, 17], particles: { kind: 'bubbles', colors: ['#dff6ff', '#bfefff', '#ffffff'], n: 28 }, shafts: { color: '#bfe8ff', n: 3, op: 0.15 }, backdrop: { kind: 'reef', colors: ['#2f6a7a', '#3a7a9a'] } },
+  coldkiln:       { light: { key: ['#ffd0a0', 2.3], rim: ['#ff8a3a', 2.0], hemi: ['#ffb890', '#3a1a12', 1.15] }, fog: [6, 15], particles: { kind: 'embers', colors: ['#ffdf7a', '#ffa43a', '#ff6a2a'], n: 34 }, shafts: null, backdrop: { kind: 'kiln', colors: ['#4a2418', '#5a2e20'] }, flicker: true },
+  hollowveil:     { light: { key: ['#e0d4ff', 2.0], rim: ['#b49bff', 1.9], hemi: ['#9a88d8', '#160f26', 1.1] }, fog: [6, 14], particles: { kind: 'wisps', colors: ['#c9b8ff', '#e8dcff', '#9a78e6'], n: 24 }, shafts: { color: '#c9b8ff', n: 2, op: 0.12 }, backdrop: { kind: 'arches', colors: ['#2a2040', '#1e1830'] } },
+  lanternorchard: { light: { key: ['#ffe2b8', 2.1], rim: ['#ffd070', 1.8], hemi: ['#c0b0e8', '#2a2a3a', 1.15] }, fog: [7, 16], particles: { kind: 'fireflies', colors: ['#fff3a0', '#ffe070', '#d8ff9a'], n: 26 }, shafts: null, backdrop: { kind: 'orchard', colors: ['#2f5a3a', '#3a4a5a'] } },
+  windstair:      { light: { key: ['#ffffff', 2.5], rim: ['#d8fff4', 1.5], hemi: ['#e0f4ff', '#7a8a9a', 1.4] }, fog: [9, 20], particles: { kind: 'gusts', colors: ['#ffffff', '#e8fff8', '#c8f4ec'], n: 22 }, shafts: { color: '#ffffff', n: 2, op: 0.12 }, backdrop: { kind: 'spires', colors: ['#8a98a8', '#a8c4d8'] } },
+  resonancescar:  { light: { key: ['#ffe4f6', 2.1], rim: ['#9fe8ff', 2.0], hemi: ['#d0b8ff', '#2a1a40', 1.2] }, fog: [7, 16], particles: { kind: 'glitter', colors: ['#ff9ede', '#9fe8ff', '#fff0a8', '#c8b4ff'], n: 30 }, shafts: { color: '#ffd2f0', n: 3, op: 0.13 }, backdrop: { kind: 'crystals', colors: ['#3a2a5a', '#4a3a7a'] } },
+  heartwood:      { light: { key: ['#e8ffd0', 1.9], rim: ['#9affb0', 1.9], hemi: ['#a8d8a0', '#0e1a10', 1.05] }, fog: [6, 15], particles: { kind: 'leaves', colors: ['#7ad44a', '#5ab83a', '#b8e86a', '#e8c85a'], n: 28 }, shafts: { color: '#e8ffc0', n: 5, op: 0.2 }, backdrop: { kind: 'roots', colors: ['#2a2418', '#1e2a1e'] } },
+};
+const BOSS_LIGHT = { key: 0.82, rim: 1.25, hemi: 0.78 };
+
+// ambient particles: small cubes with a behaviour per arena (one InstancedMesh)
+function ambient(T, cfg, n, still) {
+  const geo = T.g(new THREE.BoxGeometry(1, 1, 1)), mat = T.m(new THREE.MeshBasicMaterial({ color: '#ffffff', toneMapped: false, transparent: true, opacity: 0.9, depthWrite: false }));
+  const mesh = new THREE.InstancedMesh(geo, mat, n); mesh.frustumCulled = false; mesh.name = 'atmo:particles';
+  const P = [], col = new THREE.Color(), m = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), v = new THREE.Vector3(), sc = new THREE.Vector3();
+  const k = cfg.kind;
+  for (let i = 0; i < n; i++) {
+    const p = { x: (Math.random() - 0.5) * 11, y: Math.random() * 3.2, z: -0.6 - Math.random() * 4.4 + (k === 'gusts' ? 1.5 : 0), ph: Math.random() * 6.28, s: 0.035 + Math.random() * 0.035, r: Math.random() * 3 };
+    if (k === 'leaves') { p.s = 0.06 + Math.random() * 0.04; p.y = Math.random() * 4; }
+    if (k === 'gusts') { p.s = 0.03; p.len = 0.4 + Math.random() * 0.5; }
+    if (k === 'bubbles') p.s = 0.03 + Math.random() * 0.05;
+    P.push(p); mesh.setColorAt(i, col.set(cfg.colors[i % cfg.colors.length]));
+  }
+  if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+  const write = (t) => {
+    for (let i = 0; i < n; i++) { const p = P[i]; let sx = p.s, sy = p.s, sz = p.s, rx = p.r, ry = p.r * 0.7;
+      if (k === 'gusts') { sx = p.len; sy = p.s * 0.6; sz = p.s * 0.6; rx = 0; ry = 0; }
+      if (k === 'fireflies') { const b = 0.5 + 0.5 * Math.sin(t * 2.2 + p.ph * 3); sx = sy = sz = p.s * (0.35 + b * 0.9); }
+      if (k === 'embers') { const b = 0.6 + 0.4 * Math.sin(t * 9 + p.ph * 5); sx = sy = sz = p.s * b; }
+      if (k === 'leaves') { sy = p.s * 0.3; }
+      m.compose(v.set(p.x, p.y, p.z), q.setFromEuler(e.set(rx, ry, k === 'leaves' ? p.r * 0.5 : 0)), sc.set(sx, sy, sz)); mesh.setMatrixAt(i, m); }
+    mesh.instanceMatrix.needsUpdate = true;
+  };
+  write(0);
+  return {
+    mesh,
+    update(t, dt) {
+      if (still()) return; dt = Math.min(0.05, dt || 0.016);
+      for (let i = 0; i < n; i++) { const p = P[i];
+        if (k === 'pollen' || k === 'dust') { p.x += dt * (k === 'pollen' ? 0.18 : 0.06); p.y += Math.sin(t * 0.8 + p.ph) * dt * 0.08; p.r += dt * 0.5; if (p.x > 5.6) p.x = -5.6; }
+        else if (k === 'spores' || k === 'wisps') { p.y += dt * (k === 'spores' ? 0.16 : 0.06); p.x += Math.sin(t * 0.6 + p.ph) * dt * 0.12; p.z += Math.cos(t * 0.5 + p.ph) * dt * (k === 'wisps' ? 0.1 : 0.04); p.r += dt; if (p.y > 3.4) p.y = 0.05; }
+        else if (k === 'bubbles') { p.y += dt * (0.3 + p.s * 4); p.x += Math.sin(t * 3 + p.ph) * dt * 0.1; if (p.y > 3.4) { p.y = 0.02; p.x = (Math.random() - 0.5) * 11; } }
+        else if (k === 'embers') { p.y += dt * (0.45 + (i % 4) * 0.12); p.x += Math.sin(t * 1.4 + p.ph) * dt * 0.2; p.r += dt * 3; if (p.y > 3.4) { p.y = 0.02; p.x = (Math.random() - 0.5) * 11; } }
+        else if (k === 'fireflies') { p.x += Math.sin(t * 0.7 + p.ph) * dt * 0.25; p.y += Math.cos(t * 0.9 + p.ph * 2) * dt * 0.18; p.z += Math.sin(t * 0.5 + p.ph * 3) * dt * 0.12; if (p.y < 0.2) p.y = 0.2; if (p.y > 2.8) p.y = 2.8; }
+        else if (k === 'gusts') { p.x += dt * (3.2 + (i % 3)); if (p.x > 6.5) { p.x = -6.5; p.y = 0.3 + Math.random() * 2.6; } }
+        else if (k === 'glitter') { p.y -= dt * 0.12; p.r += dt * 1.6; if (p.y < 0.05) p.y = 3.3; }
+        else if (k === 'leaves') { p.y -= dt * (0.28 + (i % 3) * 0.06); p.x += Math.sin(t * 1.3 + p.ph) * dt * 0.35; p.r += dt * 1.8; if (p.y < 0.04) { p.y = 3.6 + Math.random(); p.x = (Math.random() - 0.5) * 11; } } }
+      write(t);
+    },
+  };
+}
+// soft light shafts: tall additive quads with a vertical fade, merged into one mesh; their opacity breathes slowly
+function shafts(T, cfg, r) {
+  const c = document.createElement('canvas'); c.width = 4; c.height = 64; const g = c.getContext('2d'); const gr = g.createLinearGradient(0, 0, 0, 64);
+  gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(0.3, 'rgba(255,255,255,0.9)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, 4, 64);
+  const tex = T.t(new THREE.CanvasTexture(c)); tex.colorSpace = THREE.SRGBColorSpace;
+  const mat = T.m(new THREE.MeshBasicMaterial({ map: tex, color: cfg.color, transparent: true, opacity: cfg.op, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, toneMapped: false, fog: false }));
+  const geos = [];
+  const n = Math.min(cfg.n, cfg.max || 3);
+  for (let i = 0; i < n; i++) { const w = 0.5 + r() * 0.5, h = 4.2, q = new THREE.PlaneGeometry(w, h); const x = -4 + (i / Math.max(1, n - 1)) * 8 + (r() - 0.5) * 1.2;
+    q.applyMatrix4(new THREE.Matrix4().compose(new THREE.Vector3(x, h / 2 + 0.2, -2.8 - r() * 1.6), new THREE.Quaternion().setFromEuler(new THREE.Euler(0, (r() - 0.5) * 0.4, -0.38)), new THREE.Vector3(1, 1, 1))); geos.push(q); }
+  const merged = T.g(mergeGeometries(geos, false)); geos.forEach((x) => x.dispose());
+  const mesh = new THREE.Mesh(merged, mat); mesh.renderOrder = 3; mesh.name = 'atmo:shafts';
+  return { mesh, update(t, still) { if (!still) mat.opacity = cfg.op * (0.75 + Math.sin(t * 0.5) * 0.25); } };
+}
+// distant voxel silhouettes: two layers of blocks, tinted towards the fog so they read as depth, not as props
+function backdrop(T, cfg, fog, r, layers) {
+  const geo = T.g(new THREE.BoxGeometry(1, 1, 1)), out = [], fogC = new THREE.Color(fog), m = new THREE.Matrix4(), q = new THREE.Quaternion(), col = new THREE.Color();
+  [[0, -6.8, 0.45], [1, -9.4, 0.7]].slice(0, layers || 2).forEach(([li, z, mix]) => {
+    const blocks = [], base = new THREE.Color(cfg.colors[li]).lerp(fogC, mix), push = (x, y, zz, w, h, d, c) => blocks.push([x, y, zz, w, h, d, c || base]);
+    for (let x = -13; x <= 13; x += 0.9 + r() * 0.8) {
+      const k = cfg.kind, h = 1 + r() * 2.2 + li * 0.8, zz = z + (r() - 0.5) * 1.2;
+      if (k === 'trees' || k === 'orchard') { push(x, 0, zz, 0.3, h * 0.6, 0.3); const cw = 1 + r() * 0.8; push(x, h * 0.55, zz, cw, h * 0.5, cw); push(x, h * 1.02, zz, cw * 0.6, h * 0.3, cw * 0.6); if (k === 'orchard' && r() < 0.6) push(x + 0.3, h * 0.6, zz + 0.5, 0.14, 0.18, 0.14, new THREE.Color('#ffd070')); }
+      else if (k === 'pillars' || k === 'arches') { push(x, 0, zz, 0.55, h * 1.2, 0.55); if (k === 'arches' && r() < 0.5) push(x + 0.7, h * 1.2, zz, 1.9, 0.4, 0.5); }
+      else if (k === 'reef') { push(x, 0, zz, 0.4, h * 0.8, 0.4); push(x + 0.25, h * 0.5, zz, 0.5, 0.25, 0.3); }
+      else if (k === 'kiln' || k === 'hall') { push(x, 0, zz, 0.95, h * 1.3, 0.8); if (k === 'kiln' && r() < 0.3) push(x, h * 1.3, zz, 0.4, 1.2, 0.4); }
+      else if (k === 'spires') { push(x, 0, zz, 0.7, h * 1.6, 0.7); push(x, h * 1.6, zz, 0.4, h * 0.6, 0.4); }
+      else if (k === 'crystals') { push(x, 0, zz, 0.45, h * 1.4, 0.45, null); }
+      else if (k === 'roots') { push(x, 0, zz, 1.0 + r() * 0.6, h * 1.6, 1.0); if (r() < 0.5) push(x + 0.8, h * 1.1, zz, 1.6, 0.45, 0.6); }
+      else push(x, 0, zz, 0.9, h, 0.9);
+    }
+    const mesh = new THREE.InstancedMesh(geo, T.m(new THREE.MeshBasicMaterial({ color: '#ffffff', fog: true })), blocks.length);
+    blocks.forEach(([x, y, zz, w, h, d, c], i) => { const tilt = cfg.kind === 'crystals' ? (r() - 0.5) * 0.4 : 0; m.compose(new THREE.Vector3(x, y + h / 2, zz), q.setFromEuler(new THREE.Euler(0, r() * 0.4, tilt)), new THREE.Vector3(w, h, d)); mesh.setMatrixAt(i, m); mesh.setColorAt(i, col.copy(c)); });
+    mesh.name = 'atmo:backdrop'; mesh.renderOrder = 1; // drawn after the arena, so the parts hidden behind it cost nothing
+    mesh.instanceMatrix.needsUpdate = true; if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true; out.push(mesh);
+  });
+  return out;
+}
+
 // Builds an arena into `scene`; returns { def, group, update(t), dispose() }. o: { boss, island }
 export function buildArena(scene, id, o) {
   o = o || {}; const key = arenaFor(id);
   const def = ARENAS[key], T = tracker(), group = new THREE.Group(), anim = [], r = rnd(key.length * 977 + 13 + (o.boss ? 7 : 0));
+  const AT = ATMOS[key] || {}, still = o.still || (() => false), saver = o.saver || (() => false);
   const add = (mesh, p) => {
     p = p || {}; mesh.position.set(p.x || 0, p.y || 0, p.z || 0); mesh.rotation.set(p.rx || 0, p.ry || 0, p.rz || 0);
     if (p.sx || p.sy || p.sz) mesh.scale.set(p.sx || 1, p.sy || 1, p.sz || 1);
@@ -267,27 +369,53 @@ export function buildArena(scene, id, o) {
   const K = kit(add, T, r);
   def.build(add, T, r, K, o);
   mergeStatic(group, new Set(anim.map((a) => a.mesh)), T);
-  const mt = motes(T, def.motes || '#ffffff', o.boss ? 46 : 26); group.add(mt);
+  // Phase 7 atmosphere (the living-pixel motes stay for boss rooms, on top of the arena's own particles)
+  const mt = o.boss ? motes(T, def.motes || '#ffffff', 30) : null; if (mt) group.add(mt);
+  const amb = AT.particles ? ambient(T, AT.particles, Math.max(8, Math.round(AT.particles.n * (saver() ? 0.5 : 1) * (o.boss ? 1.2 : 1))), () => still() || false) : null; if (amb) group.add(amb.mesh);
+  // light shafts are the costliest layer to draw (large see-through quads): up to three on High, two on Balanced, none in Battery saver
+  const tier = o.tier ? o.tier() : 'high', shMax = saver() || tier === 'saver' ? 0 : tier === 'balanced' ? 2 : 3;
+  const sh = AT.shafts && shMax ? shafts(T, Object.assign({}, AT.shafts, { max: shMax }, o.island ? { color: '#ffd2f0', op: AT.shafts.op * 1.2 } : {}), r) : null; if (sh) group.add(sh.mesh);
+  // the distant silhouettes paint sky that was empty before: two layers on High, the near one on Balanced, none in Battery saver
+  const bd = AT.backdrop && !(saver() || tier === 'saver') ? backdrop(T, AT.backdrop, def.fog, rnd(key.length * 31 + 5), tier === 'high' ? 2 : 1) : []; bd.forEach((m) => group.add(m));
+  // a pool of light under the boss
+  let pool = null;
+  if (o.boss) { pool = new THREE.Mesh(T.g(new THREE.CircleGeometry(1.7, 40)), T.m(new THREE.MeshBasicMaterial({ map: T.t(radialTexture([[0, 'rgba(255,255,255,0.75)'], [0.6, 'rgba(255,255,255,0.18)'], [1, 'rgba(255,255,255,0)']], 128)), color: o.island ? '#ffd2f0' : '#ffe2a0', transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false })));
+    pool.rotation.x = -Math.PI / 2; pool.position.set(1.35, 0.025, -0.95); pool.scale.set(1, 0.8, 1); group.add(pool); }
   scene.add(group);
-  scene.fog = new THREE.Fog(def.fog, 7, 16);
-  const col = new THREE.Color();
+  const fog = AT.fog || [7, 16]; scene.fog = new THREE.Fog(def.fog, fog[0] - (o.boss ? 0.5 : 0), fog[1] - (o.boss ? 1 : 0));
+  // the light rig the runtime builds with (studioLights override), dimmer and rim-lit for a boss
+  const L = AT.light ? { key: AT.light.key.slice(), rim: AT.light.rim.slice(), hemi: AT.light.hemi.slice() } : null;
+  if (L && o.boss) { L.key[1] *= BOSS_LIGHT.key; L.rim = [o.island ? '#ff9ee0' : '#ffd070', L.rim[1] * BOSS_LIGHT.rim]; L.hemi[2] *= BOSS_LIGHT.hemi; }
+  let rig = null; const col = new THREE.Color(), key0 = L ? L.key[1] : 0;
   return {
-    def, group, key,
+    def, group, key, light: L,
+    atmo: { tier, backdropLayers: bd.length, particles: AT.particles ? AT.particles.kind : null, count: amb ? amb.mesh.count : 0, shafts: sh ? Math.min(AT.shafts.n, shMax) : 0, backdrop: AT.backdrop ? AT.backdrop.kind : null, boss: !!o.boss, island: !!o.island },
+    bindLights(g) { rig = g; },
     update(t, dt) {
+      const quiet = still();
       anim.forEach((a) => {
         const m = a.mesh;
+        if (quiet && a.kind !== 'prism') return;
         if (a.kind === 'drift') { m.position.y = a.y0 + Math.sin(t * 0.6 + a.ph) * 0.15; m.rotation.y += 0.004; }
         else if (a.kind === 'orbit') { m.position.y = a.y0 + Math.sin(t * 0.5 + a.ph) * 0.25; m.rotation.x += 0.003; m.rotation.y += 0.005; }
         else if (a.kind === 'flicker') m.scale.y = a.sy * (1 + Math.sin(t * 13 + a.ph) * 0.15);
         else if (a.kind === 'bob') m.position.y = a.y0 + Math.sin(t * 0.8) * 0.03;
         else if (a.kind === 'sway') m.rotation.y = Math.sin(t * 1.6 + a.ph) * 0.35;
         else if (a.kind === 'vane') m.rotation.y = Math.sin(t * 0.35) * 1.2;
-        else if (a.kind === 'prism') { col.setHSL((t * 0.12) % 1, 0.85, 0.62); m.material.emissive.copy(col); m.material.color.copy(col); m.rotation.y += 0.01; m.scale.setScalar(0.6 * (1 + Math.sin(t * 2.2) * 0.08)); }
+        else if (a.kind === 'prism') { col.setHSL((t * 0.12) % 1, 0.85, 0.62); m.material.emissive.copy(col); m.material.color.copy(col); if (!quiet) m.rotation.y += 0.01; m.scale.setScalar(0.6 * (1 + (quiet ? 0 : Math.sin(t * 2.2) * 0.08))); }
       });
-      // motes rise and wrap; a little sideways drift
-      const u = mt.userData, p = u.pos, step = Math.min(0.05, dt || 0.016);
-      for (let i = 0; i < u.n; i++) { p[i * 3 + 1] += step * (0.22 + (i % 5) * 0.05); p[i * 3] += Math.sin(t * 0.7 + u.seed[i]) * step * 0.08; if (p[i * 3 + 1] > 3.4) p[i * 3 + 1] = 0.05; }
-      mt.geometry.attributes.position.needsUpdate = true;
+      if (amb) amb.update(t, dt);
+      if (sh) sh.update(t, quiet || saver());
+      if (pool && !quiet) pool.material.opacity = 0.75 + Math.sin(t * 1.4) * 0.2;
+      // the light itself: a kiln's key flickers; the Island Boss's rim walks the spectrum
+      if (rig && !quiet) {
+        const kl = rig.children[1], rl = rig.children[2];
+        if (AT.flicker && kl) kl.intensity = key0 * (0.94 + Math.sin(t * 7) * 0.03 + Math.sin(t * 13.1) * 0.03);
+        if (o.island && rl) rl.color.setHSL((t * 0.05) % 1, 0.7, 0.72);
+      }
+      if (mt) { const u = mt.userData, p = u.pos, step = Math.min(0.05, dt || 0.016);
+        if (!quiet) { for (let i = 0; i < u.n; i++) { p[i * 3 + 1] += step * (0.22 + (i % 5) * 0.05); p[i * 3] += Math.sin(t * 0.7 + u.seed[i]) * step * 0.08; if (p[i * 3 + 1] > 3.4) p[i * 3 + 1] = 0.05; }
+          mt.geometry.attributes.position.needsUpdate = true; } }
     },
     dispose() { scene.remove(group); scene.fog = null; T.dispose(); },
   };

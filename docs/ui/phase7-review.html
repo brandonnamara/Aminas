@@ -1,0 +1,285 @@
+<title>Aminas Phase 7 Review</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+  /* Layout: a stacked review sheet; each comparison is a pair of phone screenshots, Before then After, with a view switch. */
+  :root {
+    color-scheme: dark;
+    --ink: #120e2e; --glass: #231b55; --glass-hi: #2f2470; --line: rgba(190, 170, 255, .28);
+    --text: #fff9f0; --muted: #cfc6ee; --gold: #ffd978; --cyan: #8ff0ff; --pink: #ff9ee0;
+    --spectrum: linear-gradient(100deg, #ff9ee0, #b49bff 22%, #86b4ff 42%, #8ff0ff 60%, #fff0b0 80%, #ff9ee0);
+    --display: "Baloo 2", "Trebuchet MS", system-ui, sans-serif;
+    --body: "Atkinson Hyperlegible", -apple-system, "Segoe UI", system-ui, sans-serif;
+    --cut: polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px), 0 10px);
+  }
+  * { box-sizing: border-box; }
+  body { background: radial-gradient(120% 70% at 20% 0%, #3a2c7e, var(--ink) 65%) fixed, var(--ink); color: var(--text); font-family: var(--body); font-size: 15px; line-height: 1.5;
+    padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 1.6rem 3rem; }
+  main { max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 2.2rem; }
+  h1, h2, h3 { font-family: var(--display); line-height: 1.1; margin: 0; text-wrap: balance; }
+  h1 { font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 800; background: linear-gradient(180deg, #fffbe8 20%, var(--gold) 60%, #ffb6e6); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .lede { color: var(--muted); max-width: 65ch; margin: .4rem 0 0; }
+  .meta { display: flex; flex-wrap: wrap; gap: .4rem .6rem; margin-top: .8rem; font-size: .78rem; }
+  .meta span { padding: .2rem .6rem; background: rgba(255, 255, 255, .07); clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%); color: var(--muted); }
+  .meta b { color: var(--text); }
+  .bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1rem; padding: .55rem .8rem; background: rgba(18, 14, 46, .92); border: 1px solid var(--line); clip-path: var(--cut); }
+  body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--ink); }
+  .bar nav { display: flex; flex-wrap: wrap; gap: .3rem .8rem; font-size: .82rem; }
+  .bar nav a { color: var(--muted); text-decoration: none; } .bar nav a:hover, .bar nav a:focus-visible { color: var(--cyan); }
+  .seg { margin-left: auto; display: flex; gap: 2px; padding: 2px; background: rgba(0, 0, 0, .3); clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 50%, calc(100% - 6px) 100%, 6px 100%, 0 50%); }
+  .seg button { font: 700 .78rem var(--body); color: var(--muted); background: none; border: 0; padding: .35rem .8rem; cursor: pointer; }
+  .seg button[aria-pressed="true"] { color: #10204a; background: linear-gradient(180deg, #f2fdff, #a9eeff 55%, #7ec9ff); }
+  .seg button:focus-visible, .shot:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+  section { display: flex; flex-direction: column; gap: 1rem; scroll-margin-top: 4.5rem; }
+  section > header { display: flex; flex-direction: column; gap: .2rem; }
+  h2 { font-size: 1.6rem; font-weight: 800; color: var(--gold); }
+  section > header p { margin: 0; color: var(--muted); max-width: 70ch; }
+  section > header ul { margin: .2rem 0; padding-left: 1.2rem; color: var(--muted); max-width: 70ch; }
+  .pair { display: flex; flex-direction: column; gap: .5rem; padding: .9rem; background: linear-gradient(170deg, rgba(48, 36, 108, .7), rgba(18, 13, 48, .8)); clip-path: var(--cut); border: 1px solid var(--line); }
+  .pair h3 { font-size: 1.15rem; font-weight: 600; }
+  .pair p { margin: 0; color: var(--muted); font-size: .88rem; max-width: 80ch; }
+  .shots { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem; margin-top: .3rem; }
+  body[data-view="before"] .shots, body[data-view="after"] .shots { grid-template-columns: minmax(0, 1fr); }
+  body[data-view="before"] .after, body[data-view="after"] .before { display: none; }
+  .shots.solo { grid-template-columns: minmax(0, 1fr); }
+  figure { margin: 0; display: flex; flex-direction: column; gap: .3rem; min-width: 0; }
+  figcaption { font-size: .7rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); }
+  .after figcaption { color: var(--cyan); }
+  .shot { display: block; width: 100%; padding: 0; border: 0; background: none; cursor: zoom-in; }
+  .shot img { display: block; width: 100%; height: auto; aspect-ratio: 1266 / 585; object-fit: cover; border: 1px solid rgba(255, 255, 255, .12); }
+  .tall img { aspect-ratio: auto; }
+  .notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: .7rem; }
+  .note { padding: .8rem .9rem; background: rgba(255, 255, 255, .05); border-left: 3px solid var(--gold); }
+  .note b { display: block; color: var(--text); font-family: var(--display); font-size: 1rem; }
+  .note span { color: var(--muted); font-size: .86rem; }
+  .ladder { display: flex; flex-wrap: wrap; gap: .4rem; font-size: .75rem; font-weight: 700; }
+  .ladder i { font-style: normal; padding: .15rem .55rem; clip-path: polygon(5px 0, 100% 0, calc(100% - 5px) 100%, 0 100%); color: #1a1240; }
+  dialog { padding: 0; border: 0; background: transparent; max-width: 96vw; max-height: 94vh; }
+  dialog::backdrop { background: rgba(6, 4, 20, .88); }
+  dialog img { display: block; max-width: 96vw; max-height: 90vh; width: auto; height: auto; }
+  dialog form { text-align: right; } dialog button { font: 700 .85rem var(--body); color: var(--text); background: var(--glass-hi); border: 1px solid var(--line); padding: .4rem .9rem; margin-top: .4rem; cursor: pointer; }
+  @media (max-width: 720px) { .shots { grid-template-columns: minmax(0, 1fr); } .seg { margin-left: 0; } }
+  @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+
+<main>
+  <header>
+    <h1>Aminas · Phase 7 review</h1>
+    <p class="lede">Combat immersion: the arena now follows the turn, every Amina moves with its own personality, each arena has its own air, and attacks carry their element across the field. Phase 6 against Phase 7, from the same scripted battles. Tap any screenshot to see it full size.</p>
+    <div class="meta"><span>Branch <b>ui7-arena</b> from <b>ui6-combat</b> (d8ee70b)</span><span>Screens: desktop Chromium with software 3D at <b>844 × 390</b>, not a real phone; mid-action frames are taken at fixed delays, so poses differ slightly between runs</span></div>
+  </header>
+
+  <div class="bar" role="toolbar" aria-label="Sections and view">
+    <nav aria-label="Sections"><a href="#link">Arena link</a><a href="#motion">Movement</a><a href="#effects">Attacks</a><a href="#arenas">Arenas</a><a href="#bosses">Bosses</a></nav>
+    <div class="seg" role="group" aria-label="Show"><button id="v-both" type="button" data-v="both" aria-pressed="true">Both</button><button id="v-before" type="button" data-v="before" aria-pressed="false">Before</button><button id="v-after" type="button" data-v="after" aria-pressed="false">After</button></div>
+  </div>
+
+  <section id="link">
+    <header><h2>The arena follows the turn</h2><p>The interface and the arena now point at the same creatures, in the same colours. On your move, your Amina gets a cyan voxel ring, an outline in its element's colour and a battle-ready move. The foe carries rose corner brackets. Pressing a move closes the brackets on its target. While a move plays, whoever is acting is lit and the other is marked as the target, in the arena and on its panel.</p></header>
+    <div id="link-pairs"></div>
+  </section>
+  <section id="motion">
+    <header><h2>Movement with personality</h2><p>All 63 Aminas still share one rig, but each species now has a motion profile worked out from its body shape, stage, element, speed and personality. That gives 14 distinct styles across the roster: pouncers, slammers, spinners, floating casters and plain lungers, in playful, fierce, sly and calm temperaments. Each style has its own idle, battle-ready, attack, special, hit, heal, guard, victory and defeat.</p></header>
+    <div id="motion-pairs"></div>
+  </section>
+  <section id="effects">
+    <header><h2>Element attacks</h2><p>Attacks are built from voxel cubes in the element's colours:</p>
+      <ul>
+        <li>Fire throws an ember ball with a rising trail, and water arcs.</li>
+        <li>Light is a fast beam.</li>
+        <li>Earth lobs a heavy rock.</li>
+        <li>Wind corkscrews.</li>
+        <li>Resonance cycles the spectrum.</li>
+      </ul>
+      <p>Super-effective hits get a short freeze-frame, a camera punch and a shockwave. Special moves gather a column of light while the camera leans in.</p></header>
+    <div id="effects-pairs"></div>
+  </section>
+  <section id="arenas">
+    <header><h2>Ten arenas, ten atmospheres</h2><p>Each arena has its own light and its own air (pollen, lantern dust, spores, bubbles, embers, wisps, fireflies, wind gusts, crystal glitter, falling leaves). Most also get soft light shafts, and every one has distant voxel silhouettes for depth.</p></header>
+    <div id="arenas-pairs"></div>
+  </section>
+  <section id="bosses">
+    <header><h2>Guardians and the Island Boss</h2><p>Boss rooms keep their halos, runes and title cards. Each also gets a dimmer key light, a coloured rim and a pool of light under the boss. For the Island Boss the rim slowly walks the spectrum.</p></header>
+    <div id="bosses-pairs"></div>
+  </section>
+</main>
+
+<dialog id="zoom" aria-label="Full-size screenshot"><img id="zoom-img" alt=""><form method="dialog"><button id="zoom-close">Close</button></form></dialog>
+
+<script>
+  const P = {
+ "link": [
+  [
+   "turn",
+   "Your move",
+   "Cyan ring and element outline on your Amina; rose target brackets on the foe; a battle-ready move as the turn begins."
+  ],
+  [
+   "press",
+   "Pressing a move",
+   "The brackets close and the foe is outlined in rose while you press an attack."
+  ],
+  [
+   "enemy-acts",
+   "The foe acts",
+   "Its ring turns rose and your Amina is marked as the target; its panel and yours mirror it."
+  ]
+ ],
+ "motion": [
+  [
+   "attack-light",
+   "Lumifern attacks",
+   "Playful pouncer (light): crouch, leap and land, its light shot crossing as it lands."
+  ],
+  [
+   "attack-fire",
+   "Emberix attacks",
+   "Playful pouncer (fire): an ember ball with a rising trail."
+  ],
+  [
+   "attack-resonance",
+   "Aimza attacks",
+   "Floating caster (resonance): rises, leans back and thrusts a prismatic shot."
+  ],
+  [
+   "heal",
+   "Aimza heals",
+   "The heal clip: it draws itself up inside a rising column of mint light."
+  ],
+  [
+   "special",
+   "A special move",
+   "The ultimate: a spin-up swell, a column of the element and the camera leaning in."
+  ],
+  [
+   "victory",
+   "Victory",
+   "Each temperament celebrates differently (a double hop with a spin here), inside a gold ring and a rising column."
+  ],
+  [
+   "defeat",
+   "Defeat",
+   "The foe celebrates; the fallen Amina slumps, topples or sinks according to its build."
+  ]
+ ],
+ "effects": [
+  [
+   "impact-light",
+   "Light impact",
+   "Shards in the element’s colours, a glow and the reticle snapping shut."
+  ],
+  [
+   "impact-fire",
+   "Fire impact",
+   "Embers and a warm flash."
+  ],
+  [
+   "impact-resonance",
+   "Resonance impact",
+   "Spectrum shards."
+  ],
+  [
+   "super",
+   "Super effective",
+   "A freeze-frame, a camera punch, a shockwave ring and the heavy reaction clip."
+  ]
+ ],
+ "arenas": [
+  [
+   "arena-forgottenroad",
+   "The Forgotten Road",
+   "drifting pollen, sun shafts, distant trees"
+  ],
+  [
+   "arena-gatheringhall",
+   "The Gathering Hall",
+   "lantern dust in warm light, hall silhouettes"
+  ],
+  [
+   "arena-reliquary",
+   "The Overgrown Reliquary",
+   "rising spores, green shafts, mossy pillars"
+  ],
+  [
+   "arena-drownedsteps",
+   "The Drowned Steps",
+   "rising bubbles, blue light, reef silhouettes"
+  ],
+  [
+   "arena-coldkiln",
+   "The Cold Kiln",
+   "embers and a flickering kiln glow"
+  ],
+  [
+   "arena-hollowveil",
+   "The Hollow Veil",
+   "violet wisps, arches in the dark"
+  ],
+  [
+   "arena-lanternorchard",
+   "The Lantern Orchard",
+   "fireflies among lantern trees"
+  ],
+  [
+   "arena-windstair",
+   "The Wind Stair",
+   "wind gusts, bright sky, distant spires"
+  ],
+  [
+   "arena-resonancescar",
+   "The Resonance Scar",
+   "falling crystal glitter, prismatic light"
+  ],
+  [
+   "arena-heartwood",
+   "The Heartwood",
+   "falling voxel leaves, green shafts, great roots"
+  ]
+ ],
+ "bosses": [
+  [
+   "boss-forgottenroad",
+   "The Forgotten Road · boss room",
+   "Boss lighting: dimmer key, coloured rim, a pool of light under the boss."
+  ],
+  [
+   "boss-gatheringhall",
+   "The Gathering Hall · boss room",
+   "Boss lighting: dimmer key, coloured rim, a pool of light under the boss."
+  ],
+  [
+   "boss-coldkiln",
+   "The Cold Kiln · boss room",
+   "Boss lighting: dimmer key, coloured rim, a pool of light under the boss."
+  ],
+  [
+   "boss-hollowveil",
+   "The Hollow Veil · boss room",
+   "Boss lighting: dimmer key, coloured rim, a pool of light under the boss."
+  ],
+  [
+   "boss-lanternorchard",
+   "The Lantern Orchard · boss room",
+   "Boss lighting: dimmer key, coloured rim, a pool of light under the boss."
+  ],
+  [
+   "boss-heartwood",
+   "The Heartwood · boss room",
+   "Boss lighting: dimmer key, coloured rim, a pool of light under the boss (spectrum rim for the Island Boss)."
+  ]
+ ]
+};
+  const fig = (side, id, label) => '<figure class="' + side + '"><figcaption>' + (side === 'before' ? 'Before · Phase 5' : 'After · Phase 6') + '</figcaption><button class="shot" type="button" data-full="img/' + side + '/' + id + '.jpg" aria-label="' + label + ', ' + side + ', full size"><img src="img/' + side + '/' + id + '.jpg" alt="' + label + ' (' + side + ')" loading="lazy" width="1266" height="585"></button></figure>';
+  Object.keys(P).forEach((k) => {
+    document.getElementById(k + '-pairs').outerHTML = P[k].map(([id, t, d]) => '<div class="pair"><h3>' + t + '</h3><p>' + d + '</p><div class="shots">' + fig('before', id, t) + fig('after', id, t) + '</div></div>').join('');
+  });
+  // view switch: both, only before, only after (remembered for this viewer)
+  const setView = (v) => { document.body.dataset.view = v; document.querySelectorAll('.seg button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === v))); try { localStorage.setItem('p7-view', v); } catch (e) {} };
+  document.querySelectorAll('.seg button').forEach((b) => b.addEventListener('click', () => setView(b.dataset.v)));
+  try { const v = localStorage.getItem('p7-view'); if (v) setView(v); } catch (e) {}
+  // full-size view
+  const dlg = document.getElementById('zoom'), zi = document.getElementById('zoom-img');
+  document.addEventListener('click', (e) => { const s = e.target.closest('.shot'); if (!s) return; zi.src = s.dataset.full; zi.alt = s.querySelector('img').alt; if (dlg.showModal) dlg.showModal(); });
+  dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
+</script>

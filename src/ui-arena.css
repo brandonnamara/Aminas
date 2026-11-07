@@ -1,0 +1,44 @@
+/* =====================================================================================================
+   Aminas — Phase 7: the interface half of the arena link, and the 2D stage's version of the arena cues.
+   The 3D arena draws its own rings, outlines and reticles (src/3d/combatfx.js); this file gives the panels and
+   the 2D fallback stage the same language and colours: cyan = your active Amina, rose = targeted / the foe acting.
+   ===================================================================================================== */
+
+/* panels: the targeted fighter's panel gets the same rose corner brackets as the arena reticle */
+.b-panel.fp.targeted::after { content: ''; position: absolute; inset: 3px; pointer-events: none; z-index: 1;
+  background:
+    linear-gradient(#ff7aa0, #ff7aa0) left top / 10px 2px no-repeat, linear-gradient(#ff7aa0, #ff7aa0) left top / 2px 10px no-repeat,
+    linear-gradient(#ff7aa0, #ff7aa0) right top / 10px 2px no-repeat, linear-gradient(#ff7aa0, #ff7aa0) right top / 2px 10px no-repeat,
+    linear-gradient(#ff7aa0, #ff7aa0) left bottom / 10px 2px no-repeat, linear-gradient(#ff7aa0, #ff7aa0) left bottom / 2px 10px no-repeat,
+    linear-gradient(#ff7aa0, #ff7aa0) right bottom / 10px 2px no-repeat, linear-gradient(#ff7aa0, #ff7aa0) right bottom / 2px 10px no-repeat; }
+.b-panel.fp.crit.targeted::after { animation: none; } /* the critical glow keeps its own ::after when not targeted */
+
+/* ---------- 2D stage (portraits): the same cues as the 3D arena ---------- */
+.b-spr::before { content: ''; position: absolute; left: 50%; bottom: 2%; width: 78%; height: 18%; transform: translateX(-50%); border-radius: 50%; pointer-events: none; opacity: 0;
+  border: 3px dotted var(--ring, #8ff0ff); transition: opacity var(--pz-med); }
+.b-spr.is-active::before { opacity: .85; }
+.b-spr.e.is-active::before { --ring: #ff7aa0; }
+.b-spr.is-turn img.portrait, .b-spr.is-turn .amina-svg { filter: drop-shadow(0 0 .14rem #8ff0ff) drop-shadow(0 0 .45rem rgba(143, 240, 255, .55)); }
+.b-spr.e.is-active:not(.is-turn) img.portrait, .b-spr.e.is-active:not(.is-turn) .amina-svg { filter: drop-shadow(0 0 .14rem #ff7aa0) drop-shadow(0 0 .45rem rgba(255, 122, 160, .5)); }
+.b-spr::after { content: ''; position: absolute; inset: 6% 10% 0; pointer-events: none; opacity: 0; transition: opacity var(--pz-med), inset var(--pz-med);
+  background:
+    linear-gradient(#ff7aa0, #ff7aa0) left top / 16px 3px no-repeat, linear-gradient(#ff7aa0, #ff7aa0) left top / 3px 16px no-repeat,
+    linear-gradient(#ff7aa0, #ff7aa0) right top / 16px 3px no-repeat, linear-gradient(#ff7aa0, #ff7aa0) right top / 3px 16px no-repeat,
+    linear-gradient(#ff7aa0, #ff7aa0) left bottom / 16px 3px no-repeat, linear-gradient(#ff7aa0, #ff7aa0) left bottom / 3px 16px no-repeat,
+    linear-gradient(#ff7aa0, #ff7aa0) right bottom / 16px 3px no-repeat, linear-gradient(#ff7aa0, #ff7aa0) right bottom / 3px 16px no-repeat; }
+.b-spr.is-target::after { opacity: .5; }
+.b-spr.is-aim::after { opacity: 1; inset: 12% 16% 6%; }
+.b-spr.p.is-aim::before { opacity: 1; }
+.b-spr.cast { animation: cast2d .45s; } @keyframes cast2d { 40% { transform: translateY(-.4rem) scale(1.04); } }
+.b-spr.healed { animation: healed2d .7s; } @keyframes healed2d { 40% { transform: translateY(-.3rem); filter: drop-shadow(0 0 .8rem #9dffb0) brightness(1.2); } }
+.b-spr.guarding { animation: guard2d .6s; } @keyframes guard2d { 30%, 70% { transform: scale(1.04, .94); filter: drop-shadow(0 0 .6rem #9ad4ff); } }
+.b-spr.hurt.big { animation: hurtbig .6s; } @keyframes hurtbig { 10% { transform: translateX(-.9rem) rotate(-6deg); filter: brightness(2.6) saturate(.2); } 35% { transform: translateX(.7rem) rotate(4deg); } 60% { transform: translateX(-.3rem); } }
+.b-spr.cheer { animation: cheer2d .7s 2 alternate; } @keyframes cheer2d { to { transform: translateY(-.8rem); } }
+.streak2d { position: absolute; z-index: 3; width: 14px; height: 14px; margin: -7px 0 0 -7px; pointer-events: none; background: var(--c); box-shadow: 0 0 10px 3px var(--c), 10px 0 0 -3px var(--c), -10px 0 0 -3px var(--c);
+  animation: streak2d .38s cubic-bezier(.5, 0, .8, .6) forwards; }
+.streak2d.big { width: 22px; height: 22px; margin: -11px 0 0 -11px; }
+@keyframes streak2d { from { transform: translate(0, 0) rotate(0); opacity: 1; } to { transform: translate(var(--dx), var(--dy)) rotate(270deg); opacity: .85; } }
+
+body.calm .b-spr.cast, body.calm .b-spr.healed, body.calm .b-spr.guarding, body.calm .b-spr.hurt.big, body.calm .b-spr.cheer { animation: none; }
+body.perf-saver .b-spr.cheer { animation: none; }
+@media (prefers-reduced-motion: reduce) { .b-spr.cast, .b-spr.healed, .b-spr.guarding, .b-spr.hurt.big, .b-spr.cheer, .streak2d { animation: none !important; } .streak2d { display: none; } }

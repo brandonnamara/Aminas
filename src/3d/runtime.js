@@ -6,6 +6,7 @@
 import * as C from './creature3d.js';
 import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/loaders/GLTFLoader.js/+esm';
 import { buildArena, kit, motes, tracker, rnd } from './arenas.js';
+import { Fx, FocusMarks, ELFX } from './combatfx.js';
 const THREE = C.THREE;
 const A = window.A, D = A.Data;
 
@@ -125,10 +126,27 @@ class Actor {
   }
   idle() {
     const a = this.actions.idle; if (!a) return; a.reset(); a.setLoop(THREE.LoopRepeat); a.enabled = true; a.setEffectiveWeight(1); a.timeScale = calm() ? 0 : 1; a.play(); this.current = a;
+    // Phase 7: two of the same species never breathe in step
+    if (!this._idled) { this._idled = true; a.time = Math.random() * a.getClip().duration; }
   }
-  // play('attack'|'hit'|'victory'|'defeat'|'move'); returns a Promise resolved at the end of the clip
+  // Phase 7: clips a species may not have fall back to the closest shared one
+  clipName(name) { if (this.actions[name]) return name; return { special: 'attack', hitBig: 'hit', heal: 'move', guard: 'move', ready: null }[name] || null; }
+  // Phase 7: an element-coloured outline (an inverted hull: the creature's own geometry, scaled about its centre,
+  // drawn back faces only). Built on first use; fades in and out.
+  setOutline(color, strength) {
+    if (!this.hull) {
+      this.hull = []; const meshes = []; this.root.traverse((o) => { if (o.isMesh && meshes.length < 8) meshes.push(o); });
+      meshes.forEach((m) => { if (!m.geometry.boundingBox) m.geometry.computeBoundingBox(); const c = m.geometry.boundingBox.getCenter(new THREE.Vector3()), s = 1.06;
+        const h = new THREE.Mesh(m.geometry, new THREE.MeshBasicMaterial({ color: '#ffffff', side: THREE.BackSide, transparent: true, opacity: 0, depthWrite: false, toneMapped: false }));
+        h.name = 'hull'; h.scale.setScalar(s); h.position.copy(c).multiplyScalar(1 - s); h.visible = false; h.renderOrder = 1; m.add(h); this.hull.push(h); });
+      this.hullOp = 0;
+    }
+    if (color) this.hull.forEach((h) => h.material.color.set(color));
+    this.hullTarget = Math.max(0, Math.min(1, strength || 0));
+  }
+  // play('attack'|'special'|'hit'|'hitBig'|'heal'|'guard'|'ready'|'victory'|'defeat'|'move'); resolves at the end of the clip
   play(name, o) {
-    o = o || {}; const a = this.actions[name]; if (!a) return Promise.resolve();
+    o = o || {}; name = this.clipName(name); const a = name && this.actions[name]; if (!a) return Promise.resolve();
     const prev = this.current; a.reset(); a.enabled = true; a.setEffectiveWeight(1); a.timeScale = 1;
     if (o.loop) { a.setLoop(THREE.LoopRepeat); a.clampWhenFinished = false; } else { a.setLoop(THREE.LoopOnce, 1); a.clampWhenFinished = true; }
     if (prev && prev !== a) a.crossFadeFrom(prev, 0.12, false); a.play(); this.current = a;
@@ -137,13 +155,15 @@ class Actor {
     return new Promise((res) => { this._done = () => { if (name !== 'defeat' && !o.hold) { const idle = this.actions.idle; idle.reset(); idle.play(); idle.crossFadeFrom(a, 0.18, false); this.current = idle; } res(); }; });
   }
   flash(color) { this.flashT = 0.22; this.flashCol = new THREE.Color(color || '#ffffff'); }
+  get profile() { return (this.root.userData && this.root.userData.profile) || null; }
   update(dt) {
     this.mixer.update(dt);
+    if (this.hull) { const k = Math.min(1, dt * 7); this.hullOp += ((this.hullTarget || 0) - this.hullOp) * k; const op = this.hullOp < 0.01 ? 0 : this.hullOp * 0.85; this.hull.forEach((h) => { h.material.opacity = op; h.visible = op > 0; }); }
     if (this.flashT > 0) { this.flashT -= dt; const k = Math.max(0, this.flashT / 0.22); this.mats.forEach((m) => { if (!m.userData.e0) m.userData.e0 = [m.emissive.clone(), m.emissiveIntensity]; m.emissive.copy(m.userData.e0[0]).lerp(this.flashCol, k); m.emissiveIntensity = m.userData.e0[1] + k * 1.2; }); if (this.flashT <= 0) this.mats.forEach((m) => { if (m.userData.e0) { m.emissive.copy(m.userData.e0[0]); m.emissiveIntensity = m.userData.e0[1]; } }); }
     if (this.glow) this.glow.material.opacity = 0.45 + Math.sin(performance.now() / 600) * 0.1;
     const rig = this.root.getObjectByName('rig'); if (rig) this.shadow.scale.setScalar(Math.max(0.5, 1 - rig.position.y * 0.8));
   }
-  dispose() { this.mixer.stopAllAction(); this.mixer.uncacheRoot(this.root); this.mats.forEach((m) => m.dispose()); this.shadow.geometry.dispose(); this.shadow.material.dispose(); if (this.glow) this.glow.material.dispose(); this.t.refs--; this.group.removeFromParent(); }
+  dispose() { this.mixer.stopAllAction(); this.mixer.uncacheRoot(this.root); this.mats.forEach((m) => m.dispose()); if (this.hull) this.hull.forEach((h) => { h.removeFromParent(); h.material.dispose(); }); this.shadow.geometry.dispose(); this.shadow.material.dispose(); if (this.glow) this.glow.material.dispose(); this.t.refs--; this.group.removeFromParent(); }
 }
 export async function actor(spId) { return new Actor(await template(spId), spId); }
 
@@ -189,8 +209,10 @@ function pixelAura(scene, at, scale, prismatic) {
 // createBattle(container, { dungeon, player: spId, enemy: spId, boss }) -> controller used by ui2.js
 export async function createBattle(container, o) {
   const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(36, 2, 0.1, 60);
-  const arena = buildArena(scene, o.dungeon || 'reliquary', { boss: !!o.boss, island: !!o.prismatic }); const lights = C.studioLights(scene, arena.def.mood);
+  const saver = () => { const Pf = Perf(); return !!(Pf && Pf.saver()); };
+  const arena = buildArena(scene, o.dungeon || 'reliquary', { boss: !!o.boss, island: !!o.prismatic, still: calm, saver, tier: () => { const Pf = Perf(); return Pf ? (Pf.saver() ? 'saver' : Pf.forceTier || (Pf.quality ? Pf.quality() : 'high')) : 'high'; } }); const lights = C.studioLights(scene, arena.def.mood, arena.light); arena.bindLights(lights);
   const bursts = new Bursts(scene);
+  const fx = new Fx(scene, { calm, saver }), marks = new FocusMarks(scene);
   // both creatures turn three quarters towards the camera and partly towards each other, so faces stay readable
   const P = { pos: new THREE.Vector3(-1.45, 0, 0.9), yaw: 1.2 }, E = { pos: new THREE.Vector3(1.35, 0, -0.95), yaw: -0.85 };
   const slots = { p: null, e: null };
@@ -199,6 +221,7 @@ export async function createBattle(container, o) {
   // bosses stand larger; o.scale (from the battle spec) sets how much, capped so faces stay in frame
   const eScale = o.scale ? Math.min(2.1, 1.3 * Math.max(1, o.scale)) : o.boss ? 1.65 : 1.3;
   slots.p = pa; slots.e = ea; place('p', pa, 1.25); place('e', ea, eScale);
+  marks.slot('p', P.pos, 1.25); marks.slot('e', E.pos, eScale);
   // telegraph ring under the enemy (a charged attack is coming)
   const ring = new THREE.Mesh(new THREE.RingGeometry(0.75, 0.95, 40), new THREE.MeshBasicMaterial({ color: '#ff4a6a', transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide }));
   ring.rotation.x = -Math.PI / 2; ring.position.copy(E.pos).setY(0.03); scene.add(ring);
@@ -215,43 +238,114 @@ export async function createBattle(container, o) {
   const aura = o.boss ? pixelAura(scene, E.pos, eScale, !!o.prismatic) : null;
   let shake = 0, telegraph = false, t0 = 0;
   const camBase = new THREE.Vector3(-0.35, 1.7, 5.0), look = new THREE.Vector3(0.05, 0.62, -0.15);
+  // Phase 7 camera: a gentle push towards whoever unleashes an ultimate, and a short punch-in on big hits
+  const cam = { push: 0, pushTo: 0, toward: new THREE.Vector3(), punch: 0 }, camTmp = new THREE.Vector3(), lookTmp = new THREE.Vector3();
+  // Phase 7 timeline: effects scheduled against the battle's own clock (they line up with the animation, not with timers)
+  const timeline = []; let clockT = 0; const at = (delay, fn) => timeline.push({ t: clockT + delay, fn });
+  // Phase 7 focus: who is active, who is targeted (driven by the battle UI, see ui2.js syncArena)
+  const focus = { active: null, target: null, mode: null, preview: null, key: '' };
+  const SIDE = { p: '#8ff0ff', e: '#ff7aa0' }, TARGET = '#ff7aa0';
+  const elOf = (who) => (slots[who].profile && slots[who].profile.el) || (D.SPECIES[slots[who].spId] && D.SPECIES[slots[who].spId].el) || 'light';
+  const applyFocus = () => {
+    ['p', 'e'].forEach((w) => {
+      const act = focus.active === w, tgt = focus.target === w, pv = focus.preview;
+      const ringK = act ? (focus.mode === 'turn' ? 0.85 : 1) * (pv === 'self' && w === 'p' ? 1.25 : 1) : 0;
+      marks.ring(w, act && focus.mode === 'act' && w === 'e' ? SIDE.e : SIDE[w], Math.min(1, ringK));
+      marks.reticle(w, tgt ? (pv === 'foe' && w === 'e' ? 1 : focus.mode === 'turn' ? 0.5 : 0.85) : 0, TARGET); if (tgt && pv === 'foe' && w === 'e') marks.strike(w);
+      // the active Amina is outlined in its element's colour; a foe you are aiming at is outlined in the target rose
+      const a = slots[w]; if (a) { if (act) a.setOutline(D.ELEMENTS[elOf(w)] ? D.ELEMENTS[elOf(w)].color : '#ffffff', focus.mode === 'turn' ? 0.5 : 0.8); else if (tgt && pv === 'foe') a.setOutline(TARGET, 0.55); else a.setOutline(null, 0); }
+    });
+  };
   const view = {
     scene, camera,
     update(dt, t) {
-      t0 = t; slots.p.update(dt); slots.e.update(dt); arena.update(t, dt); bursts.update(dt); if (aura) aura.update(t, dt);
+      t0 = t; clockT += dt;
+      for (let i = timeline.length - 1; i >= 0; i--) if (timeline[i].t <= clockT) { const ev = timeline[i]; timeline.splice(i, 1); try { ev.fn(); } catch (e) { /* an effect never stops a battle */ } }
+      const still = calm(), hold = fx.frozen > 0 ? 0 : dt;   // a super-effective hit freezes the fighters for a beat
+      slots.p.update(hold); slots.e.update(hold); arena.update(t, dt); bursts.update(dt); fx.update(dt); marks.update(dt, t, still); if (aura) aura.update(t, dt);
       ring.material.opacity = telegraph ? 0.45 + Math.sin(t * 8) * 0.3 : Math.max(0, ring.material.opacity - dt * 2);
       if (bossRune) bossRune.rotation.z += dt * 0.25;
-      if (prism && !calm()) { prism.material.color.setHSL((t * 0.12) % 1, 0.85, 0.62); prismUp.material.color.setHSL((t * 0.12 + 0.5) % 1, 0.85, 0.66); prism.rotation.z += dt * 0.4; prismUp.material.opacity = 0.24 + Math.sin(t * 2.2) * 0.1; }
+      if (prism && !still) { prism.material.color.setHSL((t * 0.12) % 1, 0.85, 0.62); prismUp.material.color.setHSL((t * 0.12 + 0.5) % 1, 0.85, 0.66); prism.rotation.z += dt * 0.4; prismUp.material.opacity = 0.24 + Math.sin(t * 2.2) * 0.1; }
       dome.material.opacity += ((barrier ? 0.28 : 0) - dome.material.opacity) * Math.min(1, dt * 6);
-      camera.position.copy(camBase); if (shake > 0 && !calm()) { shake -= dt; camera.position.x += (Math.random() - 0.5) * shake * 0.25; camera.position.y += (Math.random() - 0.5) * shake * 0.2; }
-      camera.lookAt(look);
+      cam.push += (cam.pushTo - cam.push) * Math.min(1, dt * 5); cam.punch = Math.max(0, cam.punch - dt * 3.5);
+      camera.position.copy(camBase); lookTmp.copy(look);
+      if (cam.push > 0.002 && !still) { camTmp.copy(cam.toward).sub(camBase).multiplyScalar(0.16 * cam.push); camera.position.add(camTmp); lookTmp.lerp(cam.toward, 0.25 * cam.push); }
+      if (shake > 0 && !still) { shake -= dt; camera.position.x += (Math.random() - 0.5) * shake * 0.25; camera.position.y += (Math.random() - 0.5) * shake * 0.2; }
+      const fov = 36 - (still ? 0 : cam.punch * 2.2); if (Math.abs(camera.fov - fov) > 0.01) { camera.fov = fov; camera.updateProjectionMatrix(); }
+      camera.lookAt(lookTmp);
     },
     onResize(w, h) { const narrow = w / h < 1.6; camBase.set(-0.35, narrow ? 1.9 : 1.7, narrow ? 6.2 : 5.0); },
     detach() { stop(); },
   };
   attach(view, container);
   const head = (who) => { const a = slots[who]; const p = a.group.position.clone(); p.y += 0.75 * a.group.scale.y; return p; };
+  const chest = (who) => { const a = slots[who]; const p = a.group.position.clone(); p.y += 0.5 * a.group.scale.y; return p; };
   const toScreen = (v) => { const p = v.clone().project(camera), r = renderer.domElement.getBoundingClientRect(); return { x: r.left + (p.x * 0.5 + 0.5) * r.width, y: r.top + (-p.y * 0.5 + 0.5) * r.height }; };
   const elCol = (el) => (D.ELEMENTS[el] && D.ELEMENTS[el].color) || '#ffffff';
+  const other = (w) => (w === 'p' ? 'e' : 'p');
+  const log = []; const note = (k) => { log.push(k); if (log.length > 60) log.shift(); };
   return {
     is3d: true,
     anchor: (who) => toScreen(head(who)),
     attack(who) { boost(); return slots[who].play('attack'); },
-    // 'attack' lunges at the foe; anything else (guard, heal) is a short hop in place
-    use(who, kind) { boost(); return slots[who].play(kind === 'attack' ? 'attack' : 'move'); },
-    async hit(who, el, eff) { boost(); const a = slots[who]; a.flash(eff === 'super' ? '#ffffff' : elCol(el)); bursts.emit(head(who), elCol(el), eff === 'super' ? 22 : 12, eff === 'super' ? 2.2 : 1.4, 0.6); shake = eff === 'super' ? 0.35 : 0.18; return a.play('hit'); },
-    heal(who) { bursts.emit(head(who), '#8cffa0', 10, 1, 0.8); },
-    guard(who) { bursts.emit(head(who), '#9ad4ff', 8, 0.8, 0.5); },
-    status(who, color) { bursts.emit(head(who), color, 6, 0.7, 0.6); },
-    faint(who) { boost(); return slots[who].play('defeat'); },
-    victory(who) { boost(2500); return slots[who].play('victory', { loop: true }); },
-    async swap(who, spId) { boost(); const old = slots[who]; const n = await actor(spId); place(who, n, who === 'e' ? 1.3 : 1.25); slots[who] = n; old.dispose(); n.play('move'); bursts.emit(head(who), '#ffffff', 10, 1.2, 0.5); },
+    // Phase 7: the battle UI says who is active and who is targeted; the arena shows it (outline, ring, reticle)
+    focus(f) {
+      f = f || {}; const key = (f.active || '-') + '|' + (f.target || '-') + '|' + (f.mode || '-');
+      if (key === focus.key) return; const was = focus.key; focus.key = key; focus.active = f.active || null; focus.target = f.target || null; focus.mode = f.mode || null;
+      note(key); applyFocus(); boost(600);
+      // its turn begins: the active Amina plays its battle-ready move (once per turn, not with Reduce motion)
+      if (f.mode === 'turn' && f.active && !calm()) slots[f.active].play('ready');
+      void was;
+    },
+    // pressing a move previews its target: 'foe' (the reticle closes on the opponent) or 'self' (your ring brightens)
+    preview(kind) { if (focus.preview === (kind || null)) return; focus.preview = kind || null; applyFocus(); boost(400); },
+    // 'attack' (style from the creature's profile), 'cast' (heal/guard). info: { el, type, special, boss, power }
+    use(who, kind, info) {
+      boost(1600); info = info || {}; const a = slots[who], tgt = other(who), pf = a.profile || {}, el = info.el || elOf(who);
+      if (kind !== 'attack') { const clip = info.type === 'heal' ? 'heal' : info.type === 'guard' ? 'guard' : 'move'; note('use:' + who + ':' + clip); return a.play(clip); }
+      const ult = !!(info.special || info.boss), clip = ult ? 'special' : 'attack', F = ELFX[el] || ELFX.light;
+      note('use:' + who + ':' + clip);
+      if (ult) {
+        // the ultimate: the attacker gathers its element in a rising column while the camera leans in
+        fx.column(a.group.position, F.c, 14, { r: 0.55 * a.group.scale.x, rise: 1.4 }); fx.glow(chest(who), F.c[1], 1.6, 0.5);
+        if (!calm()) { cam.toward.copy(chest(who)); cam.pushTo = 1; at(0.62, () => { cam.pushTo = 0; }); }
+      }
+      const contact = ult ? 0.4 : 0.34, ranged = pf.ranged || ult || info.type === 'drain' || info.type === 'weaken';
+      if (ranged) at(Math.max(0.05, contact - 0.2), () => { fx.projectile(chest(who), chest(tgt), el, { dur: 0.2, big: ult }); });
+      else at(contact, () => { fx.slash(chest(tgt), el, who === 'p' ? 1 : -1); });
+      return a.play(clip);
+    },
+    async hit(who, el, eff, info) {
+      boost(1200); info = info || {}; const a = slots[who]; const big = eff === 'super' || info.big;
+      a.flash(elCol(el)); marks.strike(who); note('hit:' + who + ':' + (eff || 'normal'));
+      fx.impact(chest(who), el, eff === 'super' ? 'super' : info.big ? 'big' : eff === 'weak' ? 'weak' : 'normal');
+      shake = big ? 0.35 : eff === 'weak' ? 0.08 : 0.18;
+      if (eff === 'super') { fx.freeze(80); cam.punch = 1; } else if (info.big) cam.punch = 0.6;
+      return a.play(big ? 'hitBig' : 'hit');
+    },
+    heal(who) { boost(1000); const a = slots[who]; fx.column(a.group.position, ['#e8ffe8', '#9dffb0', '#5fe08a'], 12, { r: 0.5 * a.group.scale.x, rise: 1.0 }); fx.glow(chest(who), '#9dffb0', 1.3, 0.5); a.flash('#9dffb0'); note('heal:' + who); },
+    guard(who) { boost(800); const a = slots[who]; fx.column(a.group.position, ['#e8f6ff', '#9ad4ff', '#5aa8e8'], 10, { r: 0.68 * a.group.scale.x, rise: 0.55, life: 0.55, size: 0.07 }); note('guard:' + who); },
+    status(who, color) { fx.burst(head(who), [color, '#ffffff'], 7, { speed: 0.8, life: 0.5, size: 0.05, grav: 0.4 }); },
+    faint(who) { boost(); note('faint:' + who); slots[who].setOutline(null, 0); marks.ring(who, null, 0); marks.reticle(who, 0); fx.burst(slots[who].group.position.clone().setY(0.1), ['#cfc6ee', '#9a90c0'], 10, { speed: 0.7, up: 0.3, life: 0.6, size: 0.06, grav: 0.6 }); return slots[who].play('defeat'); },
+    victory(who) {
+      boost(2500); note('victory:' + who); focus.key = ''; focus.active = focus.target = null; applyFocus();
+      const a = slots[who], F = ELFX[elOf(who)] || ELFX.light; marks.ring(who, '#ffd978', 1);
+      fx.column(a.group.position, F.c.concat(['#ffd978']), 18, { r: 0.6 * a.group.scale.x, rise: 1.8, life: 1.0, size: 0.06 });
+      return a.play('victory', { loop: true });
+    },
+    async swap(who, spId) {
+      boost(); const old = slots[who]; const n = await actor(spId); const sc = who === 'e' ? 1.3 : 1.25; place(who, n, sc); slots[who] = n; marks.resize(who, sc); old.dispose(); n.play('move');
+      fx.burst(head(who), ['#ffffff', elCol(elOf(who))], 10, { speed: 1.2, life: 0.5, size: 0.06 }); note('swap:' + who); applyFocus();
+    },
     setTelegraph(on) { telegraph = !!on; },
     setBarrier(on) { barrier = !!on; },
-    setElement(el) { bursts.emit(head('e'), elCol(el), 14, 1.4, 0.7); },
+    setElement(el) { fx.burst(head('e'), [elCol(el), '#ffffff'], 14, { speed: 1.4, life: 0.7, size: 0.06 }); },
+    // diagnostics for tests: what the arena is showing and what is alive
+    debug() { return { focus: { active: focus.active, target: focus.target, mode: focus.mode, preview: focus.preview }, marks: marks.state(), fx: fx.live(), cubes: fx.p.length, shots: fx.shots.length, timeline: timeline.length, log: log.slice(), profiles: { p: slots.p.profile, e: slots.e.profile }, clips: { p: Object.keys(slots.p.actions), e: Object.keys(slots.e.actions) }, playing: { p: slots.p.current && slots.p.current.getClip().name, e: slots.e.current && slots.e.current.getClip().name }, arena: arena.key, atmosphere: arena.atmo || null }; },
     dispose() {
       if (active === view) { active = null; stop(); } if (renderer && renderer.domElement.parentNode === container) container.removeChild(renderer.domElement);
-      slots.p.dispose(); slots.e.dispose(); bursts.dispose(); arena.dispose(); scene.remove(lights); ring.geometry.dispose(); ring.material.dispose();
+      timeline.length = 0;
+      slots.p.dispose(); slots.e.dispose(); bursts.dispose(); fx.dispose(); marks.dispose(); arena.dispose(); scene.remove(lights); ring.geometry.dispose(); ring.material.dispose();
       if (bossRune) { bossRune.geometry.dispose(); bossRune.material.dispose(); }
       if (prism) { [prism, prismUp].forEach((m) => { scene.remove(m); m.geometry.dispose(); m.material.dispose(); }); }
       scene.remove(dome); dome.geometry.dispose(); dome.material.dispose();
@@ -331,6 +425,16 @@ export async function createTestScene(container, o) {
 }
 
 /* ------------------------------------------------------------------ diagnostics */
+// renders the live view n times back to back and reports the average cost (performance test and tests only).
+// o.hide: names of scene objects (e.g. 'atmo:shafts') to hide for this measurement.
+export function bench(n, o) {
+  if (!active || !renderer) return null; o = o || {}; const hidden = [];
+  if (o.hide) active.scene.traverse((x) => { if (o.hide.indexOf(x.name) >= 0 && x.visible) { x.visible = false; hidden.push(x); } });
+  const gl = renderer.getContext(), px = new Uint8Array(4); renderer.render(active.scene, active.camera); gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
+  const t0 = performance.now(); for (let i = 0; i < n; i++) renderer.render(active.scene, active.camera); gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
+  const ms = (performance.now() - t0) / n; hidden.forEach((x) => { x.visible = true; });
+  return { ms: +ms.toFixed(2), calls: renderer.info.render.calls, pixelRatio: pr };
+}
 export function stats() {
   const i = renderer ? renderer.info : null;
   return { c3dFps: +fps.toFixed(1), drawn, starts, loopRunning: !!raf, targetFps: Perf() ? Perf().targetFps() : 60, pixelRatio: pr, drawCalls: i ? i.render.calls : 0, triangles: i ? i.render.triangles : 0, geometries: i ? i.memory.geometries : 0, textures: i ? i.memory.textures : 0, templates: templates.size, live: !!active };

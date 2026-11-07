@@ -545,9 +545,182 @@ function track(node, prop, keys, rest) {
   const T = prop === 'quaternion' ? THREE.QuaternionKeyframeTrack : THREE.VectorKeyframeTrack;
   return new T(node.name + '.' + prop, times, values);
 }
+/* ---------------------------------------------------------------- Phase 7: movement personalities
+   Every Amina shares one rig contract (rig = whole-body motion, body = breathing/squash), so personality comes from
+   *how* those two pivots move. motionProfile() reads what the game already knows about a species — its voxel body
+   shape, evolution stage, element, speed and the words of its personality — and picks a temperament, a weight and a
+   fighting style. personaClips() turns that into its own idle, battle-ready, attack, special, hit, heal, guard,
+   victory and defeat clips. Designs, stats and abilities are untouched; only the motion differs.
+   Timing contract with the battle UI: attack and special clips reach the foe (contact) at 0.34–0.40 s so the effect
+   lands inside the existing beat before the hit event; nothing makes a battle longer. */
+const TEMPER = [
+  ['playful', /playful|energetic|restless|mischiev|spirited|bright|cheer|curious|giggl|bouncy|excit|quick/],
+  ['fierce', /fierce|proud|bold|stubborn|relentless|brave|fearless|powerful|strong|noble|vain|hot/],
+  ['sly', /sly|clever|tactical|secret|trick|cunning|watchful|alert/],
+  ['calm', /gentle|calm|patient|quiet|steady|slow|thoughtful|nurtur|careful|graceful|kind|wise|serene|immovable|naps/],
+];
+export function motionProfile(spec, root) {
+  const pers = String((spec && spec.pers) || '').toLowerCase(), el = (spec && spec.el) || 'light', stage = (spec && spec.stage) || 1;
+  const spd = (spec && spec.stats && spec.stats.spd) || 12;
+  let temper = 'neutral'; for (const [k, re] of TEMPER) if (re.test(pers)) { temper = k; break; }
+  // body shape from the normalised model: long-bodied creatures pounce, tall slim ones cast, broad ones slam
+  const box = new THREE.Box3().setFromObject(root), size = box.getSize(new THREE.Vector3());
+  const long = size.z / Math.max(0.01, size.y), broad = size.x / Math.max(0.01, size.y);
+  const weight = Math.min(1, 0.22 + (stage - 1) * 0.24 + (spec && spec.legendary ? 0.12 : 0) + (el === 'earth' || el === 'metal' ? 0.14 : 0) + Math.max(0, broad - 0.9) * 0.3);
+  const float = el === 'wind' || el === 'resonance' || (el === 'light' && stage >= 3);
+  const magic = el === 'light' || el === 'dark' || el === 'resonance';
+  let attack = 'lunge';
+  if (float || (magic && (temper === 'calm' || temper === 'sly'))) attack = 'cast';
+  else if (weight >= 0.66) attack = 'slam';
+  else if (long > 1.15 && weight < 0.6) attack = 'pounce';
+  else if ((el === 'water' || el === 'wind') && temper !== 'calm') attack = 'spin';
+  else if (temper === 'playful') attack = 'pounce';
+  const tempo = Math.max(0.88, Math.min(1.14, 1 + (spd - 13) * 0.012 - weight * 0.06));
+  // ranged = sends its element across the arena; the rest strike in person (the impact still carries the element)
+  const ranged = attack === 'cast' || el === 'light' || el === 'resonance';
+  return { temper, weight: +weight.toFixed(2), float, attack, ranged, tempo: +tempo.toFixed(3), long: +long.toFixed(2), el, stage };
+}
+export function personaClips(root, p) {
+  const n = {}; root.traverse((x) => { if (x.name && !n[x.name]) n[x.name] = x; });
+  const T = (k, prop, keys) => (n[k] ? [track(n[k], prop, keys, n[k])] : []);
+  const Z = [0, 0, 0], O = [1, 1, 1], w = p.weight, sq = (a) => [1 + a, 1 - a, 1 + a];   // squash (a>0) / stretch (a<0)
+  const ears = (k) => T('earL', 'quaternion', k).concat(T('earR', 'quaternion', k.map(([t, v]) => [t, [v[0], -v[1], -v[2]]])));
+  const clip = (name, d, tracks) => new THREE.AnimationClip(name, d, tracks.filter(Boolean));
+  const out = [];
+  /* idle: the loop it stands in between actions */
+  const fl = p.float ? 1 : 0, heavy = w >= 0.66;
+  if (p.float) {
+    const D = 3.2; out.push(clip('idle', D, [
+      ...T('rig', 'position', [[0, Z], [D * 0.25, [0, 0.07, 0]], [D * 0.5, [0, 0.11, 0]], [D * 0.75, [0, 0.05, 0]], [D, Z]]),
+      ...T('rig', 'quaternion', [[0, Z], [D * 0.3, [0.03, 0, 0.05]], [D * 0.7, [-0.02, 0, -0.05]], [D, Z]]),
+      ...T('body', 'scale', [[0, O], [D / 2, [0.98, 1.035, 0.98]], [D, O]]) ]));
+  } else if (p.temper === 'playful') {
+    const D = 1.9; out.push(clip('idle', D, [
+      ...T('rig', 'position', [[0, Z], [0.14, [0, 0.055 * (1 - w), 0]], [0.28, Z], [D, Z]]),
+      ...T('rig', 'scale', [[0, O], [0.06, sq(0.06)], [0.16, sq(-0.05)], [0.3, sq(0.05)], [0.42, O], [D, O]]),
+      ...T('rig', 'quaternion', [[0, Z], [0.9, [0, 0.12, 0.04]], [1.3, [0, -0.08, -0.03]], [D, Z]]),
+      ...T('body', 'scale', [[0, O], [1.2, [0.985, 1.025, 0.985]], [D, O]]) ]));
+  } else if (p.temper === 'fierce') {
+    const D = heavy ? 2.8 : 2.2; out.push(clip('idle', D, [
+      ...T('rig', 'position', [[0, Z], [D * 0.25, [0.03, 0, 0.02]], [D * 0.5, Z], [D * 0.75, [-0.03, 0, 0.02]], [D, Z]]),
+      ...T('rig', 'quaternion', [[0, [0.05, 0, 0]], [D * 0.25, [0.06, 0.05, 0.05]], [D * 0.5, [0.05, 0, 0]], [D * 0.75, [0.06, -0.05, -0.05]], [D, [0.05, 0, 0]]]),
+      ...T('body', 'scale', [[0, O], [D / 2, [1.01, 1.035, 1.01]], [D, O]]) ]));
+  } else if (p.temper === 'sly') {
+    const D = 3.4; out.push(clip('idle', D, [
+      ...T('rig', 'quaternion', [[0, Z], [0.5, [0, 0.22, 0]], [1.3, [0, 0.22, 0]], [1.8, [0, -0.14, 0]], [2.6, [0, -0.14, 0]], [D, Z]]),
+      ...T('rig', 'position', [[0, Z], [D / 2, [0, 0.01, -0.02]], [D, Z]]),
+      ...T('body', 'scale', [[0, O], [D / 2, [0.99, 1.025, 0.99]], [D, O]]) ]));
+  } else {
+    const D = heavy ? 3.4 : p.temper === 'calm' ? 3.0 : 2.4; out.push(clip('idle', D, [
+      ...T('rig', 'position', [[0, Z], [D / 2, [0, 0.012, 0]], [D, Z]]),
+      ...T('rig', 'quaternion', [[0, Z], [D * 0.3, [0, 0, 0.025]], [D * 0.7, [0, 0, -0.025]], [D, Z]]),
+      ...T('body', 'scale', [[0, O], [D / 2, [0.98 - w * 0.01, 1.03 + w * 0.012, 0.98 - w * 0.01]], [D, O]]) ]));
+  }
+  /* ready: the moment its turn begins — a short, characterful "I'm up" */
+  const R = 0.75; out.push(clip('ready', R, p.float ? [
+    ...T('rig', 'position', [[0, Z], [0.25, [0, 0.16, 0]], [0.5, [0, 0.08, 0]], [R, Z]]),
+    ...T('rig', 'quaternion', [[0, Z], [0.15, [0, Math.PI / 2, 0]], [0.32, [0, Math.PI, 0]], [0.5, [0, Math.PI * 1.5, 0]], [0.62, [0, Math.PI * 2 - 0.001, 0]], [R, Z]]) ]
+    : p.temper === 'playful' ? [
+      ...T('rig', 'position', [[0, Z], [0.12, [0, 0.12, 0]], [0.24, Z], [0.36, [0, 0.08, 0]], [0.48, Z], [R, Z]]),
+      ...T('rig', 'scale', [[0, O], [0.05, sq(0.08)], [0.12, sq(-0.06)], [0.24, sq(0.07)], [0.36, sq(-0.04)], [0.48, sq(0.05)], [0.6, O], [R, O]]),
+      ...T('rig', 'quaternion', [[0, Z], [0.24, [0, 0, 0.12]], [0.48, [0, 0, -0.1]], [R, Z]]) ]
+    : p.temper === 'fierce' || heavy ? [
+      ...T('rig', 'position', [[0, Z], [0.2, [0, -0.02, -0.06]], [0.38, [0, heavy ? 0.06 : 0.02, 0.06]], [0.46, [0, 0, 0.05]], [R, Z]]),
+      ...T('rig', 'quaternion', [[0, Z], [0.2, [-0.16, 0, 0]], [0.38, [0.2, 0, 0]], [R, Z]]),
+      ...T('rig', 'scale', [[0, O], [0.2, sq(-0.06)], [0.4, sq(0.1 + w * 0.04)], [0.55, O], [R, O]]) ]
+    : [
+      ...T('rig', 'position', [[0, Z], [0.2, [0, 0.05, 0]], [0.4, Z], [R, Z]]),
+      ...T('rig', 'quaternion', [[0, Z], [0.2, [-0.08, 0.14, 0]], [0.45, [0, -0.06, 0]], [R, Z]]),
+      ...T('body', 'scale', [[0, O], [0.2, [0.97, 1.06, 0.97]], [0.45, O], [R, O]]) ]));
+  /* attack: the style decides the motion; contact at ~0.36 s */
+  const ST = {
+    lunge: (k) => [
+      ...T('rig', 'position', [[0, Z], [0.18, [0, 0.02, -0.12 * k]], [0.36, [0, 0.06, 0.62 * k]], [0.48, [0, 0, 0.58 * k]], [0.9, Z]]),
+      ...T('rig', 'quaternion', [[0, Z], [0.18, [-0.22, 0, 0]], [0.36, [0.26, 0, 0]], [0.6, [0.05, 0, 0]], [0.9, Z]]),
+      ...T('rig', 'scale', [[0, O], [0.18, sq(0.08)], [0.36, sq(-0.1)], [0.6, O], [0.9, O]]) ],
+    pounce: (k) => [
+      ...T('rig', 'position', [[0, Z], [0.16, [0, -0.03, -0.08]], [0.27, [0, 0.42 * k, 0.32 * k]], [0.37, [0, 0, 0.74 * k]], [0.5, [0, 0, 0.7 * k]], [0.95, Z]]),
+      ...T('rig', 'quaternion', [[0, Z], [0.16, [0.18, 0, 0]], [0.27, [-0.3, 0, 0]], [0.37, [0.32, 0, 0]], [0.6, [0.04, 0, 0]], [0.95, Z]]),
+      ...T('rig', 'scale', [[0, O], [0.16, sq(0.14)], [0.27, sq(-0.12)], [0.38, sq(0.16)], [0.55, O], [0.95, O]]) ],
+    slam: (k) => [
+      ...T('rig', 'position', [[0, Z], [0.22, [0, 0.26 * k, -0.06]], [0.36, [0, -0.02, 0.46 * k]], [0.5, [0, 0, 0.42 * k]], [1.0, Z]]),
+      ...T('rig', 'quaternion', [[0, Z], [0.22, [-0.3, 0, 0]], [0.36, [0.34, 0, 0]], [0.55, [0.2, 0, 0]], [1.0, Z]]),
+      ...T('rig', 'scale', [[0, O], [0.22, sq(-0.1)], [0.36, sq(0.2)], [0.5, sq(0.12)], [0.7, O], [1.0, O]]) ],
+    spin: (k) => [
+      ...T('rig', 'position', [[0, Z], [0.12, [0, -0.02, -0.06]], [0.36, [0, 0.08, 0.6 * k]], [0.5, [0, 0, 0.56 * k]], [0.9, Z]]),
+      ...T('rig', 'quaternion', [[0, Z], [0.12, [0.1, 0, 0]], [0.2, [0, Math.PI * 0.66, 0]], [0.28, [0, Math.PI * 1.33, 0]], [0.36, [0, Math.PI * 2 - 0.001, 0]], [0.6, Z], [0.9, Z]]),
+      ...T('rig', 'scale', [[0, O], [0.12, sq(0.1)], [0.36, sq(-0.06)], [0.55, O], [0.9, O]]) ],
+    cast: (k) => [
+      ...T('rig', 'position', [[0, Z], [0.24, [0, 0.13 + fl * 0.06, -0.14]], [0.34, [0, 0.06, 0.2 * k]], [0.5, [0, 0.04, 0.12]], [0.9, Z]]),
+      ...T('rig', 'quaternion', [[0, Z], [0.24, [-0.32, 0, 0]], [0.34, [0.22, 0, 0]], [0.6, [0.04, 0, 0]], [0.9, Z]]),
+      ...T('rig', 'scale', [[0, O], [0.24, sq(-0.1)], [0.34, sq(0.08)], [0.55, O], [0.9, O]]),
+      ...T('body', 'scale', [[0, O], [0.24, [1.06, 1.06, 1.06]], [0.34, [0.96, 0.96, 0.96]], [0.5, O], [0.9, O]]) ],
+  };
+  out.push(clip('attack', p.attack === 'slam' || p.attack === 'pounce' ? 1.0 : 0.9, ST[p.attack](1).concat(ears([[0, Z], [0.18, [-0.4, 0, 0]], [0.36, [-0.6, 0, 0]], [0.9, Z]]))));
+  /* special: the same style, gathered and bigger (a power-up spin and swell before it lands, still on the beat) */
+  out.push(clip('special', 1.1, [
+    ...T('rig', 'position', [[0, Z], [0.2, [0, 0.22 + fl * 0.08, -0.16]], [0.4, [0, 0.04, p.ranged ? 0.25 : 0.8]], [0.56, [0, 0, p.ranged ? 0.18 : 0.72]], [1.1, Z]]),
+    ...T('rig', 'quaternion', [[0, Z], [0.1, [-0.2, Math.PI * 0.66, 0]], [0.2, [-0.34, Math.PI * 1.33, 0]], [0.28, [-0.34, Math.PI * 2 - 0.001, 0]], [0.4, [0.36, 0, 0]], [0.7, [0.06, 0, 0]], [1.1, Z]]),
+    ...T('rig', 'scale', [[0, O], [0.2, [1.12, 1.16, 1.12]], [0.4, sq(0.16)], [0.6, O], [1.1, O]]),
+    ...T('body', 'scale', [[0, O], [0.12, [1.06, 1.06, 1.06]], [0.24, [1.1, 1.1, 1.1]], [0.4, O], [1.1, O]]) ]));
+  /* hit: lighter creatures are knocked further and wobble; heavy ones barely budge */
+  const kb = 0.32 * (1 - w * 0.6), tilt = 0.34 * (1 - w * 0.5), wob = (1 - w) * 0.16;
+  out.push(clip('hit', 0.55, [
+    ...T('rig', 'position', [[0, Z], [0.1, [0, 0.02 * (1 - w), -kb]], [0.3, [0, 0, -kb * 0.2]], [0.55, Z]]),
+    ...T('rig', 'quaternion', [[0, Z], [0.1, [-tilt, 0, wob]], [0.22, [0.04, 0, -wob]], [0.34, [0, 0, wob * 0.5]], [0.55, Z]]),
+    ...T('rig', 'scale', [[0, O], [0.1, sq(0.12 + w * 0.04)], [0.25, sq(-0.04)], [0.55, O]]),
+    ...ears([[0, Z], [0.1, [0, 0, 0.5]], [0.55, Z]]), ...T('eyes', 'scale', [[0, O], [0.08, [1, 0.15, 1]], [0.4, [1, 0.15, 1]], [0.55, O]]) ]));
+  out.push(clip('hitBig', 0.8, [
+    ...T('rig', 'position', [[0, Z], [0.12, [0, 0.12 * (1 - w), -kb * 1.8]], [0.32, [0, 0, -kb * 1.2]], [0.5, [0, 0, -kb * 0.3]], [0.8, Z]]),
+    ...T('rig', 'quaternion', [[0, Z], [0.12, [-tilt * 1.5, 0, wob * 2]], [0.28, [0.1, 0, -wob * 2]], [0.44, [0, 0, wob]], [0.62, [0, 0, -wob * 0.5]], [0.8, Z]]),
+    ...T('rig', 'scale', [[0, O], [0.12, sq(0.2)], [0.3, sq(-0.08)], [0.5, sq(0.04)], [0.8, O]]) ]));
+  /* heal: draws itself up, glowing (the runtime adds the light); guard: braces */
+  out.push(clip('heal', 0.9, [
+    ...T('rig', 'position', [[0, Z], [0.35, [0, 0.1 + fl * 0.05, 0]], [0.65, [0, 0.06, 0]], [0.9, Z]]),
+    ...T('rig', 'quaternion', [[0, Z], [0.35, [-0.14, 0, 0]], [0.65, [-0.06, 0, 0]], [0.9, Z]]),
+    ...T('body', 'scale', [[0, O], [0.35, [1.04, 1.1, 1.04]], [0.55, [1.06, 1.04, 1.06]], [0.9, O]]) ]));
+  out.push(clip('guard', 0.7, [
+    ...T('rig', 'position', [[0, Z], [0.15, [0, -0.02, -0.08]], [0.5, [0, -0.02, -0.08]], [0.7, Z]]),
+    ...T('rig', 'quaternion', [[0, Z], [0.15, [0.12, 0, 0]], [0.5, [0.12, 0, 0]], [0.7, Z]]),
+    ...T('rig', 'scale', [[0, O], [0.15, sq(0.12)], [0.5, sq(0.1)], [0.7, O]]) ]));
+  /* victory (loops on the result) and defeat (holds its last pose) */
+  const V = 1.6; const spin = (a, b) => [0, 0.25, 0.5, 0.75, 1].map((f) => [a + f * (b - a), [0, f * (Math.PI * 2 - 0.001), 0]]);
+  out.push(clip('victory', V, p.float ? [
+    ...T('rig', 'position', [[0, Z], [0.5, [0, 0.4, 0]], [1.0, [0, 0.3, 0]], [V, Z]]),
+    ...T('rig', 'quaternion', [[0, Z], ...spin(0.1, 1.0), [V, Z]]),
+    ...T('body', 'scale', [[0, O], [0.5, [1.06, 1.06, 1.06]], [1.0, O], [V, O]]) ]
+    : p.temper === 'playful' ? [
+      ...T('rig', 'position', [[0, Z], [0.2, [0, 0.32, 0]], [0.4, Z], [0.6, [0, 0.42, 0]], [0.82, Z], [V, Z]]),
+      ...T('rig', 'quaternion', [[0, Z], [0.4, Z], ...spin(0.42, 0.82), [V, Z]]),
+      ...T('rig', 'scale', [[0, O], [0.05, sq(0.1)], [0.2, sq(-0.08)], [0.4, sq(0.1)], [0.6, sq(-0.08)], [0.82, sq(0.1)], [0.95, O], [V, O]]) ]
+    : p.temper === 'fierce' || heavy ? [
+      ...T('rig', 'position', [[0, Z], [0.35, [0, 0.12, -0.06]], [0.8, [0, 0.12, -0.06]], [1.0, Z], [V, Z]]),
+      ...T('rig', 'quaternion', [[0, Z], [0.35, [-0.42, 0, 0]], [0.45, [-0.42, 0, 0.06]], [0.55, [-0.42, 0, -0.06]], [0.65, [-0.42, 0, 0.06]], [0.8, [-0.4, 0, 0]], [1.0, [0.1, 0, 0]], [1.15, Z], [V, Z]]),
+      ...T('rig', 'scale', [[0, O], [0.35, sq(-0.08)], [1.0, sq(0.12)], [1.15, O], [V, O]]) ]
+    : [
+      ...T('rig', 'position', [[0, Z], [0.15, [0, -0.03, 0]], [0.45, [0, 0.42, 0]], [0.75, Z], [1.0, [0, 0.16, 0]], [1.2, Z], [V, Z]]),
+      ...T('rig', 'quaternion', [[0, Z], ...spin(0.15, 0.75), [V, Z]]),
+      ...T('rig', 'scale', [[0, O], [0.15, sq(0.12)], [0.3, sq(-0.1)], [0.75, sq(0.08)], [0.9, O], [V, O]]) ]));
+  out.push(clip('defeat', 1.2, p.float ? [
+    ...T('rig', 'position', [[0, Z], [0.3, [0, 0.12, 0]], [1.2, [0, -0.02, 0.05]]]),
+    ...T('rig', 'quaternion', [[0, Z], [0.3, [0, 0, 0.2]], [1.2, [0.5, 0, 0.9]]]),
+    ...T('rig', 'scale', [[0, O], [1.2, [0.92, 0.7, 0.92]]]) ]
+    : heavy ? [
+      ...T('rig', 'position', [[0, Z], [0.3, [0, 0.03, 0]], [0.9, [0, -0.04, 0.12]], [1.2, [0, -0.05, 0.14]]]),
+      ...T('rig', 'quaternion', [[0, Z], [0.3, [-0.1, 0, 0]], [0.9, [0.95, 0, 0.1]], [1.05, [0.85, 0, 0.1]], [1.2, [0.9, 0, 0.1]]]),
+      ...T('rig', 'scale', [[0, O], [0.9, sq(0.1)], [1.2, sq(0.08)]]) ]
+    : [
+      ...T('rig', 'position', [[0, Z], [0.2, [0, 0.04 + (p.temper === 'playful' ? 0.1 : 0), 0]], [0.8, [0.18, -0.04, 0]], [1.2, [0.2, -0.05, 0]]]),
+      ...T('rig', 'quaternion', [[0, Z], [0.2, [0, p.temper === 'playful' ? 1.2 : 0, -0.15]], [0.8, [0, p.temper === 'playful' ? 2.2 : 0, 1.4]], [0.95, [0, p.temper === 'playful' ? 2.2 : 0, 1.3]], [1.2, [0, p.temper === 'playful' ? 2.2 : 0, 1.38]]]),
+      ...T('eyes', 'scale', [[0, O], [0.4, [1, 0.1, 1]], [1.2, [1, 0.1, 1]]]) ]));
+  return out;
+}
 // makeClips(root): builds the six clips for whichever rig nodes exist under root (works for imported models too).
+// With o.profile (Phase 7) the clips come from the creature's movement personality instead, plus ready, special,
+// hitBig, heal and guard; 'move' (the swap-in hop) is shared.
 export function makeClips(root, o) {
   o = o || {};
+  if (o.profile) { const base = makeClips(root, Object.assign({}, o, { profile: null })); return personaClips(root, o.profile).concat(base.filter((c) => c.name === 'move')); }
   const n = {}; root.traverse((x) => { if (x.name && !n[x.name]) n[x.name] = x; });
   const has = (k) => !!n[k];
   const T = (k, prop, keys) => (has(k) ? [track(n[k], prop, keys, n[k])] : []);
@@ -667,12 +840,14 @@ export function validate(root, clips, o) {
    One lighting recipe for every 3D view (battle, viewer, portraits) so creatures look the same everywhere:
    a warm key from the upper left (matches the island art), a cool sky fill and a strong back rim light that
    separates the silhouette from busy backgrounds. */
-export function studioLights(scene, mood) {
+// Phase 7: an arena may pass L = { key: [colour, intensity], rim: [colour, intensity], hemi: [sky, ground, intensity] }
+// to give its place its own light; the positions (and so the creatures' modelling) stay the same everywhere.
+export function studioLights(scene, mood, L) {
   const m = { day: ['#fff3dc', '#cfe4ff', '#7a8a6a', '#ffffff'], dusk: ['#ffd9b0', '#b8b0ff', '#4a3a5a', '#ffd0f0'], dark: ['#e8dcff', '#8a7ad8', '#2a2040', '#c8b8ff'], studio: ['#fff6e8', '#dfeaff', '#6a6a80', '#ffffff'] }[mood || 'studio'];
   const g = new THREE.Group(); g.name = 'lights';
-  const hemi = new THREE.HemisphereLight(m[1], m[2], 1.25); g.add(hemi);
-  const key = new THREE.DirectionalLight(m[0], 2.3); key.position.set(-2.5, 4, 3.2); g.add(key);
-  const rim = new THREE.DirectionalLight(m[3], 1.7); rim.position.set(2.2, 2.4, -3.5); g.add(rim);
+  const hemi = new THREE.HemisphereLight(L ? L.hemi[0] : m[1], L ? L.hemi[1] : m[2], L ? L.hemi[2] : 1.25); g.add(hemi);
+  const key = new THREE.DirectionalLight(L ? L.key[0] : m[0], L ? L.key[1] : 2.3); key.position.set(-2.5, 4, 3.2); g.add(key);
+  const rim = new THREE.DirectionalLight(L ? L.rim[0] : m[3], L ? L.rim[1] : 1.7); rim.position.set(2.2, 2.4, -3.5); g.add(rim);
   const fill = new THREE.DirectionalLight(m[1], 0.45); fill.position.set(3, 1, 2.5); g.add(fill);
   scene.add(g); return g;
 }
@@ -789,7 +964,8 @@ export function buildVoxel(spec) {
   if (solid) { solid.translate(-cx, 0, -cz); const me = new THREE.Mesh(solid, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.85, metalness: 0, flatShading: true, name: 'voxel' })); me.name = 'body:voxel'; holder.add(me); }
   if (glow) { glow.translate(-cx, 0, -cz); const me = new THREE.Mesh(glow, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.6, metalness: 0, flatShading: true, emissive: '#000000', name: 'voxelGlow', toneMapped: false })); me.name = 'body:glow'; holder.add(me); }
   normalise(root, { big: spec.stage === 3 });
-  root.userData = { id: spec.id, hover: false, glow: null, version: VERSION, voxel: true };
-  const clips = makeClips(root, {});
+  const profile = motionProfile(spec, root);
+  root.userData = { id: spec.id, hover: false, glow: null, version: VERSION, voxel: true, profile };
+  const clips = makeClips(root, { profile });
   return { root, clips, info: summarise(root, clips) };
 }
