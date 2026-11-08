@@ -91,6 +91,16 @@
     lose: (t) => [67, 63, 60, 55].forEach((m, i) => tone(N(m), t + i * 0.18, 0.4, 'sine', 0.16)),
     hatch: (t) => { noise(t, 0.08, 0.2); [76, 79, 83, 88, 91].forEach((m, i) => tone(N(m), t + 0.1 + i * 0.07, 0.25, 'sine', 0.16)); },
     hum: (t) => tone(N(57), t, 1.2, 'sine', 0.12, null, N(58)),
+    // Hide and Seek (hs-redesign)
+    hsMorph: (t) => { noise(t, 0.12, 0.08); [79, 74, 83, 86].forEach((m, i) => tone(N(m), t + i * 0.05, 0.18, 'sine', 0.13)); tone(N(62), t, 0.3, 'triangle', 0.08, null, N(74)); },
+    hsSwing: (t) => { noise(t, 0.14, 0.16); tone(520, t, 0.13, 'triangle', 0.06, null, 180); },
+    hsReveal: (t) => { noise(t, 0.08, 0.2); [72, 76, 79, 84].forEach((m, i) => { tone(N(m), t + 0.05 + i * 0.06, 0.32, 'triangle', 0.17); tone(N(m + 12), t + 0.07 + i * 0.06, 0.18, 'sine', 0.06); }); },
+    hsMiss: (t) => { noise(t, 0.09, 0.14); tone(110, t, 0.16, 'sine', 0.16, null, 70); },
+    hsLeaf: (t) => noise(t, 0.08, 0.035),
+    hsRock: (t) => { noise(t, 0.06, 0.03); tone(70, t, 0.09, 'sine', 0.05, null, 50); },
+    hsWood: (t) => tone(N(50), t, 0.06, 'triangle', 0.04, null, N(46)),
+    hsTick: (t) => tone(N(81), t, 0.06, 'sine', 0.09),
+    hsGo: (t) => { tone(N(67), t, 0.16, 'triangle', 0.15); tone(N(74), t + 0.12, 0.28, 'triangle', 0.17); tone(N(79), t + 0.12, 0.28, 'sine', 0.08); },
   };
   Au.play = function (name) {
     if (!Au.sfxOn || !ctx || ctx.state !== 'running') return;

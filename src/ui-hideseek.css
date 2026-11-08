@@ -1,0 +1,94 @@
+/* Aminas — Hide and Seek round (hs-redesign): the full-screen 3D round's HUD, in the prismatic design system. */
+.overlay.hs-ov { padding: 0; background: #9fd4f5; animation: none; }
+.hsround { position: absolute; inset: 0; overflow: hidden; background: radial-gradient(120% 90% at 50% 0%, #bfe6ff, #8ccbf3 55%, #6fb3e6); touch-action: none; user-select: none; -webkit-user-select: none; color: var(--pz-text, #fff); }
+.hs-host { position: absolute; inset: 0; }
+.hs3d { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.hs-load { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: .6rem; font-size: .95rem; text-shadow: 0 1px 2px rgba(10, 8, 30, .5); }
+.hs-load .ico { width: 2.4rem; height: 2.4rem; }
+.hs-labels { position: absolute; inset: 0; pointer-events: none; }
+.hs-tag3 { position: absolute; left: 0; top: 0; padding: .18rem .55rem; font-size: .78rem; font-weight: 900; white-space: nowrap; background: var(--pz-sheet, #2a2060); border: 1.5px solid var(--pz-gold, #ffd978); color: #fff; clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px); }
+
+/* joystick: anywhere on the left of the screen */
+.hs-zone { position: absolute; left: 0; top: 3.4rem; bottom: 0; width: 46%; z-index: 2; }
+.hs-stick { position: absolute; width: 6.2rem; height: 6.2rem; margin: -3.1rem 0 0 -3.1rem; border-radius: 50%; background: radial-gradient(circle, rgba(26, 20, 64, .32), rgba(26, 20, 64, .18)); border: 2px solid rgba(255, 255, 255, .55); opacity: 0; pointer-events: none; z-index: 3; left: 18%; top: 72%; transition: opacity .12s; }
+.hs-stick.on { opacity: 1; }
+.hs-stick i { position: absolute; left: 50%; top: 50%; width: 2.6rem; height: 2.6rem; margin: -1.3rem; border-radius: 50%; background: var(--pz-btn-gold, #ffd873); box-shadow: 0 2px 6px rgba(10, 8, 30, .35); }
+
+/* top bar */
+.hs-top { position: absolute; top: 0; left: 0; right: 0; display: flex; align-items: center; gap: .6rem; padding: calc(.45rem + var(--sat, 0px)) calc(.7rem + var(--sar, 0px)) 0 calc(.7rem + var(--sal, 0px)); z-index: 4; pointer-events: none; }
+.hs-top > * { pointer-events: auto; }
+.hs-clock { margin: 0 auto; display: flex; align-items: baseline; gap: .55rem; padding: .28rem .9rem; background: var(--pz-sheet, #2a2060); border: 1.5px solid rgba(255, 255, 255, .25); clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px); }
+.hs-phase { font-size: .72rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--pz-cyan, #8ff0ff); }
+.hs-time b { font-size: 1.25rem; font-variant-numeric: tabular-nums; }
+.hsround.prep .hs-phase { color: var(--pz-gold, #ffd978); }
+.hs-pips { display: flex; align-items: center; gap: .25rem; padding: .25rem .5rem; background: rgba(26, 20, 64, .78); clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px); }
+.hs-pips b { font-size: .72rem; margin-left: .25rem; }
+.hs-pip { width: 1.25rem; height: 1.25rem; display: grid; place-items: center; font-size: .62rem; font-weight: 900; line-height: 1; color: #fff; background: rgba(255, 255, 255, .5); clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); position: relative; isolation: isolate; }
+.hs-pip::before { content: ''; position: absolute; inset: 1.5px; background: #3a2e78; clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); z-index: -1; }
+.hs-pip.got { background: #fff6d0; color: #3a2a10; } .hs-pip.got::before { background: var(--pz-gold, #ffd978); }
+.hs-pip.me { background: var(--pz-cyan, #8ff0ff); }
+
+/* role chip, message */
+.hs-role { position: absolute; left: calc(.7rem + var(--sal, 0px)); bottom: calc(.6rem + var(--sab, 0px)); z-index: 4; padding: .28rem .7rem; font-size: .78rem; font-weight: 800; display: flex; align-items: center; gap: .35rem; background: rgba(26, 20, 64, .8); pointer-events: none; clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px); }
+.hs-role .ico { width: 1rem; height: 1rem; }
+.hs-role.seek { color: #ffd0c8; } .hs-role.hide { color: var(--pz-cyan, #8ff0ff); } .hs-look { color: #fff; }
+.hs-msg { position: absolute; left: 50%; top: calc(3.4rem + var(--sat, 0px)); transform: translateX(-50%); max-width: min(34rem, 80%); text-align: center; z-index: 5; padding: .35rem .9rem; font-size: .84rem; font-weight: 700; background: rgba(20, 15, 52, .88); border: 1.5px solid rgba(255, 255, 255, .2); opacity: 0; transition: opacity .2s; pointer-events: none; clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px); }
+.hs-msg.on { opacity: 1; }
+.hs-msg.good { border-color: var(--pz-gold, #ffd978); } .hs-msg.warn { border-color: #ff9a8a; }
+
+/* the action button: Disguise (gold) or Attack (rose) with its recharge ring */
+.hs-act { position: absolute; right: calc(1rem + var(--sar, 0px)); bottom: calc(1rem + var(--sab, 0px)); width: 5.4rem; height: 5.4rem; border-radius: 50%; border: 0; z-index: 4; display: grid; place-items: center; align-content: center; gap: .1rem; color: #2a1a08; font-weight: 900; background: var(--pz-btn-gold, #ffd873); box-shadow: 0 3px 10px rgba(10, 8, 30, .4), inset 0 2px 0 rgba(255, 255, 255, .6); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.hs-act .ico { width: 1.9rem; height: 1.9rem; position: relative; }
+.hs-act small { font-size: .68rem; position: relative; font-variant-numeric: tabular-nums; }
+.hs-act.attack { background: linear-gradient(180deg, #ffd6cc, #ff9a8a 45%, #e8607a); color: #3a0e18; }
+.hs-ring { position: absolute; inset: -5px; border-radius: 50%; background: conic-gradient(var(--ringc, #fff6d0) calc(var(--p, 1) * 360deg), rgba(26, 20, 64, .55) 0); -webkit-mask: radial-gradient(circle, transparent 61%, #000 62%); mask: radial-gradient(circle, transparent 61%, #000 62%); }
+.hs-act.cool { filter: saturate(.55) brightness(.9); } .hs-act.cool .hs-ring { --ringc: var(--pz-cyan, #8ff0ff); }
+.hs-act.off { filter: grayscale(.6) brightness(.8); }
+.hs-act.pen .hs-ring { --ringc: #ff9a8a; }
+.hs-act:active { transform: scale(.95); }
+
+/* the Seeker counts with eyes covered */
+.hs-veil { position: absolute; inset: 0; z-index: 3; display: grid; place-content: center; justify-items: center; gap: .3rem; background: radial-gradient(circle, rgba(15, 11, 40, .72), rgba(15, 11, 40, .9)); opacity: 0; pointer-events: none; transition: opacity .3s; }
+.hs-veil.on { opacity: 1; }
+.hs-veil span { font-weight: 800; color: var(--pz-cyan, #8ff0ff); letter-spacing: .05em; }
+.hs-veil b { font-size: 3.4rem; line-height: 1; color: var(--pz-gold, #ffd978); font-variant-numeric: tabular-nums; }
+.hs-veil small { color: var(--pz-muted, #cfc6ee); }
+
+/* disguise tray */
+.hs-tray { position: absolute; left: calc(.7rem + var(--sal, 0px)); right: calc(7.4rem + var(--sar, 0px)); bottom: calc(.6rem + var(--sab, 0px)); z-index: 5; display: none; flex-direction: column; gap: .3rem; padding: .4rem .5rem .5rem; background: var(--pz-sheet, #2a2060); border: 1.5px solid rgba(255, 255, 255, .22); clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px); }
+.hs-tray.on { display: flex; }
+.hs-trayhead { display: flex; align-items: center; gap: .6rem; font-size: .8rem; }
+.hs-trayhead span { color: var(--pz-cyan, #8ff0ff); font-variant-numeric: tabular-nums; }
+.hs-trayx { margin-left: auto; background: none; border: 0; color: #fff; padding: .1rem; }
+.hs-trayx .ico { width: 1.1rem; height: 1.1rem; }
+.hs-cards { display: flex; gap: .35rem; overflow-x: auto; overscroll-behavior: contain; touch-action: pan-x; padding-bottom: .1rem; }
+.hs-card { position: relative; flex: 0 0 4.6rem; display: flex; flex-direction: column; align-items: center; gap: .1rem; padding: .25rem .2rem; background: rgba(255, 255, 255, .07); border: 1.5px solid rgba(255, 255, 255, .16); color: #fff; font-size: .62rem; line-height: 1.1; cursor: pointer; }
+.hs-card img, .hs-noimg { width: 3.4rem; height: 3.4rem; object-fit: contain; image-rendering: auto; }
+.hs-card small { text-align: center; min-height: 1.4em; }
+.hs-card em { position: absolute; top: .1rem; left: .1rem; font-style: normal; font-size: .5rem; font-weight: 900; padding: 0 .2rem; background: var(--pz-cyan, #8ff0ff); color: #10233a; }
+.hs-card.cur { border-color: var(--pz-gold, #ffd978); background: rgba(255, 217, 120, .14); }
+.hs-card.wait { opacity: .5; }
+
+.hs-skip { position: absolute; right: calc(7.4rem + var(--sar, 0px)); bottom: calc(1rem + var(--sab, 0px)); z-index: 4; display: none; }
+.hsround.spectate .hs-skip { display: inline-flex; }
+.hsround.spectate .hs-act, .hsround.over .hs-act, .hsround.over .hs-zone { pointer-events: none; }
+
+/* results */
+.hsresults .hs-res h1 { margin: .1rem 0; }
+.hs-sides { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr); gap: .7rem; text-align: left; margin: .4rem 0; }
+.hs-side { padding: .45rem .55rem; background: rgba(0, 0, 0, .18); }
+.hs-side h3 { margin: 0 0 .35rem; font-size: .85rem; display: flex; align-items: center; gap: .3rem; }
+.hs-side h3 .ico { width: 1rem; height: 1rem; }
+.hs-stats { display: grid; grid-template-columns: 1fr 1fr; gap: .3rem; }
+.hs-stats span { display: flex; flex-direction: column; font-size: .66rem; color: var(--pz-muted, #cfc6ee); }
+.hs-stats b { font-size: 1.1rem; color: #fff; }
+.hs-tbl { width: 100%; border-collapse: collapse; font-size: .72rem; }
+.hs-tbl th { text-align: left; font-size: .62rem; color: var(--pz-muted, #cfc6ee); font-weight: 700; padding: .1rem .25rem; }
+.hs-tbl td { padding: .18rem .25rem; border-top: 1px solid rgba(255, 255, 255, .08); }
+.hs-tbl tr.safe td:nth-child(3) { color: #a8ffc0; } .hs-tbl tr.got td:nth-child(3) { color: #ffd0c8; }
+.hs-tbl tr.me td:first-child b { color: var(--pz-cyan, #8ff0ff); }
+
+/* calm: Reduce Motion, Battery saver, a resting island */
+body.calm .hs-msg, body.calm .hs-veil, body.calm .hs-stick, body.perf-saver .hs-msg, body.perf-saver .hs-veil, body.perf-saver .hs-stick { transition: none; }
+@media (prefers-reduced-motion: reduce) { .hs-msg, .hs-veil, .hs-stick { transition: none; } }
+@media (max-height: 420px) { .hs-act { width: 4.8rem; height: 4.8rem; } .hs-card { flex-basis: 4.1rem; } .hs-card img, .hs-noimg { width: 2.9rem; height: 2.9rem; } }

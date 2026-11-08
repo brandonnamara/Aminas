@@ -151,6 +151,19 @@
     return { sig: JSON.stringify([up.map((a) => a.slice(0, 5).map(a[5] ? r1 : r8)), flat.map((a) => a.map(r8))]) + '|' + cut.map((c) => c.map(r16).join(',')).join(';'), up, flat, cut, rect: rect[2] > 0 && rect[3] > 0 ? rect : null };
   }
   V.overlay = overlay;
+  // Hide and Seek (hs-redesign): the Starter Island as a map, the same data the voxel island draws from, so the mode
+  // plays on the real island (its terrain, buildings, trees, rocks and scenery) without touching the island screen.
+  V.mapData = function (iid) {
+    iid = iid || 'starter'; const s = st(), W = A.World, t = IA.terrain(iid, s), items = [];
+    W.buildingsOn(s, iid).forEach((b) => {
+      if (b.x == null || b.state === 'stored') return; const d = D.BUILDINGS[b.type], sz = W.size(b.type, b.rot);
+      items.push({ k: 'b', id: b.id, type: b.type, name: d.name, art: d.art || d.id, cat: d.cat, level: b.level, state: b.state, rot: b.rot ? 1 : 0, x: b.x, y: b.y, w: sz.w, h: sz.h, w0: d.w, h0: d.h });
+    });
+    W.obstaclesOn(s, iid).forEach((o) => { if (o.state === 'cleared') return; const ty = D.OBSTACLE_TYPES[o.type]; items.push({ k: 'o', id: o.id, type: o.type, name: ty.name, x: o.x, y: o.y, w: ty.w, h: ty.h, seed: Math.abs(String(o.id).split('').reduce((a, c) => a * 31 + c.charCodeAt(0), 7)) % 1000 }); });
+    IA.landmark(iid, s).forEach((l) => items.push({ k: 'l', kind: l.kind, on: l.kind === 'stones' ? !!(s.struct.tidegate && !s.flags.r1) : false, x: l.x, y: l.y, w: l.w, h: l.h }));
+    const cols = t.cols.map((c) => ({ x: c.x, y: c.y, kind: c.kind, top: c.top, bot: c.bot }));
+    return { iid, cols, items, scenery: scenery(t.cols), extras: extras(iid, t.cols) };
+  };
   // true when the 3D layer covers the overlay at this screen point (a tap there belongs to the building, not to
   // the creature hidden behind it)
   V.occludedAt = (x, y) => !!(ctrl && V.on && ctrl.occludedAt(x, y));

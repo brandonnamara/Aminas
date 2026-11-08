@@ -236,18 +236,20 @@
     const s = st(); s.hideseek = s.hideseek || { pref: 'hider', played: 0, won: 0, seekerCount: {} };
     if (!UI.HS || UI.HS.match) UI.HS = { lobby: R.HideSeek.lobby(s, (Date.now() % 1e6) | 0), vote: null };
     const L = UI.HS.lobby, me = L.players[0]; me.pref = s.hideseek.pref;
-    const elig = R.HideSeek.eligible(L);
+    const elig = R.HideSeek.eligible(L), seekLook = s.hideseek.seekerModel || 'male';
     const players = L.players.map((p) => '<div class="hs-pl"><span class="hs-av">' + (p.bot ? I('paw') : I('star')) + '</span><b>' + esc(p.name) + '</b>' + (p.bot ? '<small class="muted">computer</small>' : '') + '<span class="tagp ' + (p.pref === 'seeker' ? 'prog' : 'play') + '">' + (p.pref === 'seeker' ? 'Wants to seek' : 'Hider') + '</span>' +
       (p.pref === 'seeker' ? '<button class="btn small ' + (UI.HS.vote === p.id ? 'gold' : 'ghost') + '" data-act="hsVote" data-id="' + p.id + '">' + (UI.HS.vote === p.id ? 'Your vote' : 'Vote') + '</button>' : '') + '</div>').join('');
     const body = OFFLINE + '<div class="hs-lobby"><div><h3>Lobby</h3>' + players + '</div><div><h3>Your role preference</h3><div class="row-actions"><button class="btn small ' + (me.pref === 'hider' ? 'gold' : 'ghost') + '" data-act="hsPref" data-p="hider">Hider</button><button class="btn small ' + (me.pref === 'seeker' ? 'gold' : 'ghost') + '" data-act="hsPref" data-p="seeker">Seeker</button></div>' +
       '<p class="muted small-t">Everyone votes for a Seeker among the players who chose the Seeker preference. Most votes wins. A tie goes to whoever has been Seeker least often, then to a random draw. If nobody wants to seek, the Seeker is drawn from everyone.</p>' +
-      '<p class="small-t"><b>' + elig.length + '</b> player' + (elig.length === 1 ? '' : 's') + ' can be voted for.</p><p class="muted small-t">Hiders Morph into a piece of scenery and choose where to stand. The Seeker has ' + D.HIDESEEK.seconds + ' seconds and ' + D.HIDESEEK.searches + ' searches to find everyone.</p></div></div>' +
+      '<p class="small-t"><b>' + elig.length + '</b> player' + (elig.length === 1 ? '' : 's') + ' can be voted for.</p><p class="muted small-t">Played on your Starter Island. Hiders get ' + D.HIDESEEK.prep + ' seconds to disguise themselves as island objects (trees, rocks, buildings and more); the Seeker then has ' + D.HIDESEEK.seconds + ' seconds to find them. Attacking real scenery costs the Seeker ' + D.HIDESEEK.missPenalty + ' seconds.</p>' +
+      '<h3>Your Seeker</h3><div class="row-actions"><button class="btn small ' + (seekLook === 'male' ? 'gold' : 'ghost') + '" data-act="hsLook" data-l="male">Male</button><button class="btn small ' + (seekLook === 'female' ? 'gold' : 'ghost') + '" data-act="hsLook" data-l="female">Female</button></div></div></div>' +
       '<div class="todo"><b>Still needed for online play:</b> shared lobbies, live positions and timers synced between devices, and votes counted by a server.</div>';
     return open(ovEx, UI.sheet(I('compass') + ' Hide and Seek · lobby', body, back('pvpMenu') + '<button class="btn" data-act="hsNew">New lobby</button><button class="btn gold" data-act="hsStart" data-hl="hsStart">Start the vote</button>', 'wide'));
   };
   UI.act('hideseek', (el) => { UI.HS = null; UI.hideSeek(el.closest('.overlay')); });
   UI.act('hsNew', (el) => { UI.HS = null; UI.hideSeek(el.closest('.overlay')); });
   UI.act('hsPref', (el) => { const s = st(); s.hideseek.pref = el.dataset.p; UI.HS.lobby.players[0].pref = el.dataset.p; if (UI.HS.vote === 'you' && el.dataset.p !== 'seeker') UI.HS.vote = null; S.save(); UI.hideSeek(el.closest('.overlay')); });
+  UI.act('hsLook', (el) => { const s = st(); s.hideseek.seekerModel = el.dataset.l === 'female' ? 'female' : 'male'; S.save(); UI.hideSeek(el.closest('.overlay')); });
   UI.act('hsVote', (el) => { UI.HS.vote = el.dataset.id; UI.hideSeek(el.closest('.overlay')); });
   UI.act('hsStart', (el) => {
     const s = st(), L = UI.HS.lobby, votes = R.HideSeek.botVotes(L);
@@ -258,9 +260,10 @@
     UI.HS.assign = r;
     const tally = Object.keys(r.tally).map((id) => esc(name(id)) + ': ' + r.tally[id]).join(' · ');
     const how = r.method === 'vote' ? 'Most votes.' : r.method === 'tiebreak' ? 'A tie, settled for whoever has been Seeker least often.' : 'Nobody chose Seeker, so the Seeker was drawn from everyone.';
-    open(el.closest('.overlay'), UI.sheet('The Seeker is ' + esc(r.seeker === 'you' ? 'you' : name(r.seeker)), '<div class="vcard"><h1>' + (r.seeker === 'you' ? 'You are the Seeker' : esc(name(r.seeker)) + ' is the Seeker') + '</h1><p>' + how + '</p>' + (tally ? '<p class="muted small-t">Votes: ' + tally + '</p>' : '') + '<p>' + (r.seeker === 'you' ? 'Tap the scenery to search it. You have ' + D.HIDESEEK.searches + ' searches and ' + D.HIDESEEK.seconds + ' seconds.' : 'Choose what to Morph into and where to hide.') + '</p></div>', '<button class="btn gold" data-act="hsGo">' + (r.seeker === 'you' ? 'Start searching' : 'Choose a disguise') + '</button>', 'narrow'));
+    open(el.closest('.overlay'), UI.sheet('The Seeker is ' + esc(r.seeker === 'you' ? 'you' : name(r.seeker)), '<div class="vcard"><h1>' + (r.seeker === 'you' ? 'You are the Seeker' : esc(name(r.seeker)) + ' is the Seeker') + '</h1><p>' + how + '</p>' + (tally ? '<p class="muted small-t">Votes: ' + tally + '</p>' : '') + '<p>' + (UI.hsRound ? (r.seeker === 'you' ? 'Count while the hiders hide, then search the island for ' + D.HIDESEEK.seconds + ' seconds. Attack anything suspicious, but hitting real scenery costs ' + D.HIDESEEK.missPenalty + ' seconds.' : 'You have ' + D.HIDESEEK.prep + ' seconds to find a spot and disguise yourself as something on the island.') : r.seeker === 'you' ? 'Tap the scenery to search it. You have ' + D.HIDESEEK.searches + ' searches and ' + D.HIDESEEK.seconds + ' seconds.' : 'Choose what to Morph into and where to hide.') + '</p></div>', '<button class="btn gold" data-act="hsGo">' + (r.seeker === 'you' ? (UI.hsRound ? 'Start the round' : 'Start searching') : (UI.hsRound ? 'Go and hide' : 'Choose a disguise')) + '</button>', 'narrow'));
   });
-  UI.act('hsGo', () => { UI.closeAll(); const r = UI.HS.assign; if (r.seeker === 'you') hsMatch(null); else hsMorph(); });
+  // hs-redesign: the round itself is the 3D Starter Island round (ui-hideseek.js); the grid round stays as a fallback
+  UI.act('hsGo', () => { UI.closeAll(); const r = UI.HS.assign; if (UI.hsRound && A.VoxIsland && A.VoxIsland.mapData && A.C3D && A.C3D.supported()) return UI.hsRound(); if (r.seeker === 'you') hsMatch(null); else hsMorph(); });
   function hsMorph() {
     let morph = D.HIDESEEK.morphs[0], cell = null;
     const pre = R.HideSeek.newMatch(UI.HS.lobby, UI.HS.assign.seeker, null); // preview of the scenery (same seed)

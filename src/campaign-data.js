@@ -271,5 +271,14 @@
     morphs: ['bush', 'rock', 'barrel', 'stump', 'lantern', 'crate'],
     bots: ['Pip', 'Marlo', 'Juno', 'Fen', 'Sable', 'Wren'],
     map: { w: 8, h: 5 },
+    // hs-redesign: the prop-disguise round on the Starter Island (src/hideseek.js). The voting and lobby above are
+    // unchanged. `seconds` is still the search time; hiding gets its own short preparation before it.
+    prep: 20, morphCooldown: 10, missPenalty: 3, swing: 0.55, reach: 1.35, cone: 60,
+    seekerSpeed: 2.4, botSeekerSpeed: 2.1, wispSpeed: 2.2,
+    speed: { tiny: 1.6, small: 1.2, medium: 0.8, large: 0.45, huge: 0.3 },
+    // Seeker models. A Tripo export dropped in here (a .glb path, rigged, with idle/walk/attack/reveal clips) replaces
+    // the built-in voxel seeker of that look; null keeps the voxel seeker.
+    seekerGlb: { male: null, female: null },
+    seekerLook: { Pip: 'male', Marlo: 'male', Juno: 'female', Fen: 'male', Sable: 'female', Wren: 'female' },
   };
 })(typeof window !== 'undefined' ? window : globalThis);

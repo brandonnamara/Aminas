@@ -35,7 +35,7 @@ const fromIso = (wx, wy) => { const a = wx / 32, b = wy / 16; return new THREE.V
 /* ------------------------------------------------------------------ terrain */
 function vnoise(x, y, s) { const xi = Math.floor(x), yi = Math.floor(y), fx = x - xi, fy = y - yi, a = hash(xi, yi, s), b = hash(xi + 1, yi, s), c = hash(xi, yi + 1, s), d = hash(xi + 1, yi + 1, s), u = fx * fx * (3 - 2 * fx), v = fy * fy * (3 - 2 * fy); return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v; }
 
-function buildTerrain(cols, avoid) {
+export function buildTerrain(cols, avoid) { // exported for Hide and Seek (src/3d/hideseek3d.js); unchanged
   const V = 1 / TV; // voxels per cell (2)
   let minX = 1e9, maxX = -1e9, minZ = 1e9, maxZ = -1e9, maxY = 0;
   const vy = (px) => Math.round(px / HEIGHT_PX / TV);
