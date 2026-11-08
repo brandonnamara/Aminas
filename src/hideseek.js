@@ -351,6 +351,7 @@
       } else if (ai.route && ai.route.length) follow(m, h, ai, dt, 0.3);
       return;
     }
+    if (!h.key) { HS.autoDisguise(m, h); return; }
     if (ai.mode === 'move') { if (follow(m, h, ai, dt, 0.3) || ai.stuck > 1) { ai.mode = 'hide'; ai.route = null; } return; }
     if (ai.think > 0) return; ai.think = 0.4 + m.rnd() * 0.3;
     const s = m.seeker, d = hyp(s.x - h.x, s.z - h.z), toMe = Math.atan2(h.z - s.z, h.x - s.x), facing = Math.cos(toMe - s.face) > 0.6;

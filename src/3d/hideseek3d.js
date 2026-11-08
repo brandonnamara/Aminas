@@ -86,7 +86,7 @@ export function buildSeeker(look, colours) {
   const staff = new THREE.Group(); staff.position.set(0.4 * SV, -5.5 * SV, 0); P.armR.add(staff); P.staff = staff;
   staff.add(mk(part((v) => { v.box(0, 0, 0, 1, 12, 1, '#5a3a2a'); v.set(0, 11, 0, '#ffd86b'); }, 1, 12, 1, -0.5, -4, -0.5)));
   const gem = mk(part((v) => { v.box(1, 0, 1, 2, 4, 2, '#a8e4ff'); v.box(0, 1, 1, 3, 3, 2, '#e2d4ff'); v.box(1, 1, 0, 2, 3, 3, '#ffd6f4'); v.set(1, 4, 1, '#ffffff'); }, 3, 5, 3, -1.5, 8, -1.5), mats.glow);
-  staff.add(gem); P.gem = gem; staff.rotation.z = -0.5;
+  staff.add(gem); P.gem = gem; staff.rotation.z = -0.2; staff.position.z = 1.1 * SV;
   root.userData = { P, mats, h: 16 * SV };
   return root;
 }
@@ -291,9 +291,13 @@ export function createView(host, map, m, opts) {
       if (P.tail) P.tail.rotation.z = Math.sin(sAnim.phase) * 0.25 * w + (mo ? 0 : Math.sin(t * 1.7) * 0.05);
       const as = clock - sAnim.swing, ar = clock - sAnim.reveal, al = clock - sAnim.slump;
       if (m.phase === 'prep') { P.armL.rotation.set(-0.6, 0, 2.5); P.armR.rotation.set(0.6, 0, 2.5); P.head.rotation.z = -0.25; } // counting, eyes covered
-      if (as < 0.38) { const k = as / 0.38, e = k < 0.35 ? -k / 0.35 : (k - 0.35) / 0.65; P.armR.rotation.z = 2.3 - Math.max(0, e) * 3.4 + (e < 0 ? -e * 0.6 + 0.4 : 0); P.torso.rotation.y = -0.3 + Math.max(0, e) * 0.6; }
+      if (as < 0.4) { // wind up overhead, strike down in front, recover
+        const base = P.armR.rotation.z, k = as < 0.1 ? as / 0.1 : as < 0.24 ? (as - 0.1) / 0.14 : (as - 0.24) / 0.16, ease = (x) => x * x * (3 - 2 * x);
+        P.armR.rotation.z = as < 0.1 ? base + (2.8 - base) * ease(k) : as < 0.24 ? 2.8 - 2.4 * ease(k) : 0.4 + (base - 0.4) * ease(k);
+        P.torso.rotation.y = as < 0.1 ? 0.25 * k : as < 0.24 ? 0.25 - 0.55 * ease(k) : -0.3 * (1 - ease(k)); P.armL.rotation.z = as < 0.24 ? 0.5 : 0.5 * (1 - k);
+      }
       if (ar < 0.9) { const k = Math.sin(Math.min(1, ar / 0.9) * Math.PI); P.armR.rotation.z = -0.35 + k * 3.0; P.armL.rotation.z = k * 2.4; if (!mo) so.position.y += k * 0.12; }
-      if (al < 0.6 && as >= 0.38) { const k = Math.sin(Math.min(1, al / 0.6) * Math.PI); P.head.rotation.y = Math.sin(al * 22) * 0.25 * k; P.torso.rotation.z = -0.12 * k; }
+      if (al < 0.6 && as >= 0.4) { const k = Math.sin(Math.min(1, al / 0.6) * Math.PI); P.head.rotation.y = Math.sin(al * 22) * 0.25 * k; P.torso.rotation.z = -0.12 * k; }
       if (P.gem) { const pen = A.Rules.HideSeek.penaltyLeft(m) > 0; P.gem.visible = !pen || Math.floor(clock * 4) % 2 === 0; }
     }
     if (mixer) { mixer.update(dt); const want = clock - sAnim.swing < 0.4 && clips.attack ? 'attack' : clock - sAnim.reveal < 0.9 && clips.reveal ? 'reveal' : sAnim.walk > 0.3 && clips.walk ? 'walk' : 'idle'; if (want !== sAnim.clip && clips[want]) { if (sAnim.clip && clips[sAnim.clip]) clips[sAnim.clip].fadeOut(0.15); clips[want].reset().fadeIn(0.15).play(); sAnim.clip = want; } }
@@ -316,11 +320,11 @@ export function createView(host, map, m, opts) {
     if (lastT && now - lastT < gap - 2) { raf = requestAnimationFrame(render); return; }
     const dt = lastT ? Math.min(0.1, (now - lastT) / 1000) : 1 / fps; lastT = now; clock += dt;
     if (!calm()) uni.uTime.value = clock;
-    if (opts.tick) opts.tick(dt); if (disposed) return;
-    sync(dt); step(dt);
+    // a fault in one frame must not freeze the round: report it and keep drawing
+    try { if (opts.tick) opts.tick(dt); if (disposed) return; sync(dt); step(dt); } catch (e) { console.error('Hide and Seek frame error:', e && e.stack || e); if (disposed) return; }
     // camera follows the player (or whoever the player is watching)
     const fid = api.focusId, fe = fid === m.seeker.id ? m.seeker : m.hiders.find((q) => q.id === fid);
-    if (fe) fTarget.set(fe.x, groundY(fe.x, fe.z), fe.z);
+    if (fe) fTarget.set(fe.x, groundY(fe.x, fe.z) + 0.6, fe.z);
     focus.lerp(fTarget, Math.min(1, dt * (calm() ? 12 : 6))); placeCamera();
     // aim ring and own marker
     const tgt = api.aim ? api.aim() : null;
@@ -341,7 +345,8 @@ export function createView(host, map, m, opts) {
     // the island point under a screen position (for tap-to-face)
     groundAt(clientX, clientY) { const r = R.domElement.getBoundingClientRect(), nd = new THREE.Vector2((clientX - r.left) / r.width * 2 - 1, -((clientY - r.top) / r.height) * 2 + 1), rc = new THREE.Raycaster(); rc.setFromCamera(nd, camera); const p = new THREE.Vector3(); rc.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0, 1, 0), -focus.y), p); return p ? { x: p.x, z: p.z } : null; },
     screenOf(x, y, z) { const p = new THREE.Vector3(x, y, z).project(camera); return { x: (p.x + 1) / 2 * view.w, y: (1 - p.y) / 2 * view.h }; },
-    snapFocus() { const fe = api.focusId === m.seeker.id ? m.seeker : m.hiders.find((q) => q.id === api.focusId); if (fe) { focus.set(fe.x, groundY(fe.x, fe.z), fe.z); fTarget.copy(focus); } placeCamera(); },
+    setZoom(z) { view.zoom = Math.max(0.6, Math.min(4, z)); placeCamera(); },
+    snapFocus() { const fe = api.focusId === m.seeker.id ? m.seeker : m.hiders.find((q) => q.id === api.focusId); if (fe) { focus.set(fe.x, groundY(fe.x, fe.z) + 0.6, fe.z); fTarget.copy(focus); } placeCamera(); },
     renderOnce() { sync(0.016); step(0.016); api.snapFocus(); if (useShadows) R.shadowMap.needsUpdate = true; R.render(scene, camera); },
     info() { let tris = 0, calls = 0; R.info.reset && R.info.reset(); R.render(scene, camera); tris = R.info.render.triangles; calls = R.info.render.calls; return { triangles: tris, calls, geometries: R.info.memory.geometries, shadows: useShadows, lod, fps: saver() ? 20 : 30, seeker: seekerObj.userData.glb ? 'glb' : 'voxel-' + m.seeker.look }; },
     // what a disguised hider looks like next to its genuine twin: their model, material and tint (for the tests)
