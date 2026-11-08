@@ -11,8 +11,8 @@
    offsets on the rig are converted with U. */
 import { THREE, CLIP_HOOKS } from './creature3d.js';
 
-const qE = (x, y, z) => new THREE.Quaternion().setFromEuler(new THREE.Euler(x, y, z, 'XYZ'));
-function kit(root) {
+export const qE = (x, y, z) => new THREE.Quaternion().setFromEuler(new THREE.Euler(x, y, z, 'XYZ'));
+export function kit(root) {
   const n = {}; root.traverse((o) => { if (o.name && !n[o.name]) n[o.name] = o; });
   const U = 1 / root.scale.x;
   const times = (keys) => keys.map((k) => k[0]);
@@ -26,7 +26,7 @@ function kit(root) {
   // scale multipliers
   const S = (name, keys) => { const o = n[name]; if (!o) return null; const v = []; keys.forEach(([, s]) => v.push(o.scale.x * s[0], o.scale.y * s[1], o.scale.z * s[2])); return new THREE.VectorKeyframeTrack(name + '.scale', times(keys), v); };
   // eyelids: 0 open … 1 closed (absolute; their rest scale is closed-to-nothing)
-  const L = (name, keys) => (n[name] ? new THREE.VectorKeyframeTrack(name + '.scale', times(keys), [].concat(...keys.map(([, c]) => [1, Math.max(0.001, c), 1]))) : null);
+  const L = (name, keys) => (n[name] ? new THREE.VectorKeyframeTrack(name + '.scale', times(keys), [].concat(...keys.map(([, c]) => [1, c <= 0.001 ? 0 : c, 1]))) : null);
   const clip = (name, d, tracks) => new THREE.AnimationClip(name, d, tracks.flat().filter(Boolean));
   // a periodic curve sampled into keys (f(phase 0..1) must return to its start)
   const wave = (D, steps, f) => Array.from({ length: steps + 1 }, (_, i) => [D * i / steps, f(i / steps)]);
@@ -34,7 +34,7 @@ function kit(root) {
   return { n, U, R, P, S, L, clip, wave, pair, has: (k) => !!n[k] };
 }
 const Z3 = [0, 0, 0], O3 = [1, 1, 1], sin = Math.sin, TAU = Math.PI * 2;
-const blinks = (k, lids, D, at) => k.clip('blink', D, lids.map((l, i) => k.L(l, [[0, 0]].concat(...(at[i] || at[0]).map((t) => [[t - 0.04, 0], [t, 1], [t + 0.1, 1], [t + 0.16, 0]])).concat([[D, 0]]))));
+export const blinks = (k, lids, D, at) => k.clip('blink', D, lids.map((l, i) => k.L(l, [[0, 0]].concat(...(at[i] || at[0]).map((t) => [[t - 0.04, 0], [t, 1], [t + 0.1, 1], [t + 0.16, 0]])).concat([[D, 0]]))));
 
 /* ================================================================= UMBRIT: shy, watchful, loyal; quick and sly */
 function umbritClips(root) {
@@ -241,7 +241,7 @@ CLIP_HOOKS.cannonis = (root) => cannonisClips(root);
 CLIP_HOOKS.aimza = (root) => aimzaClips(root, 1);
 CLIP_HOOKS.aimza2 = (root) => aimzaClips(root, 2);
 CLIP_HOOKS.aimza3 = (root) => aimzaClips(root, 3);
-export const SHOWCASE_IDS = ['umbrit', 'cannonis', 'aimza', 'aimza2', 'aimza3'];
+export const SHOWCASE_IDS = ['umbrit', 'cannonis', 'aimza', 'aimza2', 'aimza3'];   // Phase 8B adds the whole roster (src/3d/roster.js)
 // the details-screen viewer opens at a three-quarter angle that shows each one's signature (Cannonis's cannon and shell, Aimza's wings and heads)
 export const VIEW_YAW = { umbrit: -0.45, cannonis: -1.05, aimza: -0.75, aimza2: -0.8, aimza3: -0.8 };
 
@@ -249,7 +249,7 @@ export const VIEW_YAW = { umbrit: -0.45, cannonis: -1.05, aimza: -0.75, aimza2: 
    Glow that breathes with the creature, flares for a special and dims when it is defeated; a ground decoration
    (Umbrit's shadow pool, the glowing ring Aimza stands on in its card). Cheap: a colour multiply on the glow
    materials and one ground mesh. Reduce motion keeps everything still. */
-const LIVING = {
+export const LIVING = {
   umbrit: { rate: 0.9, base: 0.9, amp: 0.12, ground: 'pool', col: '#1a1030' },
   cannonis: { rate: 1.6, base: 0.88, amp: 0.14, ground: null },
   aimza: { rate: 1.2, base: 0.86, amp: 0.16, ground: 'ring', col: '#22d3ee' },
@@ -266,7 +266,9 @@ export function living(actor, calm) {
   const cfg = LIVING[actor.spId]; if (!cfg || !actor.root.userData.parts) return null;
   const glows = actor.mats.filter((m) => m.name === 'voxelGlow'); let t = Math.random() * 10, flare = 0, dim = 0, dimTo = 0;
   // eyelids are only drawn while they are closing (an open lid is scaled to nothing: no need to send it to the GPU)
-  const lids = []; actor.root.traverse((o) => { if (/^lid/.test(o.name) && o.children.length) lids.push(o); });
+  const lids = []; actor.root.traverse((o) => { if (/^lid/.test(o.name) && o.children.length && !o.isBone) lids.push(o); });
+  // Phase 8B: floating debris (aura) and rings (halo) drift slowly around the creature; no clip moves them
+  const spins = []; actor.root.traverse((o) => { if (o.isBone && (o.name === 'aura' || o.name === 'halo')) spins.push(o); });
   let ground = null;
   if (cfg.ground === 'ring') {
     ground = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 1.5), new THREE.MeshBasicMaterial({ map: ringTexture(), color: cfg.col, transparent: true, opacity: 0.5, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false }));
@@ -281,6 +283,7 @@ export function living(actor, calm) {
       const k = (cfg.base + (still ? 0 : cfg.amp * Math.sin(t * cfg.rate * Math.PI))) * (1 + flare * 0.6) * (1 - dim);
       glows.forEach((m) => m.color.setScalar(k));
       for (let i = 0; i < lids.length; i++) lids[i].visible = lids[i].scale.y > 0.02;
+      if (!still) for (let i = 0; i < spins.length; i++) spins[i].rotation.y += dt * (spins[i].name === 'halo' ? 0.9 : 0.32) * (cfg.spin || 1);
       if (ground) { const p = still ? 0 : Math.sin(t * cfg.rate * 0.8); ground.material.opacity = (cfg.ground === 'ring' ? 0.42 + p * 0.12 + flare * 0.3 : 0.36 + p * 0.05) * (1 - dim * 0.8); if (cfg.ground === 'pool') ground.scale.setScalar(1 + p * 0.05 + dim * 0.25); }
     },
     dispose() { if (ground) { ground.removeFromParent(); ground.geometry.dispose(); ground.material.dispose(); } },
@@ -291,8 +294,8 @@ export function living(actor, calm) {
    Each of their moves gets its own sequence, timed against the clip: shots leave from the real cannon muzzle or each
    head's mouth; the effect reaches the foe as the battle's hit beat lands (≈0.48 s), as before.
    api: { fx, at(delay, fn), from(who, node), chest(who), head(who), other(who), calm() } */
-const V3 = (x, y, z) => new THREE.Vector3(x, y, z);
-const STYLE = {
+export const V3 = (x, y, z) => new THREE.Vector3(x, y, z);
+export const STYLE = {
   // Cannonis: Bubble Pop — a muzzle flash and a stream of bubbles from the cannon
   bubbles(api, who) {
     const { fx, at } = api, tgt = api.other(who), n = Math.max(2, Math.round(6 * fx.scale()));
@@ -352,19 +355,19 @@ const STYLE = {
     at(0.3, () => fx.glow(api.chest(who), '#7fe6f0', 1.2, 0.5));
   },
 };
-function ring(api, who, tgt, mouthNode, dur, idx) {
+export function ring(api, who, tgt, mouthNode, dur, idx) {
   const { fx } = api, a = api.from(who, mouthNode), b = api.chest(tgt), d = b.clone().sub(a), L = d.length(); d.normalize();
   const u = Math.abs(d.y) < 0.9 ? V3(0, 1, 0) : V3(1, 0, 0), s1 = u.clone().cross(d).normalize(), s2 = d.clone().cross(s1).normalize(), n = Math.max(6, Math.round(12 * fx.scale())), r0 = 0.08 + idx * 0.02;
   for (let i = 0; i < n; i++) { const t = (i / n) * Math.PI * 2, off = s1.clone().multiplyScalar(Math.cos(t)).addScaledVector(s2, Math.sin(t));
     fx.spawn(a.clone().addScaledVector(off, r0), d.clone().multiplyScalar(L / dur).addScaledVector(off, 1.2), { color: i % 3 ? '#22d3ee' : '#ffffff', life: dur + 0.06, size: 0.045, grav: 0, spin: 1 }); }
 }
-function beam(api, a, b) {
+export function beam(api, a, b) {
   const { fx } = api, n = Math.max(6, Math.round(16 * fx.scale())), d = b.clone().sub(a);
   for (let i = 0; i <= n; i++) fx.spawn(a.clone().addScaledVector(d, i / n), V3((Math.random() - 0.5) * 0.2, (Math.random() - 0.5) * 0.2, (Math.random() - 0.5) * 0.2), { color: i % 4 ? '#22d3ee' : '#ffffff', life: 0.22 + (i / n) * 0.08, size: 0.06, grav: 0, spin: 2 });
   fx.glow(b, '#7fe6f0', 0.9, 0.22);
 }
 export const MOVES = { bubblepop: 'bubbles', tidalsurge: 'surge', shadenip: 'nip', gloomveil: 'veil', echowave: 'echo', doubleecho: 'beams', tripleecho: 'beams', hum: 'hum' };
-const HEADS = { aimza: 1, aimza2: 2, aimza3: 3 };
+export const HEADS = { aimza: 1, aimza2: 2, aimza3: 3 };
 // returns true when the move was choreographed here (the stage then skips its generic projectile / slash)
 export function choreograph(api, who, spId, abil, info) {
   if (SHOWCASE_IDS.indexOf(spId) < 0) return false; const st = STYLE[MOVES[abil]]; if (!st) return false;

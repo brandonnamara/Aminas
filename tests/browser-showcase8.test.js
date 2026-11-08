@@ -25,7 +25,8 @@ const IDS = ['umbrit', 'cannonis', 'aimza', 'aimza2', 'aimza3'];
         blinkTracks: (r.clips.find((c) => c.name === 'blink') || { tracks: [] }).tracks.map((t) => t.name) };
     }
     // every other form keeps its earlier builder (not part-built)
-    out.others = ['duskmantle', 'eclipsar', 'reefback', 'shellfin', 'lumifern', 'ignivor'].map((id) => { const s = A.Data.SPECIES[id], m = A.Voxel.model(s.art.vox, s.art.st); return [id, !m.pivots, m.count()]; });
+    // Phase 8B rigs every other monster in parts too (same blocks: tests/browser-roster8b.test.js compares them with Phase 8)
+    out.others = ['duskmantle', 'eclipsar', 'reefback', 'shellfin', 'lumifern', 'ignivor'].map((id) => { const s = A.Data.SPECIES[id], m = A.Voxel.model(s.art.vox, s.art.st); return [id, !!m.pivots && !!m.rig, m.count()]; });
     return out;
   }, IDS);
   ok(IDS.every((id) => md[id].ok), 'all five showcase forms validate (rig, size, clips, rest pose)' + IDS.filter((id) => !md[id].ok).map((id) => ' ' + id + ': ' + md[id].errors.join('; ')).join(''));
@@ -39,7 +40,7 @@ const IDS = ['umbrit', 'cannonis', 'aimza', 'aimza2', 'aimza3'];
   ok(IDS.every((id) => md[id].blinkTracks.length && md[id].blinkTracks.every((t) => /^lid.*\.scale$/.test(t))), 'the blink overlay only moves eyelids (it plays alongside everything else)');
   ok(IDS.every((id) => Math.abs(md[id].atk - 0.34) < 0.01 && Math.abs(md[id].sp - 0.4) < 0.01), 'attacks reach the foe at 0.34 s and specials at 0.40 s (battle length unchanged)');
   ok(IDS.every((id) => md[id].hidden > 0 && !md[id].lidsIn2D), 'eyelids live in a hidden layer: never drawn on 2D portraits or cards');
-  ok(md.others.every((o) => o[1] && o[2] > 0), 'every other monster keeps its earlier model (Duskmantle, Eclipsar, Reefback, Shellfin and the rest are untouched)');
+  ok(md.others.every((o) => o[1] && o[2] > 0), 'Phase 8B: every other monster keeps its earlier sculpt, rigged in parts by the roster pass (Duskmantle, Eclipsar, Reefback, Shellfin, Lumifern, Ignivor)');
   const anim = await page.evaluate(async () => {
     const C = await import('/src/3d/creature3d.js'); const T = C.THREE, out = {};
     for (const id of ['umbrit', 'cannonis', 'aimza2']) { const r = C.buildVoxel(A.Data.SPECIES[id]), root = r.root, mx = new T.AnimationMixer(root);
@@ -102,11 +103,12 @@ const IDS = ['umbrit', 'cannonis', 'aimza', 'aimza2', 'aimza3'];
     Au.setPrefs({ sfx: false, music: false }); out.gate.off = Au.monster('umbrit', 'attack');
     Au.setPrefs({ sfx: true, music: false }); out.gate.on = Au.monster('umbrit', 'idle'); out.gate.repeat = Au.monster('umbrit', 'idle');
     out.gate.other = Au.monster('lumifern', 'attack'); out.hasVoice = ['umbrit', 'cannonis', 'aimza', 'aimza2', 'aimza3', 'lumifern', 'duskmantle'].map((s) => Au.hasVoice(s));
+    Au.setPrefs({ sfx: false, music: false }); out.gate.otherOff = Au.monster('lumifern', 'attack'); Au.setPrefs({ sfx: true, music: false });
     return out; });
   ok(snd.render.every(([, , p]) => p > 0.01), 'every cue of every voice makes a sound (' + snd.render.length + ' rendered)');
   ok(snd.render.every(([, , p]) => p < 0.98), 'none of them clips (loudest peak ' + Math.max(...snd.render.map((r) => r[2])) + ')');
   ok(snd.gate.off === false && snd.gate.on === true && snd.gate.repeat === false, 'monster sounds respect the sound-effects setting and never repeat the same cue within 120 ms');
-  ok(snd.gate.other === false && snd.hasVoice.join() === 'true,true,true,true,true,false,false', 'only the three showcase monsters have voices (every other monster keeps the shared sounds)');
+  ok(snd.hasVoice.every(Boolean) && snd.gate.otherOff === false, 'Phase 8B: every monster has its own voice now, under the same sound-effects setting');
 
   /* ---------------- details screen: feeding keeps everything in place ---------------- */
   const fd = await page.evaluate(async () => {

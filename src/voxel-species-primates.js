@@ -8,34 +8,51 @@
   function primate(m, k, P) {
     const S = (v) => v * k;
     const body = P.body, belly = P.belly;
+    V.rigStart(m, 'primate');   // Phase 8B: torso, two legs, two arms, head (with jaw), tail
     // torso: hips low at the back, chest raised at the front
     m.capsule([S(-3.5), S(7.5), 0], [S(2), S(9.5), 0], S(4.2), S(4.4), body);
     m.ellipsoid(S(1.5), S(8.3), 0, S(3.2), S(3.4), S(3), belly, 'paint');
     // legs (crouched) and arms (planted forward)
     K.sym((sd) => {
-      m.capsule([S(-3.5), S(7), sd * S(3)], [S(-1.5), S(3.5), sd * S(4.2)], S(2.4), S(2), body);
-      m.capsule([S(-1.5), S(3.5), sd * S(4.2)], [S(-2.5), S(1), sd * S(4)], S(2), S(1.7), body);
-      m.ellipsoid(S(-1.2), S(0.9), sd * S(4), S(2.4), S(1), S(1.6), P.paw);
-      m.capsule([S(3), S(10), sd * S(3.4)], [S(5.2), S(5), sd * S(4.6)], S(1.8), S(1.5), body);
-      m.capsule([S(5.2), S(5), sd * S(4.6)], [S(6), S(1.3), sd * S(4.4)], S(1.5), S(1.4), body);
-      m.ellipsoid(S(6.6), S(1), sd * S(4.4), S(1.8), S(1), S(1.5), P.paw);
-      K.toes(m, Math.round(S(8)), 0, Math.round(sd * S(4.4)), 3, P.claw || P.paw);
+      const s = sd > 0 ? 'L' : 'R';
+      V.joint(m, 'leg' + s, [S(-3), S(6), sd * S(3.2)], null); V.joint(m, 'arm' + s, [S(3), S(9.5), sd * S(3.4)], null);
+      V.inPart(m, 'leg' + s, () => {
+        m.capsule([S(-3.5), S(7), sd * S(3)], [S(-1.5), S(3.5), sd * S(4.2)], S(2.4), S(2), body);
+        m.capsule([S(-1.5), S(3.5), sd * S(4.2)], [S(-2.5), S(1), sd * S(4)], S(2), S(1.7), body);
+        m.ellipsoid(S(-1.2), S(0.9), sd * S(4), S(2.4), S(1), S(1.6), P.paw);
+      });
+      V.inPart(m, 'arm' + s, () => {
+        m.capsule([S(3), S(10), sd * S(3.4)], [S(5.2), S(5), sd * S(4.6)], S(1.8), S(1.5), body);
+        m.capsule([S(5.2), S(5), sd * S(4.6)], [S(6), S(1.3), sd * S(4.4)], S(1.5), S(1.4), body);
+        m.ellipsoid(S(6.6), S(1), sd * S(4.4), S(1.8), S(1), S(1.5), P.paw);
+        K.toes(m, Math.round(S(8)), 0, Math.round(sd * S(4.4)), 3, P.claw || P.paw);
+      });
+      V.emit(m, 'hand' + s, [S(7), S(1.6), sd * S(4.4)], 'arm' + s);
     });
     // head: big and round, turned a little towards the viewer, with a pale muzzle and side ears
     const fy = (P.faceYaw == null ? 32 : P.faceYaw) * Math.PI / 180, fd = [Math.cos(fy), 0, Math.sin(fy)], sdv = [-Math.sin(fy), 0, Math.cos(fy)];
     const hc = [S(5), S(15), 0], hr = S(5.2), at = (d, up, side) => [hc[0] + fd[0] * d + sdv[0] * side, hc[1] + up, hc[2] + fd[2] * d + sdv[2] * side];
-    m.ellipsoid(hc[0], hc[1], hc[2], hr, hr * 0.95, hr, P.head || body);
-    const mz = at(S(3.6), -S(1.7), 0); m.ellipsoid(mz[0], mz[1], mz[2], S(2.8), S(2.3), S(2.8), P.face);
-    const fc = at(S(2.6), S(0.3), 0); m.ellipsoid(fc[0], fc[1], fc[2], S(3), S(2.3), S(3), P.face, 'paint');
-    K.sym((sd) => {
-      const e = at(-S(0.6), S(0.6), sd * S(5.3)); m.ellipsoid(e[0], e[1], e[2], S(1.6), S(1.9), S(1.6), P.ear || P.face);
-      const ei = at(-S(0.2), S(0.6), sd * S(6.2)); m.set(Math.round(ei[0]), Math.round(ei[1]), Math.round(ei[2]), P.earIn || P.face);
+    const mz = at(S(3.6), -S(1.7), 0);
+    V.joint(m, 'head', [S(4), S(10.5), 0], null);
+    V.inPart(m, 'head', () => {
+      m.ellipsoid(hc[0], hc[1], hc[2], hr, hr * 0.95, hr, P.head || body);
+      m.ellipsoid(mz[0], mz[1], mz[2], S(2.8), S(2.3), S(2.8), P.face);
+      const fc = at(S(2.6), S(0.3), 0); m.ellipsoid(fc[0], fc[1], fc[2], S(3), S(2.3), S(3), P.face, 'paint');
+      K.sym((sd) => {
+        const e = at(-S(0.6), S(0.6), sd * S(5.3)); m.ellipsoid(e[0], e[1], e[2], S(1.6), S(1.9), S(1.6), P.ear || P.face);
+        const ei = at(-S(0.2), S(0.6), sd * S(6.2)); m.set(Math.round(ei[0]), Math.round(ei[1]), Math.round(ei[2]), P.earIn || P.face);
+      });
+      const ns = K.surface(m, at(0, -S(1.3), 0), P.faceYaw == null ? 32 : P.faceYaw, 0, 20); if (ns) { m.set(ns[0], ns[1], ns[2], P.nose || '#3a2a20'); m.set(ns[0], ns[1] - 2, ns[2], P.mouth || P.nose || '#3a2a20'); }
     });
-    const ns = K.surface(m, at(0, -S(1.3), 0), P.faceYaw == null ? 32 : P.faceYaw, 0, 20); if (ns) { m.set(ns[0], ns[1], ns[2], P.nose || '#3a2a20'); m.set(ns[0], ns[1] - 2, ns[2], P.mouth || P.nose || '#3a2a20'); }
+    // the jaw: the lower half of the muzzle
+    V.jaw(m, 'head', 'jaw', [mz[0] - fd[0] * S(1.6), mz[1] + S(0.1), mz[2] - fd[2] * S(1.6)], (x, y, z) => { const t = (x - hc[0]) * fd[0] + (z - hc[2]) * fd[2]; return t > S(2.4) && y < mz[1] - S(0.3) && Math.hypot(x - mz[0], (y - mz[1]) * 1.2, z - mz[2]) < S(3.1); });
+    V.emit(m, 'mouth', at(S(5.6), -S(1.9), 0), 'head');
     // tail: a loop curling up behind
     const tail = [];
     for (let i = 0; i <= 10; i++) { const a = -0.3 + i * 0.55, r = S(3.6) * (1 - i * 0.04); tail.push([S(-8) - Math.sin(a) * r * 0.6, S(8) + S(i * 0.9) + Math.cos(a) * r * 0.3, 0]); }
-    for (let i = 0; i < tail.length - 1; i++) m.capsule(tail[i], tail[i + 1], S(1.3) * (1 - i * 0.05), S(1.3) * (1 - (i + 1) * 0.05), P.tail || body);
+    V.joint(m, 'tail', [S(-6.5), S(8), 0], null);
+    V.inPart(m, 'tail', () => { for (let i = 0; i < tail.length - 1; i++) m.capsule(tail[i], tail[i + 1], S(1.3) * (1 - i * 0.05), S(1.3) * (1 - (i + 1) * 0.05), P.tail || body); });
+    m.part = null;
     return { hc, hr, fy: P.faceYaw == null ? 32 : P.faceYaw, tailTip: tail[tail.length - 1], S };
   }
   function eyes(m, g, P) { K.eyes(m, [g.hc[0], g.hc[1] - g.S(0.2), g.hc[2]], { yaw: g.fy, ang: 30, el: 12, size: 2, tall: 2, iris: P.eye, pupil: P.pupil || '#0a0a14', white: '#ffffff', lid: P.lid }); }

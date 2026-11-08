@@ -41,7 +41,11 @@
   P.set = function (x, y, z, c, g) {
     x = Math.round(x); y = Math.round(y); z = Math.round(z);
     if (c == null) { this.v.delete(key(x, y, z)); return; }
-    this.v.set(key(x, y, z), this.part ? { c, g: g || 0, p: this.part } : { c, g: g || 0 });
+    // Phase 8B rigging: with keepParts, a block keeps the part that first claimed it (a leg drawn into the body leaves the
+    // body's blocks as body) unless partForce says otherwise; colours are written exactly as before
+    const k0 = key(x, y, z); let p = this.part;
+    if (this.keepParts && !this.partForce) { const old = this.v.get(k0); if (old && old.p) p = old.p; }
+    this.v.set(k0, p ? { c, g: g || 0, p } : { c, g: g || 0 });
     if (x < this.min[0]) this.min[0] = x; if (y < this.min[1]) this.min[1] = y; if (z < this.min[2]) this.min[2] = z;
     if (x > this.max[0]) this.max[0] = x; if (y > this.max[1]) this.max[1] = y; if (z > this.max[2]) this.max[2] = z;
   };
@@ -81,7 +85,8 @@
   // swap: optional part renames for the mirrored side (e.g. { earL: 'earR' })
   P.mirrorZ = function (swap) { const add = []; this.v.forEach((val, k) => { const p = k.split(',').map(Number); if (p[2] > 0) add.push([p[0], p[1], -p[2], val]); }); const was = this.part; add.forEach((p) => { this.part = p[3].p ? (swap && swap[p[3].p]) || p[3].p : undefined; this.set(p[0], p[1], p[2], p[3].c, p[3].g); }); this.part = was; return this; };
   // drop the model so its lowest voxel sits on y = 0 (part joints move with it)
-  P.ground = function () { const dy = -this.min[1]; if (!dy) return this; const old = this.v, was = this.part; this.v = new Map(); this.min = [1e9, 1e9, 1e9]; this.max = [-1e9, -1e9, -1e9]; old.forEach((val, k) => { const p = k.split(',').map(Number); this.part = val.p; this.set(p[0], p[1] + dy, p[2], val.c, val.g); }); this.part = was; if (this.pivots) Object.values(this.pivots).forEach((pv) => { pv.at[1] += dy; }); return this; };
+  P.ground = function () { const dy = -this.min[1]; if (!dy) return this; const old = this.v, was = this.part; this.v = new Map(); this.min = [1e9, 1e9, 1e9]; this.max = [-1e9, -1e9, -1e9]; old.forEach((val, k) => { const p = k.split(',').map(Number); this.part = val.p; this.set(p[0], p[1] + dy, p[2], val.c, val.g); }); this.part = was; if (this.pivots) Object.values(this.pivots).forEach((pv) => { pv.at[1] += dy; });
+    if (this.hid) { const h = this.hid; this.hid = new Map(); h.forEach((val, k) => { const p = k.split(',').map(Number); this.hid.set(key(p[0], p[1] + dy, p[2]), val); }); } return this; };
   // Voxels with at least one exposed face towards the viewer (top, +x, +z). Order is set per view when drawing.
   P.visible = function () {
     const out = [];
@@ -151,7 +156,7 @@
   V.has = (id) => !!V.SPECIES[id];
   V.model = function (id, stage) {
     const k = id + '#' + (stage || 1);
-    if (!models.has(k)) { const m = V.SPECIES[id](stage || 1); m.ground(); m._vis = m.visible(); models.set(k, m); }
+    if (!models.has(k)) { const m = V.SPECIES[id](stage || 1); if (m.rig && !m.pivots && V.autoRig) V.autoRig(m); m.ground(); m._vis = m.visible(); models.set(k, m); }
     return models.get(k);
   };
   // A sprite canvas for a species/stage at a target box size (px). The voxel size is chosen so the model fits.

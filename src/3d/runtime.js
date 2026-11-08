@@ -8,6 +8,7 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.170.0/examples/
 import { buildArena, kit, motes, tracker, rnd } from './arenas.js';
 import { Fx, FocusMarks, ELFX } from './combatfx.js';
 import * as SC from './showcase.js';   // Phase 8: bespoke clips (registered on import), living details, move choreography
+import './roster.js';                  // Phase 8B: the rest of the roster (clips, living details, moves) registered on import
 const THREE = C.THREE;
 const A = window.A, D = A.Data;
 
@@ -137,7 +138,7 @@ function trimTemplates() {
   if (templates.size <= 14) return;
   for (const [id, p] of templates) { if (templates.size <= 14) break; p.then((t) => { if (t.refs <= 0 && templates.get(id) === p) { templates.delete(id); disposeTree(t.root); } }); }
 }
-function disposeTree(root) { root.traverse((o) => { if (o.isMesh) { o.geometry.dispose(); (Array.isArray(o.material) ? o.material : [o.material]).forEach((m) => m.dispose()); } }); }
+function disposeTree(root) { const sk = new Set(); root.traverse((o) => { if (o.isMesh) { if (o.geometry.userData && o.geometry.userData.shell) o.geometry.userData.shell.geo.dispose(); o.geometry.dispose(); (Array.isArray(o.material) ? o.material : [o.material]).forEach((m) => m.dispose()); if (o.isSkinnedMesh) sk.add(o.skeleton); } }); sk.forEach((s) => s.dispose()); }
 
 /* ------------------------------------------------------------------ shared sprite textures */
 let glowTex = null, shadowTex = null, sparkTex = null;
@@ -154,8 +155,8 @@ function tex(kind) {
 class Actor {
   constructor(t, spId) {
     this.spId = spId; this.t = t; t.refs++;
-    this.root = t.root.clone(true); this.mats = [];
-    this.root.traverse((o) => { if (o.isMesh) { o.material = o.material.clone(); this.mats.push(o.material); o.frustumCulled = true; } });
+    this.root = C.cloneCreature(t.root); this.mats = [];   // Phase 8B: skinned parts are re-bound to this copy's own bones
+    this.root.traverse((o) => { if (o.isMesh) { o.material = o.material.clone(); this.mats.push(o.material); o.frustumCulled = !o.isSkinnedMesh; } });
     this.group = new THREE.Group(); this.group.add(this.root);
     const quad = new THREE.Mesh(new THREE.PlaneGeometry(1.1, 1.1), new THREE.MeshBasicMaterial({ map: tex('shadow'), transparent: true, depthWrite: false }));
     quad.rotation.x = -Math.PI / 2; quad.position.y = 0.01; this.group.add(quad); this.shadow = quad;
@@ -180,9 +181,13 @@ class Actor {
   // drawn back faces only). Built on first use; fades in and out.
   setOutline(color, strength) {
     if (!this.hull) {
-      this.hull = []; const meshes = []; const parts = !!this.root.userData.parts; this.root.traverse((o) => { if (o.isMesh && !/:lid/.test(o.name) && !(parts && /:glow/.test(o.name)) && meshes.length < 24) meshes.push(o); });
-      meshes.forEach((m) => { if (!m.geometry.boundingBox) m.geometry.computeBoundingBox(); const c = m.geometry.boundingBox.getCenter(new THREE.Vector3()), s = 1.06;
-        const h = new THREE.Mesh(m.geometry, new THREE.MeshBasicMaterial({ color: '#ffffff', side: THREE.BackSide, transparent: true, opacity: 0, depthWrite: false, toneMapped: false }));
+      this.hull = []; const meshes = []; const parts = !!this.root.userData.parts; this.root.traverse((o) => { if (o.isMesh && o.name !== 'hull' && !/:lid/.test(o.name) && !(parts && /:glow/.test(o.name)) && meshes.length < 24) meshes.push(o); });
+      const hullMat = () => new THREE.MeshBasicMaterial({ color: '#ffffff', side: THREE.BackSide, transparent: true, opacity: 0, depthWrite: false, toneMapped: false });
+      meshes.forEach((m) => {
+        // Phase 8B: a skinned creature gets a skinned shell (each part inflated about its own centre, following the pose)
+        if (m.isSkinnedMesh) { const h = C.skinnedShell(m, 1.06, hullMat()); h.name = 'hull'; h.visible = false; h.renderOrder = 1; m.parent.add(h); this.hull.push(h); return; }
+        if (!m.geometry.boundingBox) m.geometry.computeBoundingBox(); const c = m.geometry.boundingBox.getCenter(new THREE.Vector3()), s = 1.06;
+        const h = new THREE.Mesh(m.geometry, hullMat());
         h.name = 'hull'; h.scale.setScalar(s); h.position.copy(c).multiplyScalar(1 - s); h.visible = false; h.renderOrder = 1; m.add(h); this.hull.push(h); });
       this.hullOp = 0;
     }
@@ -211,7 +216,8 @@ class Actor {
     if (this.glow) this.glow.material.opacity = 0.45 + Math.sin(performance.now() / 600) * 0.1;
     const rig = this.root.getObjectByName('rig'); if (rig) this.shadow.scale.setScalar(Math.max(0.5, 1 - rig.position.y * 0.8));
   }
-  dispose() { if (this.living) this.living.dispose(); this.mixer.stopAllAction(); this.mixer.uncacheRoot(this.root); this.mats.forEach((m) => m.dispose()); if (this.hull) this.hull.forEach((h) => { h.removeFromParent(); h.material.dispose(); }); this.shadow.geometry.dispose(); this.shadow.material.dispose(); if (this.glow) this.glow.material.dispose(); this.t.refs--; this.group.removeFromParent(); }
+  dispose() { if (this.living) this.living.dispose(); this.mixer.stopAllAction(); this.mixer.uncacheRoot(this.root); this.mats.forEach((m) => m.dispose());
+    { const sk = new Set(); this.root.traverse((o) => { if (o.isSkinnedMesh && o.name !== 'hull') sk.add(o.skeleton); }); sk.forEach((s) => s.dispose()); } if (this.hull) this.hull.forEach((h) => { h.removeFromParent(); h.material.dispose(); }); this.shadow.geometry.dispose(); this.shadow.material.dispose(); if (this.glow) this.glow.material.dispose(); this.t.refs--; this.group.removeFromParent(); }
 }
 export async function actor(spId) { return new Actor(await template(spId), spId); }
 
@@ -350,7 +356,8 @@ export async function createBattle(container, o) {
     // 'attack' (style from the creature's profile), 'cast' (heal/guard). info: { el, type, special, boss, power }
     use(who, kind, info) {
       boost(1600); info = info || {}; const a = slots[who], tgt = other(who), pf = a.profile || {}, el = info.el || elOf(who);
-      const api = { fx, at, slot: (w) => slots[w], other, calm, chest, head, from: (w, node) => { const o = slots[w].root.getObjectByName(node); return o ? o.getWorldPosition(new THREE.Vector3()) : chest(w); } };
+      // Phase 8B: a shot leaves from the named point, else the creature's mouth, else its hand, else its chest
+      const api = { fx, at, slot: (w) => slots[w], other, calm, chest, head, from: (w, node) => { const r = slots[w].root, o = r.getObjectByName(node) || r.getObjectByName('mouth') || r.getObjectByName('handR'); return o ? o.getWorldPosition(new THREE.Vector3()) : chest(w); } };
       if (kind !== 'attack') { const clip = info.type === 'heal' ? 'heal' : info.type === 'guard' ? 'guard' : 'move'; note('use:' + who + ':' + clip); SC.choreograph(api, who, a.spId, info.abil, info); return a.play(clip); }
       const mv = SC.SHOWCASE_IDS.indexOf(a.spId) >= 0 && A.Showcase && A.Showcase.moves && A.Showcase.moves[info.abil];
       const ult = mv && mv.ult === false ? !!info.boss : !!(info.special || info.boss), clip = mv && mv.clip ? mv.clip : ult ? 'special' : 'attack', F = ELFX[el] || ELFX.light;

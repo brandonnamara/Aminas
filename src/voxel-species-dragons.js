@@ -6,39 +6,58 @@
   // Dragon body plan. P: palette and proportions. heads: 1..3 (Aimza).
   function dragon(m, k, P) {
     const S = (v) => v * k, lo = P.leg || 6;
+    V.rigStart(m, 'dragon');   // Phase 8B: body, four legs, one to three heads (each with a jaw), wings, tail
     m.capsule([S(-5), S(lo + 2.2), 0], [S(3), S(lo + 3.6), 0], S(P.girth || 3.6), S((P.girth || 3.6) + 0.3), P.body);
     if (P.belly) m.ellipsoid(S(0), S(lo + 1), 0, S(6.5), S(2.4), S(3), P.belly, 'paint');
     K.sym((sd) => {
       // hind legs: thick haunches; fore legs thinner
-      m.ellipsoid(S(-4.5), S(lo + 1.5), sd * S(2.8), S(3), S(3.2), S(1.8), P.body);
-      m.capsule([S(-4), S(lo), sd * S(3.2)], [S(-2.5), S(1.2), sd * S(3.4)], S(1.9), S(1.4), P.leg1 || P.body);
-      m.capsule([S(3), S(lo + 2), sd * S(2.6)], [S(4), S(1.2), sd * S(3)], S(1.4), S(1.2), P.leg1 || P.body);
-      [[S(-2.2), S(3.4)], [S(4.2), S(3)]].forEach(([x, z]) => { m.ellipsoid(x + S(0.4), S(0.9), sd * z, S(1.6), S(0.9), S(1.4), P.leg1 || P.body); K.toes(m, Math.round(x + S(1.8)), 0, Math.round(sd * z), 3, P.claw || '#f0e8d8'); });
+      const s = sd > 0 ? 'L' : 'R';
+      V.joint(m, 'legB' + s, [S(-4.5), S(lo + 1.5), sd * S(2.8)], null); V.joint(m, 'legF' + s, [S(3), S(lo + 1.5), sd * S(2.6)], null);
+      V.inPart(m, 'legB' + s, () => { m.ellipsoid(S(-4.5), S(lo + 1.5), sd * S(2.8), S(3), S(3.2), S(1.8), P.body); m.capsule([S(-4), S(lo), sd * S(3.2)], [S(-2.5), S(1.2), sd * S(3.4)], S(1.9), S(1.4), P.leg1 || P.body); });
+      V.inPart(m, 'legF' + s, () => m.capsule([S(3), S(lo + 2), sd * S(2.6)], [S(4), S(1.2), sd * S(3)], S(1.4), S(1.2), P.leg1 || P.body));
+      [[S(-2.2), S(3.4), 'legB'], [S(4.2), S(3), 'legF']].forEach(([x, z, n]) => V.inPart(m, n + s, () => { m.ellipsoid(x + S(0.4), S(0.9), sd * z, S(1.6), S(0.9), S(1.4), P.leg1 || P.body); K.toes(m, Math.round(x + S(1.8)), 0, Math.round(sd * z), 3, P.claw || '#f0e8d8'); }));
     });
     // necks and heads
     const heads = P.heads || 1, out = [];
     for (let h = 0; h < heads; h++) {
       const zo = heads === 1 ? 0 : (h - (heads - 1) / 2) * S(4.2), lift = heads === 3 && h === 1 ? S(1.5) : 0;
       const n0 = [S(3), S(lo + 4), zo * 0.4], n1 = [S(5.5), S(lo + 6 + (P.neck || 3) * 0.6) + lift, zo * 0.8], n2 = [S(7), S(lo + 7 + (P.neck || 3)) + lift, zo];
-      m.capsule(n0, n1, S(2.4), S(2), P.neckCol || P.body); m.capsule(n1, n2, S(2), S(1.8), P.neckCol || P.body);
-      if (P.belly) m.capsule([n0[0] + S(1.2), n0[1], n0[2]], [n2[0] + S(0.8), n2[1] - S(0.6), n2[2]], S(1.3), S(1.1), P.belly, 'paint');
+      const hn = h ? 'head' + (h + 1) : 'head', jn = h ? 'jaw' + (h + 1) : 'jaw', mn = h ? 'mouth' + (h + 1) : 'mouth';
       const fy = ((P.faceYaw == null ? 22 : P.faceYaw) + (heads > 1 ? (zo > 0 ? 12 : zo < 0 ? -8 : 0) : 0)) * Math.PI / 180, fd = [Math.cos(fy), -0.12, Math.sin(fy)];
       const hc = [n2[0] + S(1), n2[1] + S(1), n2[2]], hr = S(P.head || 2.6);
-      m.ellipsoid(hc[0], hc[1], hc[2], hr, hr * 0.9, hr * 0.9, P.headCol || P.body);
       const snout = K.add(hc, fd, hr * (P.snoutLen || 1.5));
-      m.capsule(hc, snout, hr * 0.75, hr * 0.5, P.snoutCol || P.headCol || P.body);
-      if (P.jaw) m.capsule([hc[0], hc[1] - hr * 0.55, hc[2]], [snout[0] - S(0.3), snout[1] - hr * 0.55, snout[2]], hr * 0.45, hr * 0.32, P.jaw);
-      if (P.teeth) { const t = K.add([snout[0], snout[1] - hr * 0.4, snout[2]], fd, -S(0.8)); m.set(t[0], t[1], t[2] + 1, P.teeth); m.set(t[0] - 1, t[1], t[2] - 1, P.teeth); }
-      if (P.horn) K.sym((sd) => K.tuft(m, [hc[0] - hr * 0.3, hc[1] + hr * 0.6, hc[2] + sd * hr * 0.55], [-1, 0.75, sd * 0.3], S(P.hornLen || 3.4), S(0.9), P.horn));
-      if (P.crest) for (let i = 0; i < (P.crestN || 4); i++) K.tuft(m, [hc[0] - hr * 0.6 - i * S(0.7), hc[1] + hr * 0.5 - i * S(0.6), hc[2]], [-1, 0.6, 0], S(2.6) - i * 0.3, S(0.8), typeof P.crest === 'function' ? P.crest(i) : P.crest);
-      K.eyes(m, hc, { yaw: fy * 180 / Math.PI, ang: 42, el: 18, size: P.eyeSize || 1, tall: 1, iris: P.eye, white: P.eyeWhite, pupil: '#120808', lid: P.lid });
+      V.joint(m, hn, n0, null);
+      V.inPart(m, hn, () => {
+        m.capsule(n0, n1, S(2.4), S(2), P.neckCol || P.body); m.capsule(n1, n2, S(2), S(1.8), P.neckCol || P.body);
+        if (P.belly) m.capsule([n0[0] + S(1.2), n0[1], n0[2]], [n2[0] + S(0.8), n2[1] - S(0.6), n2[2]], S(1.3), S(1.1), P.belly, 'paint');
+        m.ellipsoid(hc[0], hc[1], hc[2], hr, hr * 0.9, hr * 0.9, P.headCol || P.body);
+        m.capsule(hc, snout, hr * 0.75, hr * 0.5, P.snoutCol || P.headCol || P.body);
+      });
+      if (P.jaw) {
+        V.joint(m, jn, [hc[0], hc[1] - hr * 0.5, hc[2]], hn);
+        V.inPart(m, jn, () => {
+          m.capsule([hc[0], hc[1] - hr * 0.55, hc[2]], [snout[0] - S(0.3), snout[1] - hr * 0.55, snout[2]], hr * 0.45, hr * 0.32, P.jaw);
+          if (P.teeth) { const t = K.add([snout[0], snout[1] - hr * 0.4, snout[2]], fd, -S(0.8)); m.set(t[0], t[1], t[2] + 1, P.teeth); m.set(t[0] - 1, t[1], t[2] - 1, P.teeth); }
+        }, true);
+      } else {
+        if (P.teeth) V.inPart(m, hn, () => { const t = K.add([snout[0], snout[1] - hr * 0.4, snout[2]], fd, -S(0.8)); m.set(t[0], t[1], t[2] + 1, P.teeth); m.set(t[0] - 1, t[1], t[2] - 1, P.teeth); });
+        V.jaw(m, hn, jn, [hc[0], hc[1] - hr * 0.35, hc[2]], (x, y, z) => { const t = (x - hc[0]) * fd[0] + (z - hc[2]) * fd[2]; return t > hr * 0.5 && y < hc[1] - hr * 0.2 - t * 0.14 && Math.abs((z - hc[2]) * fd[0] - (x - hc[0]) * fd[2]) < hr * 0.85; });
+      }
+      V.inPart(m, hn, () => {
+        if (P.horn) K.sym((sd) => K.tuft(m, [hc[0] - hr * 0.3, hc[1] + hr * 0.6, hc[2] + sd * hr * 0.55], [-1, 0.75, sd * 0.3], S(P.hornLen || 3.4), S(0.9), P.horn));
+        if (P.crest) for (let i = 0; i < (P.crestN || 4); i++) K.tuft(m, [hc[0] - hr * 0.6 - i * S(0.7), hc[1] + hr * 0.5 - i * S(0.6), hc[2]], [-1, 0.6, 0], S(2.6) - i * 0.3, S(0.8), typeof P.crest === 'function' ? P.crest(i) : P.crest);
+        K.eyes(m, hc, { yaw: fy * 180 / Math.PI, ang: 42, el: 18, size: P.eyeSize || 1, tall: 1, iris: P.eye, white: P.eyeWhite, pupil: '#120808', lid: P.lid });
+      });
+      V.emit(m, mn, snout, hn);
       out.push({ hc, hr, snout });
     }
     // spine spikes
-    if (P.spikes) for (let i = 0; i < 6; i++) K.tuft(m, [S(3 - i * 2), S(lo + 5.6 - i * 0.3), 0], [-0.6, 1, 0], S(1.8), S(0.8), P.spikes);
+    if (P.spikes) V.inPart(m, 'core', () => { for (let i = 0; i < 6; i++) K.tuft(m, [S(3 - i * 2), S(lo + 5.6 - i * 0.3), 0], [-0.6, 1, 0], S(1.8), S(0.8), P.spikes); });
     // tail: tapering chain sweeping back, down and up
     const tp = [[S(-7.5), S(lo + 2), 0], [S(-11), S(lo + 0.5), S(1.5)], [S(-14.5), S(lo), S(2.5)], [S(-17.5), S(lo + 1.5), S(2)], [S(-19.5), S(lo + 3.5), S(0.5)]].slice(0, P.tailN || 5);
-    for (let i = 0; i < tp.length - 1; i++) m.capsule(tp[i], tp[i + 1], S(2.2) * (1 - i * 0.2), S(2.2) * (1 - (i + 1) * 0.2), P.tailCol || P.body);
+    V.joint(m, 'tail', [S(-6), S(lo + 2.2), 0], null);
+    V.inPart(m, 'tail', () => { for (let i = 0; i < tp.length - 1; i++) m.capsule(tp[i], tp[i + 1], S(2.2) * (1 - i * 0.2), S(2.2) * (1 - (i + 1) * 0.2), P.tailCol || P.body); });
+    m.part = null;
     const shoulder = [S(1), S(lo + 5.2), S(1.8)];
     return { S, lo, heads: out, tailTip: tp[tp.length - 1], shoulder };
   }
@@ -85,13 +104,19 @@
     if (stage === 1) {
       // coiled serpent rising in an S from a ground coil
       const pts = []; for (let i = 0; i <= 26; i++) { const t = i / 26; const a = t * Math.PI * 3.2; const r = 7 - t * 4; pts.push([Math.cos(a) * r * (t < 0.45 ? 1 : 0.6) + (t > 0.45 ? (t - 0.45) * 10 : 0), 2 + t * 17 + Math.max(0, t - 0.6) * 4, Math.sin(a) * r * (t < 0.45 ? 1 : 0.5)]); }
-      for (let i = 0; i < pts.length - 1; i++) m.capsule(pts[i], pts[i + 1], 2.6 - i * 0.04, 2.6 - (i + 1) * 0.04, body);
+      V.rigStart(m, 'serpent');   // Phase 8B: the ground coil stays, the rising body sways, the head looks about
+      V.joint(m, 'neck', pts[11], null);
+      for (let i = 0; i < pts.length - 1; i++) V.inPart(m, i < 11 ? 'core' : 'neck', () => m.capsule(pts[i], pts[i + 1], 2.6 - i * 0.04, 2.6 - (i + 1) * 0.04, body));
       K.recolour(m, (x, y, z) => !m.has(x, y - 1, z) && y > 3, () => W);
       const hc = K.add(pts[pts.length - 1], [1.5, 0.5, 0], 1);
-      m.ellipsoid(hc[0], hc[1], hc[2], 2.6, 2.2, 2.2, SEG[1]); m.capsule(hc, [hc[0] + 4.5, hc[1] - 0.8, hc[2] + 1], 1.8, 1.2, SEG[0]); m.capsule([hc[0], hc[1] - 1.5, hc[2]], [hc[0] + 3.8, hc[1] - 2, hc[2] + 1], 1, 0.7, W);
-      K.eyes(m, hc, { yaw: 22, ang: 45, el: 20, size: 1, iris: '#ff3a5a' });
-      coralFan(m, [hc[0] - 2, hc[1] + 1.5, 0], [-0.8, 1, 0], 6, 5, 1);
-      for (let i = 14; i < 24; i += 2) coralFan(m, K.add(pts[i], [-1.5, 1.8, 0], 1), [-1, 0.6, 0], 2, 3.5, i);
+      V.joint(m, 'head', pts[pts.length - 2], 'neck');
+      V.inPart(m, 'head', () => { m.ellipsoid(hc[0], hc[1], hc[2], 2.6, 2.2, 2.2, SEG[1]); m.capsule(hc, [hc[0] + 4.5, hc[1] - 0.8, hc[2] + 1], 1.8, 1.2, SEG[0]); });
+      V.joint(m, 'jaw', [hc[0], hc[1] - 1.4, hc[2]], 'head');
+      V.inPart(m, 'jaw', () => m.capsule([hc[0], hc[1] - 1.5, hc[2]], [hc[0] + 3.8, hc[1] - 2, hc[2] + 1], 1, 0.7, W), true);
+      V.emit(m, 'mouth', [hc[0] + 4.8, hc[1] - 1.2, hc[2] + 1], 'head');
+      V.inPart(m, 'head', () => { K.eyes(m, hc, { yaw: 22, ang: 45, el: 20, size: 1, iris: '#ff3a5a' }); coralFan(m, [hc[0] - 2, hc[1] + 1.5, 0], [-0.8, 1, 0], 6, 5, 1); });
+      V.inPart(m, 'neck', () => { for (let i = 14; i < 24; i += 2) coralFan(m, K.add(pts[i], [-1.5, 1.8, 0], 1), [-1, 0.6, 0], 2, 3.5, i); });
+      m.part = null;
       return m;
     }
     const k = stage === 2 ? 1.1 : 1.4;
@@ -101,7 +126,7 @@
     for (let i = 0; i < 5; i++) coralFan(m, [S(3 - i * 2.4), S(g.lo + 5.5), 0], [-1, 0.8, 0], 2, S(3), 10 + i);
     if (stage === 3) {
       // water ribbons swirling around the body
-      for (let r = 0; r < 2; r++) { let prev = null; for (let i = 0; i <= 24; i++) { const a = i / 24 * Math.PI * 2 + r * 2, p = [Math.cos(a) * S(9), S(6 + r * 4) + Math.sin(a * 2) * S(1.5), Math.sin(a) * S(7)]; if (prev) m.capsule(prev, p, 0.7, 0.7, { c: r ? '#52c3ff' : '#9ff0ff', g: 0.5 }, 'under'); prev = p; } }
+      V.inPart(m, 'aura', () => { for (let r = 0; r < 2; r++) { let prev = null; for (let i = 0; i <= 24; i++) { const a = i / 24 * Math.PI * 2 + r * 2, p = [Math.cos(a) * S(9), S(6 + r * 4) + Math.sin(a * 2) * S(1.5), Math.sin(a) * S(7)]; if (prev) m.capsule(prev, p, 0.7, 0.7, { c: r ? '#52c3ff' : '#9ff0ff', g: 0.5 }, 'under'); prev = p; } } });
       K.sym((sd) => coralFan(m, [S(-1), S(g.lo + 4.5), sd * S(3)], [-0.6, 0.8, sd * 1.2], 3, S(4), 20));
     }
     return m;
@@ -127,22 +152,30 @@
     const m = new V.Model(), k = [0.85, 1.1, 1.4][stage - 1], S = (v) => v * k;
     const RD = ['#c41010', '#e02a10', '#9a0c0c'], OR = '#ff8000', YL = '#ffe600', BR = '#8b4513';
     const body = K.cellsOf(RD, 1.8, 3), lo = stage === 1 ? 2 : 3;
+    V.rigStart(m, 'bird');   // Phase 8B: body, head (beak, crest), legs, wings, tail plumes
     // body, chest and head
     m.ellipsoid(0, S(lo + 4), 0, S(stage === 1 ? 4.6 : 4), S(stage === 1 ? 4.4 : 4.6), S(stage === 1 ? 4.2 : 3.4), body);
     m.ellipsoid(S(1.6), S(lo + 3.5), 0, S(2.4), S(3.2), S(2.6), K.cellsOf([OR, YL], 1.4, 4), 'paint');
+    m.part = null;
     const hc = [S(stage === 1 ? 2.5 : 3), S(lo + (stage === 1 ? 8.5 : 9.5)), 0];
-    m.ellipsoid(hc[0], hc[1], hc[2], S(2.8), S(2.6), S(2.6), body);
-    m.capsule([hc[0] + S(2), hc[1] - S(0.3), 0], [hc[0] + S(4), hc[1] - S(1.4), S(0.8)], S(1), S(0.5), '#d8a020');
-    K.eyes(m, hc, { yaw: 25, ang: 42, el: 12, size: 1, iris: '#ff2020', white: '#ffffff' });
-    // crest flames on the head
-    K.mane(m, [hc[0] - S(1), hc[1] + S(2), 0], [-0.6, 1, 0], S(3) + stage, S(1), [RD[0], OR, YL], 3, 3, 1);
+    V.joint(m, 'head', [hc[0] - S(0.8), hc[1] - S(2.4), 0], null);
+    V.inPart(m, 'head', () => {
+      m.ellipsoid(hc[0], hc[1], hc[2], S(2.8), S(2.6), S(2.6), body);
+      m.capsule([hc[0] + S(2), hc[1] - S(0.3), 0], [hc[0] + S(4), hc[1] - S(1.4), S(0.8)], S(1), S(0.5), '#d8a020');
+      K.eyes(m, hc, { yaw: 25, ang: 42, el: 12, size: 1, iris: '#ff2020', white: '#ffffff' });
+      // crest flames on the head
+      K.mane(m, [hc[0] - S(1), hc[1] + S(2), 0], [-0.6, 1, 0], S(3) + stage, S(1), [RD[0], OR, YL], 3, 3, 1);
+    });
+    V.emit(m, 'mouth', [hc[0] + S(4.2), hc[1] - S(1.4), S(0.8)], 'head');
     // legs
-    K.sym((sd) => { m.capsule([0, S(lo + 1), sd * S(1.6)], [S(0.5), 0, sd * S(1.8)], S(0.8), S(0.7), BR); K.toes(m, Math.round(S(1)), 0, Math.round(sd * S(1.8)), 3, '#d8a020', 2); });
+    K.sym((sd) => { const n = sd > 0 ? 'legL' : 'legR'; V.joint(m, n, [0, S(lo + 1), sd * S(1.6)], null); V.inPart(m, n, () => { m.capsule([0, S(lo + 1), sd * S(1.6)], [S(0.5), 0, sd * S(1.8)], S(0.8), S(0.7), BR); K.toes(m, Math.round(S(1)), 0, Math.round(sd * S(1.8)), 3, '#d8a020', 2); }); });
     // wings raised (stage 1: small stubs)
     K.sym((sd) => K.wing(m, [S(-0.5), S(lo + 6), sd * S(2.6)], sd, S(stage === 1 ? 5 : stage === 2 ? 10 : 14), { cols: [YL, OR, RD[0], RD[2]], up: 1.6, back: 0.3, droop: 0.7, sweep: 0.6, featherLen: 0.75, feathers: stage === 1 ? 4 : 6 + stage, bone: 1, boneCol: RD[0], glowTips: stage === 3 ? YL : null }));
     // tail plumes
-    for (let i = -1; i <= 1; i++) K.flame(m, [S(-3.5), S(lo + 2.5), i * S(1)], [-1, -0.2 + (stage - 1) * 0.15, i * 0.5], S(4 + stage * 1.5), S(1.1), [RD[0], OR, YL], 40 + i);
+    V.joint(m, 'tail', [S(-2.8), S(lo + 2.6), 0], null);
+    V.inPart(m, 'tail', () => { for (let i = -1; i <= 1; i++) K.flame(m, [S(-3.5), S(lo + 2.5), i * S(1)], [-1, -0.2 + (stage - 1) * 0.15, i * 0.5], S(4 + stage * 1.5), S(1.1), [RD[0], OR, YL], 40 + i); });
     if (stage === 3) K.recolour(m, (x, y, z, v) => v.c === RD[1] && V.hash(x, y, z, 2) < 0.2, () => K.glow(OR, 0.5));
+    m.part = null;
     return m;
   });
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -6,26 +6,40 @@
 
   function quad(m, k, P) {
     const S = (v) => v * k, leg = P.leg || 8, lo = leg; // body height above ground
+    V.rigStart(m, 'quad');   // Phase 8B: parts are tagged as they are drawn (body, four legs, head, jaw, tail)
     m.capsule([S(-6), S(lo + 1.5), 0], [S(4), S(lo + 2.5), 0], S(P.girth || 4), S((P.girth || 4) + 0.3), P.body);
     if (P.belly) m.ellipsoid(S(-0.5), S(lo + 0.4), 0, S(6), S(2), S(2.8), P.belly, 'paint');
     K.sym((sd) => [[S(3.4), 'f'], [S(-5.6), 'b']].forEach(([x, w]) => {
-      const z = sd * S(P.stance || 2.8);
-      m.capsule([x, S(lo + 1.5), z], [x + (w === 'b' ? -S(0.6) : S(0.3)), S(leg * 0.45), z], S(P.thigh || 1.9), S(1.5), P.leg1 || P.body);
-      m.capsule([x + (w === 'b' ? -S(0.6) : S(0.3)), S(leg * 0.45), z], [x, S(1), z], S(1.5), S(1.3), P.leg2 || P.leg1 || P.body);
-      m.ellipsoid(x + S(0.5), S(0.9), z, S(1.8), S(1), S(1.5), P.paw || P.leg2 || P.body);
-      if (P.claw) K.toes(m, Math.round(x + S(2)), 0, Math.round(z), 3, P.claw);
+      const z = sd * S(P.stance || 2.8), name = 'leg' + (w === 'f' ? 'F' : 'B') + (sd > 0 ? 'L' : 'R');
+      V.joint(m, name, [x, S(lo + 0.5), z], null);
+      V.inPart(m, name, () => {
+        m.capsule([x, S(lo + 1.5), z], [x + (w === 'b' ? -S(0.6) : S(0.3)), S(leg * 0.45), z], S(P.thigh || 1.9), S(1.5), P.leg1 || P.body);
+        m.capsule([x + (w === 'b' ? -S(0.6) : S(0.3)), S(leg * 0.45), z], [x, S(1), z], S(1.5), S(1.3), P.leg2 || P.leg1 || P.body);
+        m.ellipsoid(x + S(0.5), S(0.9), z, S(1.8), S(1), S(1.5), P.paw || P.leg2 || P.body);
+        if (P.claw) K.toes(m, Math.round(x + S(2)), 0, Math.round(z), 3, P.claw);
+      });
     }));
     const fy = (P.faceYaw == null ? 30 : P.faceYaw) * Math.PI / 180, fd = [Math.cos(fy), 0, Math.sin(fy)], sv = [-Math.sin(fy), 0, Math.cos(fy)];
     const neckTop = [S(6.5), S(lo + 6 + (P.neck || 0)), 0];
-    m.capsule([S(3.5), S(lo + 3), 0], neckTop, S(2.8), S(2.4), P.neckCol || P.body);
     const hc = [neckTop[0] + S(1.2), neckTop[1] + S(1.2), 0], hr = S(P.head || 3.4);
     const at = (d, up, side) => [hc[0] + fd[0] * d + sv[0] * side, hc[1] + up, hc[2] + fd[2] * d + sv[2] * side];
-    m.ellipsoid(hc[0], hc[1], hc[2], hr, hr * 0.92, hr * 0.95, P.headCol || P.body);
-    const sn = at(hr * 0.95, -hr * 0.35, 0); m.capsule(at(0, -hr * 0.2, 0), sn, hr * 0.62, hr * (P.snout || 0.45), P.muzzle || P.headCol || P.body);
-    const ns = K.surface(m, at(0, -hr * 0.3, 0), fy * 180 / Math.PI, 0, 20); if (ns) m.set(ns[0], ns[1], ns[2], P.nose || '#2a2228');
+    const sn = at(hr * 0.95, -hr * 0.35, 0);
+    V.joint(m, 'head', [S(3.5), S(lo + 3), 0], null);
+    V.inPart(m, 'head', () => {
+      m.capsule([S(3.5), S(lo + 3), 0], neckTop, S(2.8), S(2.4), P.neckCol || P.body);
+      m.ellipsoid(hc[0], hc[1], hc[2], hr, hr * 0.92, hr * 0.95, P.headCol || P.body);
+      m.capsule(at(0, -hr * 0.2, 0), sn, hr * 0.62, hr * (P.snout || 0.45), P.muzzle || P.headCol || P.body);
+      const ns = K.surface(m, at(0, -hr * 0.3, 0), fy * 180 / Math.PI, 0, 20); if (ns) m.set(ns[0], ns[1], ns[2], P.nose || '#2a2228');
+    });
+    // the jaw: the lower half of the snout, hinged under the eyes
+    const ax0 = hc[1] - hr * 0.2;
+    V.jaw(m, 'head', 'jaw', [hc[0] + fd[0] * hr * 0.1, hc[1] - hr * 0.42, hc[2] + fd[2] * hr * 0.1], (x, y, z) => { const t = (x - hc[0]) * fd[0] + (z - hc[2]) * fd[2]; return t > hr * 0.42 && y < ax0 - (t / (hr * 0.95)) * hr * 0.15 - 0.4; });
+    V.emit(m, 'mouth', sn, 'head');
     // tail
     const tb = [S(-9.5), S(lo + 2.5), 0], tt = [S(-12.5), S(lo + 2.5 + (P.tailUp == null ? 4 : P.tailUp)), 0];
-    if (P.tail !== false) m.capsule(tb, tt, S(1.3), S(0.8), P.tailCol || P.body);
+    V.joint(m, 'tail', [S(-7.5), S(lo + 2.5), 0], null);
+    if (P.tail !== false) V.inPart(m, 'tail', () => m.capsule(tb, tt, S(1.3), S(0.8), P.tailCol || P.body));
+    m.part = null;
     return { S, hc, hr, at, fy: fy * 180 / Math.PI, tailTip: tt, lo, neckTop };
   }
   const eyes = (m, g, o) => K.eyes(m, [g.hc[0], g.hc[1], g.hc[2]], Object.assign({ yaw: g.fy, ang: 34, el: 14, size: 2, tall: 2, white: '#ffffff', pupil: '#0b0f1e' }, o));

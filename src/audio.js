@@ -202,6 +202,90 @@
       defeat: (X, t) => { osc(X, t, 0.8, 'sawtooth', 800, 80, 0.06, { lp: 1800 }); for (let i = 0; i < 5; i++) osc(X, t + 0.5 + i * 0.05, 0.04, 'square', 300 - i * 40, null, 0.04, { lp: 1500 }); },
     },
   };
+  /* Phase 8B: a voice for every other line, built from a recipe: base pitch, timbre, warble or growl, chirp shape and
+     an element layer (crackle, bubbles, rustle, stone, wind, whisper, chimes, metal). Later forms are deeper, and the
+     third form adds a body tone under its calls. Same bus, limits and settings as the Phase 8 voices. */
+  const EL = {
+    fire: { hit: (X, t, k) => { for (let i = 0; i < 4; i++) nz(X, t + i * 0.025 + r(0, 0.02), 0.05, 0.07 * k, 'bandpass', r(2200, 4800), null, 1.4); nz(X, t, 0.22, 0.09 * k, 'lowpass', 700, 2600); },
+      burst: (X, t, k) => { nz(X, t, 0.55, 0.13 * k, 'bandpass', 600, 3200, 0.7); for (let i = 0; i < 7; i++) nz(X, t + 0.05 + i * 0.05 + r(0, 0.03), 0.04, 0.06 * k, 'highpass', 3000); },
+      amb: (X, t, k) => { for (let i = 0; i < 3; i++) nz(X, t + i * 0.07 + r(0, 0.04), 0.04, 0.035 * k, 'bandpass', r(2500, 4500), null, 1.6); } },
+    water: { hit: (X, t, k) => { nz(X, t, 0.25, 0.11 * k, 'bandpass', 1400, 500, 0.9); for (let i = 0; i < 4; i++) osc(X, t + i * 0.04, 0.05, 'sine', r(380, 600), r(900, 1300), 0.05 * k); },
+      burst: (X, t, k) => { nz(X, t, 0.7, 0.13 * k, 'lowpass', 300, 1800); for (let i = 0; i < 8; i++) osc(X, t + 0.06 + i * 0.045 + r(0, 0.02), 0.05, 'sine', r(400, 650), r(950, 1400), 0.05 * k); },
+      amb: (X, t, k) => { for (let i = 0; i < 3; i++) osc(X, t + i * 0.09 + r(0, 0.05), 0.05, 'sine', r(500, 700), r(1000, 1300), 0.03 * k); } },
+    nature: { hit: (X, t, k) => { nz(X, t, 0.14, 0.1 * k, 'bandpass', 4200, 2400, 1.1); osc(X, t, 0.12, 'sine', 300, 170, 0.09 * k); },
+      burst: (X, t, k) => { for (let i = 0; i < 5; i++) nz(X, t + i * 0.06, 0.12, 0.07 * k, 'bandpass', r(2600, 5200), null, 1.2); osc(X, t + 0.02, 0.4, 'triangle', 180, 120, 0.08 * k, { lp: 900 }); },
+      amb: (X, t, k) => nz(X, t, 0.3, 0.03 * k, 'bandpass', 4600, 3000, 1) },
+    earth: { hit: (X, t, k) => { nz(X, t, 0.12, 0.13 * k, 'bandpass', 700, 380, 1.6); osc(X, t, 0.2, 'sine', 110, 50, 0.14 * k, { attack: 0.004 }); },
+      burst: (X, t, k) => { osc(X, t, 0.7, 'sine', 70, 38, 0.16 * k, { attack: 0.01 }); nz(X, t, 0.7, 0.11 * k, 'lowpass', 600, 180); for (let i = 0; i < 4; i++) nz(X, t + 0.1 + i * 0.08, 0.08, 0.08 * k, 'bandpass', r(500, 900), null, 2); },
+      amb: (X, t, k) => osc(X, t, 0.4, 'sine', 62, 52, 0.04 * k, { attack: 0.1 }) },
+    wind: { hit: (X, t, k) => { nz(X, t, 0.22, 0.11 * k, 'bandpass', 900, 3400, 0.8); },
+      burst: (X, t, k) => { nz(X, t, 0.7, 0.13 * k, 'bandpass', 500, 3200, 0.7); osc(X, t + 0.1, 0.5, 'sine', 1400, 2100, 0.03 * k, { vib: [6, 30] }); },
+      amb: (X, t, k) => nz(X, t, 0.45, 0.03 * k, 'bandpass', 700, 1600, 0.9) },
+    dark: { hit: (X, t, k) => { nz(X, t, 0.12, 0.1 * k, 'highpass', 2200); osc(X, t, 0.2, 'sine', 260, 90, 0.11 * k); },
+      burst: (X, t, k) => { nz(X, t, 0.7, 0.12 * k, 'lowpass', 3000, 240); osc(X, t, 0.7, 'sine', 110, 62, 0.11 * k, { attack: 0.08, vib: [5, 4] }); },
+      amb: (X, t, k) => nz(X, t, 0.3, 0.03 * k, 'highpass', 5200) },
+    light: { hit: (X, t, k) => { osc(X, t, 0.3, 'triangle', 1568, null, 0.07 * k, { echo: true }); osc(X, t + 0.03, 0.3, 'sine', 2093, null, 0.05 * k, { echo: true }); },
+      burst: (X, t, k) => { [1047, 1319, 1568, 2093].forEach((f, i) => osc(X, t + i * 0.05, 0.4, 'triangle', f, null, 0.05 * k, { echo: true })); nz(X, t, 0.4, 0.05 * k, 'highpass', 6000); },
+      amb: (X, t, k) => osc(X, t, 0.4, 'sine', 1760, null, 0.025 * k, { echo: true }) },
+    metal: { hit: (X, t, k) => { nz(X, t, 0.06, 0.09 * k, 'bandpass', 3200, null, 3); [1780, 2630, 3410].forEach((f) => osc(X, t, 0.35, 'sine', f, null, 0.035 * k)); },
+      burst: (X, t, k) => { for (let i = 0; i < 6; i++) osc(X, t + i * 0.04, 0.05, 'square', r(800, 2400), null, 0.035 * k, { lp: 3600 }); osc(X, t, 0.5, 'sawtooth', 220, 880, 0.05 * k, { lp: 2400 }); nz(X, t + 0.3, 0.12, 0.08 * k, 'bandpass', 3000, null, 3); },
+      amb: (X, t, k) => osc(X, t, 0.06, 'square', r(1400, 2000), null, 0.025 * k, { lp: 3000 }) },
+  };
+  // line recipes: base pitch (Hz), timbre, filter, warble [rate, depth], growl am [rate, depth], call shape, element(s), weight 0..1
+  const RECIPE = {
+    lumifern: { base: 640, wave: 'sine', vib: [6, 16], shape: 'up', el: ['light', 'nature'], w: 0.1 },
+    umbrit: { base: 560, wave: 'triangle', lp: 1400, am: [24, 0.45], shape: 'up', el: ['dark'], w: 0.25 },
+    cannonis: { base: 92, wave: 'sawtooth', lp: 280, am: [7, 0.5], shape: 'down', el: ['water', 'earth'], w: 0.9, boom: 1 },
+    kairyu: { base: 500, wave: 'triangle', lp: 2400, vib: [12, 30], shape: 'wobble', el: ['water'], w: 0.3 },
+    aquaflora: { base: 300, wave: 'sine', vib: [4, 22], shape: 'song', el: ['water'], w: 0.3, echo: 1 },
+    gaiaroki: { base: 150, wave: 'sawtooth', lp: 650, am: [11, 0.5], shape: 'down', el: ['earth', 'nature'], w: 0.7 },
+    pyrocell: { base: 95, wave: 'sawtooth', lp: 420, am: [8, 0.6], shape: 'down', el: ['earth', 'fire'], w: 0.95 },
+    acinus: { base: 210, wave: 'triangle', lp: 1100, vib: [5, 8], shape: 'down', el: ['nature'], w: 0.6 },
+    sylvaneer: { base: 360, wave: 'sine', vib: [5, 20], shape: 'bugle', el: ['nature'], w: 0.45 },
+    terraflora: { base: 165, wave: 'triangle', lp: 900, am: [4, 0.35], shape: 'song', el: ['nature'], w: 0.5 },
+    emberix: { base: 580, wave: 'triangle', lp: 2600, shape: 'up', el: ['fire', 'light'], w: 0.3 },
+    pyrokai: { base: 470, wave: 'square', lp: 1700, am: [18, 0.4], shape: 'wobble', el: ['fire'], w: 0.35 },
+    igniflare: { base: 230, wave: 'sawtooth', lp: 950, am: [13, 0.45], shape: 'down', el: ['fire'], w: 0.5, roar: 1 },
+    pyrospark: { base: 1150, wave: 'sine', vib: [14, 40], shape: 'tweet', el: ['fire'], w: 0.15 },
+    zephyr: { base: 760, wave: 'sine', vib: [7, 28], shape: 'cry', el: ['wind'], w: 0.35 },
+    voltar: { base: 620, wave: 'square', lp: 2200, am: [16, 0.55], shape: 'giggle', el: ['dark'], w: 0.25, bells: 1 },
+    zeep: { base: 820, wave: 'square', lp: 3000, shape: 'beep', el: ['metal'], w: 0.5 },
+    lumi: { base: 920, wave: 'sine', vib: [5, 18], shape: 'song', el: ['light'], w: 0.1, echo: 1 },
+    meta: { base: 540, wave: 'triangle', shape: 'chatter', el: ['metal', 'light'], w: 0.35 },
+    atem: { base: 165, wave: 'sawtooth', lp: 720, am: [30, 0.25], shape: 'servo', el: ['metal'], w: 0.65, blade: 1 },
+  };
+  function makeVoice(R0, stage) {
+    const P = Object.assign({}, R0), k = [1, 0.84, 0.7][stage - 1], f = P.base * k, big = stage === 3, E = EL[P.el[0]], E2 = EL[P.el[1] || P.el[0]];
+    const o = (extra) => Object.assign({ lp: P.lp, vib: P.vib, am: P.am, echo: !!P.echo }, extra || {});
+    // one call in the line's own shape: dur, start/end pitch multipliers, volume
+    const call = (X, t, dur, a, b, vol, x) => {
+      const v = vol * (P.wave === 'sawtooth' || P.wave === 'square' ? 0.7 : 1);
+      if (P.shape === 'beep') { for (let i = 0; i < Math.max(2, Math.round(dur / 0.07)); i++) osc(X, t + i * 0.07, 0.05, 'square', f * (a + (b - a) * (i % 3) / 2) * (1 + (i % 2) * 0.25), null, v * 0.7, { lp: 3000 }); return; }
+      if (P.shape === 'chatter') { for (let i = 0; i < Math.max(3, Math.round(dur / 0.05)); i++) osc(X, t + i * 0.05, 0.04, i % 2 ? 'square' : 'triangle', f * (a + (b - a) * i / Math.max(1, dur / 0.05)) * (1 + r(-0.12, 0.12)), null, v * 0.6, { lp: 2800 }); return; }
+      if (P.shape === 'giggle') { for (let i = 0; i < Math.max(3, Math.round(dur / 0.06)); i++) osc(X, t + i * 0.06, 0.05, 'square', f * (a + (b - a) * i / Math.max(1, dur / 0.06)) * (1 + (i % 2) * 0.18), null, v * 0.6, { lp: 2400 }); return; }
+      if (P.shape === 'tweet') { for (let i = 0; i < Math.max(2, Math.round(dur / 0.08)); i++) osc(X, t + i * 0.08, 0.06, 'sine', f * a * (1 + i * 0.06), f * b * (1.3 + i * 0.06), v, { slideAt: 0.7 }); return; }
+      if (P.shape === 'servo') { osc(X, t, dur, 'sawtooth', f * a, f * b, v * 0.8, o({ attack: 0.03 })); osc(X, t, dur, 'square', f * a * 4, f * b * 4, v * 0.15, { lp: 1800 }); return; }
+      const shp = { up: [a, b * 1.25], down: [a * 1.1, b * 0.8], wobble: [a, b], song: [a, b], bugle: [a * 0.9, b * 1.5], cry: [a * 1.3, b * 0.75] }[P.shape] || [a, b];
+      osc(X, t, dur, P.wave, f * shp[0], f * shp[1], v, o(Object.assign({ attack: Math.min(0.06, dur * 0.2), slideAt: P.shape === 'bugle' ? 0.5 : 0.9 }, x)));
+      if (big) osc(X, t, dur, 'sine', f * shp[0] * 0.5, f * shp[1] * 0.5, v * 0.45, { attack: 0.04, lp: 600 });   // the third form's body tone
+    };
+    const step = (X, t, vol) => (P.w > 0.6 ? osc(X, t, 0.14, 'sine', 70 * (2 - P.w), 40, vol, { attack: 0.004 }) : P.shape === 'song' || P.el[0] === 'light' || P.el[0] === 'wind' ? nz(X, t, 0.18, vol * 0.5, 'bandpass', 1400, 700, 1) : osc(X, t, 0.04, 'sine', 380 * (1.4 - P.w), 300, vol * 0.7));
+    return {
+      tap: (X, t) => { call(X, t, 0.32 + P.w * 0.2, 1, 1.15, 0.12); E.amb(X, t + 0.25, 1.2); },
+      idle: (X, t) => { call(X, t, 0.2, 1.05, 1.12, 0.06); E.amb(X, t + 0.1, 0.8); },
+      move: (X, t) => { step(X, t, 0.08); step(X, t + 0.18, 0.07); },
+      attack: (X, t) => { call(X, t + 0.06, 0.14, 1.2, 0.9, 0.1); E.hit(X, t + 0.3, 0.8); if (P.blade) nz(X, t + 0.22, 0.16, 0.04, 'highpass', 4500); if (P.bells) [2637, 3136].forEach((q, i) => osc(X, t + 0.3 + i * 0.05, 0.12, 'triangle', q, null, 0.04)); if (P.boom) kick(X, t + 0.34, 130 * k, 38, 0.36, 0.3); },
+      special: (X, t) => { call(X, t, 0.36, 0.8, 1.4, 0.1); nz(X, t, 0.38, 0.05, 'lowpass', 400, 2200); E.burst(X, t + 0.38, 1); if (E2 !== E) E2.hit(X, t + 0.45, 0.6); if (P.roar || big) call(X, t + 0.4, 0.5, 0.9, 0.7, 0.09, { lp: 900 }); if (P.boom) kick(X, t + 0.4, 110 * k, 32, 0.45, 0.34); if (P.bells) [2093, 2637, 3136, 4186].forEach((q, i) => osc(X, t + 0.4 + i * 0.05, 0.16, 'triangle', q, null, 0.035)); },
+      impact: (X, t, oo) => { E.hit(X, t, (oo && oo.big) ? 1.25 : 1); osc(X, t, 0.12, 'sine', 240 * (1.6 - P.w), 90, 0.08); },
+      hurt: (X, t) => call(X, t, 0.2, 1.5, 0.95, 0.11, { vib: [22, 40] }),
+      heal: (X, t) => { [1, 1.25, 1.5, 2].forEach((m, i) => osc(X, t + i * 0.08, 0.22, 'sine', Math.min(2400, f * 2 * m), null, 0.045, { echo: true })); EL.light.amb(X, t + 0.3, 1); },
+      guard: (X, t) => { E.hit(X, t, 0.7); call(X, t + 0.04, 0.14, 1, 0.9, 0.06); },
+      victory: (X, t) => { [1, 1.26, 1.5].forEach((m, i) => call(X, t + i * 0.13, 0.2, m, m * 1.08, 0.08)); E.amb(X, t + 0.45, 1.4); if (P.bells) [2093, 2637, 3136].forEach((q, i) => osc(X, t + 0.5 + i * 0.07, 0.14, 'triangle', q, null, 0.035)); },
+      defeat: (X, t) => { call(X, t, 0.6, 1.1, 0.55, 0.09); call(X, t + 0.55, 0.4, 0.6, 0.45, 0.05); },
+    };
+  }
+  (function rosterVoices() { const D = root.A && root.A.Data; if (!D) return;
+    Object.values(D.SPECIES).forEach((sp) => { if (VOICED[sp.id] || !RECIPE[sp.line]) return; VOICE[sp.id] = makeVoice(RECIPE[sp.line], sp.stage || 1); VOICED[sp.id] = 1; }); })();
   // one voice per head: unison, then a fifth, then a triad (the third head adds a major third an octave up)
   const STACK = [[1], [1, 1.5], [1, 1.5, 2.52]];
   function voices(o, fn) { const n = (o && o.heads) || 1; STACK[n - 1].forEach((k, i) => fn(k, i)); }

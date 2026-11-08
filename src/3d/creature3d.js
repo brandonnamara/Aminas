@@ -812,6 +812,13 @@ export function summarise(root, clips) {
     minY: +box.min.y.toFixed(3), centerX: +((box.min.x + box.max.x) / 2).toFixed(3), nodes: [...names], clips: (clips || []).map((c) => ({ name: c.name, duration: +c.duration.toFixed(3), tracks: c.tracks.length })) };
 }
 // Returns { ok, errors[], warnings[], info }. Used by tools/creature-pipeline.js and the tests.
+// Phase 8B: the posed blocks of one part (and the parts hung from it) of a skinned creature, in world space
+export function boneBox(root, bone) {
+  const box = new THREE.Box3(), v = new THREE.Vector3(), ids = new Set(); root.updateMatrixWorld(true);
+  root.traverse((o) => { if (!o.isSkinnedMesh || o.name === 'hull') return; o.skeleton.bones.forEach((b, i) => { let p = b; while (p) { if (p === bone) { ids.add(i); break; } p = p.parent; } });
+    const si = o.geometry.attributes.skinIndex; for (let i = 0; i < si.count; i++) { if (!ids.has(si.getX(i))) continue; o.getVertexPosition(i, v); box.expandByPoint(v.applyMatrix4(o.matrixWorld)); } ids.clear(); });
+  return box;
+}
 export function validate(root, clips, o) {
   o = o || {};
   const info = summarise(root, clips), errors = [], warnings = [];
@@ -832,7 +839,13 @@ export function validate(root, clips, o) {
     if (c.name !== 'defeat') c.tracks.forEach((t) => { const s = t.getValueSize(), v = t.values, L = v.length; for (let i = 0; i < s; i++) if (Math.abs(v[i] - v[L - s + i]) > 1e-4) { errors.push('clip ' + c.name + ' does not return to its start pose (' + t.name + ')'); break; } });
   });
   const head = root.getObjectByName('head'), body = root.getObjectByName('body');
-  if (head && body) { const eyes = root.getObjectByName('eyes') || head; const ez = new THREE.Box3().setFromObject(eyes).getCenter(new THREE.Vector3()).z, rz = new THREE.Box3().setFromObject(root).getCenter(new THREE.Vector3()).z; if (ez < rz - 0.01) errors.push('face points away from +Z'); }
+  if (head && body) {
+    // Phase 8B: a skinned head is judged by its mouth point against the head itself (arms or blades reaching forward
+    // move the whole creature's centre); other heads by their box against the creature's
+    const eyes = root.getObjectByName('eyes') || head, mouth = head.isBone && root.getObjectByName('mouth');
+    const ez = mouth ? mouth.getWorldPosition(new THREE.Vector3()).z : (eyes.isBone ? boneBox(root, eyes) : new THREE.Box3().setFromObject(eyes)).getCenter(new THREE.Vector3()).z;
+    const rz = (mouth ? boneBox(root, head) : new THREE.Box3().setFromObject(root)).getCenter(new THREE.Vector3()).z;
+    if (ez < rz - 0.01) errors.push('face points away from +Z'); }
   else warnings.push('no head/body nodes: only whole-body animation is possible');
   ['earL', 'tail', 'eyes'].forEach((k) => { if (info.nodes.indexOf(k) < 0) warnings.push('no "' + k + '" node'); });
   return { ok: !errors.length, errors, warnings: [...new Set(warnings)], info };
@@ -919,11 +932,12 @@ export { THREE };
 // other creature here, then normalised and animated with the shared clips (rig / body pivots).
 // Phase 8: part = only the voxels of that part (faces are culled against the same part only, so a joint stays closed
 // when the part turns); src = another voxel map (the hidden eyelid layer)
-export function voxelGeometry(m, glowPass, part, src) {
+export function voxelGeometry(m, glowPass, part, src, bounds) {
   const pos = [], col = [], idx = [], c = new THREE.Color();
   const map = src || m.v, K = (x, y, z) => x + ',' + y + ',' + z;
   let lo = m.min, hi = m.max;
-  if (src) { lo = [1e9, 1e9, 1e9]; hi = [-1e9, -1e9, -1e9]; src.forEach((v, k) => { k.split(',').forEach((q, i) => { const n = +q; if (n < lo[i]) lo[i] = n; if (n > hi[i]) hi[i] = n; }); }); }
+  if (bounds) { lo = bounds[0]; hi = bounds[1]; }   // Phase 8B: a part only scans its own box
+  else if (src) { lo = [1e9, 1e9, 1e9]; hi = [-1e9, -1e9, -1e9]; src.forEach((v, k) => { k.split(',').forEach((q, i) => { const n = +q; if (n < lo[i]) lo[i] = n; if (n > hi[i]) hi[i] = n; }); }); }
   const raw = (x, y, z) => map.get(K(x, y, z));
   const get = part === undefined ? raw : (x, y, z) => { const a = raw(x, y, z); return a && (a.p || 'core') === part ? a : null; };
   m = part === undefined && !src ? m : { has: (x, y, z) => !!get(x, y, z) };
@@ -961,6 +975,29 @@ export function voxelGeometry(m, glowPass, part, src) {
   g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); g.setIndex(idx); g.computeVertexNormals();
   return g;
 }
+// Phase 8B: copy a creature for a new actor. A plain clone keeps a skinned mesh tied to the template's bones, so each
+// copy's skinned meshes are re-bound to the copy's own bones (same names, same bind pose).
+export function cloneCreature(src) {
+  const dst = src.clone(true); let skinned = false; dst.traverse((o) => { if (o.isSkinnedMesh) skinned = true; });
+  if (!skinned) return dst;
+  const byName = {}; dst.traverse((o) => { if (o.isBone) byName[o.name] = o; });
+  const made = new Map();
+  dst.traverse((o) => { if (!o.isSkinnedMesh) return; const sk = o.skeleton; let ns = made.get(sk);
+    if (!ns) { ns = new THREE.Skeleton(sk.bones.map((b) => byName[b.name]), sk.boneInverses.map((x) => x.clone())); made.set(sk, ns); }
+    o.bind(ns, o.bindMatrix); });
+  return dst;
+}
+// Phase 8B: an outline shell for a skinned creature: the same geometry, each part inflated about its own centre
+// (as the Phase 7 per-mesh shells were), skinned to the same bones so it follows every pose.
+export function skinnedShell(mesh, s, mat) {
+  const g = mesh.geometry; let shell = g.userData.shell;
+  if (!shell || shell.s !== s) {
+    const geo = g.clone(), pos = geo.attributes.position, si = geo.attributes.skinIndex, C = g.userData.partCenters;
+    for (let i = 0; i < pos.count; i++) { const b = si.getX(i) * 3; pos.setXYZ(i, C[b] + (pos.getX(i) - C[b]) * s, C[b + 1] + (pos.getY(i) - C[b + 1]) * s, C[b + 2] + (pos.getZ(i) - C[b + 2]) * s); }
+    pos.needsUpdate = true; shell = g.userData.shell = { s, geo };
+  }
+  const h = new THREE.SkinnedMesh(shell.geo, mat); h.frustumCulled = false; h.bind(mesh.skeleton, mesh.bindMatrix); return h;
+}
 // Phase 8: species with bespoke animation register a clip builder here (src/3d/showcase.js): fn(root, profile, clips, model)
 // returns the clips to use. Every other species keeps its Phase 7 movement personality.
 export const CLIP_HOOKS = {};
@@ -978,22 +1015,46 @@ export function buildVoxel(spec) {
     if (solid) { solid.translate(-cx, 0, -cz); const me = new THREE.Mesh(solid, solidMat()); me.name = 'body:voxel'; holder.add(me); }
     if (glow) { glow.translate(-cx, 0, -cz); const me = new THREE.Mesh(glow, glowMat()); me.name = 'body:glow'; holder.add(me); }
   } else {
-    // Phase 8 parts: one pivot per part at its joint, nested as the model says; each part's voxels are meshed on
-    // their own (solid + glow) and hung on its pivot, so heads, jaws, wings and eyelids move independently
+    // Phase 8 parts: one bone per part at its joint, nested as the model says. Each part's voxels are meshed on their
+    // own (faces culled against the same part only, so a joint stays closed when the part turns) and skinned rigidly to
+    // its bone. Phase 8B: all parts go into ONE skinned mesh (plus one for the glow), so a creature in parts costs two
+    // draw calls instead of two per part. Clips address the bones by the part names, exactly as before.
     const base = new THREE.Group(); base.name = 'parts'; base.position.set(-cx, 0, -cz); holder.add(base);
-    const nodes = { core: base }, P = m.pivots;
-    const make = (n) => { if (nodes[n]) return nodes[n]; const pv = P[n], has = pv.parent && P[pv.parent], par = has ? make(pv.parent) : base, pa = has ? P[pv.parent].at : [0, 0, 0];
-      const g = pivot(n); g.position.set(pv.at[0] - pa[0], pv.at[1] - pa[1], pv.at[2] - pa[2]); par.add(g); nodes[n] = g; return g; };
-    Object.keys(P).forEach(make);
-    ['core'].concat(Object.keys(P)).forEach((n) => {
-      const at = n === 'core' ? [0, 0, 0] : P[n].at, node = nodes[n];
-      [[voxelGeometry(m, false, n), false], [voxelGeometry(m, true, n), true], [m.hid ? voxelGeometry(m, false, n, m.hid) : null, false], [m.hid ? voxelGeometry(m, true, n, m.hid) : null, true]].forEach(([geo, gl], i) => {
-        if (!geo) return; geo.translate(-at[0], -at[1], -at[2]);
-        const me = new THREE.Mesh(geo, gl ? glowMat() : solidMat()); me.name = n + (i >= 2 ? ':lid' : '') + (gl ? ':glow' : ':voxel'); node.add(me);
+    const P = m.pivots, names = Object.keys(P), bones = {}, list = [];
+    const core = new THREE.Bone(); core.name = 'core'; base.add(core); bones.core = core; list.push(core);
+    const make = (n) => { if (bones[n]) return bones[n]; const pv = P[n], has = pv.parent && P[pv.parent], par = has ? make(pv.parent) : core, pa = has ? P[pv.parent].at : [0, 0, 0];
+      const b = new THREE.Bone(); b.name = n; b.position.set(pv.at[0] - pa[0], pv.at[1] - pa[1], pv.at[2] - pa[2]); par.add(b); bones[n] = b; list.push(b); return b; };
+    names.forEach(make);
+    const index = {}; list.forEach((b, i) => { index[b.name] = i; });
+    const centers = new Float32Array(list.length * 3), counted = new Float32Array(list.length);
+    // what each part holds (its box, and whether it has glow or eyelid blocks), so each scan covers only that part
+    const stat = (map) => { const o = {}; map.forEach((v, k) => { const n = v.p || 'core', q = k.split(','), x = +q[0], y = +q[1], z = +q[2]; let e = o[n];
+      if (!e) e = o[n] = { lo: [x, y, z], hi: [x, y, z], solid: 0, glow: 0 }; if (x < e.lo[0]) e.lo[0] = x; if (y < e.lo[1]) e.lo[1] = y; if (z < e.lo[2]) e.lo[2] = z; if (x > e.hi[0]) e.hi[0] = x; if (y > e.hi[1]) e.hi[1] = y; if (z > e.hi[2]) e.hi[2] = z; if (v.g > 0.5) e.glow++; else e.solid++; }); return o; };
+    const SV = stat(m.v), SH = m.hid ? stat(m.hid) : {};
+    const geoOf = (n, glowPass, hid) => { const e = (hid ? SH : SV)[n]; if (!e || !(glowPass ? e.glow : e.solid)) return null; return voxelGeometry(m, glowPass, n, hid ? m.hid : undefined, [e.lo, e.hi]); };
+    const build = (glowPass) => {
+      const geos = [];
+      list.forEach((b) => { const n = b.name;
+        [geoOf(n, glowPass, false), geoOf(n, glowPass, true)].forEach((g, j) => {
+          if (!g) return; const cnt = g.attributes.position.count, si = new Uint16Array(cnt * 4), sw = new Float32Array(cnt * 4), bi = index[n];
+          for (let i = 0; i < cnt; i++) { si[i * 4] = bi; sw[i * 4] = 1; }
+          g.setAttribute('skinIndex', new THREE.Uint16BufferAttribute(si, 4)); g.setAttribute('skinWeight', new THREE.Float32BufferAttribute(sw, 4));
+          // each part's own centre (for the Phase 7 outline, inflated part by part like the per-part meshes were)
+          if (!glowPass && !j) { g.computeBoundingBox(); const c = g.boundingBox.getCenter(new THREE.Vector3()); centers[bi * 3] = c.x; centers[bi * 3 + 1] = c.y; centers[bi * 3 + 2] = c.z; counted[bi] = 1; }
+          geos.push(g);
+        });
       });
-    });
+      return geos.length ? mergeGeometries(geos) : null;
+    };
+    const solidG = build(false), glowG = build(true);
+    list.forEach((b, i) => { if (!counted[i]) { const pv = P[b.name], at = pv ? pv.at : [0, 0, 0]; centers[i * 3] = at[0]; centers[i * 3 + 1] = at[1]; centers[i * 3 + 2] = at[2]; } });
+    const meshes = [];
+    [[solidG, false], [glowG, true]].forEach(([g, gl]) => { if (!g) return; g.userData.partCenters = centers; const me = new THREE.SkinnedMesh(g, gl ? glowMat() : solidMat()); me.name = 'parts' + (gl ? ':glow' : ':voxel'); me.frustumCulled = false; base.add(me); meshes.push(me); });
+    root.updateMatrixWorld(true);
+    const skel = new THREE.Skeleton(list);
+    meshes.forEach((me) => me.bind(skel, me.matrixWorld));
     // eyelids (hidden voxels) rest closed to nothing; the blink opens them downwards over the eyes
-    Object.keys(P).forEach((n) => { if (P[n].lid) nodes[n].scale.set(1, 0.001, 1); });
+    names.forEach((n) => { if (P[n].lid) bones[n].scale.set(1, 0, 1); });
   }
   normalise(root, { big: spec.stage === 3 });
   const profile = motionProfile(spec, root);

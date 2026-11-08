@@ -71,7 +71,7 @@ export class Fx {
   }
   // the element's signature shot, from → to over `dur` seconds; resolves on arrival
   projectile(from, to, el, o) {
-    o = o || {}; const F = fxOf(el), dur = (o.dur || 0.2) / F.speed, big = o.big ? 1.6 : 1;
+    o = o || {}; const F = o.cols ? Object.assign({}, fxOf(el), { c: o.cols }) : fxOf(el), dur = (o.dur || 0.2) / F.speed, big = o.big ? 1.6 : 1;   // Phase 8B: a line's own colours
     const shot = { from: from.clone(), to: to.clone(), el, F, t: 0, dur, big, emitT: 0, core: [], done: null, hue: Math.random() };
     const n = Math.max(3, Math.round((F.path === 'beam' ? 4 : 7) * big * (this.calm() ? 0.6 : 1)));
     for (let i = 0; i < n; i++) { const q = this.spawn(from, new THREE.Vector3(), { color: F.c[i % 3], life: dur + 0.3, size: (i === 0 ? 0.16 : 0.08 + Math.random() * 0.06) * F.size * big, grav: 0, spin: 5 }); if (q) { q.off = new THREE.Vector3((Math.random() - 0.5) * 0.18, (Math.random() - 0.5) * 0.18, (Math.random() - 0.5) * 0.18).multiplyScalar(i === 0 ? 0 : big); shot.core.push(q); } }
