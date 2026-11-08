@@ -112,7 +112,7 @@ const CLIPS = ['idle', 'blink', 'ready', 'attack', 'special', 'hit', 'hitBig', '
   const fight = (ps, es, presses) => page.evaluate(async ({ ps, es, presses }) => {
     const R = A.Rules, Bt = R.Battle, f = Bt.fighter(ps, 30), e = Bt.fighter(es, 30); [f, e].forEach((x) => { x.hpMax *= 50; x.hp = x.hpMax; }); f.spd = 999; e.atk = 1;
     const played = []; const m0 = A.Audio.monster; A.Audio.monster = function (sp, cue, o) { const r = m0.call(this, sp, cue, o); played.push(sp + ':' + cue + (r ? '' : '-skipped')); return r; };
-    if (A.UI.B) A.UI.leaveBattle(() => {}); A.UI.closeAll(); A.UI.startBattle({ kind: 'test', b: Bt.create([f], e, {}), d: 'heartwood', label: 't', finish: () => {} });
+    if (A.UI.B) A.UI.leaveBattle(() => {}); A.UI.closeAll(); A.UI.startBattle({ kind: 'test', b: Bt.create([f], e, { rng: () => 0.5 }), d: 'heartwood', label: 't', finish: () => {} });   // fixed rolls: no stun or miss to skip a pressed move
     for (let i = 0; i < 100 && !(A.UI.B.stage && A.UI.B.stage.is3d && !A.UI.B.busy); i++) await new Promise((r) => setTimeout(r, 100));
     const M = await A.C3D.load(); const out = { is3d: !!A.UI.B.stage.is3d, maxDraws: 0, presses: [] };
     const wait = async (ms) => { const t0 = performance.now(); while (performance.now() - t0 < ms) { out.maxDraws = Math.max(out.maxDraws, M.stats().drawCalls); await new Promise((r) => setTimeout(r, 120)); } };
