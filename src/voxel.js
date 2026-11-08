@@ -34,13 +34,19 @@
   V.Model = function () { this.v = new Map(); this.min = [1e9, 1e9, 1e9]; this.max = [-1e9, -1e9, -1e9]; };
   const P = V.Model.prototype;
   const key = (x, y, z) => x + ',' + y + ',' + z;
+  // Phase 8 parts: a model may be split into named parts that the 3D view animates separately (heads, jaws, eyelids,
+  // wings, tail, cannon…). Set m.part before sculpting a part; every voxel remembers it. m.pivot(name, at, parent)
+  // gives a part its joint (in voxel coordinates) and its parent part. 2D drawing ignores parts entirely.
+  P.pivot = function (name, at, parent, o) { (this.pivots = this.pivots || {})[name] = Object.assign({ at: at.slice(), parent: parent || null }, o || {}); return this; };
   P.set = function (x, y, z, c, g) {
     x = Math.round(x); y = Math.round(y); z = Math.round(z);
     if (c == null) { this.v.delete(key(x, y, z)); return; }
-    this.v.set(key(x, y, z), { c, g: g || 0 });
+    this.v.set(key(x, y, z), this.part ? { c, g: g || 0, p: this.part } : { c, g: g || 0 });
     if (x < this.min[0]) this.min[0] = x; if (y < this.min[1]) this.min[1] = y; if (z < this.min[2]) this.min[2] = z;
     if (x > this.max[0]) this.max[0] = x; if (y > this.max[1]) this.max[1] = y; if (z > this.max[2]) this.max[2] = z;
   };
+  // hidden voxels: only the 3D view uses them (eyelids that close for a blink); never drawn in 2D or counted
+  P.hide = function (part, x, y, z, c, g) { (this.hid = this.hid || new Map()).set(key(Math.round(x), Math.round(y), Math.round(z)), { c, g: g || 0, p: part }); };
   P.get = function (x, y, z) { return this.v.get(key(x, y, z)); };
   P.has = function (x, y, z) { return this.v.has(key(x, y, z)); };
   P.count = function () { return this.v.size; };
@@ -72,9 +78,10 @@
     }, typeof col === 'function' ? (x, y, z) => { let t = ((x - a[0]) * d[0] + (y - a[1]) * d[1] + (z - a[2]) * d[2]) / L2; return col(x, y, z, Math.max(0, Math.min(1, t))); } : col, mode);
   };
   // mirror every voxel with z>0 to -z (left/right symmetry); call after sculpting one side
-  P.mirrorZ = function () { const add = []; this.v.forEach((val, k) => { const p = k.split(',').map(Number); if (p[2] > 0) add.push([p[0], p[1], -p[2], val]); }); add.forEach((p) => this.set(p[0], p[1], p[2], p[3].c, p[3].g)); return this; };
-  // drop the model so its lowest voxel sits on y = 0
-  P.ground = function () { const dy = -this.min[1]; if (!dy) return this; const old = this.v; this.v = new Map(); this.min = [1e9, 1e9, 1e9]; this.max = [-1e9, -1e9, -1e9]; old.forEach((val, k) => { const p = k.split(',').map(Number); this.set(p[0], p[1] + dy, p[2], val.c, val.g); }); return this; };
+  // swap: optional part renames for the mirrored side (e.g. { earL: 'earR' })
+  P.mirrorZ = function (swap) { const add = []; this.v.forEach((val, k) => { const p = k.split(',').map(Number); if (p[2] > 0) add.push([p[0], p[1], -p[2], val]); }); const was = this.part; add.forEach((p) => { this.part = p[3].p ? (swap && swap[p[3].p]) || p[3].p : undefined; this.set(p[0], p[1], p[2], p[3].c, p[3].g); }); this.part = was; return this; };
+  // drop the model so its lowest voxel sits on y = 0 (part joints move with it)
+  P.ground = function () { const dy = -this.min[1]; if (!dy) return this; const old = this.v, was = this.part; this.v = new Map(); this.min = [1e9, 1e9, 1e9]; this.max = [-1e9, -1e9, -1e9]; old.forEach((val, k) => { const p = k.split(',').map(Number); this.part = val.p; this.set(p[0], p[1] + dy, p[2], val.c, val.g); }); this.part = was; if (this.pivots) Object.values(this.pivots).forEach((pv) => { pv.at[1] += dy; }); return this; };
   // Voxels with at least one exposed face towards the viewer (top, +x, +z). Order is set per view when drawing.
   P.visible = function () {
     const out = [];

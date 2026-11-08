@@ -17,7 +17,7 @@ import { mergeGeometries, mergeVertices } from 'https://cdn.jsdelivr.net/npm/thr
 export const VERSION = '1.0.0';
 export const CLIP_NAMES = ['idle', 'move', 'attack', 'hit', 'victory', 'defeat'];
 export const RIG_NODES = ['amina', 'rig', 'body', 'head', 'eyes', 'earL', 'earR', 'crest', 'tail', 'wingL', 'wingR', 'footL', 'footR'];
-export const BUDGET = { tris: 12000, meshes: 40, texture: 1024, heightMin: 0.95, heightMax: 1.2 };
+export const BUDGET = { tris: 12000, showcaseTris: 20000, meshes: 40, texture: 1024, heightMin: 0.95, heightMax: 1.2 };
 const HOVER = { drop: 1, fish: 1, moth: 1, jelly: 1 };
 export const isHover = (art) => !!HOVER[art.body];
 // Fixed portrait camera (pipeline + runtime). With these values a creature's feet land at ~PORTRAIT.feetY of the image height.
@@ -821,7 +821,9 @@ export function validate(root, clips, o) {
   if (info.height < hMin || info.height > BUDGET.heightMax) errors.push('height ' + info.height + ' outside ' + hMin + '–' + BUDGET.heightMax);
   if (info.minY < -0.02 || info.minY > (o.hover ? 0.2 : 0.03)) errors.push('feet not on the ground (min y ' + info.minY + ')');
   if (Math.abs(info.centerX) > 0.06) errors.push('not centred on x (' + info.centerX + ')');
-  if (info.tris > BUDGET.tris) errors.push('too many triangles: ' + info.tris + ' > ' + BUDGET.tris);
+  // Phase 8: the part-built showcase models carry more detail; their budget is measured on the iPhone battle test
+  const triCap = root.userData && root.userData.parts ? BUDGET.showcaseTris : BUDGET.tris;
+  if (info.tris > triCap) errors.push('too many triangles: ' + info.tris + ' > ' + triCap);
   if (info.meshes > BUDGET.meshes) errors.push('too many meshes/draw calls: ' + info.meshes + ' > ' + BUDGET.meshes);
   if (info.maxTexture > BUDGET.texture) errors.push('texture larger than ' + BUDGET.texture + 'px: ' + info.maxTexture);
   CLIP_NAMES.forEach((c) => { if (!(clips || []).some((x) => x.name === c)) errors.push('missing clip "' + c + '"'); });
@@ -915,10 +917,16 @@ export { THREE };
 // Greedy meshing merges same-coloured faces into larger quads (a few thousand triangles per creature). Glowing
 // voxels go in a second mesh with brightened colours. The model faces +x; it is turned to face +z like every
 // other creature here, then normalised and animated with the shared clips (rig / body pivots).
-export function voxelGeometry(m, glowPass) {
+// Phase 8: part = only the voxels of that part (faces are culled against the same part only, so a joint stays closed
+// when the part turns); src = another voxel map (the hidden eyelid layer)
+export function voxelGeometry(m, glowPass, part, src) {
   const pos = [], col = [], idx = [], c = new THREE.Color();
-  const lo = m.min, hi = m.max;
-  const get = (x, y, z) => m.get(x, y, z);
+  const map = src || m.v, K = (x, y, z) => x + ',' + y + ',' + z;
+  let lo = m.min, hi = m.max;
+  if (src) { lo = [1e9, 1e9, 1e9]; hi = [-1e9, -1e9, -1e9]; src.forEach((v, k) => { k.split(',').forEach((q, i) => { const n = +q; if (n < lo[i]) lo[i] = n; if (n > hi[i]) hi[i] = n; }); }); }
+  const raw = (x, y, z) => map.get(K(x, y, z));
+  const get = part === undefined ? raw : (x, y, z) => { const a = raw(x, y, z); return a && (a.p || 'core') === part ? a : null; };
+  m = part === undefined && !src ? m : { has: (x, y, z) => !!get(x, y, z) };
   for (let d = 0; d < 3; d++) {
     const u = (d + 1) % 3, v = (d + 2) % 3, du = hi[u] - lo[u] + 1, dv = hi[v] - lo[v] + 1;
     for (const sgn of [1, -1]) {
@@ -953,6 +961,9 @@ export function voxelGeometry(m, glowPass) {
   g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); g.setIndex(idx); g.computeVertexNormals();
   return g;
 }
+// Phase 8: species with bespoke animation register a clip builder here (src/3d/showcase.js): fn(root, profile, clips, model)
+// returns the clips to use. Every other species keeps its Phase 7 movement personality.
+export const CLIP_HOOKS = {};
 export function buildVoxel(spec) {
   const Vx = window.A && window.A.Voxel, art = spec.art;
   const m = Vx.model(art.vox, art.st || 1);
@@ -960,12 +971,34 @@ export function buildVoxel(spec) {
   const body = pivot('body'); rig.add(body);
   const holder = new THREE.Group(); holder.rotation.y = -Math.PI / 2; body.add(holder);
   const cx = (m.min[0] + m.max[0] + 1) / 2, cz = (m.min[2] + m.max[2] + 1) / 2;
-  const solid = voxelGeometry(m, false), glow = voxelGeometry(m, true);
-  if (solid) { solid.translate(-cx, 0, -cz); const me = new THREE.Mesh(solid, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.85, metalness: 0, flatShading: true, name: 'voxel' })); me.name = 'body:voxel'; holder.add(me); }
-  if (glow) { glow.translate(-cx, 0, -cz); const me = new THREE.Mesh(glow, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.6, metalness: 0, flatShading: true, emissive: '#000000', name: 'voxelGlow', toneMapped: false })); me.name = 'body:glow'; holder.add(me); }
+  const solidMat = () => new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.85, metalness: 0, flatShading: true, name: 'voxel' });
+  const glowMat = () => new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.6, metalness: 0, flatShading: true, emissive: '#000000', name: 'voxelGlow', toneMapped: false });
+  if (!m.pivots) {
+    const solid = voxelGeometry(m, false), glow = voxelGeometry(m, true);
+    if (solid) { solid.translate(-cx, 0, -cz); const me = new THREE.Mesh(solid, solidMat()); me.name = 'body:voxel'; holder.add(me); }
+    if (glow) { glow.translate(-cx, 0, -cz); const me = new THREE.Mesh(glow, glowMat()); me.name = 'body:glow'; holder.add(me); }
+  } else {
+    // Phase 8 parts: one pivot per part at its joint, nested as the model says; each part's voxels are meshed on
+    // their own (solid + glow) and hung on its pivot, so heads, jaws, wings and eyelids move independently
+    const base = new THREE.Group(); base.name = 'parts'; base.position.set(-cx, 0, -cz); holder.add(base);
+    const nodes = { core: base }, P = m.pivots;
+    const make = (n) => { if (nodes[n]) return nodes[n]; const pv = P[n], has = pv.parent && P[pv.parent], par = has ? make(pv.parent) : base, pa = has ? P[pv.parent].at : [0, 0, 0];
+      const g = pivot(n); g.position.set(pv.at[0] - pa[0], pv.at[1] - pa[1], pv.at[2] - pa[2]); par.add(g); nodes[n] = g; return g; };
+    Object.keys(P).forEach(make);
+    ['core'].concat(Object.keys(P)).forEach((n) => {
+      const at = n === 'core' ? [0, 0, 0] : P[n].at, node = nodes[n];
+      [[voxelGeometry(m, false, n), false], [voxelGeometry(m, true, n), true], [m.hid ? voxelGeometry(m, false, n, m.hid) : null, false], [m.hid ? voxelGeometry(m, true, n, m.hid) : null, true]].forEach(([geo, gl], i) => {
+        if (!geo) return; geo.translate(-at[0], -at[1], -at[2]);
+        const me = new THREE.Mesh(geo, gl ? glowMat() : solidMat()); me.name = n + (i >= 2 ? ':lid' : '') + (gl ? ':glow' : ':voxel'); node.add(me);
+      });
+    });
+    // eyelids (hidden voxels) rest closed to nothing; the blink opens them downwards over the eyes
+    Object.keys(P).forEach((n) => { if (P[n].lid) nodes[n].scale.set(1, 0.001, 1); });
+  }
   normalise(root, { big: spec.stage === 3 });
   const profile = motionProfile(spec, root);
-  root.userData = { id: spec.id, hover: false, glow: null, version: VERSION, voxel: true, profile };
-  const clips = makeClips(root, { profile });
+  root.userData = { id: spec.id, hover: false, glow: null, version: VERSION, voxel: true, profile, parts: m.pivots ? Object.keys(m.pivots) : null, voxScale: root.scale.x };
+  const base = makeClips(root, { profile }), hook = CLIP_HOOKS[spec.id];
+  const clips = hook ? hook(root, profile, base, m) : base;
   return { root, clips, info: summarise(root, clips) };
 }

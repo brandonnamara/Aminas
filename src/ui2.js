@@ -381,7 +381,8 @@
     d.style.cssText = 'left:' + x0 + 'px;top:' + y0 + 'px;--dx:' + (x1 - x0) + 'px;--dy:' + (y1 - y0) + 'px;--c:' + E.color;
     fld.appendChild(d); setTimeout(() => d.remove(), 420);
   }
-  function cls(side, c, ms) { const e = $('#spr-' + side); if (!e) return; e.classList.remove(c); void e.offsetWidth; e.classList.add(c); setTimeout(() => e.classList.remove(c), ms || 500); }
+  // c may hold several classes ('hurt big'); classList methods need them one by one (a space throws and froze the 2D battle)
+  function cls(side, c, ms) { const e = $('#spr-' + side); if (!e) return; const cs = String(c).split(/\s+/).filter(Boolean); e.classList.remove(...cs); void e.offsetWidth; e.classList.add(...cs); setTimeout(() => e.classList.remove(...cs), ms || 500); }
   // Telegraph banner: what is coming and what the player can do about it, worked out from the real party.
   function setTele(ev) {
     const t = $('#b-tele'), U = UI.B; if (!t || !U) return;
@@ -412,6 +413,7 @@
   async function playEvents(ev) {
     const U = UI.B, d = U.disp;
     const stSet = (who) => (who === 'p' ? d.pSt : d.eSt);
+    const spOf = (who) => (who === 'p' ? d.pSp : d.eSp);
     for (const e of ev) {
       if (!$('#battle') || UI.B !== U) return;
       const stg = U.stage || stage2d();
@@ -421,8 +423,10 @@
           bLog(e.name + ' used ' + e.abName + '!');
           U.acting = e.who; bRender();
           const ab = D.ABILITIES[e.abil];
-          stg.use(e.who, ty === 'guard' || ty === 'heal' ? 'cast' : 'attack', { el: e.el, type: ty, special: ab.cd > 0, boss: !!e.boss, power: ab.power || 0 });
-          if (ty === 'guard') { Au.play('guard'); stg.guard(e.who); }
+          stg.use(e.who, ty === 'guard' || ty === 'heal' ? 'cast' : 'attack', { el: e.el, type: ty, special: ab.cd > 0, boss: !!e.boss, power: ab.power || 0, abil: e.abil });
+          // Phase 8: the showcase monsters have their own voices for their moves
+          const mSp = spOf(e.who); if (Au.hasVoice && Au.hasVoice(mSp)) { const mo = A.Showcase && A.Showcase.moves && A.Showcase.moves[e.abil]; Au.monster(mSp, ty === 'heal' ? 'heal' : ty === 'guard' ? 'guard' : mo && mo.cue ? mo.cue : ab.cd > 0 ? 'special' : 'attack'); }
+          if (ty === 'guard') { if (!(Au.hasVoice && Au.hasVoice(mSp))) Au.play('guard'); stg.guard(e.who); }
           if (e.boss) setTele(null);
           await sleep(e.boss ? 620 : 480); break;
         }
@@ -433,7 +437,12 @@
         case 'hit': {
           const side = e.who; if (!e.blocked) { stg.hit(side, e.el, e.eff, { big: !!e.big }); floatAt(side, '-' + e.dmg, e.eff + (e.big ? ' big' : ''), e.eff === 'super' ? 'Super effective' : e.eff === 'weak' ? 'Resisted' : e.guarded ? 'Guarded' : e.big ? 'Heavy blow' : ''); }
           if (side === 'e') { d.eHp = e.hp; d.eGuard = false; } else { d.pHp = e.hp; d.pGuard = false; }
-          if (!e.blocked) Au.play(e.eff === 'super' || e.big ? 'super' : e.eff === 'weak' ? 'weak' : 'hit');
+          if (!e.blocked) {
+            // Phase 8: a showcase attacker's impact sounds like its move; a showcase victim cries out (at most two sounds)
+            const atk = spOf(side === 'p' ? 'e' : 'p'), vic = spOf(side), voiced = Au.hasVoice && Au.hasVoice(atk);
+            if (voiced) Au.monster(atk, 'impact', { big: e.eff === 'super' || e.big }); else Au.play(e.eff === 'super' || e.big ? 'super' : e.eff === 'weak' ? 'weak' : 'hit');
+            if (Au.hasVoice && Au.hasVoice(vic)) Au.monster(vic, 'hurt', { delay: 0.08, big: e.eff === 'super' || e.big });
+          }
           if (!e.blocked) bLog(e.eff === 'super' ? 'It’s super effective!' : e.eff === 'weak' ? 'It’s not very effective…' : (e.guarded ? (e.big ? 'The guard absorbed most of the blow!' : 'The guard softened the blow.') : ''));
           bRender(); await sleep(e.blocked ? 120 : e.eff === 'super' || e.big ? 800 : 620); break;
         }
@@ -473,7 +482,7 @@
           d.eEl = e.el; stg.status('e', D.ELEMENTS[e.el].color); if (stg.setElement) stg.setElement(e.el); floatAt('e', D.ELEMENTS[e.el].name + '!', 'status'); Au.play('hum');
           bLog(e.name + ' shifts to ' + D.ELEMENTS[e.el].name + '!'); setTele(null); bRender(); await sleep(800); break;
         case 'faint': {
-          const sd = e.who; stg.faint(sd); if (sd === 'e') { setTele(null); stg.setBarrier(false); } Au.play('faint');
+          const sd = e.who; stg.faint(sd); if (sd === 'e') { setTele(null); stg.setBarrier(false); } if (Au.hasVoice && Au.hasVoice(spOf(sd))) Au.monster(spOf(sd), 'defeat'); else Au.play('faint');
           bLog((sd === 'p' ? d.pName : d.eName) + ' was defeated!'); await sleep(900); break;
         }
         case 'foeIn': {
@@ -491,7 +500,7 @@
           Au.play('ok'); bLog('Go, ' + f.name + '!'); bRender(); await sleep(stg.is3d ? 260 : 560); break;
         }
         case 'needSwitch': bLog('Choose your next Amina.'); break;
-        case 'end': if (e.result === 'win') stg.victory('p'); else if (stg.is3d && U.b.enemy && U.b.enemy.hp > 0) stg.victory('e'); break;
+        case 'end': { const w = e.result === 'win' ? 'p' : stg.is3d && U.b.enemy && U.b.enemy.hp > 0 ? 'e' : null; if (w) { stg.victory(w); if (Au.hasVoice && Au.hasVoice(spOf(w))) Au.monster(spOf(w), 'victory', { delay: 0.15 }); } break; }
       }
     }
     // the event list is complete for this action: line the display up with the real battle state

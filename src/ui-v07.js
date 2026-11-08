@@ -204,6 +204,8 @@
     const old = $('#comp'); if (!old) return;
     const t = document.createElement('div'); t.innerHTML = UI.selectorHtml(st()); const n = t.firstChild; if (!n) return;
     if (old.dataset.uid !== n.dataset.uid && !(UI.calm && UI.calm())) n.classList.add('swap');
+    // Phase 8: the same Amina (after feeding): update the card in place instead of replacing it
+    if (old.dataset.uid === n.dataset.uid && UI.morph) { UI.morph(old, n); if (UI.applyHl) UI.applyHl(); return; }
     old.replaceWith(n); bindSel(n); if (UI.applyHl) UI.applyHl();
   };
   function bindSel(el) {

@@ -315,7 +315,29 @@
   };
   // Evolution family of a species: [base, evolved] in order (one or two stages in this roster).
   UI.family = function (spId) { return D.LINES[D.SPECIES[spId].line].ids.slice(); };
-  const CLIP_LABEL = { idle: 'Idle', move: 'Hop', attack: 'Attack', hit: 'Ouch', victory: 'Cheer', defeat: 'Faint' };
+  const CLIP_LABEL = { idle: 'Idle', move: 'Hop', attack: 'Attack', hit: 'Ouch', victory: 'Cheer', defeat: 'Faint', special: 'Special' };
+  // Phase 8: the showcase monsters also show their special move in the viewer, with sound
+  const CLIP_CUE = { move: 'move', attack: 'attack', hit: 'hurt', victory: 'victory', defeat: 'defeat', special: 'special' };
+  // Phase 8: update a live element in place to match freshly rendered markup — text and attributes change, the
+  // elements stay (so a running 3D viewer, scroll positions, focus and the button you just tapped all survive).
+  // Elements that differ in tag (or data-key) are replaced; anything marked .live (a mounted 3D viewer) is kept as is.
+  UI.morph = function (cur, next) {
+    if (cur.nodeType !== next.nodeType || cur.nodeName !== next.nodeName) { cur.replaceWith(next); return; }
+    if (cur.nodeType === 3 || cur.nodeType === 8) { if (cur.nodeValue !== next.nodeValue) cur.nodeValue = next.nodeValue; return; }
+    if (cur.nodeType !== 1) return;
+    if (cur.classList.contains('live')) return;
+    for (const a of [...cur.attributes]) if (!next.hasAttribute(a.name) && a.name !== 'hidden' && a.name !== 'style') cur.removeAttribute(a.name);
+    for (const a of [...next.attributes]) if (cur.getAttribute(a.name) !== a.value) cur.setAttribute(a.name, a.value);
+    if (next.hasAttribute('style') !== cur.hasAttribute('style') && !next.hasAttribute('style')) cur.removeAttribute('style');
+    if (!next.hasAttribute('hidden') && cur.hasAttribute('hidden')) cur.removeAttribute('hidden');
+    const a = [...cur.childNodes], b = [...next.childNodes];
+    for (let i = 0; i < b.length; i++) {
+      if (i >= a.length) { cur.appendChild(b[i]); continue; }
+      const ka = a[i].nodeType === 1 ? a[i].getAttribute('data-key') : null, kb = b[i].nodeType === 1 ? b[i].getAttribute('data-key') : null;
+      if (ka !== kb) a[i].replaceWith(b[i]); else UI.morph(a[i], b[i]);
+    }
+    for (let i = b.length; i < a.length; i++) a[i].remove();
+  };
   UI.detail = function (spId, o) {
     o = o || {}; const s = st(), W = A.World;
     let inst = o.uid ? R.inst(s, o.uid) : null; if (inst) spId = inst.sp;
@@ -346,7 +368,7 @@
       const gearP = '<div class="dpanel" data-panel="gear"' + (tab === 'gear' ? '' : ' hidden') + '>' + UI.gearHtml(s, inst) + '</div>' +
         '<div class="dpanel" data-panel="moves"' + (tab === 'moves' ? '' : ' hidden') + '>' + (UI.movesHtml ? UI.movesHtml(s, inst) : '') + '</div>';
       const growth = '<div class="dpanel" data-panel="growth"' + (tab === 'growth' ? '' : ' hidden') + '>' + famHtml + '<div class="kv"><b>Evolution:</b> ' + evo + '</div>' + breedHtml + homeHtml + '</div>';
-      const clips = A.C3D && A.C3D.enabled() ? '<div class="clipbar">' + ['move', 'attack', 'hit', 'victory'].map((c) => '<button class="fchip" data-act="vPlay" data-clip="' + c + '">' + CLIP_LABEL[c] + '</button>').join('') + '</div>' : '';
+      const clips = A.C3D && A.C3D.enabled() ? '<div class="clipbar">' + ['move', 'attack', 'hit', 'victory'].concat(Au.hasVoice && Au.hasVoice(spId) ? ['special'] : []).map((c) => '<button class="fchip" data-act="vPlay" data-clip="' + c + '">' + CLIP_LABEL[c] + '</button>').join('') + '</div>' : '';
       body = '<div class="detail"><div><div class="big art viewer3d">' + Art.portrait(spId) + '</div>' + clips + '</div><div><h2>' + esc(sp.name) + ' ' + chip(sp.el) + '</h2>' + (sp.title ? '<div class="sp-title muted">' + esc(sp.title) + ' · Stage ' + sp.stage + '</div>' : '') + tabs + about + battle + gearP + growth + '</div></div>';
       body += '<div class="section-t">Your ' + esc(sp.name) + (mine.length > 1 ? 's' : '') + '</div>' + mine.map((a) => {
         const need = R.xpNeed(a.lv), isAct = a.uid === s.active, hm = W.homeOf(s, a.uid);
@@ -355,6 +377,14 @@
       }).join('');
     }
     const html = UI.sheet(esc(status === 'unknown' ? 'Undiscovered Amina' : sp.name), body, '<button class="btn gold" data-act="close">Close</button>', 'wide');
+    if (o.ov && o.ov.parentNode && o.ov._sp === spId && o.ov.firstElementChild) {
+      // Phase 8: the same Amina redrawn (feeding, companion change, gear): update in place, nothing resets
+      const t = document.createElement('div'); t.innerHTML = html;
+      const tab = o.ov._tab; UI.morph(o.ov.firstElementChild, t.firstElementChild);
+      if (tab) { o.ov.querySelectorAll('.dtab').forEach((b) => { const on = b.dataset.tab === tab; b.classList.toggle('on', on); b.setAttribute('aria-selected', on); }); o.ov.querySelectorAll('.dpanel').forEach((p) => (p.hidden = p.dataset.panel !== tab)); }
+      const slot = $('.viewer3d', o.ov); if (live && slot && !slot.classList.contains('live') && !(o.ov._views || []).some((r) => !r.dead)) UI.mountViewer(o.ov, slot, spId);
+      return o.ov;
+    }
     if (o.ov && o.ov.parentNode) {
       // keep a running 3D viewer when the same species is redrawn (feeding, companion change)
       const keep = o.ov._sp === spId ? $('.viewer3d.live', o.ov) : null; if (!keep) UI.disposeViews(o.ov); else keep.remove();
@@ -368,7 +398,7 @@
   };
   UI.act('dTab', (el) => { const ov = el.closest('.overlay'), k = el.dataset.tab; ov._tab = k; ov.querySelectorAll('.dtab').forEach((b) => { b.classList.toggle('on', b === el); b.setAttribute('aria-selected', b === el); }); ov.querySelectorAll('.dpanel').forEach((p) => (p.hidden = p.dataset.panel !== k)); });
   UI.act('dTabGo', (el) => { const b = el.closest('.overlay') && el.closest('.overlay').querySelector('.dtab[data-tab="' + el.dataset.tab + '"]'); if (b) b.click(); });
-  UI.act('vPlay', (el) => { const r = UI.viewOf(el.closest('.overlay')); if (r && r.v) r.v.play(el.dataset.clip); });
+  UI.act('vPlay', (el) => { const ov = el.closest('.overlay'), r = UI.viewOf(ov); if (r && r.v) { r.v.play(el.dataset.clip); if (Au.hasVoice && ov && Au.hasVoice(ov._sp)) Au.monster(ov._sp, CLIP_CUE[el.dataset.clip] || 'tap'); } });
   UI.act('detail', (el) => UI.detail(el.dataset.sp));
   UI.act('detailFeed', (el) => {
     const ov = el.closest('.overlay'), uid = +el.dataset.uid;

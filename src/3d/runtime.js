@@ -7,6 +7,7 @@ import * as C from './creature3d.js';
 import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/loaders/GLTFLoader.js/+esm';
 import { buildArena, kit, motes, tracker, rnd } from './arenas.js';
 import { Fx, FocusMarks, ELFX } from './combatfx.js';
+import * as SC from './showcase.js';   // Phase 8: bespoke clips (registered on import), living details, move choreography
 const THREE = C.THREE;
 const A = window.A, D = A.Data;
 
@@ -164,6 +165,9 @@ class Actor {
     t.clips.forEach((c) => { this.actions[c.name] = this.mixer.clipAction(c); });
     this.mixer.addEventListener('finished', (e) => { const cb = this._done; if (cb && e.action === this._oneShot) { this._done = null; cb(); } });
     this.idle(); this.flashT = 0;
+    // Phase 8: eyelids blink on their own overlay, alongside whatever else is playing; glow and ground details live
+    if (this.actions.blink) { this.blinkA = this.actions.blink; this.blinkA.setLoop(THREE.LoopRepeat); this.blinkA.time = Math.random() * this.blinkA.getClip().duration; this.blinkA.play(); }
+    this.living = SC.living(this, calm);
   }
   idle() {
     const a = this.actions.idle; if (!a) return; a.reset(); a.setLoop(THREE.LoopRepeat); a.enabled = true; a.setEffectiveWeight(1); a.timeScale = calm() ? 0 : 1; a.play(); this.current = a;
@@ -176,7 +180,7 @@ class Actor {
   // drawn back faces only). Built on first use; fades in and out.
   setOutline(color, strength) {
     if (!this.hull) {
-      this.hull = []; const meshes = []; this.root.traverse((o) => { if (o.isMesh && meshes.length < 8) meshes.push(o); });
+      this.hull = []; const meshes = []; const parts = !!this.root.userData.parts; this.root.traverse((o) => { if (o.isMesh && !/:lid/.test(o.name) && !(parts && /:glow/.test(o.name)) && meshes.length < 24) meshes.push(o); });
       meshes.forEach((m) => { if (!m.geometry.boundingBox) m.geometry.computeBoundingBox(); const c = m.geometry.boundingBox.getCenter(new THREE.Vector3()), s = 1.06;
         const h = new THREE.Mesh(m.geometry, new THREE.MeshBasicMaterial({ color: '#ffffff', side: THREE.BackSide, transparent: true, opacity: 0, depthWrite: false, toneMapped: false }));
         h.name = 'hull'; h.scale.setScalar(s); h.position.copy(c).multiplyScalar(1 - s); h.visible = false; h.renderOrder = 1; m.add(h); this.hull.push(h); });
@@ -188,6 +192,8 @@ class Actor {
   // play('attack'|'special'|'hit'|'hitBig'|'heal'|'guard'|'ready'|'victory'|'defeat'|'move'); resolves at the end of the clip
   play(name, o) {
     o = o || {}; name = this.clipName(name); const a = name && this.actions[name]; if (!a) return Promise.resolve();
+    if (this.living) this.living.onPlay(name);
+    if (this.blinkA) { if (name === 'defeat') this.blinkA.stop(); else if (!this.blinkA.isRunning()) this.blinkA.play(); }
     const prev = this.current; a.reset(); a.enabled = true; a.setEffectiveWeight(1); a.timeScale = 1;
     if (o.loop) { a.setLoop(THREE.LoopRepeat); a.clampWhenFinished = false; } else { a.setLoop(THREE.LoopOnce, 1); a.clampWhenFinished = true; }
     if (prev && prev !== a) a.crossFadeFrom(prev, 0.12, false); a.play(); this.current = a;
@@ -199,12 +205,13 @@ class Actor {
   get profile() { return (this.root.userData && this.root.userData.profile) || null; }
   update(dt) {
     this.mixer.update(dt);
+    if (this.living) this.living.update(dt);
     if (this.hull) { const k = Math.min(1, dt * 7); this.hullOp += ((this.hullTarget || 0) - this.hullOp) * k; const op = this.hullOp < 0.01 ? 0 : this.hullOp * 0.85; this.hull.forEach((h) => { h.material.opacity = op; h.visible = op > 0; }); }
     if (this.flashT > 0) { this.flashT -= dt; const k = Math.max(0, this.flashT / 0.22); this.mats.forEach((m) => { if (!m.userData.e0) m.userData.e0 = [m.emissive.clone(), m.emissiveIntensity]; m.emissive.copy(m.userData.e0[0]).lerp(this.flashCol, k); m.emissiveIntensity = m.userData.e0[1] + k * 1.2; }); if (this.flashT <= 0) this.mats.forEach((m) => { if (m.userData.e0) { m.emissive.copy(m.userData.e0[0]); m.emissiveIntensity = m.userData.e0[1]; } }); }
     if (this.glow) this.glow.material.opacity = 0.45 + Math.sin(performance.now() / 600) * 0.1;
     const rig = this.root.getObjectByName('rig'); if (rig) this.shadow.scale.setScalar(Math.max(0.5, 1 - rig.position.y * 0.8));
   }
-  dispose() { this.mixer.stopAllAction(); this.mixer.uncacheRoot(this.root); this.mats.forEach((m) => m.dispose()); if (this.hull) this.hull.forEach((h) => { h.removeFromParent(); h.material.dispose(); }); this.shadow.geometry.dispose(); this.shadow.material.dispose(); if (this.glow) this.glow.material.dispose(); this.t.refs--; this.group.removeFromParent(); }
+  dispose() { if (this.living) this.living.dispose(); this.mixer.stopAllAction(); this.mixer.uncacheRoot(this.root); this.mats.forEach((m) => m.dispose()); if (this.hull) this.hull.forEach((h) => { h.removeFromParent(); h.material.dispose(); }); this.shadow.geometry.dispose(); this.shadow.material.dispose(); if (this.glow) this.glow.material.dispose(); this.t.refs--; this.group.removeFromParent(); }
 }
 export async function actor(spId) { return new Actor(await template(spId), spId); }
 
@@ -343,8 +350,10 @@ export async function createBattle(container, o) {
     // 'attack' (style from the creature's profile), 'cast' (heal/guard). info: { el, type, special, boss, power }
     use(who, kind, info) {
       boost(1600); info = info || {}; const a = slots[who], tgt = other(who), pf = a.profile || {}, el = info.el || elOf(who);
-      if (kind !== 'attack') { const clip = info.type === 'heal' ? 'heal' : info.type === 'guard' ? 'guard' : 'move'; note('use:' + who + ':' + clip); return a.play(clip); }
-      const ult = !!(info.special || info.boss), clip = ult ? 'special' : 'attack', F = ELFX[el] || ELFX.light;
+      const api = { fx, at, slot: (w) => slots[w], other, calm, chest, head, from: (w, node) => { const o = slots[w].root.getObjectByName(node); return o ? o.getWorldPosition(new THREE.Vector3()) : chest(w); } };
+      if (kind !== 'attack') { const clip = info.type === 'heal' ? 'heal' : info.type === 'guard' ? 'guard' : 'move'; note('use:' + who + ':' + clip); SC.choreograph(api, who, a.spId, info.abil, info); return a.play(clip); }
+      const mv = SC.SHOWCASE_IDS.indexOf(a.spId) >= 0 && A.Showcase && A.Showcase.moves && A.Showcase.moves[info.abil];
+      const ult = mv && mv.ult === false ? !!info.boss : !!(info.special || info.boss), clip = mv && mv.clip ? mv.clip : ult ? 'special' : 'attack', F = ELFX[el] || ELFX.light;
       note('use:' + who + ':' + clip);
       if (ult) {
         // the ultimate: the attacker gathers its element in a rising column while the camera leans in
@@ -352,7 +361,8 @@ export async function createBattle(container, o) {
         if (!calm()) { cam.toward.copy(chest(who)); cam.pushTo = 1; at(0.62, () => { cam.pushTo = 0; }); }
       }
       const contact = ult ? 0.4 : 0.34, ranged = pf.ranged || ult || info.type === 'drain' || info.type === 'weaken';
-      if (ranged) at(Math.max(0.05, contact - 0.2), () => { fx.projectile(chest(who), chest(tgt), el, { dur: 0.2, big: ult }); });
+      if (SC.choreograph(api, who, a.spId, info.abil, info)) note('move:' + who + ':' + info.abil);
+      else if (ranged) at(Math.max(0.05, contact - 0.2), () => { fx.projectile(chest(who), chest(tgt), el, { dur: 0.2, big: ult }); });
       else at(contact, () => { fx.slash(chest(tgt), el, who === 'p' ? 1 : -1); });
       return a.play(clip);
     },
@@ -402,7 +412,7 @@ export async function createViewer(container, spId, o) {
   const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(28, 1, 0.05, 30); C.studioLights(scene, 'studio');
   const disc = new THREE.Mesh(new THREE.CircleGeometry(0.75, 40), new THREE.MeshBasicMaterial({ map: tex('shadow'), transparent: true, depthWrite: false })); disc.rotation.x = -Math.PI / 2; scene.add(disc);
   let act = await actor(spId); act.group.scale.setScalar(1); scene.add(act.group);
-  let yaw = -0.45, vel = 0, drag = null;
+  let yaw = SC.VIEW_YAW[spId] != null ? SC.VIEW_YAW[spId] : -0.45, vel = 0, drag = null;
   const view = {
     scene, camera, kind: 'viewer:' + spId,
     update(dt) { if (!drag) { yaw += vel * dt; vel *= Math.pow(0.04, dt); if (Math.abs(vel) < 0.02 && !calm()) yaw += dt * 0.15; } act.group.rotation.y = yaw; act.update(dt);
@@ -413,9 +423,10 @@ export async function createViewer(container, spId, o) {
   const el = renderer.domElement;
   const down = (e) => { boost(3000); drag = { x: e.clientX, y0: yaw, t: performance.now(), moved: false }; el.setPointerCapture && el.setPointerCapture(e.pointerId); };
   const move = (e) => { if (!drag) return; boost(); const dx = e.clientX - drag.x; if (Math.abs(dx) > 4) drag.moved = true; const ny = drag.y0 + dx * 0.012; vel = (ny - yaw) / Math.max(0.016, (performance.now() - drag.t) / 1000); drag.t = performance.now(); yaw = ny; };
-  const up = () => { if (drag && !drag.moved) act.play('victory'); drag = null; vel = Math.max(-6, Math.min(6, vel)); };
+  const voice = (cue) => { const Au = A.Audio; if (Au && Au.monster) Au.monster(act.spId, cue); };
+  const up = () => { if (drag && !drag.moved) { act.play('victory'); voice('tap'); } drag = null; vel = Math.max(-6, Math.min(6, vel)); };
   el.addEventListener('pointerdown', down); el.addEventListener('pointermove', move); el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up);
-  if (o.intro) act.play(o.intro);
+  if (o.intro) { act.play(o.intro); voice('idle'); }
   return {
     play: (n) => { boost(); return act.play(n); },
     async set(sp) { const n = await actor(sp); scene.add(n.group); act.dispose(); act = n; },

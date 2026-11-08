@@ -306,3 +306,14 @@ body.calm .overlay, body.calm .overlay > .sheet, body.calm .toast, body.calm .ac
 /* item rows: the old left stripe is replaced by the full rarity rim; equipped items keep a gold inner marker */
 .gitem.gitem, .fitem.fitem { border-left-color: transparent; }
 .fitem.fitem.worn { box-shadow: inset .22rem 0 0 var(--pz-gold); }
+
+/* Phase 8: the gem currency — a soft prismatic glow (static), plus a brief glint on the top bar every few seconds.
+   The glint is a filter change on one small icon; it is off with Reduce motion, Battery saver and while the island rests. */
+.ico.px-gem { filter: drop-shadow(0 0 1px rgba(200, 240, 255, .9)) drop-shadow(0 0 2.5px rgba(150, 200, 255, .55)) drop-shadow(0 0 4px rgba(255, 150, 230, .28)); }
+.res .ico.px-gem { animation: gemGlint 7s ease-in-out infinite; }
+@keyframes gemGlint {
+  0%, 86%, 100% { filter: drop-shadow(0 0 1px rgba(200, 240, 255, .9)) drop-shadow(0 0 2.5px rgba(150, 200, 255, .55)) drop-shadow(0 0 4px rgba(255, 150, 230, .28)); }
+  91% { filter: brightness(1.35) drop-shadow(0 0 1.5px #fff) drop-shadow(0 0 4px rgba(160, 230, 255, .9)) drop-shadow(0 0 7px rgba(255, 170, 240, .55)); }
+}
+body.calm .res .ico.px-gem, body.perf-saver .res .ico.px-gem, body.perf-rest .res .ico.px-gem, body.perf-hidden .res .ico.px-gem { animation: none; }
+@media (prefers-reduced-motion: reduce) { .res .ico.px-gem { animation: none; } }

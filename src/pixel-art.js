@@ -57,23 +57,24 @@
     [[4, 3], [5, 3]].forEach(([x, y]) => { g[y][x] = 'n'; });                                  // little honey drop
     return toRows(g);
   }
-  /* ---- gems: a cut, faceted stone with a bright table and darker pavilion ---- */
-  const GEM = [
-    '...oooooooo...',
-    '..oLLwwLLLLo..',
-    '.oLwwLLLLLLto.',
-    'oLLLLLLLLLttto',
-    'ommmmmmmmmmmmo',
-    '.ommmmmmmmmmo.',
-    '.oMmmmmmmmmdo.',
-    '..oMmmmmmmdo..',
-    '...oMmmmmmo...',
-    '....oMmmdo....',
-    '.....oMdo.....',
-    '......oo......',
-    '..............',
-    '..............',
-  ];
+  /* ---- gems (Phase 8): a brilliant-cut prismatic crystal. A pale table and crown catch the light; the pavilion splits
+     it into rainbow facets (rose, violet, cyan, mint, gold) that darken towards the point; one white sparkle. ---- */
+  function gem() {
+    // the earlier gem's silhouette (it reads well at 16 px); only the colouring is new
+    const SHAPE = ['...oooooooo...', '..o........o..', '.o..........o.', 'o............o', 'o............o', '.o..........o.', '.o..........o.', '..o........o..', '...o......o...', '....o....o....', '.....o..o.....', '......oo......', '..............', '..............'];
+    const g = SHAPE.map((r) => r.split(''));
+    for (let y = 1; y <= 10; y++) { const row = g[y], a = row.indexOf('o'), b = row.lastIndexOf('o');
+      for (let x = a + 1; x < b; x++) {
+        let c;
+        if (y <= 3) c = (x >= 5 && x <= 8) ? (y === 1 ? 'T' : 't') : x < 5 ? 'L' : 'l';                  // crown: table and side facets
+        else if (y === 4) c = 'G';                                                                        // girdle
+        else { const f = (x - a - 1) / Math.max(1, b - a - 2), band = Math.min(4, Math.floor(f * 5)); c = 'PVCMY'[band]; if (y >= 8) c = c.toLowerCase(); if (x === a + 1 && y <= 8) c = 'H'; }
+        row[x] = c; } }
+    [[4, 1], [5, 1], [3, 2]].forEach(([x, y]) => { g[y][x] = 'w'; });     // sparkle on the upper-left facet
+    g[2][10] = 'w';
+    return g.map((r) => r.join(''));
+  }
+  const GEM = gem();
   /* ---- essence: a living crystal shard with drifting pixels (the "radiating" look) ---- */
   const SHARD = [
     '......o.......',
@@ -96,7 +97,7 @@
   const SPRITES = {};
   SPRITES.gold = [coin(), { o: '#6b3a08', r: '#d9971c', l: '#ffe27a', d: '#b06d0e', g: '#f6bf2e', w: '#fff6c8', s: '#c47f10' }];
   SPRITES.food = [berry(), { o: '#5a1222', r: '#ff5a6e', d: '#c22a48', w: '#ffd0d6', p: '#ff9aa8', b: '#6a4220', f: '#4fbf4a', e: '#9ae86a', n: '#ffcf4a' }];
-  SPRITES.gem = [GEM, { o: '#28206a', L: '#c9f4ff', w: '#ffffff', t: '#7ad8ff', m: '#58a8ff', M: '#9ad0ff', d: '#3a5ad8' }];
+  SPRITES.gem = [GEM, { o: '#2a1a5e', w: '#ffffff', T: '#effcff', t: '#c8f4ff', L: '#ffd2f4', l: '#d8fff0', G: '#a8e8ff', P: '#ff8fd0', V: '#a98bff', C: '#5fd8ff', M: '#6ff0c0', Y: '#ffe27a', p: '#c4509a', v: '#6a4ad0', c: '#2a9ad8', m: '#2fb48a', y: '#d9a83a', H: '#f4fbff' }];
   D.ESSENCES = Object.keys(D.ELEMENTS);
   D.ESSENCES.forEach((el) => {
     const c = D.ELEMENTS[el].color;
