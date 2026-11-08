@@ -878,7 +878,8 @@
   /* ---------- PvP foundations (local only: there is no server yet) ---------- */
   const PV = (R.PvP = {});
   const pvRec = (st) => (st.pvp = Object.assign({ roster: [], practice: { w: 0, l: 0 }, rewardDay: '', rewardsToday: 0 }, st.pvp || {}));
-  const dfRec = (st) => (st.defence = Object.assign({ attack: [], defence: [], log: [] }, st.defence || {}));
+  // fills in missing fields in place (the record keeps its identity, so nested writes always land in the save)
+  const dfRec = (st) => { const d = st.defence || (st.defence = {}); if (!d.attack) d.attack = []; if (!d.defence) d.defence = []; if (!d.log) d.log = []; return d; };
   PV.rec = pvRec; PV.defRec = dfRec;
   PV.setRoster = function (st, uids) {
     uids = cleanUids(st, uids, D.PVP.rosterSize);
@@ -900,12 +901,14 @@
     return B.create(party, PV.aiTeam(avgLv(st, uids), D.PVP.rosterSize, seed == null ? Math.floor((rng || R.rng)() * 1e6) : seed), { rng });
   };
   const today = () => { const d = new Date(R.now()); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); };
-  function practiceReward(st) {
+  function practiceReward(st, amount) {
     const r = pvRec(st), t = today();
     if (r.rewardDay !== t) { r.rewardDay = t; r.rewardsToday = 0; }
     if (r.rewardsToday >= D.PVP.practiceDailyRewards) return null;
-    r.rewardsToday++; A.Economy.gain(st, D.PVP.practiceReward); return Object.assign({}, D.PVP.practiceReward);
+    r.rewardsToday++; return A.Economy.gain(st, amount || D.PVP.practiceReward);
   }
+  // rewarded wins left today (5v5 practice and raids share the limit); reading it changes nothing
+  PV.rewardsLeft = function (st) { const r = pvRec(st); return r.rewardDay !== today() ? D.PVP.practiceDailyRewards : Math.max(0, D.PVP.practiceDailyRewards - r.rewardsToday); };
   PV.resolvePractice = function (st, b) {
     if (!b.over) return { invalid: true };
     const r = pvRec(st), win = b.result === 'win';
@@ -932,9 +935,69 @@
   function logDef(st, entry) { const r = dfRec(st); r.log.unshift(Object.assign({ t: R.now() }, entry)); r.log.length = Math.min(r.log.length, 10); }
   PV.resolveRaid = function (st, b) {
     if (!b.over) return { invalid: true };
-    const win = b.result === 'win'; logDef(st, { kind: 'raid', win });
+    const r = dfRec(st), t = r.target, win = b.result === 'win';
+    if (b.raidTarget) {
+      // a raid on a previewed island pays exactly the loot that was shown, once: the island is used up by a win
+      if (!t || t.id !== b.raidTarget || !t.locked) return { invalid: true, stale: true };
+      logDef(st, { kind: 'raid', win, foe: t.name, isle: t.isle });
+      const reward = win ? practiceReward(st, t.loot) : null;
+      if (win) { r.target = null; r.recent = recentAdd(r.recent, t.bot); } else t.locked = false;
+      return { win, reward, target: t, capped: win && !reward };
+    }
+    logDef(st, { kind: 'raid', win });
     const reward = win ? practiceReward(st) : null;
     return { win, reward };
+  };
+
+  /* Island Defence raid targets (Phase 12A). Before a raid you see one computer-owned island: who owns it, its
+     defenders and exactly what a win would pay. Skip costs nothing and changes nothing but the island on offer.
+     The island is kept in the save, so leaving the screen or restarting shows the same one; Attack locks it for
+     that battle, and the battle only pays the loot of the island it was locked to. */
+  const RC = () => D.PVP.raid;
+  const recentAdd = (list, id) => (list || []).filter((x) => x !== id).concat([id]).slice(-RC().recent);
+  function attackLevel(st) {
+    const uids = PV.team(st, 'attack');
+    if (uids.length) return avgLv(st, uids);
+    const top = st.aminas.slice().sort((a, b) => b.lv - a.lv).slice(0, D.PVP.defenceSize);
+    return Math.max(1, avgLv(st, top.map((a) => a.uid)));
+  }
+  function makeTarget(st, seed) {
+    const C = RC(), rnd = seededRng(seed), r = dfRec(st), avoid = (r.recent || []).concat(r.target ? [r.target.bot] : []);
+    let pool = C.bots.filter((b) => avoid.indexOf(b.id) < 0); if (!pool.length) pool = C.bots.filter((b) => !r.target || b.id !== r.target.bot);
+    const bot = pool[Math.floor(rnd() * pool.length)];
+    let pick = rnd() * C.tiers.reduce((a, x) => a + x.w, 0), tier = C.tiers[0];
+    for (const x of C.tiers) { if (pick < x.w) { tier = x; break; } pick -= x.w; }
+    const m = tier.mult[0] + rnd() * (tier.mult[1] - tier.mult[0]);
+    const loot = { gold: Math.max(5, Math.round(C.base.gold * m / 5) * 5), food: Math.max(1, Math.round(C.base.food * m * (0.85 + rnd() * 0.3))) };
+    const lv = Math.max(1, Math.min(D.MAX_LEVEL, attackLevel(st) + tier.lv));
+    const foes = PV.aiTeam(lv, D.PVP.defenceSize, Math.floor(rnd() * 1e6)).map((f) => ({ sp: f.sp, lv: f.lv }));
+    const look = { skin: Math.floor(rnd() * 6), hair: Math.floor(rnd() * 6), hairCol: Math.floor(rnd() * 7), eyes: Math.floor(rnd() * 4), outfit: Math.floor(rnd() * 6), acc: Math.floor(rnd() * 4) };
+    return { id: bot.id + '-' + (seed >>> 0).toString(36), bot: bot.id, name: bot.name, isle: bot.isle, biome: bot.biome, look, tier: tier.id, guard: tier.label, foes, loot, locked: false, t: R.now() };
+  }
+  // what a win against the island on offer would pay right now (0 when today's rewarded wins are used up)
+  PV.raidValue = (loot) => (loot.gold || 0) + (loot.food || 0) * RC().foodValue;
+  PV.raidPreview = function (st) {
+    const r = dfRec(st);
+    // a battle that never finished (the game closed during it) counts as a called-off raid, as retreating does
+    if (r.target && r.target.locked) { logDef(st, { kind: 'raid', win: false, foe: r.target.name, isle: r.target.isle, left: true }); r.target.locked = false; }
+    if (!r.target) r.target = makeTarget(st, Math.floor(R.rng() * 4294967295));
+    const t = r.target, left = PV.rewardsLeft(st);
+    return { target: t, loot: Object.assign({}, t.loot), value: PV.raidValue(t.loot), rewardsLeft: left, pays: left > 0 ? Object.assign({}, t.loot) : {} };
+  };
+  PV.skipRaid = function (st, rng) {
+    const r = dfRec(st); if (r.target && r.target.locked) return { ok: false, reason: 'locked' };
+    if (r.target) r.recent = recentAdd(r.recent, r.target.bot);
+    const t = makeTarget(st, Math.floor((rng || R.rng)() * 4294967295)); r.target = t;
+    return { ok: true, target: t };
+  };
+  // Attack: lock the island on offer and build the battle from its saved defenders
+  PV.attackRaid = function (st, rng) {
+    const uids = PV.team(st, 'attack'), r = dfRec(st), t = r.target;
+    if (uids.length !== D.PVP.defenceSize || !t || t.locked) return null;
+    t.locked = true;
+    const party = uids.map((u) => R.partyFighter(st, R.inst(st, u)));
+    const foes = t.foes.map((f) => B.fighter(f.sp, f.lv, { name: 'Defender ' + D.SPECIES[f.sp].name }));
+    const b = B.create(party, foes, { rng }); b.raidTarget = t.id; return b;
   };
   // Computer raiders attack your saved defence team; both sides are played by the computer. Nothing is spent or lost.
   PV.simulateDefence = function (st, rng, seed) {

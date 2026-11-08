@@ -168,19 +168,53 @@
     const s = st(), N = D.PVP.defenceSize, at = R.PvP.team(s, 'attack'), df = R.PvP.team(s, 'defence'), log = R.PvP.defRec(s).log;
     const body = OFFLINE + '<div class="dteams"><div class="dteam atk"><h3>' + I('swords') + ' Attack team</h3><p class="muted small-t">Raids other islands.</p>' + teamRow(s, at, N) + '<button class="btn small" data-act="defEdit" data-kind="attack">Edit attack team</button></div>' +
       '<div class="dteam def"><h3>' + I('shield') + ' Defence team</h3><p class="muted small-t">Guards your island while you are away. Saved on this device.</p>' + teamRow(s, df, N) + '<button class="btn small" data-act="defEdit" data-kind="defence">Edit defence team</button></div></div>' +
-      (log.length ? '<h3>Recent</h3><div class="dlog">' + log.slice(0, 5).map((l) => '<div>' + (l.kind === 'raid' ? I('swords') + ' Practice raid: ' + (l.win ? '<span class="good">won</span>' : '<span class="bad">lost</span>') : I('shield') + ' Defence test: ' + (l.win ? '<span class="good">held</span>' : '<span class="bad">fell</span>') + (l.turns ? ' in ' + l.turns + ' turns' : '')) + '</div>').join('') + '</div>' : '') +
+      (log.length ? '<h3>Recent</h3><div class="dlog">' + log.slice(0, 5).map((l) => '<div>' + (l.kind === 'raid' ? I('swords') + ' Raid' + (l.isle ? ' on ' + esc(l.isle) : '') + ': ' + (l.win ? '<span class="good">won</span>' : '<span class="bad">' + (l.left ? 'called off' : 'lost') + '</span>') : I('shield') + ' Defence test: ' + (l.win ? '<span class="good">held</span>' : '<span class="bad">fell</span>') + (l.turns ? ' in ' + l.turns + ' turns' : '')) + '</div>').join('') + '</div>' : '') +
       '<div class="todo"><b>Still needed for real Island Defence:</b> a server that stores defence teams, finds islands to raid, runs the defence side for an absent player, and records results for both players.</div>';
-    const foot = back('pvpMenu') + '<button class="btn' + (df.length === N ? '' : ' off') + '" data-act="defTest">' + I('shield') + ' Test my defence</button><button class="btn gold' + (at.length === N ? '' : ' off') + '" data-act="defRaid">' + I('swords') + ' Practice raid</button>';
+    const foot = back('pvpMenu') + '<button class="btn' + (df.length === N ? '' : ' off') + '" data-act="defTest">' + I('shield') + ' Test my defence</button><button class="btn gold' + (at.length === N ? '' : ' off') + '" data-act="defRaid">' + I('swords') + ' Find an island to raid</button>';
     return open(ovEx, UI.sheet(I('shield') + ' Island Defence', body, foot, 'wide'));
   };
   UI.act('defence', (el) => UI.defence(el.closest('.overlay')));
   UI.act('defEdit', (el) => { const kind = el.dataset.kind, ov = el.closest('.overlay'); UI.pickTeam({ size: D.PVP.defenceSize, exact: true, title: (kind === 'attack' ? 'Attack' : 'Defence') + ' team', go: 'Save team', initial: R.PvP.team(st(), kind), note: kind === 'attack' ? 'These three raid other islands.' : 'These three defend your island.', onGo: (sel) => { const r = R.PvP.setTeam(st(), kind, sel); if (!r.ok) return false; S.save(); if (ov && ov.parentNode) UI.defence(ov); return true; } }); });
-  UI.act('defRaid', () => {
-    const b = R.PvP.createRaid(st()); if (!b) return; UI.closeAll();
-    UI.startBattle({ kind: 'raid', b, d: 'hollowveil', label: 'Practice raid · computer defenders', intro: 'Practice raid: three computer defenders stand in your way.',
-      retreat: { title: 'Call off the raid?', text: 'It counts as a lost raid.', yes: 'Call it off', fn: () => { b.over = true; b.result = 'lose'; R.PvP.resolveRaid(st(), b); S.save(); }, after: () => { UI.showIsland(); UI.defence(); } },
-      finish: (U) => { const out = R.PvP.resolveRaid(st(), U.b); S.save(); Au.play(out.win ? 'win' : 'lose'); pvpResult(out.win ? 'Raid successful' : 'The defenders held', out, () => UI.defence()); } });
+  /* ---------- Island Defence: Raid Preview (Phase 12A) ----------
+     One computer-owned island at a time: its owner, its defenders and exactly what a win pays. Skip offers another
+     island (free, changes nothing else); Attack locks the island shown for that battle. The island on offer is kept
+     in the save, so leaving or restarting shows the same one. */
+  const lootTile = (k, n, lab, dim) => '<div class="rp-tile ' + k + (dim ? ' dim' : '') + '"><span class="rp-ti">' + I(k) + '</span><b>' + fmt(n) + '</b><small>' + lab + '</small></div>';
+  UI.raidPreview = function (ovEx, fresh) {
+    const s = st(), P = R.PvP.raidPreview(s), t = P.target, N = D.PVP.defenceSize, at = R.PvP.team(s, 'attack'), ready = at.length === N, pays = P.rewardsLeft > 0, lim = D.PVP.practiceDailyRewards;
+    S.save();
+    const mine = at.map((u) => R.inst(s, u)).filter(Boolean), sum = (xs) => xs.reduce((a, x) => a + x.lv, 0);
+    const odds = !mine.length ? '' : sum(t.foes) > sum(mine) + 2 ? 'Tougher than your team' : sum(t.foes) < sum(mine) - 2 ? 'Weaker than your team' : 'An even match';
+    const foe = '<section class="rp-foe"><div class="rp-who"><span class="rp-av" aria-hidden="true">' + A.Pixel.avatar(t.look) + '</span><div class="rp-names"><small>Island owner · computer</small><b>' + esc(t.name) + '</b><span>' + esc(t.isle) + '</span>' +
+      '<span class="rp-guard g-' + t.tier + '">' + I('shield') + ' ' + esc(t.guard) + '</span></div></div><div class="rp-isle" aria-hidden="true">' + UI.isleThumb(t.biome) + '</div></section>';
+    const loot = '<section class="rp-loot' + (pays ? '' : ' spent') + '" aria-label="Loot on this island"><h3>' + I('box') + ' Loot you can raid</h3><div class="rp-tiles">' +
+      lootTile('gold', t.loot.gold, 'Gold', !pays) + lootTile('food', t.loot.food, 'Food', !pays) +
+      '<div class="rp-total"><small>Total value</small><b>' + fmt(P.value) + '</b><small>gold · each food counts as ' + D.PVP.raid.foodValue + '</small></div></div>' +
+      (pays ? '<p class="rp-note">Win the raid to take all of it. <b>' + P.rewardsLeft + ' of ' + lim + '</b> rewarded wins left today (shared with 5v5 practice). Gems can’t be raided.</p>'
+        : '<p class="rp-note warn">' + I('warn') + ' Today’s ' + lim + ' rewarded wins are used up, so a win now pays nothing. They come back tomorrow. Gems can’t be raided.</p>') + '</section>';
+    const defs = '<section class="rp-def"><h3>' + I('shield') + ' Defenders' + (odds ? ' <span class="rp-odds">' + odds + '</span>' : '') + '</h3><div class="party-row many">' +
+      t.foes.map((f) => '<div class="slot">' + artBox(f.sp) + '<b>' + esc(D.SPECIES[f.sp].name) + '</b>Lv ' + f.lv + '</div>').join('') + '</div>' +
+      '<p class="muted small-t">' + (mine.length ? 'Your attack team: ' + mine.map((a) => esc(D.SPECIES[a.sp].name) + ' Lv ' + a.lv).join(' · ') : 'You have no attack team yet.') + '</p></section>';
+    const body = OFFLINE + '<div class="rp' + (fresh ? ' rp-new' : '') + '">' + foe + loot + defs + (ready ? '' : '<p class="bad">Set an attack team of three on the Island Defence screen first.</p>') + '</div>';
+    const foot = back('defence') + '<button class="btn rp-skip" data-act="raidSkip">' + I('arrow') + ' Skip opponent</button><button class="btn gold rp-attack' + (ready ? '' : ' off') + '" data-act="raidAttack"' + (ready ? '' : ' aria-disabled="true"') + '>' + I('swords') + ' Attack</button>';
+    return open(ovEx, UI.sheet(I('swords') + ' Raid preview', body, foot, 'wide raidsheet'));
+  };
+  UI.act('defRaid', (el) => UI.raidPreview(el.closest('.overlay')));
+  UI.act('raidSkip', (el) => { const r = R.PvP.skipRaid(st()); if (!r.ok) return; S.save(); Au.play('tap'); UI.raidPreview(el.closest('.overlay'), true); });
+  UI.act('raidAttack', () => {
+    const s = st(), b = R.PvP.attackRaid(s); if (!b) { UI.toast('Set an attack team of three first.', 't'); return; }
+    const t = R.PvP.defRec(s).target; S.save(); UI.closeAll();
+    UI.startBattle({ kind: 'raid', b, d: 'hollowveil', label: 'Raid · ' + t.isle, intro: 'Raid on ' + t.isle + ': ' + t.name + '’s three defenders stand in your way.',
+      retreat: { title: 'Call off the raid?', text: 'It counts as a lost raid. The island stays on offer.', yes: 'Call it off', fn: () => { b.over = true; b.result = 'lose'; R.PvP.resolveRaid(st(), b); S.save(); }, after: () => { UI.showIsland(); UI.raidPreview(); } },
+      finish: (U) => { const out = R.PvP.resolveRaid(st(), U.b); S.save(); Au.play(out.win ? 'win' : 'lose'); raidResult(out); } });
   });
+  function raidResult(out) {
+    const t = out.target || {}, title = out.win ? 'Raid on ' + (t.isle || 'the island') + ' succeeded' : t.name ? t.name + '’s defenders held' : 'The defenders held';
+    const spoils = out.reward ? '<div class="v-spoils">' + UI.Rewards.group({ title: 'Raided from ' + (t.isle || 'the island'), list: UI.Rewards.fromRes(out.reward) }) + '</div>'
+      : out.win ? '<p class="muted small-t">No loot: today’s rewarded wins were already used up.</p>' : '<p class="muted small-t">Nothing is lost. The island is still on offer if you want another go, or skip it for another.</p>';
+    const ov = UI.modal(UI.sheet('Raid result', '<div class="vcard vic ' + (out.win ? 'v-win' : 'defeat') + '"><div class="v-banner"><span class="v-crest">' + I(out.win ? 'swords' : 'shield') + '</span><small class="v-kick">Island Defence</small><h1>' + esc(title) + '</h1></div>' + spoils + '</div>', '<button class="btn gold" id="rr-ok">Continue</button>', 'narrow'));
+    $('.x', ov) && $('.x', ov).remove(); $('#rr-ok', ov).onclick = () => { UI.close(ov); UI.leaveBattle(() => { UI.showIsland(); UI.raidPreview(); }); };
+  }
   UI.act('defTest', (el) => {
     const s = st(), r = R.PvP.simulateDefence(s); if (!r.ok) return; S.save();
     const ov = el.closest('.overlay');

@@ -236,6 +236,35 @@
     rosterSize: 5, defenceSize: 3,
     practiceDailyRewards: 5, practiceReward: { gold: 60, food: 10 },
     online: false, // set true only when a real matchmaking service is connected
+    // Phase 12A: Island Defence raid targets. Computer-owned islands (no server yet), each with its own defenders and
+    // raidable loot, shown before you attack. Only coins (gold) and food can be raided; gems never. Loot scales with
+    // how well an island is guarded, around the existing raid reward; a win still counts towards the same daily
+    // limit of rewarded wins as 5v5 practice (practiceDailyRewards).
+    raid: {
+      base: { gold: 60, food: 10 }, // the reward a raid paid before Phase 12A, now the middle of the range
+      foodValue: 3,                  // food counted as 3 coins in an island's total loot value
+      recent: 6,                     // islands not offered again until this many others have been
+      tiers: [
+        { id: 'light', label: 'Lightly guarded', lv: -1, w: 2, mult: [0.6, 0.9] },
+        { id: 'guarded', label: 'Guarded', lv: 0, w: 3, mult: [0.9, 1.25] },
+        { id: 'well', label: 'Well guarded', lv: 1, w: 2, mult: [1.25, 1.6] },
+        { id: 'fort', label: 'Fortified', lv: 2, w: 1, mult: [1.6, 2] },
+      ],
+      bots: [
+        { id: 'mirelle', name: 'Captain Mirelle', isle: 'Driftwood Atoll', biome: 'starter' },
+        { id: 'oskar', name: 'Old Oskar', isle: 'Barnacle Rest', biome: 'starter' },
+        { id: 'tamsin', name: 'Tamsin Vale', isle: 'Clover Shoal', biome: 'starter' },
+        { id: 'bramble', name: 'Bramble & Co.', isle: 'Fernhollow Isle', biome: 'verdant' },
+        { id: 'liora', name: 'Liora Quill', isle: 'Mossgate Reach', biome: 'verdant' },
+        { id: 'hob', name: 'Hob the Gardener', isle: 'Willowmere', biome: 'verdant' },
+        { id: 'kaze', name: 'Kaze Ironleaf', isle: 'Cinder Spur', biome: 'obsidian' },
+        { id: 'vex', name: 'Vex Ashcombe', isle: 'Glasswick Crag', biome: 'obsidian' },
+        { id: 'rook', name: 'Rook & Rue', isle: 'Ember Hollow', biome: 'obsidian' },
+        { id: 'selene', name: 'Selene Arch', isle: 'Starfall Terrace', biome: 'celestial' },
+        { id: 'pell', name: 'Pell Wintergold', isle: 'Moonlit Spire', biome: 'celestial' },
+        { id: 'nyx', name: 'Nyx Halloran', isle: 'Opal Halo', biome: 'celestial' },
+      ],
+    },
   };
   D.HIDESEEK = {
     lobbySize: 5, seconds: 75, searches: 10,
