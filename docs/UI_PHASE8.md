@@ -155,6 +155,17 @@ before/after difference means anything. On the iPhone, a whole Phase 7 battle fr
 |---|---|
 | New `tests/browser-showcase8.test.js` | 38 checks |
 | Full suite (20 suites, run alone) | **596 of 596 passed** |
+| After the iPhone fixes: new `tests/browser-p8fix.test.js`, plus 3 checks in the battle test | 36 + 3 checks |
+| Full suite after the fixes (21 suites) | **634 of 635 passed**; see below |
+
+The one failure after the fixes is a Phase 7 arena check, "leaving battles frees their arenas", which compares GPU
+geometry counts between two rounds of boss battles (10, then 12). It is timing-sensitive:
+* run alone, it passed 2 of 2 times;
+* with four test browsers running at once, the Phase 7 build (`ui7-perf-fix`, before Phase 8) fails it in the same
+  way (10 → 12);
+* under that load, both builds also miss another Phase 7 timing check, "releasing clears the preview".
+
+It is not a regression.
 
 ## 9. Fixes after the first iPhone test
 **Polished monsters could not be opened (`src/ui.js`).**
