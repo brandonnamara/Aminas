@@ -178,6 +178,23 @@ const CLIPS = ['idle', 'blink', 'ready', 'attack', 'special', 'hit', 'hitBig', '
   ok(['move', 'attack', 'hurt', 'victory', 'special'].every((c) => dt.played.includes('tidalong:' + c)), 'each clip button plays the matching animation with its own sound (' + dt.played.join(' ') + ')');
   ok(dt.steps.length === 3 && dt.steps.every(Boolean), 'feeding a roster monster keeps the same screen (no reset): same sheet, 3D viewer, title and row, level updated');
 
+  /* ================= 7b. evolution: unchanged rules; the ceremony shows the new form's own victory and voice ================= */
+  const ev = await page.evaluate(async () => {
+    const s = A.State.state, R = A.Rules; A.UI.closeAll(); s.res.gold = 1e6; s.res.food = 1e5; s.res.gems = 5000;
+    const inst = s.aminas.find((a) => a.sp === 'emberix'), evo = A.Data.SPECIES.emberix.evo; inst.lv = Math.max(inst.lv, evo.lv);
+    const r = R.evolve(s, inst.uid); R.drain(); if (A.UI.queue) A.UI.queue.length = 0; document.querySelectorAll('.dlg').forEach((x) => x.remove());
+    const played = []; const m0 = A.Audio.monster; A.Audio.monster = function (sp, cue, o) { played.push(sp + ':' + cue); return m0.call(this, sp, cue, o); };
+    A.UI.evolveFx('emberix', r.to, () => {});
+    const find = () => [...document.querySelectorAll('.overlay')].find((x) => x.querySelector('.evolve'));
+    let live = false; for (let i = 0; i < 100; i++) { await new Promise((q) => setTimeout(q, 150)); const ov = find(); if (ov && ov.querySelector('.evo-to canvas')) { live = true; break; } }
+    await new Promise((q) => setTimeout(q, 1200)); A.Audio.monster = m0;
+    const ov = find(), name = ov && ov.querySelector('.evo-name') ? ov.querySelector('.evo-name').textContent : '';
+    A.UI.closeAll();
+    return { ok: !!r.ok, to: r.to, have: s.aminas.some((a) => a.sp === r.to), live, played, name };
+  });
+  ok(ev.ok && ev.to === 'flaremon' && ev.have && /Emberix II/.test(ev.name), 'evolution works as before: Emberix becomes Emberix II (same rules, same name convention): ' + ev.name);
+  ok(ev.live && ev.played.includes('flaremon:idle'), 'the evolution ceremony reveals Emberix II live in 3D, playing its own victory with its own voice (' + ev.played.join(' ') + ')');
+
   /* ================= 8. floating parts drift, and stay still with Reduce motion ================= */
   const aura = await page.evaluate(async (IDS) => {
     const C = await import('/src/3d/creature3d.js'); const SC = await import('/src/3d/showcase.js'); const out = { forms: [], moving: 0, calmStill: 0 };
@@ -214,5 +231,5 @@ const CLIPS = ['idle', 'blink', 'ready', 'attack', 'special', 'hit', 'hitBig', '
   ok(snd.off === false && snd.on === true && snd.repeat === false, 'roster voices respect the sound-effects setting and the 120 ms repeat guard');
 
   ok(errors.length === 0, 'no script errors' + (errors.length ? ': ' + errors.slice(0, 3).join(' | ') : ''));
-  console.log('\n' + pass + ' passed, ' + fail + ' failed'); await browser.close(); srv.close(); process.exit(fail ? 1 : 0);
+  console.log((fail ? 'FAILED: ' : 'PASSED: ') + pass + ' passed, ' + fail + ' failed (browser-roster8b)'); await browser.close(); srv.close(); process.exit(fail ? 1 : 0);
 })().catch((e) => { console.error(e); process.exit(1); });

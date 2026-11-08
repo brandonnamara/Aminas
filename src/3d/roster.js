@@ -213,7 +213,7 @@ const QUIRK = {
   // Sylvaneer: lifts its head high, alert, and scans the treeline
   alert: (a, b, e) => ({ head: (t) => [0, 0.32 * sin(PI * 2 * (t - a) / (b - a)) * e(t), 0.3 * e(t)], tail: (t) => [0, 0, -0.25 * e(t)], legsF: (t) => [0, 0, -0.06 * e(t)] }),
   // Terraflora: rustles its leaves (a quick wobble of the crown)
-  rustle: (a, b, e) => ({ head: (t) => [0.14 * sin(t * 18) * e(t), 0.08 * sin(t * 9) * e(t), 0], armL: (t) => [0.2 * e(t), 0, 0.15 * sin(t * 9) * e(t)], armR: (t) => [0.2 * e(t), 0, 0.15 * sin(t * 9 + 2) * e(t)] }),
+  rustle: (a, b, e) => ({ head: (t) => [0.14 * sin(t * 18) * e(t), 0.08 * sin(t * 9) * e(t), 0], hair: (t) => [0.22 * sin(t * 18 + 0.8) * e(t), 0.14 * sin(t * 9 + 0.5) * e(t), 0.06 * e(t)], armL: (t) => [0.2 * e(t), 0, 0.15 * sin(t * 9) * e(t)], armR: (t) => [0.2 * e(t), 0, 0.15 * sin(t * 9 + 2) * e(t)] }),
   // Emberix: a happy tail wag and a curious head tilt
   wag: (a, b, e) => ({ tail: (t) => [0, 0.6 * sin(t * 26) * e(t), -0.3 * e(t)], head: (t) => [0.3 * e(t), 0.1 * e(t), 0.08 * e(t)], rigP: (t) => [0, 0.015 * Math.abs(sin(t * 13)) * e(t), 0] }),
   // Pyrokai: shadow-boxes: jab, jab, cross

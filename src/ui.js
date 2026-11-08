@@ -551,7 +551,7 @@
     const g = Au.diag ? Au.diag() : {}, row = (k, v) => '<div class="kv"><b>' + SC_LABEL[k] + ':</b> ' + esc(String(v)) + '</div>';
     const body = '<p class="muted" style="font-size:.8rem;margin:.2rem 0 .4rem">Tap a button and listen. If you hear nothing, check the volume buttons and that nothing else (a call, Siri, voice dictation) is using the speaker, then tap again.</p>' +
       row('context', g.context === 'running' ? 'running' : g.context + ' (it should say running after a tap)') + row('session', g.session === 'playback' ? 'playback (plays even with the silent switch on)' : g.session) + row('sfx', g.sfx ? 'on' : 'off (turn it on in Settings)') + row('music', g.music ? 'on' : 'off') +
-      '<div class="row-actions" style="margin-top:.5rem"><button class="btn small gold" data-act="scPlay" data-k="chime">Game chime</button><button class="btn small" data-act="scPlay" data-k="umbrit">Umbrit</button><button class="btn small" data-act="scPlay" data-k="cannonis">Cannonis</button><button class="btn small" data-act="scPlay" data-k="aimza3">Aimza III</button></div>';
+      '<div class="row-actions" style="margin-top:.5rem"><button class="btn small gold" data-act="scPlay" data-k="chime">Game chime</button><button class="btn small" data-act="scPlay" data-k="umbrit">Umbrit</button><button class="btn small" data-act="scPlay" data-k="cannonis">Cannonis</button><button class="btn small" data-act="scPlay" data-k="aimza3">Aimza III</button><button class="btn small" data-act="scPlay" data-k="infernox">Emberix III</button></div>';
     const html = UI.sheet('Sound check', body, '<button class="btn gold" data-act="close">Close</button>', 'narrow');
     if (ov && ov.parentNode) { ov.innerHTML = html; return ov; }
     return UI.modal(html);

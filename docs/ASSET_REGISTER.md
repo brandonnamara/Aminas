@@ -73,3 +73,11 @@ All are in `src/3d/`. "Used" means where the asset appears in the game.
 
 Buildings without a voxel model fall back to their existing 2D picture. In Phase 1, the only such building is one
 under construction, which keeps its 2D scaffolding.
+
+## Monster animation and sound (UI Phase 8 and Phase 8B)
+
+**No third-party assets.** The monster models are the project's own voxel builders (`src/voxel-*.js`). The Phase 8B
+rigging (`src/voxel-rig.js`), the animation clips (`src/3d/showcase.js`, `src/3d/roster.js`) and the move effects
+(`src/3d/combatfx.js`) are written in code. Every monster sound is synthesized while the game runs, with the Web Audio
+API (`src/audio.js`): oscillators, filtered noise and envelopes. There are no recordings, samples or sound libraries,
+so nothing needs a licence or attribution.
