@@ -45,7 +45,11 @@ export function persona(spId) {
   const sp = window.A.Data.SPECIES[spId]; if (!sp) return null; const base = PERSONA[sp.line]; if (!base) return null;
   const s = sp.stage || 1, p = Object.assign({}, base);
   p.stage = s; p.tempo *= [1.08, 1, 0.9][s - 1]; p.bob *= [1.25, 1, 0.75][s - 1]; p.heavy = Math.min(1, p.heavy + [-0.08, 0, 0.14][s - 1]);
+  // the young look around and wag more; the third form breathes deeper and holds itself steadier
+  p.breathe *= [0.9, 1, 1.18][s - 1]; p.look *= [1.2, 1, 0.82][s - 1]; p.tail *= [1.18, 1, 0.88][s - 1]; if (p.wing) p.wing *= [1.12, 1, 0.9][s - 1];
   p.amp = [1.1, 1, 0.92][s - 1]; p.grand = s === 3; p.el = sp.el;
+  // how it performs the shared styles: livelier lines move bigger, heavier and older forms reach each pose later
+  p.size = p.amp * (0.9 + 0.22 * Math.max(0, Math.min(1, (p.tempo - 0.7) / 0.65))); p.lag = 1.1 - 0.3 * p.heavy;
   return p;
 }
 
@@ -67,13 +71,16 @@ function rosterClips(root, spId) {
   const allLegs = (f, b) => legsQ(f, b).concat(legs2(b || f));
   const tail = (keys) => R('tail', keys), neck = (keys) => R('neck', keys), hair = (keys) => R('hair', keys);
   const body = (keys) => S('body', keys), rigP = (keys) => Pw('rig', keys), rigR = (keys) => R('rig', keys);
+  // floating stones, crystals, cards, wisps and rings answer what the creature does (they draw in, flare out, settle);
+  // their slow drift around it is the living detail's job (it turns them; these clips only scale them)
+  const auraS = (keys) => [S('aura', keys), S('halo', keys)];
   // sampled curves: f(t) -> value, N keys over D (loops must return to their start)
   const F = (D, N, f) => Array.from({ length: N + 1 }, (_, i) => { const t = D * i / N; return [t, f(t)]; });
   const out = [];
 
   /* ---------------- idle: breathing, wandering look, tail and wings, and the line's own quirk ---------------- */
   {
-    const D = +(5.2 / pr.tempo).toFixed(2), N = 48, nb = Math.max(2, Math.round(D / 1.7)), qa = D * 0.52, qb = D * 0.82, e = (t) => bump(t, qa, qb);
+    const D = +(5.2 / pr.tempo).toFixed(2), N = Math.max(48, Math.ceil(D / 0.033)), nb = Math.max(2, Math.round(D / 1.7)), qa = D * 0.52, qb = D * 0.82, e = (t) => bump(t, qa, qb);
     const ph = (t) => (t / D) * TAU;
     const q = QUIRK[pr.quirk] ? QUIRK[pr.quirk](qa, qb, e, { D, pr, has, heads }) : {};
     const at = (name, f) => (q[name] ? (t) => add3(f(t), q[name](t)) : f);
@@ -93,6 +100,7 @@ function rosterClips(root, spId) {
       neck(F(D, N, at('neck', (t) => [0, 0.14 * sin(ph(t)), 0.05 * sin(ph(t) * 2)]))),
       hair(F(D, N, at('hair', (t) => [0.08 * sin(ph(t) * 2), 0.1 * sin(ph(t)), 0]))),
       R('cannon', F(D, N, at('cannon', (t) => [0, 0.03 * sin(ph(t) + 1), 0.035 * sin(ph(t) * 2 + 0.5)]))),
+      auraS(F(D, N, (t) => [1 + 0.05 * sin(ph(t) * nb), 1 + 0.035 * sin(ph(t) * nb + 1.2), 1 + 0.05 * sin(ph(t) * nb)])),
       q.lids ? lids(F(D, N, q.lids)) : [] ]));
   }
   // blink: every eyelid together, a double blink now and then (shy ones blink more)
@@ -105,14 +113,14 @@ function rosterClips(root, spId) {
     hd([[0, Z3], [0.3, [0, 0, -0.12]], [0.75, Z3]]), ears([[0, Z3], [0.18, [0, 0, -0.5]], [0.42, [0.05, 0, 0.18]], [0.75, Z3]]),
     wings([[0, Z3], [0.35, [0.3, 0, 0]], [0.75, Z3]]), armsK([[0, Z3], [0.3, [0.15, 0, 0.35]], [0.75, Z3]]),
     tail([[0, Z3], [0.3, [0, 0, -0.25]], [0.75, Z3]]), legsQ([[0, Z3], [0.3, [0, 0, 0.1]], [0.75, Z3]]),
-    R('cannon', [[0, Z3], [0.35, [0, 0, -0.18]], [0.75, Z3]]) ]));
+    R('cannon', [[0, Z3], [0.35, [0, 0, -0.18]], [0.75, Z3]]), auraS([[0, O3], [0.3, [1.1, 1.05, 1.1]], [0.75, O3]]) ]));
 
   /* ---------------- attack: wind-up, the strike lands at 0.34 s ---------------- */
   const ctx = { pr, A, H, lunge, G, hd, jw, ears, wings, armsK, legsQ, legs2, allLegs, tail, neck, hair, body, rigP, rigR, lids, R, Pv, F, quad, biped, arms, wingsOn, headOn };
-  out.push(clip('attack', 0.9, (ATTACK[pr.atk] || ATTACK.bite)(ctx)));
+  out.push(clip('attack', 0.9, (ATTACK[pr.atk] || ATTACK.bite)(ctx).concat(auraS([[0, O3], [0.2, [0.9, 0.95, 0.9]], [0.34, [1.16, 1.08, 1.16]], [0.6, [1.04, 1.02, 1.04]], [0.9, O3]]))));
 
   /* ---------------- special: a bigger build-up, the strike lands at 0.40 s ---------------- */
-  out.push(clip('special', 1.1, (SPECIAL[pr.sp] || SPECIAL.bloom)(ctx)));
+  out.push(clip('special', 1.1, (SPECIAL[pr.sp] || SPECIAL.bloom)(ctx).concat(auraS([[0, O3], [0.28, [0.8, 0.9, 0.8]], [0.4, [1.32, 1.16, 1.32]], [0.7, [1.08, 1.04, 1.08]], [1.1, O3]]))));
 
   /* ---------------- hit / hitBig: flinch, eyes squeezed shut; the big one knocks it back and twists it ---------------- */
   const flinch = 1 - 0.45 * H;
@@ -122,7 +130,7 @@ function rosterClips(root, spId) {
     hd([[0, Z3], [0.08, [0, 0.08, 0.3]], [0.4, Z3], [0.55, Z3]]), jw([[0, Z3], [0.08, [0, 0, -0.25]], [0.35, Z3], [0.55, Z3]]),
     ears([[0, Z3], [0.08, [0, 0, -0.7]], [0.55, Z3]]), wings([[0, Z3], [0.08, [-0.22, 0, 0]], [0.55, Z3]]),
     armsK([[0, Z3], [0.08, [0.35, 0, 0.3]], [0.4, Z3], [0.55, Z3]]), neck([[0, Z3], [0.08, [0, 0, 0.25]], [0.55, Z3]]),
-    tail([[0, Z3], [0.08, [0, 0.3, -0.2]], [0.55, Z3]]), lids([[0, 0], [0.05, 1], [0.3, 1], [0.4, 0], [0.55, 0]]) ]));
+    tail([[0, Z3], [0.08, [0, 0.3, -0.2]], [0.55, Z3]]), lids([[0, 0], [0.05, 1], [0.3, 1], [0.4, 0], [0.55, 0]]), auraS([[0, O3], [0.08, [1.14, 0.9, 1.14]], [0.3, [0.97, 1.02, 0.97]], [0.55, O3]]) ]));
   out.push(clip('hitBig', 0.8, [
     rigP([[0, Z3], [0.1, [0, 0.12 * flinch, -0.3 * flinch]], [0.3, [0, 0, -0.16 * flinch]], [0.8, Z3]]), rigR([[0, Z3], [0.1, [-0.38 * flinch, 0.45 * flinch, 0.16]], [0.35, [-0.1, 0.1, 0]], [0.8, Z3]]),
     body([[0, O3], [0.1, [0.88, 1.1, 0.88]], [0.3, [1.08, 0.92, 1.08]], [0.8, O3]]),
@@ -130,7 +138,7 @@ function rosterClips(root, spId) {
     ears([[0, Z3], [0.1, [0.2, 0, -0.8]], [0.5, [0, 0, -0.3]], [0.8, Z3]]), wings([[0, Z3], [0.1, [-0.32, 0, 0.1]], [0.5, Z3], [0.8, Z3]]),
     armsK([[0, Z3], [0.1, [0.6, 0, 0.5]], [0.5, [0.1, 0, 0.1]], [0.8, Z3]]), neck([[0, Z3], [0.1, [0, 0.2, 0.4]], [0.6, Z3], [0.8, Z3]]),
     tail([[0, Z3], [0.1, [0, 0.5, -0.3]], [0.6, Z3], [0.8, Z3]]), legsQ([[0, Z3], [0.1, [0, 0, -0.2]], [0.5, Z3], [0.8, Z3]]),
-    R('cannon', [[0, Z3], [0.1, [0.15, 0, 0.2]], [0.5, Z3], [0.8, Z3]]), lids([[0, 0], [0.06, 1], [0.5, 1], [0.6, 0], [0.8, 0]]) ]));
+    R('cannon', [[0, Z3], [0.1, [0.15, 0, 0.2]], [0.5, Z3], [0.8, Z3]]), lids([[0, 0], [0.06, 1], [0.5, 1], [0.6, 0], [0.8, 0]]), auraS([[0, O3], [0.1, [1.26, 0.84, 1.26]], [0.4, [0.95, 1.03, 0.95]], [0.8, O3]]) ]));
 
   /* ---------------- heal: lifts its face with eyes closed, opens up, a gentle sway ---------------- */
   out.push(clip('heal', 0.9, [
@@ -138,7 +146,7 @@ function rosterClips(root, spId) {
     wings([[0, Z3], [0.4, [0.32, 0, 0]], [0.7, [0.32, 0, 0]], [0.9, Z3]]), armsK([[0, Z3], [0.35, [0.45, 0, 0.4]], [0.7, [0.45, 0, 0.4]], [0.9, Z3]]),
     ears([[0, Z3], [0.3, [0.2, 0, 0.2]], [0.7, [0.2, 0, 0.2]], [0.9, Z3]]), rigP([[0, Z3], [0.35, [0, 0.05, 0]], [0.7, [0, 0.05, 0]], [0.9, Z3]]),
     rigR(F(0.9, 8, (t) => [0, 0, 0.06 * sin(t / 0.9 * TAU)])), lids([[0, 0], [0.25, 1], [0.7, 1], [0.9, 0]]),
-    R('cannon', [[0, Z3], [0.3, [0, 0, 0.35]], [0.65, [0, 0, 0.35]], [0.9, Z3]]) ]));
+    R('cannon', [[0, Z3], [0.3, [0, 0, 0.35]], [0.65, [0, 0, 0.35]], [0.9, Z3]]), auraS([[0, O3], [0.35, [1.14, 1.12, 1.14]], [0.7, [1.14, 1.12, 1.14]], [0.9, O3]]) ]));
 
   /* ---------------- guard: braces, head down, arms crossed or wings wrapped ---------------- */
   out.push(clip('guard', 0.7, [
@@ -146,20 +154,41 @@ function rosterClips(root, spId) {
     hd([[0, Z3], [0.2, [0, 0, -0.22]], [0.5, [0, 0, -0.22]], [0.7, Z3]]), neck([[0, Z3], [0.2, [0, 0, -0.2]], [0.5, [0, 0, -0.2]], [0.7, Z3]]),
     armsK([[0, Z3], [0.2, [-0.35, 0, 0.75]], [0.5, [-0.35, 0, 0.75]], [0.7, Z3]]), wings([[0, Z3], [0.22, [-0.35, 0.5, 0]], [0.5, [-0.35, 0.5, 0]], [0.7, Z3]]),
     ears([[0, Z3], [0.2, [0, 0, -0.8]], [0.5, [0, 0, -0.8]], [0.7, Z3]]), tail([[0, Z3], [0.2, [0, 0.45, 0.2]], [0.5, [0, 0.45, 0.2]], [0.7, Z3]]),
-    legsQ([[0, Z3], [0.2, [0, 0, 0.16]], [0.5, [0, 0, 0.16]], [0.7, Z3]]), lids([[0, 0], [0.2, 0.55], [0.5, 0.55], [0.7, 0]]) ]));
+    legsQ([[0, Z3], [0.2, [0, 0, 0.16]], [0.5, [0, 0, 0.16]], [0.7, Z3]]), lids([[0, 0], [0.2, 0.55], [0.5, 0.55], [0.7, 0]]),
+    auraS([[0, O3], [0.2, [0.8, 0.92, 0.8]], [0.5, [0.8, 0.92, 0.8]], [0.7, O3]]) ]));
 
   /* ---------------- victory / defeat in the line's own style ---------------- */
-  out.push(clip('victory', 1.6, (VICTORY[pr.vic] || VICTORY.hops)(ctx)));
-  out.push(clip('defeat', 1.2, (DEFEAT[pr.def] || DEFEAT.slump)(ctx)));
+  out.push(clip('victory', 1.6, (VICTORY[pr.vic] || VICTORY.hops)(ctx).concat(auraS(F(1.6, 16, (t) => { const b = sin(t / 1.6 * PI) * (t < 1.6 ? 1 : 0); return [1 + 0.22 * b, 1 + 0.12 * b, 1 + 0.22 * b]; })))));
+  out.push(clip('defeat', 1.2, (DEFEAT[pr.def] || DEFEAT.slump)(ctx).concat(auraS([[0, O3], [0.35, [1.12, 1.06, 1.12]], [1.2, [0.86, 0.62, 0.86]]]))));
 
-  /* ---------------- move: its own gait ---------------- */
-  const M = 0.8, gait = (amp, off) => F(M, 8, (t) => [0, 0, amp * sin(t / M * TAU + (off || 0))]);
+  /* ---------------- move: its own gait (stride, bounce, sway and waddle from its build and temper) ---------------- */
+  const M = 0.8, stride = (0.2 + 0.16 * (1 - H)) * A, gait = (amp, off) => F(M, 8, (t) => [0, 0, amp * sin(t / M * TAU + (off || 0))]);
   out.push(clip('move', M, [
-    rigP(F(M, 8, (t) => [0, (pr.float ? 0.05 : 0.04 * (1 - H * 0.5)) * Math.abs(sin(t / M * TAU)), 0])),
-    R('legFL', gait(0.3)), R('legBR', gait(0.3)), R('legFR', gait(-0.3)), R('legBL', gait(-0.3)),
-    R('legL', gait(0.35)), R('legR', gait(-0.35)), R('armL', gait(-0.3)), R('armR', gait(0.3)),
-    hd(F(M, 8, (t) => [0, 0.05 * sin(t / M * TAU), 0])), wings(F(M, 8, (t) => [0.15 * sin(t / M * TAU), 0, 0])),
-    tail(F(M, 8, (t) => [0, 0.25 * sin(t / M * TAU), 0])), neck(F(M, 8, (t) => [0, 0.12 * sin(t / M * TAU), 0])) ]));
+    rigP(F(M, 8, (t) => [0, (pr.float ? 0.05 : (0.022 + 0.03 * (1 - H)) * A) * Math.abs(sin(t / M * TAU)), 0])),
+    rigR(F(M, 8, (t) => [0, 0, (pr.float ? 0.03 : 0.06 * H) * sin(t / M * TAU)])),
+    R('legFL', gait(stride)), R('legBR', gait(stride)), R('legFR', gait(-stride)), R('legBL', gait(-stride)),
+    R('legL', gait(stride * 1.15)), R('legR', gait(-stride * 1.15)), R('armL', gait(-stride)), R('armR', gait(stride)),
+    hd(F(M, 8, (t) => [0, (0.025 + 0.12 * pr.look) * sin(t / M * TAU), 0.03 * H * sin(t / M * TAU * 2)])), wings(F(M, 8, (t) => [(0.1 + (pr.wing || 0)) * sin(t / M * TAU), 0, 0])),
+    tail(F(M, 8, (t) => [0, (0.1 + 0.4 * pr.tail) * sin(t / M * TAU), 0])), neck(F(M, 8, (t) => [0, 0.12 * sin(t / M * TAU), 0])) ]));
+
+  // the shared reaction, victory and defeat styles performed in this creature's own way: size and timing come from
+  // its line and stage (start and end poses are unchanged, and so is the battle timing of attacks and specials)
+  const big = (tr, ss) => { const q = new THREE.Quaternion(); let m = 0; for (let i = 0; i < tr.values.length; i += 4) { q.fromArray(tr.values, i); m = Math.max(m, 2 * Math.acos(Math.min(1, Math.abs(q.w)))); } return m * ss > 2.6; };
+  const modulate = (cl, s, g) => {
+    const T = cl.duration, inv = new THREE.Quaternion(), q = new THREE.Quaternion(), d = new THREE.Quaternion(), I = new THREE.Quaternion();
+    cl.tracks.forEach((tr) => {
+      const dot = tr.name.lastIndexOf('.'), node = tr.name.slice(0, dot), prop = tr.name.slice(dot + 1), o = k.n[node], v = tr.values, n = tr.times.length;
+      for (let i = 1; i < n - 1; i++) tr.times[i] = T * Math.pow(tr.times[i] / T, g);
+      if (!o || /^lid/.test(node)) return;
+      if (prop === 'quaternion' && !big(tr, s)) {
+        inv.copy(o.quaternion).invert();
+        for (let i = 0; i < n; i++) { q.fromArray(v, i * 4); d.copy(inv).multiply(q); if (d.w < 0) { d.x = -d.x; d.y = -d.y; d.z = -d.z; d.w = -d.w; } I.identity().slerp(d, s); q.copy(o.quaternion).multiply(I); q.toArray(v, i * 4); }
+      } else if (prop === 'scale') {
+        const r = o.scale; for (let i = 0; i < n; i++) { v[i * 3] = r.x + (v[i * 3] - r.x) * s; v[i * 3 + 1] = r.y + (v[i * 3 + 1] - r.y) * s; v[i * 3 + 2] = r.z + (v[i * 3 + 2] - r.z) * s; }
+      }
+    });
+  };
+  out.forEach((cl) => { if (['ready', 'hit', 'hitBig', 'heal', 'guard', 'victory', 'defeat'].indexOf(cl.name) >= 0) modulate(cl, pr.size, pr.lag); });
   return out;
 }
 
@@ -275,7 +304,10 @@ const ATTACK = {
     c.body([[0, O3], [0.2, [0.92, 0.92, 0.92]], [0.34, [1.12, 1.12, 1.12]], [0.5, [0.98, 0.98, 0.98]], [0.9, O3]]), c.wings([[0, Z3], [0.18, [0.5, 0, 0]], [0.34, [-0.1, 0, 0]], [0.9, Z3]]), c.lids([[0, 0], [0.3, 0.4], [0.4, 0.4], [0.55, 0], [0.9, 0]])],
   // Terraflora: a swing of the crown (first form) or of a branch arm
   swing: (c) => [lungeP(c, c.arms ? 0.3 : 0.22, 0.02), c.hd(c.arms ? [[0, Z3], [0.2, [0, 0.1, 0.1]], [0.34, [0, -0.1, -0.15]], [0.9, Z3]] : [[0, Z3], [0.2, [0.2, 0.35, 0.25]], [0.34, [-0.2, -0.3, -0.35]], [0.55, [0, 0, -0.1]], [0.9, Z3]]),
-    c.armsK([[0, Z3], [0.2, [0.2, 0, 0.3]], [0.36, [0, 0, -0.2]], [0.9, Z3]], [[0, Z3], [0.2, [0.6, 0, 1.3]], [0.34, [-0.2, 0, -0.2]], [0.55, [0, 0, 0.1]], [0.9, Z3]]), c.rigR([[0, Z3], [0.2, [0, -0.2, 0]], [0.36, [0.06, 0.2, 0]], [0.9, Z3]])],
+    c.armsK([[0, Z3], [0.2, [0.2, 0, 0.3]], [0.36, [0, 0, -0.2]], [0.9, Z3]], [[0, Z3], [0.2, [0.6, 0, 1.3]], [0.34, [-0.2, 0, -0.2]], [0.55, [0, 0, 0.1]], [0.9, Z3]]), c.rigR([[0, Z3], [0.2, [0, -0.2, 0]], [0.36, [0.06, 0.2, 0]], [0.9, Z3]]),
+    // a rooted sprout: the leaf crown whips after the head, the buds trail, the front roots plant and the back ones push
+    c.hair([[0, Z3], [0.2, [0.25, 0.2, -0.2]], [0.36, [-0.3, -0.25, 0.35]], [0.55, [0.1, 0, -0.12]], [0.9, Z3]]), c.ears([[0, Z3], [0.22, [0.3, 0, -0.3]], [0.4, [-0.2, 0, 0.4]], [0.6, [0.1, 0, -0.1]], [0.9, Z3]]),
+    c.legsQ([[0, Z3], [0.2, [0, 0, -0.14]], [0.34, [0, 0, 0.26]], [0.6, [0, 0, 0.06]], [0.9, Z3]], [[0, Z3], [0.2, [0, 0, 0.1]], [0.34, [0, 0, -0.22]], [0.6, Z3], [0.9, Z3]])],
 };
 
 /* ------------------------------------------------------------------ specials (1.1 s, the rig peaks forward at 0.40 s) */
@@ -301,7 +333,8 @@ const leapIn = (c, h) => [c.rigP([[0, Z3], [0.12, [0, -0.04, -0.04]], [0.26, [0,
 const SPECIAL = {
   bloom: (c) => swell(c),                                // Lumifern: rises, ears spread, glowing; the light goes out at 0.40
   veil: (c) => swell(c),                                 // Umbrit II / III
-  grow: (c) => swell(c, [c.hd([[0, Z3], [0.28, [0.15, 0, 0.3]], [0.42, [0, 0, -0.1]], [1.1, Z3]])]),
+  grow: (c) => swell(c, [c.hd([[0, Z3], [0.28, [0.15, 0, 0.3]], [0.42, [0, 0, -0.1]], [1.1, Z3]]), c.hair([[0, Z3], [0.28, [0, 0, 0.3]], [0.42, [0.2, 0, -0.25]], [0.7, [0, 0, 0.08]], [1.1, Z3]]),
+    c.legsQ([[0, Z3], [0.28, [0, 0, 0.2]], [0.42, [0, 0, -0.18]], [0.7, [0, 0, 0.05]], [1.1, Z3]], [[0, Z3], [0.28, [0, 0, -0.2]], [0.42, [0, 0, 0.18]], [0.7, [0, 0, -0.05]], [1.1, Z3]])]),
   channel: (c) => swell(c, [c.R('hair', [[0, Z3], [0.28, [0.5, 0, 0.3]], [0.5, [0.2, 0, 0.1]], [1.1, Z3]])]),
   radiate: (c) => [castP(c, 0.2, 0.12), c.body([[0, O3], [0.28, [1.16, 1.16, 1.16]], [0.42, [0.94, 0.94, 0.94]], [0.6, [1.04, 1.04, 1.04]], [1.1, O3]]),
     c.wings([[0, Z3], [0.28, [0.8, 0, 0.1]], [0.42, [0, 0, 0]], [0.6, [0.4, 0, 0]], [1.1, Z3]]), c.rigR([[0, Z3], [0.28, [0, 0.6, 0]], [0.42, [0, 0, 0]], [1.1, Z3]]), c.lids([[0, 0], [0.2, 0.6], [0.36, 0.6], [0.46, 0], [1.1, 0]])],
@@ -337,41 +370,43 @@ const hopsP = (c, h1, h2) => c.rigP([[0, Z3], [0.2, [0, h1 * c.A, 0]], [0.4, Z3]
 const happyLids = (c) => c.lids([[0, 0], [0.3, 0.7], [1.0, 0.7], [1.2, 0], [1.6, 0]]);
 const VICTORY = {
   hops: (c) => [hopsP(c, 0.2, 0.26), c.body([[0, O3], [0.05, [1.12, 0.86, 1.12]], [0.2, [0.92, 1.1, 0.92]], [0.42, [1.1, 0.88, 1.1]], [0.6, [0.92, 1.1, 0.92]], [0.85, [1.08, 0.9, 1.08]], [1.1, O3], [1.6, O3]]),
-    c.ears(c.F(1.6, 8, (t) => [0.3 * sin(t / 1.6 * TAU * 4), 0, 0.1 * sin(t / 1.6 * TAU * 2)])), c.tail(c.F(1.6, 8, (t) => [0, 0.6 * sin(t / 1.6 * TAU * 3), 0])), c.hd([[0, Z3], [0.3, [0, 0, 0.2]], [1.2, [0, 0, 0.2]], [1.6, Z3]]), happyLids(c)],
-  spin: (c) => [hopsP(c, 0.2, 0.28), c.rigR([[0, Z3], [0.6, Z3], [0.82, [0, 1.3, 0]], [1.05, [0, 1.3, 0]], [1.35, Z3], [1.6, Z3]]), c.ears(c.F(1.6, 8, (t) => [0.3 * sin(t / 1.6 * TAU * 4), 0, 0])), c.tail(c.F(1.6, 8, (t) => [0, 0.6 * sin(t / 1.6 * TAU * 3), 0])), happyLids(c)],
+    c.ears(c.F(1.6, 32, (t) => [0.3 * sin(t / 1.6 * TAU * 4), 0, 0.1 * sin(t / 1.6 * TAU * 2)])), c.tail(c.F(1.6, 32, (t) => [0, 0.6 * sin(t / 1.6 * TAU * 3), 0])), c.hd([[0, Z3], [0.3, [0, 0, 0.2]], [1.2, [0, 0, 0.2]], [1.6, Z3]]), happyLids(c)],
+  spin: (c) => [hopsP(c, 0.2, 0.28), c.rigR([[0, Z3], [0.6, Z3], [0.82, [0, 1.3, 0]], [1.05, [0, 1.3, 0]], [1.35, Z3], [1.6, Z3]]), c.ears(c.F(1.6, 32, (t) => [0.3 * sin(t / 1.6 * TAU * 4), 0, 0])), c.tail(c.F(1.6, 32, (t) => [0, 0.6 * sin(t / 1.6 * TAU * 3), 0])), happyLids(c)],
   salute: (c) => [c.rigR([[0, Z3], [0.3, [-0.22, 0, 0]], [0.55, [0.05, 0, 0]], [0.75, Z3], [1.6, Z3]]), c.rigP([[0, Z3], [0.3, [0, 0.1, 0]], [0.55, [0, -0.02, 0]], [0.75, Z3], [1.6, Z3]]),
     c.jw([[0, Z3], [0.2, [0, 0, -0.55]], [0.6, [0, 0, -0.55]], [0.8, Z3], [1.6, Z3]]), c.hd([[0, Z3], [0.3, [0, 0, 0.35]], [0.7, [0, 0, 0.2]], [1, Z3], [1.6, Z3]]),
     c.R('cannon', [[0, Z3], [0.6, [0, 0, 0.6]], [1.3, [0, 0, 0.6]], [1.6, Z3]]), c.Pv('cannon', [[0, Z3], [0.85, Z3], [0.9, [-2.2, -1.3, 0]], [1.1, [-0.35, -0.2, 0]], [1.6, Z3]]), c.legsQ([[0, Z3], [0.3, [0, 0, 0.4]], [0.55, Z3], [1.6, Z3]], [[0, Z3], [1.6, Z3]])],
   flip: (c) => [c.rigP([[0, Z3], [0.15, [0, -0.04, 0]], [0.45, [0, 0.42 * c.A, 0]], [0.75, Z3], [1.6, Z3]]), c.rigR([[0, Z3], [0.2, Z3], [0.6, [0, 1.4, 0]], [0.9, [0, 1.4, 0]], [1.3, Z3], [1.6, Z3]]),
     c.armsK([[0, Z3], [0.4, [0.4, 0, 1.6]], [0.9, [0.4, 0, 1.6]], [1.3, Z3], [1.6, Z3]]), c.body([[0, O3], [0.15, [1.1, 0.88, 1.1]], [0.4, [0.94, 1.08, 0.94]], [0.78, [1.1, 0.9, 1.1]], [1, O3], [1.6, O3]]),
-    c.tail(c.F(1.6, 8, (t) => [0, 0.5 * sin(t / 1.6 * TAU * 2), -0.2])), c.jw([[0, Z3], [0.4, [0, 0, -0.4]], [1.0, [0, 0, -0.4]], [1.2, Z3], [1.6, Z3]]), happyLids(c)],
-  coil: (c) => [c.neck(c.F(1.6, 12, (t) => [0, 0.3 * sin(t / 1.6 * TAU * 1.5) * sin(t / 1.6 * PI), 0.35 * sin(t / 1.6 * PI)])), c.hd(c.F(1.6, 12, (t) => [0, -0.25 * sin(t / 1.6 * TAU * 1.5) * sin(t / 1.6 * PI), 0.3 * sin(t / 1.6 * PI)])),
-    c.jw([[0, Z3], [0.5, [0, 0, -0.4]], [1.0, [0, 0, -0.4]], [1.2, Z3], [1.6, Z3]]), c.rigP([[0, Z3], [0.6, [0, 0.08, 0]], [1.2, Z3], [1.6, Z3]]), c.tail(c.F(1.6, 8, (t) => [0, 0.4 * sin(t / 1.6 * TAU * 2), 0])), happyLids(c)],
+    c.tail(c.F(1.6, 32, (t) => [0, 0.5 * sin(t / 1.6 * TAU * 2), -0.2])), c.jw([[0, Z3], [0.4, [0, 0, -0.4]], [1.0, [0, 0, -0.4]], [1.2, Z3], [1.6, Z3]]), happyLids(c)],
+  coil: (c) => [c.neck(c.F(1.6, 32, (t) => [0, 0.3 * sin(t / 1.6 * TAU * 1.5) * sin(t / 1.6 * PI), 0.35 * sin(t / 1.6 * PI)])), c.hd(c.F(1.6, 32, (t) => [0, -0.25 * sin(t / 1.6 * TAU * 1.5) * sin(t / 1.6 * PI), 0.3 * sin(t / 1.6 * PI)])),
+    c.jw([[0, Z3], [0.5, [0, 0, -0.4]], [1.0, [0, 0, -0.4]], [1.2, Z3], [1.6, Z3]]), c.rigP([[0, Z3], [0.6, [0, 0.08, 0]], [1.2, Z3], [1.6, Z3]]), c.tail(c.F(1.6, 32, (t) => [0, 0.4 * sin(t / 1.6 * TAU * 2), 0])), happyLids(c)],
   flex: (c) => [c.armsK([[0, Z3], [0.25, [0.5, 0, 1.6]], [0.5, [0.7, 0, 1.2]], [0.7, [0.5, 0, 1.6]], [0.95, [0.7, 0, 1.2]], [1.3, Z3], [1.6, Z3]]),
     c.rigR([[0, Z3], [0.25, [-0.16, 0, 0]], [1.0, [-0.16, 0, 0]], [1.3, Z3], [1.6, Z3]]), c.hd([[0, Z3], [0.25, [0, 0, 0.3]], [1.0, [0, 0, 0.3]], [1.3, Z3], [1.6, Z3]]),
     c.jw([[0, Z3], [0.25, [0, 0, -0.5]], [0.8, [0, 0, -0.5]], [1.0, Z3], [1.6, Z3]]), c.body([[0, O3], [0.25, [1.06, 1.04, 1.06]], [1.0, [1.06, 1.04, 1.06]], [1.3, O3], [1.6, O3]]), c.rigP([[0, Z3], [0.3, [0, 0.05, 0]], [1.0, [0, 0.05, 0]], [1.3, Z3], [1.6, Z3]])],
-  proud: (c) => [c.hd([[0, Z3], [0.3, [0, 0, 0.35]], [1.1, [0, 0, 0.35]], [1.4, Z3], [1.6, Z3]]), c.rigR(c.F(1.6, 16, (t) => [0, 0, 0.08 * sin(t * 28) * bump(t, 0.5, 1.2)])),
-    c.tail(c.F(1.6, 12, (t) => [0, 0.5 * sin(t * 20) * bump(t, 0.2, 1.3), -0.3 * bump(t, 0.2, 1.3)])), c.legsQ([[0, Z3], [0.3, [0, 0, -0.08]], [1.2, [0, 0, -0.08]], [1.6, Z3]]), happyLids(c)],
+  proud: (c) => [c.hd([[0, Z3], [0.3, [0, 0, 0.35]], [1.1, [0, 0, 0.35]], [1.4, Z3], [1.6, Z3]]), c.rigR(c.F(1.6, 32, (t) => [0, 0, 0.08 * sin(t * 28) * bump(t, 0.5, 1.2)])),
+    c.tail(c.F(1.6, 32, (t) => [0, 0.5 * sin(t * 20) * bump(t, 0.2, 1.3), -0.3 * bump(t, 0.2, 1.3)])), c.legsQ([[0, Z3], [0.3, [0, 0, -0.08]], [1.2, [0, 0, -0.08]], [1.6, Z3]]), happyLids(c)],
   rearv: (c) => [c.rigR([[0, Z3], [0.4, [-0.32, 0, 0]], [0.9, [-0.32, 0, 0]], [1.2, [0.04, 0, 0]], [1.4, Z3], [1.6, Z3]]), c.rigP([[0, Z3], [0.4, [0, 0.14, 0]], [0.9, [0, 0.14, 0]], [1.2, Z3], [1.6, Z3]]),
     c.legsQ([[0, Z3], [0.4, [0, 0, 0.6]], [0.9, [0, 0, 0.45]], [1.2, Z3], [1.6, Z3]], [[0, Z3], [0.4, [0, 0, -0.2]], [1.2, Z3], [1.6, Z3]]), c.hd([[0, Z3], [0.4, [0, 0, 0.35]], [1.1, [0, 0, 0.25]], [1.4, Z3], [1.6, Z3]]), c.tail([[0, Z3], [0.4, [0, 0, -0.4]], [1.2, Z3], [1.6, Z3]])],
-  bloom: (c) => [c.armsK([[0, Z3], [0.4, [0.7, 0, 1.3]], [1.2, [0.7, 0, 1.3]], [1.5, Z3], [1.6, Z3]]), c.hd(c.F(1.6, 12, (t) => [0.15 * sin(t / 1.6 * TAU * 2) * sin(t / 1.6 * PI), 0, 0.25 * sin(t / 1.6 * PI)])),
+  bloom: (c) => [c.hair(c.F(1.6, 32, (t) => [0.2 * sin(t / 1.6 * TAU * 2) * sin(t / 1.6 * PI), 0.15 * sin(t / 1.6 * TAU), 0.2 * sin(t / 1.6 * PI)])), c.ears([[0, Z3], [0.4, [0.35, 0, 0.3]], [1.2, [0.35, 0, 0.3]], [1.5, Z3], [1.6, Z3]]),
+    c.legsQ(c.F(1.6, 32, (t) => [0, 0, 0.18 * Math.max(0, sin(t / 1.6 * TAU * 2)) * sin(t / 1.6 * PI)]), c.F(1.6, 32, (t) => [0, 0, -0.18 * Math.max(0, -sin(t / 1.6 * TAU * 2)) * sin(t / 1.6 * PI)])),
+    c.armsK([[0, Z3], [0.4, [0.7, 0, 1.3]], [1.2, [0.7, 0, 1.3]], [1.5, Z3], [1.6, Z3]]), c.hd(c.F(1.6, 32, (t) => [0.15 * sin(t / 1.6 * TAU * 2) * sin(t / 1.6 * PI), 0, 0.25 * sin(t / 1.6 * PI)])),
     c.rigP([[0, Z3], [0.5, [0, 0.06, 0]], [1.2, [0, 0.06, 0]], [1.5, Z3], [1.6, Z3]]), c.body([[0, O3], [0.5, [1.06, 1.06, 1.06]], [1.2, [1.06, 1.06, 1.06]], [1.5, O3], [1.6, O3]]), happyLids(c)],
   roar: (c) => [c.rigR([[0, Z3], [0.35, [-0.28, 0, 0]], [1.0, [-0.2, 0, 0]], [1.3, Z3], [1.6, Z3]]), c.rigP([[0, Z3], [0.35, [0, 0.12, 0]], [1.0, [0, 0.08, 0]], [1.3, Z3], [1.6, Z3]]),
     c.wings([[0, Z3], [0.35, [0.8, 0, 0.15]], [0.6, [0.4, 0, 0]], [0.85, [0.8, 0, 0.15]], [1.3, Z3], [1.6, Z3]]), c.hd([[0, Z3], [0.35, [0, 0, 0.45]], [1.1, [0, 0, 0.35]], [1.4, Z3], [1.6, Z3]]),
     c.jw([[0, Z3], [0.35, [0, 0, -0.6]], [1.0, [0, 0, -0.6]], [1.25, Z3], [1.6, Z3]]), c.legsQ([[0, Z3], [0.35, [0, 0, 0.45]], [1.1, [0, 0, 0.3]], [1.4, Z3], [1.6, Z3]], [[0, Z3], [1.6, Z3]]), c.tail([[0, Z3], [0.35, [0, 0, -0.4]], [1.3, Z3], [1.6, Z3]])],
-  flap: (c) => [c.wings(c.F(1.6, 16, (t) => [0.8 * Math.abs(sin(t / 1.6 * TAU * 3)) * (t < 1.4 ? 1 : (1.6 - t) / 0.2), 0, 0])), c.rigP([[0, Z3], [0.3, [0, 0.16, 0]], [0.6, [0, 0.08, 0]], [0.9, [0, 0.18, 0]], [1.3, Z3], [1.6, Z3]]),
-    c.hd([[0, Z3], [0.3, [0, 0, 0.35]], [1.2, [0, 0, 0.3]], [1.6, Z3]]), c.tail(c.F(1.6, 8, (t) => [0, 0.3 * sin(t / 1.6 * TAU * 3), 0])), happyLids(c)],
+  flap: (c) => [c.wings(c.F(1.6, 32, (t) => [0.8 * Math.abs(sin(t / 1.6 * TAU * 3)) * (t < 1.4 ? 1 : (1.6 - t) / 0.2), 0, 0])), c.rigP([[0, Z3], [0.3, [0, 0.16, 0]], [0.6, [0, 0.08, 0]], [0.9, [0, 0.18, 0]], [1.3, Z3], [1.6, Z3]]),
+    c.hd([[0, Z3], [0.3, [0, 0, 0.35]], [1.2, [0, 0, 0.3]], [1.6, Z3]]), c.tail(c.F(1.6, 32, (t) => [0, 0.3 * sin(t / 1.6 * TAU * 3), 0])), happyLids(c)],
   wingbeat: (c) => [c.wings([[0, Z3], [0.25, [0.8, 0, 0]], [0.45, [0.05, 0, 0]], [0.7, [0.8, 0, 0]], [0.9, [0.05, 0, 0]], [1.2, [0.5, 0, 0]], [1.6, Z3]]), c.rigP([[0, Z3], [0.45, [0, 0.14, 0]], [0.9, [0, 0.08, 0]], [1.3, Z3], [1.6, Z3]]),
     c.hd([[0, Z3], [0.35, [0, 0.2, 0.35]], [1.1, [0, -0.15, 0.3]], [1.4, Z3], [1.6, Z3]]), c.jw([[0, Z3], [0.4, [0, 0, -0.45]], [0.8, [0, 0, -0.45]], [1.0, Z3], [1.6, Z3]]), c.tail([[0, Z3], [0.5, [0, 0, -0.3]], [1.3, Z3], [1.6, Z3]])],
-  dance: (c) => [c.rigP(c.F(1.6, 16, (t) => [0.06 * sin(t / 1.6 * TAU * 2) * sin(t / 1.6 * PI), 0.06 * Math.abs(sin(t / 1.6 * TAU * 4)) * sin(t / 1.6 * PI), 0])), c.rigR(c.F(1.6, 16, (t) => [0, 0.4 * sin(t / 1.6 * TAU * 2) * sin(t / 1.6 * PI), 0.1 * sin(t / 1.6 * TAU * 4) * sin(t / 1.6 * PI)])),
-    c.armsK(c.F(1.6, 16, (t) => [0.3, 0, (1.2 + 0.4 * sin(t / 1.6 * TAU * 4)) * sin(t / 1.6 * PI)]), c.F(1.6, 16, (t) => [0.3, 0, (1.2 - 0.4 * sin(t / 1.6 * TAU * 4)) * sin(t / 1.6 * PI)])),
-    c.hd(c.F(1.6, 16, (t) => [0.25 * sin(t / 1.6 * TAU * 4) * sin(t / 1.6 * PI), 0, 0.15 * sin(t / 1.6 * PI)])), c.legs2(c.F(1.6, 16, (t) => [0, 0, 0.35 * Math.max(0, sin(t / 1.6 * TAU * 2)) * sin(t / 1.6 * PI)]), c.F(1.6, 16, (t) => [0, 0, 0.35 * Math.max(0, -sin(t / 1.6 * TAU * 2)) * sin(t / 1.6 * PI)])), happyLids(c)],
-  spinz: (c) => [c.rigR([[0, Z3], [0.3, Z3], [0.75, [0, 1.25, 0]], [1.0, [0, 1.25, 0]], [1.4, Z3], [1.6, Z3]]), c.hd(c.F(1.6, 16, (t) => [0.3 * sin(t / 1.6 * TAU * 3) * sin(t / 1.6 * PI), 0, 0.1 * sin(t / 1.6 * PI)])),
-    c.legsQ(c.F(1.6, 16, (t) => [0, 0, 0.2 * Math.abs(sin(t / 1.6 * TAU * 4)) * sin(t / 1.6 * PI)])), c.rigP([[0, Z3], [0.75, [0, 0.06, 0]], [1.2, Z3], [1.6, Z3]]), happyLids(c)],
+  dance: (c) => [c.rigP(c.F(1.6, 32, (t) => [0.06 * sin(t / 1.6 * TAU * 2) * sin(t / 1.6 * PI), 0.06 * Math.abs(sin(t / 1.6 * TAU * 4)) * sin(t / 1.6 * PI), 0])), c.rigR(c.F(1.6, 32, (t) => [0, 0.4 * sin(t / 1.6 * TAU * 2) * sin(t / 1.6 * PI), 0.1 * sin(t / 1.6 * TAU * 4) * sin(t / 1.6 * PI)])),
+    c.armsK(c.F(1.6, 32, (t) => [0.3, 0, (1.2 + 0.4 * sin(t / 1.6 * TAU * 4)) * sin(t / 1.6 * PI)]), c.F(1.6, 32, (t) => [0.3, 0, (1.2 - 0.4 * sin(t / 1.6 * TAU * 4)) * sin(t / 1.6 * PI)])),
+    c.hd(c.F(1.6, 32, (t) => [0.25 * sin(t / 1.6 * TAU * 4) * sin(t / 1.6 * PI), 0, 0.15 * sin(t / 1.6 * PI)])), c.legs2(c.F(1.6, 32, (t) => [0, 0, 0.35 * Math.max(0, sin(t / 1.6 * TAU * 2)) * sin(t / 1.6 * PI)]), c.F(1.6, 32, (t) => [0, 0, 0.35 * Math.max(0, -sin(t / 1.6 * TAU * 2)) * sin(t / 1.6 * PI)])), happyLids(c)],
+  spinz: (c) => [c.rigR([[0, Z3], [0.3, Z3], [0.75, [0, 1.25, 0]], [1.0, [0, 1.25, 0]], [1.4, Z3], [1.6, Z3]]), c.hd(c.F(1.6, 32, (t) => [0.3 * sin(t / 1.6 * TAU * 3) * sin(t / 1.6 * PI), 0, 0.1 * sin(t / 1.6 * PI)])),
+    c.legsQ(c.F(1.6, 32, (t) => [0, 0, 0.2 * Math.abs(sin(t / 1.6 * TAU * 4)) * sin(t / 1.6 * PI)])), c.rigP([[0, Z3], [0.75, [0, 0.06, 0]], [1.2, Z3], [1.6, Z3]]), happyLids(c)],
   twirl: (c) => [c.rigR([[0, Z3], [0.75, [0, PI * 0.95, 0]], [1.45, [0, 0, 0]], [1.6, Z3]]), c.rigP([[0, Z3], [0.6, [0, 0.16, 0]], [1.2, [0, 0.08, 0]], [1.6, Z3]]),
-    c.wings(c.F(1.6, 16, (t) => [0.5 * Math.abs(sin(t / 1.6 * TAU * 3)) * sin(t / 1.6 * PI), 0, 0])), c.body([[0, O3], [0.6, [1.06, 1.06, 1.06]], [1.2, O3], [1.6, O3]]), happyLids(c)],
-  wave: (c) => [c.armsK([[0, Z3], [1.6, Z3]], c.F(1.6, 16, (t) => [0.4 * sin(t / 1.6 * PI), 0, (1.5 + 0.3 * sin(t / 1.6 * TAU * 4)) * sin(t / 1.6 * PI)])),
-    c.hd(c.F(1.6, 12, (t) => [0.25 * sin(t / 1.6 * PI), 0.1 * sin(t / 1.6 * TAU), 0.1 * sin(t / 1.6 * PI)])), c.hair(c.F(1.6, 12, (t) => [0.2 * sin(t / 1.6 * TAU * 2) * sin(t / 1.6 * PI), 0.15 * sin(t / 1.6 * TAU), 0])), c.rigP([[0, Z3], [0.4, [0, 0.04, 0]], [1.2, [0, 0.04, 0]], [1.6, Z3]]), happyLids(c)],
+    c.wings(c.F(1.6, 32, (t) => [0.5 * Math.abs(sin(t / 1.6 * TAU * 3)) * sin(t / 1.6 * PI), 0, 0])), c.body([[0, O3], [0.6, [1.06, 1.06, 1.06]], [1.2, O3], [1.6, O3]]), happyLids(c)],
+  wave: (c) => [c.armsK([[0, Z3], [1.6, Z3]], c.F(1.6, 32, (t) => [0.4 * sin(t / 1.6 * PI), 0, (1.5 + 0.3 * sin(t / 1.6 * TAU * 4)) * sin(t / 1.6 * PI)])),
+    c.hd(c.F(1.6, 32, (t) => [0.25 * sin(t / 1.6 * PI), 0.1 * sin(t / 1.6 * TAU), 0.1 * sin(t / 1.6 * PI)])), c.hair(c.F(1.6, 32, (t) => [0.2 * sin(t / 1.6 * TAU * 2) * sin(t / 1.6 * PI), 0.15 * sin(t / 1.6 * TAU), 0])), c.rigP([[0, Z3], [0.4, [0, 0.04, 0]], [1.2, [0, 0.04, 0]], [1.6, Z3]]), happyLids(c)],
   salutea: (c) => [c.armsK([[0, Z3], [1.6, Z3]], [[0, Z3], [0.35, [0.5, 0, 2.0]], [1.15, [0.5, 0, 2.0]], [1.45, Z3], [1.6, Z3]]), c.rigR([[0, Z3], [0.35, [-0.12, 0, 0]], [1.15, [-0.12, 0, 0]], [1.45, Z3], [1.6, Z3]]),
     c.hd([[0, Z3], [0.35, [0, 0, 0.2]], [1.15, [0, 0, 0.2]], [1.45, Z3], [1.6, Z3]]), c.legs2([[0, Z3], [0.3, [0, 0, 0.1]], [1.2, [0, 0, 0.1]], [1.6, Z3]], [[0, Z3], [1.6, Z3]])],
 };
@@ -402,7 +437,8 @@ const DEFEAT = {
   powerdown: (c) => [c.hd([[0, Z3], [0.5, [0, 0, -0.1]], [1.2, [0, 0.1, -0.35]]]), c.Pv('head', [[0, Z3], [1.2, [-0.5, -1, 0]]]), c.legsQ([[0, Z3], [1.2, [0.25, 0, 0.3]]], [[0, Z3], [1.2, [0.25, 0, -0.3]]]),
     c.body([[0, O3], [0.5, [1.02, 0.98, 1.02]], [1.2, [1.06, 0.88, 1.06]]]), c.rigP([[0, Z3], [1.2, [0, -0.06, 0]]]), c.tail([[0, Z3], [1.2, [0, 0, 0.4]]]), c.lids([[0, 0], [0.3, 0.3], [0.6, 0.6], [1.0, 1], [1.2, 1]])],
   dim: (c) => [c.rigP([[0, Z3], [1.2, [0, -0.16, 0]]]), c.rigR([[0, Z3], [1.2, [0.25, 0, 0.15]]]), c.wings([[0, Z3], [1.2, [-0.4, 0, -0.4]]]), c.body([[0, O3], [1.2, [0.96, 0.92, 0.96]]]), shut(c)],
-  wilt: (c) => [c.hd([[0, Z3], [1.2, [0.25, 0.1, -0.5]]]), c.armsK([[0, Z3], [1.2, [0.1, 0, -0.3]]]), c.rigP([[0, Z3], [1.2, [0, -0.1, 0]]]), c.rigR([[0, Z3], [1.2, [0.2, 0, 0.1]]]),
+  wilt: (c) => [c.hd([[0, Z3], [1.2, [0.25, 0.1, -0.5]]]), c.hair([[0, Z3], [0.5, [0.1, 0, -0.2]], [1.2, [0.3, 0, -0.5]]]), c.ears([[0, Z3], [1.2, [0.8, 0, -0.6]]]),
+    c.legsQ([[0, Z3], [1.2, [0, 0, 0.35]]], [[0, Z3], [1.2, [0, 0, -0.3]]]), c.armsK([[0, Z3], [1.2, [0.1, 0, -0.3]]]), c.rigP([[0, Z3], [1.2, [0, -0.1, 0]]]), c.rigR([[0, Z3], [1.2, [0.2, 0, 0.1]]]),
     c.legs2([[0, Z3], [1.2, [0, 0, 0.4]]], [[0, Z3], [1.2, [0, 0, -0.2]]]), shut(c)],
 };
 

@@ -83,7 +83,7 @@ const tapAct = async (page, sel) => { await page.waitForSelector(sel, { state: '
       ok(o.d && o.live && o.d.clips.includes('special') && o.d.clips.includes('attack'), id + ': the 3D model loads, with the clip buttons and Special');
       ok(o.d && /has grown into/.test(o.d.note) && o.d.note.indexOf(await page.evaluate((g) => A.Data.SPECIES[g].name, grown)) >= 0 && o.d.tabs.join() === 'about,battle,growth' && !o.d.feed, id + ': says what it grew into, has About, Battle and Growth, and no feed buttons (nothing to feed)');
     }
-    ok(opened.lumifern.d && opened.lumifern.d.sp === 'lumifern' && opened.lumifern.live && !opened.lumifern.d.clips.includes('special'), 'the fix is general: an evolved Lumifern (not polished) opens too, without the Special button');
+    ok(opened.lumifern.d && opened.lumifern.d.sp === 'lumifern' && opened.lumifern.live && opened.lumifern.d.clips.includes('special'), 'the fix is general: an evolved Lumifern opens too (and, polished in Phase 8B, it has the Special button as well)');
     // tabs, clip buttons and sounds on the evolved-away screen
     await page.tap('.card[data-sp="aimza"]'); await waitLive(page);
     await page.evaluate(() => { const m = A.Audio.monster; window.__mon = []; A.Audio.monster = function (sp, cue, o) { window.__mon.push(sp + ':' + cue); return m.call(this, sp, cue, o); }; });
@@ -107,10 +107,11 @@ const tapAct = async (page, sel) => { await page.waitForSelector(sel, { state: '
     const before = await snap();
     await tapAct(page, '[data-act="settings"]');
     for (let i = 0; i < 7; i++) { await page.tap('[data-act="verTap"]'); await sleep(380); }
-    ok(await page.isVisible('[data-act="showcase"]') && await page.isVisible('[data-act="soundCheck"]'), 'Settings → tap the version line 7 times → the developer panel has "Phase 8 showcase" and "Sound check"');
+    ok(await page.isVisible('[data-act="showcase"]') && await page.isVisible('[data-act="soundCheck"]'), 'Settings → tap the version line 7 times → the developer panel has "Monster showcase" and "Sound check"');
     await page.tap('[data-act="showcase"]'); await sleep(300);
     const rows = await page.evaluate(() => [...document.querySelectorAll('[data-act="showView"]')].map((b) => b.dataset.sp + (b.parentNode.querySelector('[data-act="showFight"]') ? '+fight' : '')));
-    ok(rows.join() === 'umbrit+fight,cannonis+fight,aimza+fight,aimza2+fight,aimza3+fight', 'the showcase lists all five polished forms, each with View and Battle (' + rows.join(', ') + ')');
+    ok(rows.slice(0, 5).join() === 'umbrit+fight,cannonis+fight,aimza+fight,aimza2+fight,aimza3+fight', 'the showcase lists the five Phase 8 forms first, each with View and Battle (' + rows.slice(0, 5).join(', ') + ')');
+    ok(rows.length === 63 && rows.every((r) => /\+fight$/.test(r)) && new Set(rows).size === 63, 'Phase 8B: then the whole roster by line, every form with View and Battle (' + rows.length + ' forms)');
     await page.tap('[data-act="showView"][data-sp="aimza3"]'); await sleep(300);
     const pv = await detailOv(page), pvLive = await waitLive(page);
     ok(pv && pv.sp === 'aimza3' && /Showcase preview/.test(pv.note) && pvLive && pv.clips.includes('special') && !pv.feed, 'View opens Aimza III (not owned) with its 3D model, clip buttons and Special, marked as a preview');
@@ -129,6 +130,11 @@ const tapAct = async (page, sel) => { await page.waitForSelector(sel, { state: '
     await page.tap('[data-act="bRetreat"]'); await tapAct(page, '#cf-yes'); await sleep(600);
     const back = await page.evaluate(() => ({ screen: A.UI.screen, inBattle: !!A.UI.B, panel: !!document.querySelector('[data-act="showFight"]') }));
     ok(back.screen === 'island' && !back.inBattle && back.panel, 'leaving returns to the island with the showcase still open');
+    await page.tap('[data-act="showFight"][data-sp="infernox"]');
+    const f2 = await page.evaluate(async () => { for (let i = 0; i < 100 && !(A.UI.B && A.UI.B.stage && A.UI.B.stage.is3d); i++) await new Promise((r) => setTimeout(r, 100)); const U = A.UI.B; return U ? { kind: U.ctx.kind, p: U.b.party[U.b.pi].sp, e: U.b.enemy.sp, is3d: !!(U.stage && U.stage.is3d) } : null; });
+    ok(f2 && f2.kind === 'showcase' && f2.p === 'infernox' && f2.e === 'oceanfang' && f2.is3d, 'Phase 8B: any roster form battles too: Emberix III against a rival line\'s third form, Kairyu III (' + JSON.stringify(f2) + ')');
+    await page.waitForFunction(() => A.UI.B && !A.UI.B.busy, null, { timeout: 30000 });
+    await page.tap('[data-act="bRetreat"]'); await tapAct(page, '#cf-yes'); await sleep(600);
     ok(await snap() === before, 'nothing in the save changed: Aminas, befriended and seen forms, resources, rank, runs and statistics');
     ok(errors.length === 0, 'no script errors in the showcase' + (errors.length ? ': ' + errors.slice(0, 2).join(' | ') : ''));
     await ctx.close();

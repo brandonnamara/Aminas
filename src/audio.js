@@ -244,8 +244,8 @@
     sylvaneer: { base: 360, wave: 'sine', vib: [5, 20], shape: 'bugle', el: ['nature'], w: 0.45 },
     terraflora: { base: 165, wave: 'triangle', lp: 900, am: [4, 0.35], shape: 'song', el: ['nature'], w: 0.5 },
     emberix: { base: 580, wave: 'triangle', lp: 2600, shape: 'up', el: ['fire', 'light'], w: 0.3 },
-    pyrokai: { base: 470, wave: 'square', lp: 1700, am: [18, 0.4], shape: 'wobble', el: ['fire'], w: 0.35 },
-    igniflare: { base: 230, wave: 'sawtooth', lp: 950, am: [13, 0.45], shape: 'down', el: ['fire'], w: 0.5, roar: 1 },
+    pyrokai: { base: 470, wave: 'square', lp: 1700, am: [18, 0.4], shape: 'wobble', el: ['fire'], w: 0.35, g: 1.45 },
+    igniflare: { base: 230, wave: 'sawtooth', lp: 950, am: [13, 0.45], shape: 'down', el: ['fire'], w: 0.5, roar: 1, g: 1.5 },
     pyrospark: { base: 1150, wave: 'sine', vib: [14, 40], shape: 'tweet', el: ['fire'], w: 0.15 },
     zephyr: { base: 760, wave: 'sine', vib: [7, 28], shape: 'cry', el: ['wind'], w: 0.35 },
     voltar: { base: 620, wave: 'square', lp: 2200, am: [16, 0.55], shape: 'giggle', el: ['dark'], w: 0.25, bells: 1 },
@@ -259,7 +259,7 @@
     const o = (extra) => Object.assign({ lp: P.lp, vib: P.vib, am: P.am, echo: !!P.echo }, extra || {});
     // one call in the line's own shape: dur, start/end pitch multipliers, volume
     const call = (X, t, dur, a, b, vol, x) => {
-      const v = vol * (P.wave === 'sawtooth' || P.wave === 'square' ? 0.7 : 1);
+      const v = vol * (P.wave === 'sawtooth' || P.wave === 'square' ? 0.7 : 1) * (P.g || 1);   // g: a muffled timbre's make-up gain
       if (P.shape === 'beep') { for (let i = 0; i < Math.max(2, Math.round(dur / 0.07)); i++) osc(X, t + i * 0.07, 0.05, 'square', f * (a + (b - a) * (i % 3) / 2) * (1 + (i % 2) * 0.25), null, v * 0.7, { lp: 3000 }); return; }
       if (P.shape === 'chatter') { for (let i = 0; i < Math.max(3, Math.round(dur / 0.05)); i++) osc(X, t + i * 0.05, 0.04, i % 2 ? 'square' : 'triangle', f * (a + (b - a) * i / Math.max(1, dur / 0.05)) * (1 + r(-0.12, 0.12)), null, v * 0.6, { lp: 2800 }); return; }
       if (P.shape === 'giggle') { for (let i = 0; i < Math.max(3, Math.round(dur / 0.06)); i++) osc(X, t + i * 0.06, 0.05, 'square', f * (a + (b - a) * i / Math.max(1, dur / 0.06)) * (1 + (i % 2) * 0.18), null, v * 0.6, { lp: 2400 }); return; }
@@ -269,7 +269,7 @@
       osc(X, t, dur, P.wave, f * shp[0], f * shp[1], v, o(Object.assign({ attack: Math.min(0.06, dur * 0.2), slideAt: P.shape === 'bugle' ? 0.5 : 0.9 }, x)));
       if (big) osc(X, t, dur, 'sine', f * shp[0] * 0.5, f * shp[1] * 0.5, v * 0.45, { attack: 0.04, lp: 600 });   // the third form's body tone
     };
-    const step = (X, t, vol) => (P.w > 0.6 ? osc(X, t, 0.14, 'sine', 70 * (2 - P.w), 40, vol, { attack: 0.004 }) : P.shape === 'song' || P.el[0] === 'light' || P.el[0] === 'wind' ? nz(X, t, 0.18, vol * 0.5, 'bandpass', 1400, 700, 1) : osc(X, t, 0.04, 'sine', 380 * (1.4 - P.w), 300, vol * 0.7));
+    const step = (X, t, vol) => (P.w > 0.6 ? osc(X, t, 0.14, 'sine', 70 * (2 - P.w), 40, vol, { attack: 0.004 }) : P.shape === 'song' || P.el[0] === 'light' || P.el[0] === 'wind' ? nz(X, t, 0.18, vol * 1.1, 'bandpass', 1400, 700, 0.8) : osc(X, t, 0.04, 'sine', 380 * (1.4 - P.w), 300, vol * 0.7));
     return {
       tap: (X, t) => { call(X, t, 0.32 + P.w * 0.2, 1, 1.15, 0.12); E.amb(X, t + 0.25, 1.2); },
       idle: (X, t) => { call(X, t, 0.2, 1.05, 1.12, 0.06); E.amb(X, t + 0.1, 0.8); },

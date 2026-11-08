@@ -520,17 +520,30 @@
   UI.act('verTap', () => { if (!D.DEV_TOOLS) return; verTaps++; clearTimeout(verT); verT = setTimeout(() => (verTaps = 0), 2000); if (verTaps >= 7) { verTaps = 0; UI.devPanel(); } });
   UI.devPanel = function () {
     if (!st().starter) return;
-    UI.modal(UI.sheet('Developer testing panel', '<p class="muted" style="font-size:.8rem">Testing shortcuts. Nothing here runs unless you tap it. Reset the save from Settings to clear their effects.</p><div class="row-actions"><button class="btn small gold" data-act="showcase">Phase 8 showcase: view and battle</button><button class="btn small gold" data-act="soundCheck">Sound check</button></div><div class="row-actions"><button class="btn small" data-act="dev" data-k="res">+500 gold, +200 food, +20 gems</button><button class="btn small" data-act="dev" data-k="ess">+50 of every essence</button><button class="btn small" data-act="lpScene">Living-pixel test scene</button><button class="btn small" data-act="dev" data-k="lv">Companion +1 level</button><button class="btn small" data-act="dev" data-k="egg">Finish egg now</button><button class="btn small" data-act="dev" data-k="rank">+1 rank</button><button class="btn small" data-act="dev" data-k="all">Befriend every Amina (Lv 5)</button><button class="btn small" data-act="dev" data-k="gold100k">+100,000 gold</button><button class="btn small" data-act="dev" data-k="timers">Finish all timers</button><button class="btn small" data-act="dev" data-k="prod">Fill all production</button><button class="btn small" data-act="dev" data-k="dboss">Next dungeon: go to its boss</button><button class="btn small" data-act="dev" data-k="dclear">Next dungeon: mark cleared</button></div>', '<button class="btn gold" data-act="close">Close</button>', 'narrow'));
+    UI.modal(UI.sheet('Developer testing panel', '<p class="muted" style="font-size:.8rem">Testing shortcuts. Nothing here runs unless you tap it. Reset the save from Settings to clear their effects.</p><div class="row-actions"><button class="btn small gold" data-act="showcase">Monster showcase: view and battle</button><button class="btn small gold" data-act="soundCheck">Sound check</button></div><div class="row-actions"><button class="btn small" data-act="dev" data-k="res">+500 gold, +200 food, +20 gems</button><button class="btn small" data-act="dev" data-k="ess">+50 of every essence</button><button class="btn small" data-act="lpScene">Living-pixel test scene</button><button class="btn small" data-act="dev" data-k="lv">Companion +1 level</button><button class="btn small" data-act="dev" data-k="egg">Finish egg now</button><button class="btn small" data-act="dev" data-k="rank">+1 rank</button><button class="btn small" data-act="dev" data-k="all">Befriend every Amina (Lv 5)</button><button class="btn small" data-act="dev" data-k="gold100k">+100,000 gold</button><button class="btn small" data-act="dev" data-k="timers">Finish all timers</button><button class="btn small" data-act="dev" data-k="prod">Fill all production</button><button class="btn small" data-act="dev" data-k="dboss">Next dungeon: go to its boss</button><button class="btn small" data-act="dev" data-k="dclear">Next dungeon: mark cleared</button></div>', '<button class="btn gold" data-act="close">Close</button>', 'narrow'));
   };
-  /* Phase 8 showcase (developer panel): open any of the polished forms, or a practice battle with one, whether or
-     not you own it. Nothing is written to the save: previews are view-only and the battle gives no rewards. */
+  /* Monster showcase (developer panel): open any form of any line, or a practice battle with it, whether or not you
+     own it (Phase 8: the three showcase monsters; Phase 8B: the whole roster). Nothing is written to the save: previews
+     are view-only and the battle gives no rewards. */
   const SHOW_FOE = { umbrit: 'cannonis', cannonis: 'aimza3', aimza: 'umbrit', aimza2: 'cannonis', aimza3: 'cannonis' };
+  // every other form meets the same stage of a rival line (a contrasting element, so both sides' effects show)
+  const RIVAL = { lumifern: 'voltar', umbrit: 'lumi', cannonis: 'gaiaroki', kairyu: 'emberix', aquaflora: 'pyrokai', gaiaroki: 'zephyr', pyrocell: 'aquaflora', acinus: 'igniflare', sylvaneer: 'pyrospark',
+    terraflora: 'kairyu', emberix: 'kairyu', pyrokai: 'aquaflora', igniflare: 'sylvaneer', pyrospark: 'gaiaroki', zephyr: 'pyrocell', voltar: 'lumifern', zeep: 'pyrokai', lumi: 'umbrit', meta: 'atem', atem: 'meta' };
+  const showFoe = (id) => { if (SHOW_FOE[id]) return SHOW_FOE[id]; const sp = D.SPECIES[id], ln = RIVAL[sp.line];
+    const f = ln && Object.values(D.SPECIES).find((x) => x.line === ln && x.stage === sp.stage); return f ? f.id : 'cannonis'; };
   UI.showcasePanel = function () {
-    const ids = (A.Showcase && A.Showcase.ids) || [];
-    const rows = ids.map((id) => { const sp = D.SPECIES[id], foe = D.SPECIES[SHOW_FOE[id] || 'cannonis'];
-      return '<div class="inst">' + artBox(id) + '<div class="grow"><b>' + esc(sp.name) + '</b> ' + chip(sp.el) + '<br><span class="muted" style="font-size:.7rem">Stage ' + sp.stage + ' · battle against ' + esc(foe.name) + '</span></div><button class="btn small" data-act="showView" data-sp="' + id + '">View</button><button class="btn small gold" data-act="showFight" data-sp="' + id + '">Battle</button></div>'; }).join('');
-    return UI.modal(UI.sheet('Phase 8 showcase', '<p class="muted" style="font-size:.8rem;margin:.2rem 0 .4rem">View opens the details screen with the 3D model, its animations and sounds. Battle starts a practice battle in the Island Boss room. Nothing is saved and nothing is earned.</p>' + rows, '<button class="btn gold" data-act="close">Close</button>', 'narrow'));
+    const trio = (A.Showcase && A.Showcase.ids) || [], lines = [];
+    Object.values(D.SPECIES).forEach((s) => { let L = lines.find((x) => x.id === s.line); if (!L) lines.push(L = { id: s.line, el: s.el, forms: [] }); L.forms[s.stage - 1] = s.id; });
+    const row = (id) => { const sp = D.SPECIES[id], foe = D.SPECIES[showFoe(id)];
+      return '<div class="inst">' + artBox(id) + '<div class="grow"><b>' + esc(sp.name) + '</b> ' + chip(sp.el) + '<br><span class="muted" style="font-size:.7rem">Stage ' + sp.stage + ' · battle against ' + esc(foe.name) + '</span></div><button class="btn small" data-act="showView" data-sp="' + id + '">View</button><button class="btn small gold" data-act="showFight" data-sp="' + id + '">Battle</button></div>'; };
+    const roster = lines.map((L) => { const ids = L.forms.filter((id) => id && trio.indexOf(id) < 0); if (!ids.length) return '';
+      return '<h4 class="sc-line" data-ln="' + L.id + '" style="margin:.7rem 0 .2rem;font-size:.8rem">' + esc(D.SPECIES[L.forms.find(Boolean)].name) + ' line ' + chip(L.el) + '</h4>' + ids.map(row).join(''); }).join('');
+    const jump = '<div class="row-actions" style="margin:.1rem 0 .4rem">' + lines.filter((L) => L.forms.some((id) => id && trio.indexOf(id) < 0)).map((L) => '<button class="fchip" data-act="scJump" data-ln="' + L.id + '">' + esc(D.SPECIES[L.forms.find(Boolean)].name) + '</button>').join('') + '</div>';
+    return UI.modal(UI.sheet('Monster showcase', '<p class="muted" style="font-size:.8rem;margin:.2rem 0 .4rem">View opens the details screen with the 3D model, its animations and sounds. Battle starts a practice battle in the Island Boss room. Nothing is saved and nothing is earned.</p>' +
+      '<h4 style="margin:.4rem 0 .2rem;font-size:.8rem">Phase 8 showcase</h4>' + trio.map(row).join('') + '<h4 style="margin:.8rem 0 .2rem;font-size:.8rem">Phase 8B roster (' + lines.reduce((n, L) => n + L.forms.filter((id) => id && trio.indexOf(id) < 0).length, 0) + ' forms)</h4>' + jump + roster,
+      '<button class="btn gold" data-act="close">Close</button>', 'narrow'));
   };
+  UI.act('scJump', (el) => { const h = el.closest('.overlay').querySelector('.sc-line[data-ln="' + el.dataset.ln + '"]'); if (h) h.scrollIntoView({ block: 'start', behavior: UI.calm && UI.calm() ? 'auto' : 'smooth' }); });
   UI.act('showcase', () => UI.showcasePanel());
   // Sound check (developer panel): plays test sounds and shows what the browser reports about audio
   const SC_LABEL = { context: 'Audio', session: 'iOS audio session', sfx: 'Sound effects setting', music: 'Music setting' };
@@ -549,7 +562,7 @@
     setTimeout(go, 30); setTimeout(() => UI.soundCheck(ov), 700); });
   UI.act('showView', (el) => UI.detail(el.dataset.sp, { preview: true }));
   UI.act('showFight', (el) => {
-    const Bt = R.Battle, id = el.dataset.sp, foeId = SHOW_FOE[id] || 'cannonis', d = D.DUNGEONS.heartwood, spec = d.battles.find((x) => x.islandBoss) || d.battles[d.battles.length - 1];
+    const Bt = R.Battle, id = el.dataset.sp, foeId = showFoe(id), d = D.DUNGEONS.heartwood, spec = d.battles.find((x) => x.islandBoss) || d.battles[d.battles.length - 1];
     const back = () => { UI.showIsland(); UI.showcasePanel(); };
     UI.closeAll();
     UI.startBattle({ kind: 'showcase', b: Bt.create([Bt.fighter(id, 20)], Bt.fighter(foeId, 20), {}), d: 'heartwood', env: spec.env || d.env, label: 'Showcase battle',

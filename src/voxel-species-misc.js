@@ -133,18 +133,23 @@
     if (stage === 1) {
       // big round head on spreading roots
       const hc = [0, 9.5, 0];
-      V.rigStart(m, 'sprout');   // Phase 8B: the big round head sways on its roots
-      V.joint(m, 'head', [0, 5.5, 0], null);
+      V.rigStart(m, 'sprout');   // Phase 8B: the big round head sways on its roots; the roots step, the leaf crown rustles, the buds twitch
+      V.joint(m, 'head', [0, 5.5, 0], null); V.joint(m, 'hair', [hc[0] - 0.5, hc[1] + 2.6, 0], 'head');
       V.inPart(m, 'head', () => {
         m.ellipsoid(hc[0], hc[1], hc[2], 5, 4.6, 4.8, wood);
         K.recolour(m, (x, y) => y > 10.5, (x, y, z) => MS[V.cells(x, y, z, 2, 3).id % 4]);
-        K.leaves(m, [hc[0] - 0.5, hc[1] + 3.2, 0], [4.4, 1.8, 4.4], MS, 5, { n: 14, dome: true });
+        V.inPart(m, 'hair', () => K.leaves(m, [hc[0] - 0.5, hc[1] + 3.2, 0], [4.4, 1.8, 4.4], MS, 5, { n: 14, dome: true }));
         K.eyes(m, [hc[0], hc[1], 0], { yaw: 25, ang: 30, el: 0, size: 2, tall: 2, iris: GL, white: '#c8ffd8' });
       });
       V.emit(m, 'mouth', [4.4, 8, 2], 'head');
       m.part = 'core';
-      for (let i = 0; i < 8; i++) { const a = i / 8 * Math.PI * 2 + 0.3, p1 = [Math.cos(a) * 3, 4.5, Math.sin(a) * 3], p2 = [Math.cos(a) * 6.5, 1.5, Math.sin(a) * 6.5], p3 = [Math.cos(a) * 8.5, 0, Math.sin(a) * 8.5]; m.capsule([0, 6, 0], p1, 1.6, 1.3, wood); m.capsule(p1, p2, 1.3, 1, circuit); m.capsule(p2, p3, 1, 0.6, circuit); }
-      V.inPart(m, 'head', () => K.sym((sd) => { const b = [hc[0] - 1, hc[1] + 3.5, sd * 2.5]; K.tuft(m, b, [-0.3, 1, sd * 0.6], 4, 0.8, WD[1]); K.tuft(m, K.add(b, K.norm([-0.3, 1, sd * 0.6]), 2.4), [0.4, 1, sd * 0.2], 2, 0.6, WD[1]); m.ellipsoid(b[0] - 1, b[1] + 4, b[2] + sd * 2.5, 1.2, 1, 1.2, '#c8e05a'); }));
+      // eight roots: the trunk end of each stays with the body, the rest steps as four "legs" (two roots each)
+      const rootLeg = (a) => (Math.cos(a) > 0 ? 'legF' : 'legB') + (Math.sin(a) > 0 ? 'L' : 'R'), legAt = {};
+      for (let i = 0; i < 8; i++) { const a = i / 8 * Math.PI * 2 + 0.3, p1 = [Math.cos(a) * 3, 4.5, Math.sin(a) * 3], p2 = [Math.cos(a) * 6.5, 1.5, Math.sin(a) * 6.5], p3 = [Math.cos(a) * 8.5, 0, Math.sin(a) * 8.5]; m.capsule([0, 6, 0], p1, 1.6, 1.3, wood);
+        const lg = rootLeg(a); (legAt[lg] = legAt[lg] || []).push(p1); V.inPart(m, lg, () => { m.capsule(p1, p2, 1.3, 1, circuit); m.capsule(p2, p3, 1, 0.6, circuit); }); }
+      Object.keys(legAt).forEach((lg) => { const ps = legAt[lg]; V.joint(m, lg, [ps.reduce((s, p) => s + p[0], 0) / ps.length, 4.5, ps.reduce((s, p) => s + p[2], 0) / ps.length], null); });
+      K.sym((sd) => { const b = [hc[0] - 1, hc[1] + 3.5, sd * 2.5], ear = sd > 0 ? 'earL' : 'earR'; V.joint(m, ear, b, 'head');
+        V.inPart(m, ear, () => { K.tuft(m, b, [-0.3, 1, sd * 0.6], 4, 0.8, WD[1]); K.tuft(m, K.add(b, K.norm([-0.3, 1, sd * 0.6]), 2.4), [0.4, 1, sd * 0.2], 2, 0.6, WD[1]); m.ellipsoid(b[0] - 1, b[1] + 4, b[2] + sd * 2.5, 1.2, 1, 1.2, '#c8e05a'); }); });
       m.part = null;
       return m;
     }
