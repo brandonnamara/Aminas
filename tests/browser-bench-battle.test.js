@@ -39,9 +39,11 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     const reportWas = A.Perf.reportSlow, saveWas = A.State.save; const seen = { stages: [], hiddenOff: null, shownOn: null };
     // watch the first "off" and "on" phases from inside: are the Phase 7 layers drawn?
     const M = await A.C3D.load(); const hideWas = M.meterHide; void hideWas;
-    const iv = setInterval(() => { const st = A.UI.B && A.UI.B.stage; if (st && st.is3d && !seen.stages.includes(st)) seen.stages.push(st); }, 200);
+    seen.pairs = []; // who stands on the 3D stage (player > foe), to confirm the Phase 8 stretch really shows the polished monsters
+    const iv = setInterval(() => { const st = A.UI.B && A.UI.B.stage; if (st && st.is3d && !seen.stages.includes(st)) seen.stages.push(st);
+      const bb = A.UI.B && A.UI.B.b; if (st && st.is3d && bb) { const k = bb.party[bb.pi].sp + '>' + bb.enemy.sp; if (!seen.pairs.includes(k)) seen.pairs.push(k); } }, 200);
     const r = await A.Bench.runBattle({ extended: true }); clearInterval(iv);
-    return { r, restoredReport: A.Perf.reportSlow === reportWas, restoredSave: A.State.save === saveWas, autoSaver: A.Perf.autoSaver, forceTier: A.Perf.forceTier, inBattle: !!A.UI.B, screen: A.UI.screen, stages: seen.stages.length, bodySaver: document.body.classList.contains('perf-saver'), banner: !!document.querySelector('.bench-banner') };
+    return { r, restoredReport: A.Perf.reportSlow === reportWas, restoredSave: A.State.save === saveWas, autoSaver: A.Perf.autoSaver, forceTier: A.Perf.forceTier, inBattle: !!A.UI.B, screen: A.UI.screen, stages: seen.stages.length, pairs: seen.pairs, bodySaver: document.body.classList.contains('perf-saver'), banner: !!document.querySelector('.bench-banner') };
   });
   const r = out.r;
   ok(!r.error, 'the battle test runs to the end' + (r.error ? ' (' + r.error + ')' : ''));
@@ -61,6 +63,11 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   ok(r.tiers.every((t) => /bound|Keeps up|Display-limited/.test(t.verdict)), 'each setting gets a bottleneck verdict');
   ok(r.displayFps > 0, 'the display rate the page gets is recorded (' + r.displayFps + ' fps)');
   ok(r.extended && r.extended.slices.length === 2 && r.extended.slices.every((s) => s.turns > 0) && r.extended.dropPct != null, 'extended combat is measured in 15 s slices with a first-vs-last comparison');
+  // Phase 8: a separate stretch with the polished monsters on stage (the main battle above never shows one)
+  const sc = r.phases.filter((p) => p.showcase);
+  ok(sc.length === 2 && sc[0].phase === 'idle, Phase 8 monsters' && /^turns, Phase 8 monsters/.test(sc[1].phase) && sc[1].turns >= 1 && sc.every((p) => p.fps3d > 0 && p.triangles > 0), 'a Phase 8 stretch measures the polished monsters on Auto: idle, and turns with their own moves (' + sc.map((p) => p.drawCalls + ' draws, ' + Math.round(p.triangles / 1000) + 'k tris').join('; ') + ')');
+  ok(r.showcase && r.showcase.load && r.showcase.load.is3d && r.showcase.party.join() === 'aimza3,umbrit' && r.showcase.foe === 'cannonis' && out.pairs.includes('aimza3>cannonis') && !out.pairs.slice(0, 1).some((k) => /aimza3|umbrit|cannonis/.test(k)), 'during that stretch Aimza III is on the 3D stage against Cannonis; the main battle keeps its usual line-up (' + out.pairs.join(', ') + ')');
+  ok(/Phase 8 monsters \(Aimza III vs Cannonis\): idle [0-9.]+\/[0-9.]+ fps.*; turns [0-9.]+\/[0-9.]+ fps/.test(r.summary || ''), 'the copied summary includes the Phase 8 stretch');
   ok(r.batterySaverBefore.onForThisSession && r.batterySaverBefore.reason && r.batterySaverBefore.reason.view === 'battle:heartwood:island-boss', 'it reports that Battery saver was already on, and why');
   ok(r.batterySaver && typeof r.batterySaver.wouldHaveStarted === 'boolean' && (!r.batterySaver.wouldHaveStarted || r.batterySaver.triggers.every((t) => t.phase && t.view && t.frames > 0 && t.slowFrames != null && t.pixelRatio && t.targetFps)), 'each time the Battery saver rule would fire, the phase and the measurement behind it are recorded');
   ok(r.save.untouched && out.restoredSave && saveBefore === await saveKey(), 'the game save is untouched (same bytes before and after; saving was suspended)');

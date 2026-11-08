@@ -156,6 +156,39 @@ before/after difference means anything. On the iPhone, a whole Phase 7 battle fr
 | New `tests/browser-showcase8.test.js` | 38 checks |
 | Full suite (20 suites, run alone) | **596 of 596 passed** |
 
+## 9. Fixes after the first iPhone test
+**Polished monsters could not be opened (`src/ui.js`).**
+* **The cause:** the details screen assumed you still have the form you tapped. A form you befriended and then
+  evolved has no Amina left, so opening it threw an error inside the tap and nothing opened. This is old (it dates
+  from the baseline) and hits every evolved-away form, but on the test phone it hit exactly the polished ones: its
+  Umbrit, Cannonis and Aimza had all evolved.
+* **The fix:** such a form now opens with its 3D model, the clip buttons (with Special and sounds for the polished
+  ones), About, Battle (base stats and moves) and Growth, plus a line saying what it grew into. There are no feed
+  buttons because there is nothing to feed.
+* **Developer panel → Phase 8 showcase** (Settings, tap the version line 7 times): View opens any of the five
+  polished forms, owned or not. Battle starts a practice battle with one in the Island Boss room. Nothing is saved
+  and nothing is earned.
+
+**No sound on the iPhone (`src/audio.js`, `src/ui.js`).** The old sounds were unchanged by Phase 8, so this was
+not new. Three things could silence everything:
+* iOS treats Web Audio as "ambient" sound, which the side (Ring/Silent) switch mutes completely. While sound effects
+  or music are on, the game now asks iOS for the "playback" audio session (the Audio Session API, iOS 16.4+), so it
+  plays like a video does, even on silent. With both off, it hands the session back. Older iOS gets a one-off silent
+  clip instead. WebKit applies the setting to the whole page, including the frame the preview runs in.
+* After a call, Siri or another app's audio, iOS leaves the sound "interrupted". The old code only restarted
+  "suspended" sound, so one interruption silenced the game until a reload. Any non-running state now restarts.
+* Sound could only start from a button. It now starts, or restarts, from any tap, touch or key.
+* **Sound check** (developer panel): plays a game chime and the three voices, and shows what the browser reports
+  (audio running or not, the iOS audio session, the settings).
+
+**The battle performance test now measures the polished monsters (`src/bench.js`).** Its main battle never puts a
+polished monster on stage (Lumifern stays in, against the Heartwood Stag). A new stretch after the four settings
+runs Aimza III, the heaviest form, against Cannonis on Auto: 5 s idle and 10 s of turns with their own moves. The
+earlier phases are unchanged, so results stay comparable. On desktop it peaks at 58–71 draw calls and 54–66k
+triangles, against 38 and 16k for the main battle.
+
+**Tests:** new `tests/browser-p8fix.test.js` (36 checks) and 3 new checks in the battle test.
+
 ## Limitations
 * **Close to the cards, not copies.** Fine painted details are simplified, and the sides and backs are interpreted.
 * **No bloom.** The cards' glow halos would need a bloom effect, which would change every creature and arena.
@@ -163,13 +196,20 @@ before/after difference means anything. On the iPhone, a whole Phase 7 battle fr
 * **More draw calls** in showcase battles, up to about 80 against 30. Merging each part's glow into one mesh would
   roughly halve it if the iPhone test shows a need.
 * **Not tested on a real iPhone.**
+* **Sound and other apps:** with the "playback" session, the game pauses music from other apps while its own sound
+  or music is on. Turning both off in Settings gives the session back.
+* **The silent switch and real interruptions** cannot happen in the test browser. The tests fake those browser APIs
+  and check that the game asks for the right things. Sound check shows what the phone actually reports.
 
 ## Testing on your iPhone
-1. Open the dev preview. In Creatures, open Umbrit (or hatch or obtain Cannonis and Aimza). Turn the creature, tap
-   it, and try Attack, Ouch, Cheer and the new Special.
+1. Open the dev preview. In Creatures, open Umbrit, Cannonis and Aimza, even if they have evolved. For the forms
+   you don't have, use Settings → tap the version line 7 times → Phase 8 showcase. Turn the creature, tap it, and
+   try Attack, Ouch, Cheer and the new Special.
 2. Feed it several times from its details screen. It should stay on the same tab and scroll position, with the
    level going up.
 3. Battle with them (any dungeon), with sound on. Watch Shade Nip, Gloom Veil, Bubble Pop, Tidal Surge, Echo Wave
    and the Echo specials.
 4. Look at the gem count on the top bar.
-5. Settings → Run performance test → Battle test, to confirm battles still hold their frame rate.
+5. Settings → Run performance test → Battle test, to confirm battles still hold their frame rate. The last two
+   rows are the Phase 8 monsters. Don't touch the screen while it runs: the move buttons stay live.
+6. Sound: with the silent switch on and the volume up, tap anywhere, then use the developer panel's Sound check.

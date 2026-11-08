@@ -65,6 +65,16 @@ Results open in a sheet with **Copy results**, the same as the island test. The 
 
    The verdict also gives the on/off difference and the biggest Phase 7 layer.
 
+**Phase 8 monsters (added in Phase 8):**
+* **Why:** the main battle never puts a polished monster on stage (Lumifern stays in, against the Heartwood Stag).
+* **What it runs:** after the four settings, the test opens a second battle in the same room on Auto. Aimza III, the
+  heaviest form (three heads, about 19k triangles), faces Cannonis.
+* **Measured:** 5 s idle (blinks and glow) and 10 s of turns with their own move sequences.
+* **Reported:** they are the last two rows of the table, flagged `showcase: true` in the JSON. The summary gets a
+  "Phase 8 monsters" line.
+* **Comparability:** the earlier phases are unchanged.
+* **Don't touch the screen** during the test: the move buttons stay live, and a tap plays a move.
+
 **Extended combat (optional):** 3 minutes of continuous turns on Auto with effects on, reported in 15 s slices. The
 resolution adapts exactly as in play. The first minute is compared with the last, for frame rate and p95. A big drop
 means the phone heated up and slowed down.

@@ -6,17 +6,59 @@
   let ctx = null, master = null, musicGain = null, musicTimer = null, step = 0;
   Au.sfxOn = true; Au.musicOn = true; Au.mode = 'light';
 
+  /* Phase 8 (iPhone sound fix):
+     - iOS plays Web Audio as "ambient" sound by default, which the side (Ring/Silent) switch mutes completely. While
+       the game's sound or music is on, the page tells iOS it plays audio the way a video does (Audio Session API,
+       iOS 17+), so the silent switch no longer mutes it; with both off the session is handed back. Older iOS: a
+       one-off silent <audio> clip in the first tap has the same effect.
+     - A context can also be left "interrupted" (a call, Siri, another app's audio) or suspended. The old code only
+       resumed "suspended", and only on button taps, so one interruption silenced the game until a reload. Every tap,
+       touch or key now resumes it from any state that is not running.
+     - The first tap also plays one silent sample through the context, which older iOS needs to start output. */
+  let kicked = false, tagTried = false;
+  const IOS = !!(root.navigator && (/iP(hone|ad|od)/.test(root.navigator.userAgent || '') || (root.navigator.platform === 'MacIntel' && root.navigator.maxTouchPoints > 1)));
+  Au.sessionType = () => (root.navigator && root.navigator.audioSession ? root.navigator.audioSession.type : null);
+  function session() {
+    const n = root.navigator; if (!n || !n.audioSession) return false;
+    const want = Au.sfxOn || Au.musicOn ? 'playback' : 'auto';
+    try { if (n.audioSession.type !== want) n.audioSession.type = want; } catch (e) {}
+    return true;
+  }
+  function silentTag() { // older iOS without navigator.audioSession: one silent clip switches the page to playback
+    if (tagTried || !IOS) return; tagTried = true;
+    try {
+      const n = 800, b = new Uint8Array(44 + n), dv = new DataView(b.buffer), w = (o, s) => { for (let i = 0; i < s.length; i++) b[o + i] = s.charCodeAt(i); };
+      w(0, 'RIFF'); dv.setUint32(4, 36 + n, true); w(8, 'WAVE'); w(12, 'fmt '); dv.setUint32(16, 16, true); dv.setUint16(20, 1, true); dv.setUint16(22, 1, true); dv.setUint32(24, 8000, true); dv.setUint32(28, 8000, true); dv.setUint16(32, 1, true); dv.setUint16(34, 8, true); w(36, 'data'); dv.setUint32(40, n, true); b.fill(128, 44);
+      let s = ''; for (let i = 0; i < b.length; i++) s += String.fromCharCode(b[i]);
+      const el = root.document.createElement('audio'); el.setAttribute('x-webkit-airplay', 'deny'); el.preload = 'auto'; el.src = 'data:audio/wav;base64,' + root.btoa(s);
+      const p = el.play(); if (p && p.catch) p.catch(() => {});
+    } catch (e) {}
+  }
+  function prime() { try { const b = ctx.createBuffer(1, 1, ctx.sampleRate), s = ctx.createBufferSource(); s.buffer = b; s.connect(ctx.destination); s.start(0); kicked = true; } catch (e) {} }
+  function create() {
+    const C = root.AudioContext || root.webkitAudioContext; if (!C) return false;
+    ctx = new C(); master = ctx.createGain(); master.gain.value = 0.5; master.connect(ctx.destination);
+    musicGain = ctx.createGain(); musicGain.gain.value = 0.18; musicGain.connect(master);
+    return true;
+  }
   Au.unlock = function () {
     try {
-      if (!ctx) {
-        const C = root.AudioContext || root.webkitAudioContext; if (!C) return;
-        ctx = new C(); master = ctx.createGain(); master.gain.value = 0.5; master.connect(ctx.destination);
-        musicGain = ctx.createGain(); musicGain.gain.value = 0.18; musicGain.connect(master);
-      }
-      if (ctx.state === 'suspended') ctx.resume();
+      // the session type goes first, so the context starts in the right iOS audio category
+      if (!session() && (Au.sfxOn || Au.musicOn)) silentTag();
+      if (!ctx && !create()) return;
+      if (ctx.state !== 'running' && ctx.state !== 'closed') { const p = ctx.resume(); if (p && p.catch) p.catch(() => {}); suspendedByUs = false; prime(); }
+      else if (!kicked) prime();
       Au.applyMusic();
     } catch (e) { /* audio is optional */ }
   };
+  // Cheap check for every tap, touch and key (see ui.js): only does anything when sound is not running yet.
+  Au.wake = function () {
+    if (ctx && ctx.state === 'running' && kicked) return;
+    if (!Au.sfxOn && !Au.musicOn) return;
+    if (root.document && root.document.hidden) return;
+    Au.unlock();
+  };
+  Au.diag = () => ({ context: ctx ? ctx.state : 'not started', sampleRate: ctx ? ctx.sampleRate : 0, session: Au.sessionType() || 'not available', ios: IOS, silentClip: tagTried, sfx: Au.sfxOn, music: Au.musicOn });
 
   function tone(freq, t0, dur, type, vol, dest, slide) {
     const o = ctx.createOscillator(), g = ctx.createGain();
@@ -78,7 +120,7 @@
   Au.ctxState = () => (ctx ? ctx.state : 'none');
   Au.musicRunning = () => !!musicTimer;
   Au.setMode = function (m) { if (Au.mode !== m) { Au.mode = m; Au.applyMusic(); } };
-  Au.setPrefs = function (s) { Au.sfxOn = !!s.sfx; Au.musicOn = !!s.music; Au.applyMusic(); };
+  Au.setPrefs = function (s) { Au.sfxOn = !!s.sfx; Au.musicOn = !!s.music; if (ctx) session(); Au.applyMusic(); };
 
   /* ================================================================ Phase 8: monster voices
      Original synthesized sounds (no recordings, nothing licensed) for the showcase monsters, one recognisable voice

@@ -141,6 +141,10 @@
      would have fired, the test records when and the exact measurement behind it. The session's own Battery saver
      state is put back afterwards. Optional: 3 minutes of continuous combat on Auto, in 15 s slices, for stability. */
   B.BATTLE = { dungeon: 'heartwood', party: [['lumifern', 30], ['emberix', 30], ['aimza', 30]], seed: 7 };
+  // Phase 8: the main battle above never brings a polished monster on stage, so a separate stretch measures the
+  // heaviest Phase 8 pairing (Aimza III, three heads, against Cannonis) in the same room on Auto: idle (blinks and
+  // glow) and turns with their own move sequences. The earlier phases are unchanged, so runs stay comparable.
+  B.SHOWCASE = { party: [['aimza3', 30], ['umbrit', 30]], foe: ['cannonis', 30], label: 'Phase 8 monsters' };
   B.P7_LAYERS = ['atmo:', 'fx:', 'hull'];
   B.LAYER_PARTS = [['distant silhouettes', ['atmo:backdrop']], ['light shafts', ['atmo:shafts']], ['arena particles', ['atmo:particles']], ['boss light pool', ['atmo:pool']], ['outlines', ['hull']], ['rings and brackets', ['fx:marks']]];
   B.BATTLE_TIERS = [['Auto', null], ['High', 'high'], ['Balanced', 'balanced'], ['Battery saver', 'saver']];
@@ -150,10 +154,10 @@
   const seeded = (n) => () => { n = (n + 0x6d2b79f5) | 0; let t = Math.imul(n ^ (n >>> 15), 1 | n); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
   const stage = () => (A.UI.B && A.UI.B.stage) || null;
 
-  async function openBattle(M) {
+  async function openBattle(M, cfg) {
     const R = A.Rules, Bt = R.Battle, D = A.Data, d = D.DUNGEONS[B.BATTLE.dungeon];
     const spec = d.battles.find((s) => s.islandBoss) || d.battles[d.battles.length - 1];
-    const party = B.BATTLE.party.map(([sp, lv]) => Bt.fighter(sp, lv)), foe = R.enemyFromSpec(spec);
+    const party = ((cfg && cfg.party) || B.BATTLE.party).map(([sp, lv]) => Bt.fighter(sp, lv)), foe = cfg && cfg.foe ? Bt.fighter(cfg.foe[0], cfg.foe[1]) : R.enemyFromSpec(spec);
     party.concat([foe]).forEach((f) => { f.hpMax *= 1000; f.hp = f.hpMax; });
     const b = Bt.create(party, foe, { rng: seeded(B.BATTLE.seed) });
     if (A.UI.B) A.UI.leaveBattle(() => {});
@@ -260,7 +264,7 @@
       S.save = () => { saveCalls++; return true; };
       P.autoSaver = false; P.reportSlow = (why) => { ctx.triggers.push(Object.assign({ phase: ctx.phase, tier: ctx.tierLabel, secondsIntoTest: Math.round((performance.now() - t0) / 1000) }, why || {})); };
       doc.body.appendChild(banner); doc.body.classList.add('bench-on');
-      const step = banner.querySelector('.bench-step'), total = B.BATTLE_TIERS.length + (opts.extended ? 1 : 0);
+      const step = banner.querySelector('.bench-step'), total = B.BATTLE_TIERS.length + 1 + (opts.extended ? 1 : 0);
       for (let i = 0; i < B.BATTLE_TIERS.length && !cancel; i++) {
         const [label, tierId] = B.BATTLE_TIERS[i]; ctx.tierLabel = label; P.forceTier = tierId; P.apply();
         step.textContent = (i + 1) + '/' + total + ': ' + label + ', opening the battle';
@@ -274,6 +278,16 @@
         for (let w = 0; w < 40 && A.UI.B && A.UI.B.busy; w++) await sleep(100);
         await sleep(400); tier.breakdown = breakdown(M); tier.verdict = verdict(on, off, tier.breakdown, out.displayFps);
         out.tiers.push(tier);
+      }
+      if (!cancel && B.SHOWCASE) {
+        const k = B.BATTLE_TIERS.length + 1, lbl = B.SHOWCASE.label; ctx.tierLabel = 'Auto'; P.forceTier = null; P.apply();
+        step.textContent = k + '/' + total + ': ' + lbl + ', opening the battle';
+        const load = await openBattle(M, B.SHOWCASE);
+        if (load.is3d) {
+          step.textContent = k + '/' + total + ': ' + lbl + ', idle'; out.phases.push(Object.assign(await battlePhase(M, 'idle, ' + lbl, { seconds: B.BATTLE_S.idle }, ctx), { showcase: true }));
+          if (!cancel) { step.textContent = k + '/' + total + ': ' + lbl + ', turns'; out.phases.push(Object.assign(await battlePhase(M, 'turns, ' + lbl + ' (Auto, effects on)', { seconds: B.BATTLE_S.turns, turns: true }, ctx), { showcase: true })); }
+          out.showcase = { party: B.SHOWCASE.party.map((x) => x[0]), foe: B.SHOWCASE.foe[0], load };
+        } else out.showcase = { error: 'opened on the 2D stage', load };
       }
       if (opts.extended && !cancel) {
         // stability: Auto, effects on, continuous combat; resolution adapts as it would in play
@@ -313,6 +327,7 @@
     o.tiers.forEach((t) => { const on = o.phases.find((p) => p.phase === 'turns, ' + t.tier + ', effects on') || {}, off = o.phases.find((p) => p.phase === 'turns, ' + t.tier + ', effects off') || {};
       s.push(t.tier + ': ' + on.fps3d + '/' + on.budgetFps + ' fps on, ' + off.fps3d + ' off (p95 ' + on.p95 + '/' + off.p95 + ' ms, CPU ' + on.cpuMs + ' ms, ' + on.drawCalls + ' draws, ' + on.pixelRatio + 'x)'); });
     const est = (o.phases || []).map((p) => p.pageFrameRate).filter(Boolean).pop(); if (est) s.push('rules judged frames against ' + est.fps + ' fps' + (est.steady ? ' (steady page cap)' : ''));
+    const sc = (o.phases || []).filter((p) => p.showcase); if (sc.length) s.push('Phase 8 monsters (Aimza III vs Cannonis): ' + sc.map((p) => (/^idle/.test(p.phase) ? 'idle ' : 'turns ') + p.fps3d + '/' + p.budgetFps + ' fps, p95 ' + p.p95 + ' ms, CPU ' + p.cpuMs + ' ms, ' + p.drawCalls + ' draws').join('; '));
     if (o.extended) s.push('extended ' + o.extended.firstMinFps + ' → ' + o.extended.lastMinFps + ' fps (' + o.extended.dropPct + '% drop)');
     s.push('auto Battery saver: ' + (o.batterySaver.wouldHaveStarted ? 'would start (' + o.batterySaver.triggers.length + 'x, first in ' + o.batterySaver.triggers[0].phase + ')' : 'would not start'));
     if (o.batterySaverBefore.onForThisSession) s.push('it was already on before the test' + (o.batterySaverBefore.reason ? ' (' + o.batterySaverBefore.reason.view + ')' : ''));

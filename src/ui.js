@@ -343,9 +343,26 @@
     let inst = o.uid ? R.inst(s, o.uid) : null; if (inst) spId = inst.sp;
     const sp = D.SPECIES[spId], status = R.status(s, spId), mine = s.aminas.filter((a) => a.sp === spId);
     if (!inst && mine.length) inst = mine.slice().sort((a, b) => b.lv - a.lv)[0];
-    const tab = (o.ov && o.ov._tab) || o.tab || 'about';
+    let tab = (o.ov && o.ov._tab) || o.tab || 'about';
     let body, live = false;
-    if (status === 'unknown') {
+    // Phase 8 fix: a form you befriended but no longer have (it evolved), or a dev showcase preview, has no instance.
+    // It used to throw here (inst.lv on null), so the screen never opened. It now shows the creature and its info.
+    const ghost = !!o.preview || (status === 'owned' && !inst);
+    if (ghost) {
+      live = true; if (['about', 'battle', 'growth'].indexOf(tab) < 0) tab = 'about';
+      const stt = R.statsAt(spId, 1), fam = UI.family(spId), nm = esc(sp.name);
+      const grown = s.aminas.filter((a) => fam.indexOf(a.sp) >= 0 && D.SPECIES[a.sp].stage > sp.stage).sort((a, b) => b.lv - a.lv)[0];
+      const note = o.preview ? 'Showcase preview (developer panel). Nothing here changes your save.' : grown ? 'Your ' + nm + ' has grown into ' + esc(D.SPECIES[grown.sp].name) + ' (Lv ' + grown.lv + '). This page shows it at this stage.' : 'You befriended ' + nm + ', but none are with you right now.';
+      const famHtml = '<div class="evo-path">' + fam.map((id, i) => { const d = D.SPECIES[id], ev = i ? D.SPECIES[fam[i - 1]].evo : null, own = !!s.owned[id] || !!o.preview;
+        return (i ? '<div class="evo-arrow">' + I('arrow') + '<small>Lv ' + ev.lv + '</small></div>' : '') + '<div class="evo-node' + (id === spId ? ' cur' : '') + (own ? '' : ' unknown') + '">' + (own ? artBox(id) : silBox(id)) + '<b>' + (own || R.status(s, id) !== 'unknown' ? esc(d.name) : '???') + '</b><small>Stage ' + d.stage + '</small></div>'; }).join('') + '</div>';
+      const tabs = '<div class="dtabs" role="tablist">' + [['about', 'About'], ['battle', 'Battle'], ['growth', 'Growth']].map(([k, t]) => '<button class="dtab ' + (tab === k ? 'on' : '') + '" role="tab" aria-selected="' + (tab === k) + '" data-act="dTab" data-tab="' + k + '">' + t + '</button>').join('') + '</div>';
+      const about = '<div class="dpanel" data-panel="about"' + (tab === 'about' ? '' : ' hidden') + '><div class="kv"><b>Personality:</b> ' + esc(sp.pers) + '</div><div class="kv">' + esc(sp.lore) + '</div><div class="kv"><b>Found:</b> ' + esc(sp.find) + '</div><div class="entnote"><div class="ep">' + Art.entity('n') + '</div><div>“' + esc(sp.ent) + '”</div></div></div>';
+      const battle = '<div class="dpanel" data-panel="battle"' + (tab === 'battle' ? '' : ' hidden') + '><div class="kv muted small-t">Base stats at level 1.</div><div class="stats">' + [['HP', 'hp'], ['ATK', 'atk'], ['DEF', 'def'], ['SPD', 'spd']].map((k) => '<div class="stat">' + k[0] + '<b>' + stt[k[1]] + '</b></div>').join('') + '</div>' + UI.effLines(sp.el) +
+        sp.abil.map((id) => { const ab = D.ABILITIES[id]; return '<div class="abil"><b>' + ab.name + '</b> ' + chip(ab.el) + ' <span class="muted">' + (R.moveEffect ? esc(R.moveEffect(id, 1).text) : ab.power ? 'Power ' + ab.power : 'Utility') + (ab.cd ? ' · every ' + (ab.cd + 1) + ' turns' : '') + '</span><br>' + esc(ab.desc) + '</div>'; }).join('') + '</div>';
+      const growth = '<div class="dpanel" data-panel="growth"' + (tab === 'growth' ? '' : ' hidden') + '>' + famHtml + '<div class="kv"><b>Evolution:</b> ' + (sp.evo ? 'Can evolve into <b>' + (s.owned[sp.evo.to] || o.preview ? esc(D.SPECIES[sp.evo.to].name) : '???') + '</b> from level ' + sp.evo.lv + '.' : 'Final form.') + '</div></div>';
+      const clips = A.C3D && A.C3D.enabled() ? '<div class="clipbar">' + ['move', 'attack', 'hit', 'victory'].concat(Au.hasVoice && Au.hasVoice(spId) ? ['special'] : []).map((c) => '<button class="fchip" data-act="vPlay" data-clip="' + c + '">' + CLIP_LABEL[c] + '</button>').join('') + '</div>' : '';
+      body = '<div class="detail"><div><div class="big art viewer3d">' + Art.portrait(spId) + '</div>' + clips + '</div><div><h2>' + nm + ' ' + chip(sp.el) + '</h2>' + (sp.title ? '<div class="sp-title muted">' + esc(sp.title) + ' · Stage ' + sp.stage + '</div>' : '') + '<div class="kv ghost-note">' + note + '</div>' + tabs + about + battle + growth + '</div></div>';
+    } else if (status === 'unknown') {
       body = '<div class="detail"><div class="big sil art">' + Art.portrait(spId) + '</div><div><h2>???</h2><div class="kv"><b>How to find it:</b> ' + esc(sp.find) + '</div><p class="muted" style="font-size:.85rem">You have not met this Amina yet.</p></div></div>';
     } else if (status === 'seen') {
       body = '<div class="detail"><div class="big sil art">' + Art.portrait(spId) + '</div><div><h2>' + esc(sp.name) + ' ' + chip(sp.el) + '</h2><p class="muted">Sighted, but not yet befriended.</p><div class="kv"><b>How to find it:</b> ' + esc(sp.find) + '</div>' + UI.effLines(sp.el) + '</div></div>';
@@ -376,7 +393,7 @@
           '<button class="btn small gold" data-act="detailFeed" data-uid="' + a.uid + '" data-kind="snack">Snack ' + D.SNACKS.snack.food + '</button><button class="btn small" data-act="detailFeed" data-uid="' + a.uid + '" data-kind="feast">Feast ' + D.SNACKS.feast.food + '</button>' + (isAct ? '' : '<button class="btn small ghost" data-act="makeActive" data-uid="' + a.uid + '">Companion</button>') + (D.SPECIES[a.sp].evo && a.lv >= D.SPECIES[a.sp].evo.lv ? '<button class="btn small gold evo-btn" data-act="evoAsk" data-uid="' + a.uid + '">' + I('spark') + 'Evolve</button>' : '') + '</div>';
       }).join('');
     }
-    const html = UI.sheet(esc(status === 'unknown' ? 'Undiscovered Amina' : sp.name), body, '<button class="btn gold" data-act="close">Close</button>', 'wide');
+    const html = UI.sheet(esc(status === 'unknown' && !ghost ? 'Undiscovered Amina' : sp.name), body, '<button class="btn gold" data-act="close">Close</button>', 'wide');
     if (o.ov && o.ov.parentNode && o.ov._sp === spId && o.ov.firstElementChild) {
       // Phase 8: the same Amina redrawn (feeding, companion change, gear): update in place, nothing resets
       const t = document.createElement('div'); t.innerHTML = html;
@@ -503,8 +520,43 @@
   UI.act('verTap', () => { if (!D.DEV_TOOLS) return; verTaps++; clearTimeout(verT); verT = setTimeout(() => (verTaps = 0), 2000); if (verTaps >= 7) { verTaps = 0; UI.devPanel(); } });
   UI.devPanel = function () {
     if (!st().starter) return;
-    UI.modal(UI.sheet('Developer testing panel', '<p class="muted" style="font-size:.8rem">Testing shortcuts. Nothing here runs unless you tap it. Reset the save from Settings to clear their effects.</p><div class="row-actions"><button class="btn small" data-act="dev" data-k="res">+500 gold, +200 food, +20 gems</button><button class="btn small" data-act="dev" data-k="ess">+50 of every essence</button><button class="btn small" data-act="lpScene">Living-pixel test scene</button><button class="btn small" data-act="dev" data-k="lv">Companion +1 level</button><button class="btn small" data-act="dev" data-k="egg">Finish egg now</button><button class="btn small" data-act="dev" data-k="rank">+1 rank</button><button class="btn small" data-act="dev" data-k="all">Befriend every Amina (Lv 5)</button><button class="btn small" data-act="dev" data-k="gold100k">+100,000 gold</button><button class="btn small" data-act="dev" data-k="timers">Finish all timers</button><button class="btn small" data-act="dev" data-k="prod">Fill all production</button><button class="btn small" data-act="dev" data-k="dboss">Next dungeon: go to its boss</button><button class="btn small" data-act="dev" data-k="dclear">Next dungeon: mark cleared</button></div>', '<button class="btn gold" data-act="close">Close</button>', 'narrow'));
+    UI.modal(UI.sheet('Developer testing panel', '<p class="muted" style="font-size:.8rem">Testing shortcuts. Nothing here runs unless you tap it. Reset the save from Settings to clear their effects.</p><div class="row-actions"><button class="btn small gold" data-act="showcase">Phase 8 showcase: view and battle</button><button class="btn small gold" data-act="soundCheck">Sound check</button></div><div class="row-actions"><button class="btn small" data-act="dev" data-k="res">+500 gold, +200 food, +20 gems</button><button class="btn small" data-act="dev" data-k="ess">+50 of every essence</button><button class="btn small" data-act="lpScene">Living-pixel test scene</button><button class="btn small" data-act="dev" data-k="lv">Companion +1 level</button><button class="btn small" data-act="dev" data-k="egg">Finish egg now</button><button class="btn small" data-act="dev" data-k="rank">+1 rank</button><button class="btn small" data-act="dev" data-k="all">Befriend every Amina (Lv 5)</button><button class="btn small" data-act="dev" data-k="gold100k">+100,000 gold</button><button class="btn small" data-act="dev" data-k="timers">Finish all timers</button><button class="btn small" data-act="dev" data-k="prod">Fill all production</button><button class="btn small" data-act="dev" data-k="dboss">Next dungeon: go to its boss</button><button class="btn small" data-act="dev" data-k="dclear">Next dungeon: mark cleared</button></div>', '<button class="btn gold" data-act="close">Close</button>', 'narrow'));
   };
+  /* Phase 8 showcase (developer panel): open any of the polished forms, or a practice battle with one, whether or
+     not you own it. Nothing is written to the save: previews are view-only and the battle gives no rewards. */
+  const SHOW_FOE = { umbrit: 'cannonis', cannonis: 'aimza3', aimza: 'umbrit', aimza2: 'cannonis', aimza3: 'cannonis' };
+  UI.showcasePanel = function () {
+    const ids = (A.Showcase && A.Showcase.ids) || [];
+    const rows = ids.map((id) => { const sp = D.SPECIES[id], foe = D.SPECIES[SHOW_FOE[id] || 'cannonis'];
+      return '<div class="inst">' + artBox(id) + '<div class="grow"><b>' + esc(sp.name) + '</b> ' + chip(sp.el) + '<br><span class="muted" style="font-size:.7rem">Stage ' + sp.stage + ' · battle against ' + esc(foe.name) + '</span></div><button class="btn small" data-act="showView" data-sp="' + id + '">View</button><button class="btn small gold" data-act="showFight" data-sp="' + id + '">Battle</button></div>'; }).join('');
+    return UI.modal(UI.sheet('Phase 8 showcase', '<p class="muted" style="font-size:.8rem;margin:.2rem 0 .4rem">View opens the details screen with the 3D model, its animations and sounds. Battle starts a practice battle in the Island Boss room. Nothing is saved and nothing is earned.</p>' + rows, '<button class="btn gold" data-act="close">Close</button>', 'narrow'));
+  };
+  UI.act('showcase', () => UI.showcasePanel());
+  // Sound check (developer panel): plays test sounds and shows what the browser reports about audio
+  const SC_LABEL = { context: 'Audio', session: 'iOS audio session', sfx: 'Sound effects setting', music: 'Music setting' };
+  UI.soundCheck = function (ov) {
+    const g = Au.diag ? Au.diag() : {}, row = (k, v) => '<div class="kv"><b>' + SC_LABEL[k] + ':</b> ' + esc(String(v)) + '</div>';
+    const body = '<p class="muted" style="font-size:.8rem;margin:.2rem 0 .4rem">Tap a button and listen. If you hear nothing, check the volume buttons and that nothing else (a call, Siri, voice dictation) is using the speaker, then tap again.</p>' +
+      row('context', g.context === 'running' ? 'running' : g.context + ' (it should say running after a tap)') + row('session', g.session === 'playback' ? 'playback (plays even with the silent switch on)' : g.session) + row('sfx', g.sfx ? 'on' : 'off (turn it on in Settings)') + row('music', g.music ? 'on' : 'off') +
+      '<div class="row-actions" style="margin-top:.5rem"><button class="btn small gold" data-act="scPlay" data-k="chime">Game chime</button><button class="btn small" data-act="scPlay" data-k="umbrit">Umbrit</button><button class="btn small" data-act="scPlay" data-k="cannonis">Cannonis</button><button class="btn small" data-act="scPlay" data-k="aimza3">Aimza III</button></div>';
+    const html = UI.sheet('Sound check', body, '<button class="btn gold" data-act="close">Close</button>', 'narrow');
+    if (ov && ov.parentNode) { ov.innerHTML = html; return ov; }
+    return UI.modal(html);
+  };
+  UI.act('soundCheck', () => { const ov = UI.soundCheck(); setTimeout(() => UI.soundCheck(ov), 400); });
+  UI.act('scPlay', (el) => { const ov = el.closest('.overlay'), k = el.dataset.k; Au.unlock();
+    let n = 0; const go = () => { if (Au.diag().context !== 'running' && n++ < 10) { setTimeout(go, 60); return; } if (k === 'chime') Au.play('level'); else Au.monster(k, k === 'cannonis' ? 'special' : 'tap'); };
+    setTimeout(go, 30); setTimeout(() => UI.soundCheck(ov), 700); });
+  UI.act('showView', (el) => UI.detail(el.dataset.sp, { preview: true }));
+  UI.act('showFight', (el) => {
+    const Bt = R.Battle, id = el.dataset.sp, foeId = SHOW_FOE[id] || 'cannonis', d = D.DUNGEONS.heartwood, spec = d.battles.find((x) => x.islandBoss) || d.battles[d.battles.length - 1];
+    const back = () => { UI.showIsland(); UI.showcasePanel(); };
+    UI.closeAll();
+    UI.startBattle({ kind: 'showcase', b: Bt.create([Bt.fighter(id, 20)], Bt.fighter(foeId, 20), {}), d: 'heartwood', env: spec.env || d.env, label: 'Showcase battle',
+      intro: 'Showcase battle: ' + D.SPECIES[id].name + ' against ' + D.SPECIES[foeId].name + '. Nothing is saved.',
+      retreat: { title: 'Leave the showcase battle?', text: 'Nothing is saved either way.', yes: 'Leave', fn: () => {}, after: back },
+      finish: (U) => { const won = U.b.result === 'win'; Au.play(won ? 'win' : 'lose'); UI.toast('Showcase battle ' + (won ? 'won' : 'lost') + '. Nothing was saved.', 'n'); UI.leaveBattle(back); } });
+  });
   UI.act('dev', (el) => {
     const s = st(), k = el.dataset.k;
     if (k === 'ess' && R.Essence) { D.ESSENCES.forEach((e) => R.Essence.gain(s, e, 50, 'dev')); S.save(); UI.refresh(); UI.toast('+50 of every essence.', 'n'); return; }
@@ -529,6 +581,9 @@
     UI.bootNote = S.status.recovered ? 'Your last save was damaged, so I restored the one before it. Nothing much should be missing.' : S.status.migratedFrom ? 'Welcome back. Your sanctuary has been moved onto the new island grid, buildings and all. A copy of your old save is kept on this device.' : S.status.lastError === 'storage-unavailable' ? 'This browser is not letting me save (Private Browsing?). You can play, but progress will be lost when you close the page.' : null;
     document.addEventListener('click', dispatch);
     document.addEventListener('pointerdown', () => Au.unlock(), { once: true });
+    // Phase 8: iOS only lets sound start (or restart after an interruption) inside a tap, so every tap, touch and
+    // key gives it the chance; Au.wake does nothing once sound is running
+    if (Au.wake) ['touchend', 'pointerup', 'click', 'keydown'].forEach((t) => document.addEventListener(t, () => Au.wake(), { capture: true, passive: true }));
     const save = () => { if (st().starter) S.save(); };
     document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
     root.addEventListener('pagehide', save); root.addEventListener('beforeunload', save);
