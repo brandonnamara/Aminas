@@ -380,7 +380,7 @@ export function buildArena(scene, id, o) {
   // a pool of light under the boss
   let pool = null;
   if (o.boss) { pool = new THREE.Mesh(T.g(new THREE.CircleGeometry(1.7, 40)), T.m(new THREE.MeshBasicMaterial({ map: T.t(radialTexture([[0, 'rgba(255,255,255,0.75)'], [0.6, 'rgba(255,255,255,0.18)'], [1, 'rgba(255,255,255,0)']], 128)), color: o.island ? '#ffd2f0' : '#ffe2a0', transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false })));
-    pool.rotation.x = -Math.PI / 2; pool.position.set(1.35, 0.025, -0.95); pool.scale.set(1, 0.8, 1); group.add(pool); }
+    pool.name = 'atmo:pool'; pool.rotation.x = -Math.PI / 2; pool.position.set(1.35, 0.025, -0.95); pool.scale.set(1, 0.8, 1); group.add(pool); }
   scene.add(group);
   const fog = AT.fog || [7, 16]; scene.fog = new THREE.Fog(def.fog, fog[0] - (o.boss ? 0.5 : 0), fog[1] - (o.boss ? 1 : 0));
   // the light rig the runtime builds with (studioLights override), dimmer and rim-lit for a boss

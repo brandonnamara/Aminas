@@ -37,14 +37,14 @@ export class Fx {
     o = o || {}; this.scene = scene; this.calm = o.calm || (() => false); this.saver = o.saver || (() => false);
     this.max = 240; this.geo = new THREE.BoxGeometry(1, 1, 1);
     this.mat = new THREE.MeshBasicMaterial({ color: '#ffffff', toneMapped: false });
-    this.mesh = new THREE.InstancedMesh(this.geo, this.mat, this.max); this.mesh.frustumCulled = false; this.mesh.count = 0;
+    this.mesh = new THREE.InstancedMesh(this.geo, this.mat, this.max); this.mesh.frustumCulled = false; this.mesh.count = 0; this.mesh.name = 'fx:cubes';
     this.mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage); this.mesh.setColorAt(0, new THREE.Color('#ffffff'));
     scene.add(this.mesh);
     this.p = []; this.shots = []; this.glows = []; this.gpool = []; this.rings = []; this.time = 0; this.frozen = 0;
     this._m = new THREE.Matrix4(); this._q = new THREE.Quaternion(); this._e = new THREE.Euler(); this._s = new THREE.Vector3(); this._c = new THREE.Color();
     // shockwave: a flat ring of cubes (one InstancedMesh shared by every wave; at most two at a time)
     this.waveN = 28; this.wave = new THREE.InstancedMesh(this.geo, new THREE.MeshBasicMaterial({ color: '#ffffff', toneMapped: false, transparent: true, opacity: 1, depthWrite: false }), this.waveN * 2);
-    this.wave.count = 0; this.wave.frustumCulled = false; scene.add(this.wave);
+    this.wave.count = 0; this.wave.frustumCulled = false; this.wave.name = 'fx:wave'; scene.add(this.wave);
   }
   scale() { return this.calm() ? 0.25 : this.saver() ? 0.5 : 1; }
   // one cube: { pos, vel, life, size, color, grav, drag, spin, shrink }
@@ -63,7 +63,7 @@ export class Fx {
     if (this.calm() && size > 1) size *= 0.6;
     const s = this.gpool.pop() || new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTexture(), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false }));
     s.material.color.set(color); s.material.opacity = 1; s.position.copy(at); s.scale.setScalar(size * 0.4); s.userData = { life: life || 0.35, max: life || 0.35, size };
-    this.scene.add(s); this.glows.push(s); return s;
+    s.name = 'fx:glow'; this.scene.add(s); this.glows.push(s); return s;
   }
   shockwave(at, color, radius) {
     if (this.rings.length >= 2) this.rings.shift();
@@ -161,7 +161,7 @@ export class FocusMarks {
     this._m = new THREE.Matrix4(); this._q = new THREE.Quaternion(); this._v = new THREE.Vector3(); this._s = new THREE.Vector3(); this._e = new THREE.Euler();
   }
   slot(who, at, size) {
-    const mk = (n) => { const me = new THREE.InstancedMesh(this.geo, new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0, depthWrite: false, toneMapped: false }), n); me.frustumCulled = false; me.renderOrder = 2; me.visible = false; this.scene.add(me); return me; };
+    const mk = (n) => { const me = new THREE.InstancedMesh(this.geo, new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0, depthWrite: false, toneMapped: false }), n); me.frustumCulled = false; me.renderOrder = 2; me.visible = false; me.name = 'fx:marks'; this.scene.add(me); return me; };
     this.marks[who] = { at: at.clone(), size, ring: mk(20), ret: mk(20), ringOp: 0, ringTo: 0, retOp: 0, retTo: 0, ringCol: new THREE.Color('#8ff0ff'), retCol: new THREE.Color('#ff7aa0'), pulse: 0, spin: Math.random() * 6 };
   }
   resize(who, size) { if (this.marks[who]) this.marks[who].size = size; }

@@ -18,7 +18,9 @@
   P.autoSaver = false;         // set for this session when the device struggles
   let boostUntil = 0, lastInput = Date.now(), restOn = false;
   const settings = () => (A.State && A.State.state && A.State.state.settings) || {};
-  P.saver = () => !!settings().batterySaver || P.autoSaver;
+  // while the performance test forces a tier, that tier decides (so High and Balanced are measured uncapped even if
+  // Battery saver is on for the session); in play P.forceTier is always null
+  P.saver = () => (P.forceTier ? P.forceTier === 'saver' : !!settings().batterySaver || P.autoSaver);
 
   /* ---- graphics quality tiers (Environment Phase 3) ----
      One table read by the voxel island (src/3d/island3d.js) and the 3D creature runtime (src/3d/runtime.js).
@@ -61,10 +63,18 @@
   P.boost = (ms) => { boostUntil = Math.max(boostUntil, Date.now() + (ms || P.BOOST_MS)); };
   P.boosting = () => Date.now() < boostUntil;
   P.targetFps = () => (P.saver() || P.forceTier === 'saver' ? P.SAVER_FPS : P.boosting() ? P.ACTION_FPS : P.IDLE_FPS);
-  // the 3D runtime reports when it is already at its lowest resolution and still slow
-  P.reportSlow = function () {
+  // the 3D runtime reports when it is already at its lowest resolution and still slow; why = the measurement behind it
+  // (which view, how many of its frames were slow, resolution, frame budget). The reason is kept for the performance
+  // test, in memory and in localStorage ('aminas.saverlog', never in the game save).
+  P.saverWhy = null;
+  P.saverLog = function () { try { return JSON.parse(root.localStorage.getItem('aminas.saverlog')) || []; } catch (e) { return []; } };
+  P.reportSlow = function (why) {
     if (P.autoSaver || settings().batterySaver) return;
-    P.autoSaver = true; P.apply();
+    P.autoSaver = true;
+    P.saverWhy = Object.assign({ when: new Date().toISOString(), screen: (A.UI && A.UI.screen) || null, quality: settings().quality || 'auto' }, why || {});
+    P.events.push({ t: Date.now(), autoSaver: P.saverWhy.view || true });
+    try { const log = P.saverLog(); log.push(P.saverWhy); root.localStorage.setItem('aminas.saverlog', JSON.stringify(log.slice(-5))); } catch (e) { /* private mode: fine */ }
+    P.apply();
     if (A.UI && A.UI.toast) A.UI.toast('This device is working hard, so I switched on Battery saver for now. You can change it in Settings.', 't');
   };
 

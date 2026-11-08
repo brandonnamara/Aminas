@@ -35,13 +35,28 @@ const Perf = () => window.A && window.A.Perf;
 // device test measured the island, not battles (re-test battles before letting Auto raise this)
 const prCap = () => { const P = Perf(); if (!P) return PR_CAP; if (P.saver() || P.forceTier === 'saver') return 1; const q = P.quality ? P.quality() : ''; return q === 'high' && P.forceTier !== 'balanced' && ((A.State && A.State.state && A.State.state.settings.quality === 'high') || P.forceTier === 'high') ? Math.min(window.devicePixelRatio || 1, 2) : q === 'balanced' ? Math.min(window.devicePixelRatio || 1, 1.5) : PR_CAP; };
 let pr = PR_CAP, slow = 0, quick = 0, sampled = 0, since = 0;
+// Performance-test instrumentation: every 1.5 s judgement is kept in a short log (what was measured and what it led
+// to), so the test can say exactly why the resolution dropped or Battery saver switched on. Recording only.
+const adaptLog = [];
 function adapt(ms, now) {
-  if (ms > 28) slow++; else if (ms < 18) quick++; sampled++;
+  if (ms > 28) slow++; else if (ms < 18) quick++; sampled++; meter.judged++; if (ms > 28) meter.judgedSlow++;
   if (!since) since = now; if (now - since < 1500 || sampled < 8) return; // judge every 1.5 s of rendering
-  const cap = prCap();
-  if (slow > sampled * 0.5 && pr <= 1 && Perf()) Perf().reportSlow();   // already at the lowest resolution and still slow
+  const cap = prCap(), P = Perf(), wantSaver = slow > sampled * 0.5 && pr <= 1;
   const next = pr > cap ? cap : slow > sampled * 0.5 && pr > 1 ? Math.max(1, pr - 0.25) : quick > sampled * 0.95 && pr < cap ? Math.min(cap, pr + 0.25) : pr;
+  const why = { at: Math.round(now), view: active && active.kind, windowMs: Math.round(now - since), frames: sampled, slowFrames: slow, quickFrames: quick, pixelRatio: pr, cap, targetFps: P ? P.targetFps() : 60, boosting: !!(P && P.boosting && P.boosting()), result: wantSaver ? 'battery-saver' : next < pr ? 'lower-resolution' : next > pr ? 'raise-resolution' : 'keep' };
+  adaptLog.push(why); if (adaptLog.length > 60) adaptLog.shift();
+  if (wantSaver && P) P.reportSlow(why);   // already at the lowest resolution and still slow
   slow = quick = sampled = 0; since = now; if (next !== pr) { pr = next; renderer.setPixelRatio(pr); resize(); }
+}
+// Per-frame cost counters for the performance test: CPU time in the scene update (animation, effects) and in
+// renderer.render (WebGL command submission). The GPU's own time cannot be read in Safari.
+// draws: interval between drawn frames (only while the test records); missed = a drawn frame later than 1.5x its
+// budget; judgedSlow = frames the resolution / Battery saver rule counted as slow (over 28 ms of render time)
+const meter = { frames: 0, upd: 0, ren: 0, worst: 0, hide: null, rec: false, draws: [], lastDraw: 0, missed: 0, judgedSlow: 0, judged: 0, budget: 0 };
+// The performance test can hide named layers (prefix match, e.g. 'atmo:') for each drawn frame, to compare with and
+// without them. Visibility is put back straight after the draw, so the game's own show/hide logic is untouched.
+function hideLayers(scene, prefixes) {
+  const out = []; scene.traverse((x) => { if (x.visible && x.name && prefixes.some((p) => x.name.indexOf(p) === 0)) { x.visible = false; out.push(x); } }); return out;
 }
 // Dev 7 frame budget: 30 fps while the view is idle, 60 fps for a moment after an action, 30 in Battery saver.
 // Frames in between are skipped before any update or draw, so the GPU does no work for them.
@@ -50,9 +65,14 @@ function loop(now) {
   raf = 0; if (!active || document.hidden || contextLost) return;
   const P = Perf(), cap = P ? P.targetFps() : 60;
   if (now - lastDraw < 1000 / cap - 2) { raf = requestAnimationFrame(loop); return; }
+  if (meter.rec) { if (meter.lastDraw) { const d = now - meter.lastDraw; if (meter.draws.length < 20000) meter.draws.push(d); if (d > 1500 / cap) meter.missed++; } meter.lastDraw = now; meter.budget += cap; }
   lastDraw = now; drawn++;
   const raw = clock.getDelta(), dt = Math.min(0.05, raw); const t = clock.elapsedTime;
-  active.update(dt, t); renderer.render(active.scene, active.camera);
+  const c0 = performance.now(); active.update(dt, t); const c1 = performance.now();
+  const hid = meter.hide ? hideLayers(active.scene, meter.hide) : null;
+  renderer.render(active.scene, active.camera); const c2 = performance.now();
+  if (hid) hid.forEach((x) => { x.visible = true; });
+  meter.frames++; meter.upd += c1 - c0; meter.ren += c2 - c1; if (c2 - c0 > meter.worst) meter.worst = c2 - c0;
   if (raw > 0 && raw < 1) adapt(Math.max(0, raw * 1000 - (1000 / cap - 1000 / 60)), now); // judge render time, not the frame cap
   frames++; if (now - lastStatsT > 1000) { fps = (frames * 1000) / (now - lastStatsT); frames = 0; lastStatsT = now; }
   raf = requestAnimationFrame(loop);
@@ -257,7 +277,7 @@ export async function createBattle(container, o) {
     });
   };
   const view = {
-    scene, camera,
+    scene, camera, kind: 'battle:' + arena.key + (o.prismatic ? ':island-boss' : o.boss ? ':guardian' : ''),
     update(dt, t) {
       t0 = t; clockT += dt;
       for (let i = timeline.length - 1; i >= 0; i--) if (timeline[i].t <= clockT) { const ev = timeline[i]; timeline.splice(i, 1); try { ev.fn(); } catch (e) { /* an effect never stops a battle */ } }
@@ -363,7 +383,7 @@ export async function createViewer(container, spId, o) {
   let act = await actor(spId); act.group.scale.setScalar(1); scene.add(act.group);
   let yaw = -0.45, vel = 0, drag = null;
   const view = {
-    scene, camera,
+    scene, camera, kind: 'viewer:' + spId,
     update(dt) { if (!drag) { yaw += vel * dt; vel *= Math.pow(0.04, dt); if (Math.abs(vel) < 0.02 && !calm()) yaw += dt * 0.15; } act.group.rotation.y = yaw; act.update(dt);
       camera.position.set(0, 0.98, 2.8); camera.lookAt(0, 0.52, 0); },
     detach() { stop(); },
@@ -412,7 +432,7 @@ export async function createTestScene(container, o) {
   glowing.mats.forEach((m) => { m.emissive = new THREE.Color('#5fd8ff'); m.emissiveIntensity = 0.16; });
   const aura = pixelAura(scene, glowing.group.position, 1.2, false);
   const bursts = new Bursts(scene);
-  const view = { scene, camera,
+  const view = { scene, camera, kind: 'test-scene',
     update(dt, t) { normal.update(dt); glowing.update(dt); aura.update(t, dt); bursts.update(dt);
       const u = mt.userData, p = u.pos; for (let i = 0; i < u.n; i++) { p[i * 3 + 1] += dt * (0.22 + (i % 5) * 0.05); if (p[i * 3 + 1] > 3.4) p[i * 3 + 1] = 0.05; } mt.geometry.attributes.position.needsUpdate = true;
       camera.position.set(0.3, 3.0, 8.4); camera.lookAt(0.1, 0.55, -0.8); },
@@ -427,14 +447,30 @@ export async function createTestScene(container, o) {
 /* ------------------------------------------------------------------ diagnostics */
 // renders the live view n times back to back and reports the average cost (performance test and tests only).
 // o.hide: names of scene objects (e.g. 'atmo:shafts') to hide for this measurement.
+// o.prefix: hide every object whose name starts with one of these. o.pr: render at this pixel ratio for the measurement.
 export function bench(n, o) {
-  if (!active || !renderer) return null; o = o || {}; const hidden = [];
+  if (!active || !renderer) return null; o = o || {}; const hidden = o.prefix ? hideLayers(active.scene, o.prefix) : [];
   if (o.hide) active.scene.traverse((x) => { if (o.hide.indexOf(x.name) >= 0 && x.visible) { x.visible = false; hidden.push(x); } });
+  const prWas = pr; if (o.pr && o.pr !== pr) { renderer.setPixelRatio(o.pr); resize(); }
   const gl = renderer.getContext(), px = new Uint8Array(4); renderer.render(active.scene, active.camera); gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
   const t0 = performance.now(); for (let i = 0; i < n; i++) renderer.render(active.scene, active.camera); gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
   const ms = (performance.now() - t0) / n; hidden.forEach((x) => { x.visible = true; });
-  return { ms: +ms.toFixed(2), calls: renderer.info.render.calls, pixelRatio: pr };
+  const out = { ms: +ms.toFixed(2), calls: renderer.info.render.calls, triangles: renderer.info.render.triangles, pixelRatio: o.pr || pr };
+  if (o.pr && o.pr !== prWas) { renderer.setPixelRatio(prWas); resize(); }
+  return out;
 }
+// performance test: read (and optionally reset) the per-frame counters; hide layers on every drawn frame (null = show
+// all); the resolution log; restart from the tier's own resolution cap, as a freshly opened battle would
+export function meterRead(reset) {
+  const f = meter.frames || 0, out = { frames: f, updateMs: f ? +(meter.upd / f).toFixed(2) : 0, renderMs: f ? +(meter.ren / f).toFixed(2) : 0, worstCpuMs: +meter.worst.toFixed(1), pixelRatio: pr, canvas: renderer ? [renderer.domElement.width, renderer.domElement.height] : null,
+    draws: meter.draws.slice(), missed: meter.missed, judged: meter.judged, judgedSlow: meter.judgedSlow, avgBudgetFps: f ? +(meter.budget / f).toFixed(1) : 0 };
+  if (reset) { meter.frames = 0; meter.upd = 0; meter.ren = 0; meter.worst = 0; meter.draws = []; meter.lastDraw = 0; meter.missed = 0; meter.judged = 0; meter.judgedSlow = 0; meter.budget = 0; }
+  return out;
+}
+export function meterRecord(on) { meter.rec = !!on; meter.lastDraw = 0; }
+export function meterHide(prefixes) { meter.hide = prefixes && prefixes.length ? prefixes.slice() : null; }
+export function resolutionLog(since) { return adaptLog.filter((e) => !since || e.at >= since).map((e) => Object.assign({}, e)); }
+export function resetResolution() { if (!renderer) return; pr = prCap(); renderer.setPixelRatio(pr); resize(); slow = quick = sampled = 0; since = 0; }
 export function stats() {
   const i = renderer ? renderer.info : null;
   return { c3dFps: +fps.toFixed(1), drawn, starts, loopRunning: !!raf, targetFps: Perf() ? Perf().targetFps() : 60, pixelRatio: pr, drawCalls: i ? i.render.calls : 0, triangles: i ? i.render.triangles : 0, geometries: i ? i.memory.geometries : 0, textures: i ? i.memory.textures : 0, templates: templates.size, live: !!active };
