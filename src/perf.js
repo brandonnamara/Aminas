@@ -46,11 +46,36 @@
     if (P.forceTier || P.saver() || P.autoStep || (settings().quality && settings().quality !== 'auto')) { samples.length = 0; return; }
     samples.push(dt); if (samples.length < 90) return;
     const med = samples.slice().sort((a, b) => a - b)[45]; samples = [];
-    if (med > 20) {
-      P.autoStep = 'balanced'; P.events.push({ t: Date.now(), autoStep: 'balanced', medianMs: Math.round(med) });
+    // slow means slower than the page can go: 20 ms on a 60 fps page (as before), 40 ms when the page only gets 30
+    if (med > Math.max(20, P.displayMs() * 1.2)) {
+      P.autoStep = 'balanced'; P.events.push({ t: Date.now(), autoStep: 'balanced', medianMs: Math.round(med), displayFps: P.displayInfo().fps });
       if (A.UI && A.UI.applyCam) A.UI.applyCam();
     }
   };
+  /* ---- the frame rate the page can actually get (Phase 7 performance fix) ----
+     A browser can deliver fewer frames than the screen shows: Low Power Mode, iOS "Limit Frame Rate", or an in-app
+     browser throttling the page (the first iPhone battle test measured 30 fps in the Claude app). A frame that is only
+     late because frames cannot come any faster is not a sign of a struggling device. The 3D views report the
+     interval between frame callbacks after a callback where the game did little work (a skipped frame; or a light
+     draw whose GPU work had already finished): those intervals are set by the browser and screen, not by the game.
+     The estimate is the median of the last 40, snapped to a frame rate, and only used when they are steady (70% within
+     15% of it); otherwise, or with too few samples, the screen is assumed to give 60 fps, as before. A device that is
+     really struggling produces heavy or irregular frames, so it keeps the 60 fps assumption and is still caught. */
+  const display = { s: [], ms: 1000 / 60, steady: false };
+  const SNAP = [1000 / 120, 1000 / 60, 1000 / 40, 1000 / 30, 1000 / 24, 1000 / 20];
+  P.noteFrame = function (ms) {
+    if (!(ms > 4 && ms < 120)) return;
+    const s = display.s; s.push(ms); if (s.length > 40) s.shift(); if (s.length < 20) return;
+    const med = s.slice().sort((a, b) => a - b)[s.length >> 1];
+    const snap = SNAP.reduce((b, x) => (Math.abs(x - med) < Math.abs(b - med) ? x : b), SNAP[0]);
+    const near = s.filter((x) => Math.abs(x - snap) <= snap * 0.15).length / s.length;
+    display.steady = near >= 0.7 && Math.abs(snap - med) <= snap * 0.15;
+    display.ms = display.steady ? Math.max(1000 / 60, snap) : 1000 / 60;
+  };
+  // the shortest frame interval the page can get (ms); never below a 60 fps frame, so faster screens change nothing
+  P.displayMs = () => display.ms;
+  P.displayInfo = () => ({ fps: Math.round(1000 / display.ms * 10) / 10, steady: display.steady, samples: display.s.length });
+  P._resetDisplay = () => { display.s = []; display.ms = 1000 / 60; display.steady = false; };
   P._coarse = COARSE;
   P.quality = function () {
     if (P.forceTier && P.TIERS[P.forceTier]) return P.forceTier;
@@ -108,7 +133,7 @@
     if (h === wasHidden) return;   // ignore repeats: never double-pause or double-resume
     wasHidden = h;
     if (A.Audio) { if (h) A.Audio.suspend && A.Audio.suspend(); else A.Audio.resume && A.Audio.resume(); }
-    if (!h) { input(); if (A.UI && A.UI.screen === 'island' && A.UI.tick) A.UI.tick(); }
+    if (!h) { input(); P._resetDisplay(); if (A.UI && A.UI.screen === 'island' && A.UI.tick) A.UI.tick(); } // Low Power Mode may have changed while away
     P.apply();
     P.events.push({ t: Date.now(), hidden: h });
     if (P.events.length > 20) P.events.shift();

@@ -469,13 +469,19 @@ export function createIsland() {
   // no GPU and WebGL falling back to software). The island then only redraws when something changes.
   let lastMoveDraw = 0, raf = 0, last = 0, t0 = performance.now(), frames = 0, drawMs = 0, slow = false, prev = 0, gaps = [];
   function kick() { if (!raf) raf = requestAnimationFrame(loop); if (!occ.timer && occ.fn) occ.timer = setTimeout(pollOcc, 60); } // the occlusion poll stops while the island is away and restarts here
+  // Phase 7 performance fix: a callback that drew nothing is light, so the interval to the next one is set by the
+  // browser and screen; it tells Perf what frame rate the page can get (see Perf.noteFrame)
+  let cbPrev = 0, cbIdle = false;
   function loop(now) {
     raf = 0; if (!R.domElement.isConnected) return;
+    if (cbPrev && cbIdle && now - cbPrev < 120 && A && A.Perf && A.Perf.noteFrame) A.Perf.noteFrame(now - cbPrev);
+    cbPrev = now;
     const animate = !slow && !saver() && !resting() && !calm();
     if (animate && prev && now - prev < 2000) { gaps.push(now - prev); if (gaps.length > 6) gaps.shift(); if (gaps.length >= 6 && gaps.reduce((a, b) => a + b, 0) / gaps.length > 125) { slow = true; if (window.console) console.info('Voxel island: slow frames, ambient animation off'); } }
     prev = animate ? now : 0;
     if (animate && now - last >= 1000 / AMBIENT_FPS - 2) { tickAmbient((now - t0) / 1000, Math.min(0.2, (now - last) / 1000)); last = now; state.dirty = true; }
-    if (state.dirty || occ.dirty) draw();
+    cbIdle = !(state.dirty || occ.dirty);
+    if (!cbIdle) draw();
     if (animate) raf = requestAnimationFrame(loop);
   }
   function tickAmbient(t, dt) {

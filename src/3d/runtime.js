@@ -43,7 +43,7 @@ function adapt(ms, now) {
   if (!since) since = now; if (now - since < 1500 || sampled < 8) return; // judge every 1.5 s of rendering
   const cap = prCap(), P = Perf(), wantSaver = slow > sampled * 0.5 && pr <= 1;
   const next = pr > cap ? cap : slow > sampled * 0.5 && pr > 1 ? Math.max(1, pr - 0.25) : quick > sampled * 0.95 && pr < cap ? Math.min(cap, pr + 0.25) : pr;
-  const why = { at: Math.round(now), view: active && active.kind, windowMs: Math.round(now - since), frames: sampled, slowFrames: slow, quickFrames: quick, pixelRatio: pr, cap, targetFps: P ? P.targetFps() : 60, boosting: !!(P && P.boosting && P.boosting()), result: wantSaver ? 'battery-saver' : next < pr ? 'lower-resolution' : next > pr ? 'raise-resolution' : 'keep' };
+  const why = { at: Math.round(now), view: active && active.kind, windowMs: Math.round(now - since), frames: sampled, slowFrames: slow, quickFrames: quick, pixelRatio: pr, cap, targetFps: P ? P.targetFps() : 60, displayFps: P && P.displayInfo ? P.displayInfo().fps : 60, boosting: !!(P && P.boosting && P.boosting()), result: wantSaver ? 'battery-saver' : next < pr ? 'lower-resolution' : next > pr ? 'raise-resolution' : 'keep' };
   adaptLog.push(why); if (adaptLog.length > 60) adaptLog.shift();
   if (wantSaver && P) P.reportSlow(why);   // already at the lowest resolution and still slow
   slow = quick = sampled = 0; since = now; if (next !== pr) { pr = next; renderer.setPixelRatio(pr); resize(); }
@@ -61,10 +61,26 @@ function hideLayers(scene, prefixes) {
 // Dev 7 frame budget: 30 fps while the view is idle, 60 fps for a moment after an action, 30 in Battery saver.
 // Frames in between are skipped before any update or draw, so the GPU does no work for them.
 let lastDraw = 0;
+// Phase 7 performance fix: evidence of the frame rate the page can get (see Perf.noteFrame). The interval to the next
+// callback counts only after a light callback: a skipped frame, or a drawn frame with under 6 ms of CPU whose GPU work
+// had finished ~6 ms after it was sent (a WebGL2 fence, checked without waiting) while the main thread was free. Heavy frames give no evidence, so a
+// struggling device cannot talk itself into a lower budget. WebGL1 has no fences: only skipped frames count there.
+let cbPrev = 0, cbLight = false, cbToken = 0;
+function judgeLight(cpuMs) {
+  const gl = renderer.getContext(); cbLight = false;
+  if (cpuMs > 6 || typeof gl.fenceSync !== 'function') return;
+  let f; try { f = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0); gl.flush(); } catch (e) { return; }
+  if (!f) return; const tok = ++cbToken, t0 = performance.now(); cbLight = null;
+  // light only if the check itself ran on time (the main thread was free right after the frame: nothing else on the
+  // page is hogging it) and the GPU had finished by then
+  setTimeout(() => { let done = false; try { done = performance.now() - t0 < 16 && gl.getSyncParameter(f, gl.SYNC_STATUS) === gl.SIGNALED; gl.deleteSync(f); } catch (e) { done = false; } if (tok === cbToken && cbLight === null) cbLight = done; }, 6);
+}
 function loop(now) {
   raf = 0; if (!active || document.hidden || contextLost) return;
   const P = Perf(), cap = P ? P.targetFps() : 60;
-  if (now - lastDraw < 1000 / cap - 2) { raf = requestAnimationFrame(loop); return; }
+  if (cbPrev && cbLight === true && P && P.noteFrame) P.noteFrame(now - cbPrev);
+  cbPrev = now;
+  if (now - lastDraw < 1000 / cap - 2) { cbLight = true; raf = requestAnimationFrame(loop); return; }
   if (meter.rec) { if (meter.lastDraw) { const d = now - meter.lastDraw; if (meter.draws.length < 20000) meter.draws.push(d); if (d > 1500 / cap) meter.missed++; } meter.lastDraw = now; meter.budget += cap; }
   lastDraw = now; drawn++;
   const raw = clock.getDelta(), dt = Math.min(0.05, raw); const t = clock.elapsedTime;
@@ -73,11 +89,16 @@ function loop(now) {
   renderer.render(active.scene, active.camera); const c2 = performance.now();
   if (hid) hid.forEach((x) => { x.visible = true; });
   meter.frames++; meter.upd += c1 - c0; meter.ren += c2 - c1; if (c2 - c0 > meter.worst) meter.worst = c2 - c0;
-  if (raw > 0 && raw < 1) adapt(Math.max(0, raw * 1000 - (1000 / cap - 1000 / 60)), now); // judge render time, not the frame cap
+  judgeLight(c2 - c0);
+  // judge render time, not the frame cap: a frame is only late beyond its budget, and the budget is never shorter than
+  // the frames the page can get (Phase 7 fix: a page capped at 30 fps is not slow for missing a 60 fps goal). On a page
+  // that gets 60 this is exactly the earlier rule.
+  const budget = Math.max(1000 / cap, P && P.displayMs ? P.displayMs() : 1000 / 60);
+  if (raw > 0 && raw < 1) adapt(Math.max(0, raw * 1000 - (budget - 1000 / 60)), now);
   frames++; if (now - lastStatsT > 1000) { fps = (frames * 1000) / (now - lastStatsT); frames = 0; lastStatsT = now; }
   raf = requestAnimationFrame(loop);
 }
-function start() { if (!raf && active && !document.hidden) { starts++; clock.start(); since = 0; slow = quick = sampled = 0; raf = requestAnimationFrame(loop); } }
+function start() { if (!raf && active && !document.hidden) { starts++; clock.start(); since = 0; slow = quick = sampled = 0; cbPrev = 0; cbLight = false; raf = requestAnimationFrame(loop); } }
 function stop() { if (raf) cancelAnimationFrame(raf); raf = 0; clock.stop(); }
 document.addEventListener('visibilitychange', () => (document.hidden ? stop() : start()));
 const boost = (ms) => { const P = Perf(); if (P) P.boost(ms); };

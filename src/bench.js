@@ -203,6 +203,7 @@
       drawCalls: maxCalls, triangles: maxTris, effectCubes: maxCubes, pixelRatio: minPr === maxPr ? maxPr : minPr + '–' + maxPr, canvas: m.canvas,
       resolutionChanges: res.filter((e) => e.result === 'lower-resolution' || e.result === 'raise-resolution').map((e) => e.result + ' at ' + e.pixelRatio + 'x (' + e.slowFrames + '/' + e.frames + ' slow)'),
       batterySaverWouldStart: ctx.triggers.length > trigBefore,
+      pageFrameRate: A.Perf.displayInfo ? A.Perf.displayInfo() : null,
     };
   }
 
@@ -311,6 +312,7 @@
     const s = ['Aminas battle perf ' + (o.version || ''), (o.device.gpu || '?') + ', DPR ' + o.device.dpr + ', display ' + o.displayFps + ' fps'];
     o.tiers.forEach((t) => { const on = o.phases.find((p) => p.phase === 'turns, ' + t.tier + ', effects on') || {}, off = o.phases.find((p) => p.phase === 'turns, ' + t.tier + ', effects off') || {};
       s.push(t.tier + ': ' + on.fps3d + '/' + on.budgetFps + ' fps on, ' + off.fps3d + ' off (p95 ' + on.p95 + '/' + off.p95 + ' ms, CPU ' + on.cpuMs + ' ms, ' + on.drawCalls + ' draws, ' + on.pixelRatio + 'x)'); });
+    const est = (o.phases || []).map((p) => p.pageFrameRate).filter(Boolean).pop(); if (est) s.push('rules judged frames against ' + est.fps + ' fps' + (est.steady ? ' (steady page cap)' : ''));
     if (o.extended) s.push('extended ' + o.extended.firstMinFps + ' → ' + o.extended.lastMinFps + ' fps (' + o.extended.dropPct + '% drop)');
     s.push('auto Battery saver: ' + (o.batterySaver.wouldHaveStarted ? 'would start (' + o.batterySaver.triggers.length + 'x, first in ' + o.batterySaver.triggers[0].phase + ')' : 'would not start'));
     if (o.batterySaverBefore.onForThisSession) s.push('it was already on before the test' + (o.batterySaverBefore.reason ? ' (' + o.batterySaverBefore.reason.view + ')' : ''));
@@ -344,7 +346,7 @@
       (before.onForThisSession ? ' It was already on for this session before the test' + (before.reason ? ', switched on in ' + esc(before.reason.view || before.reason.screen || '?') + ' (' + before.reason.slowFrames + ' of ' + before.reason.frames + ' frames slow)' : '') + '.' : '') + '</p>';
     const ext = o.extended ? '<p class="muted" style="font-size:.78rem"><b>Extended combat, 3 min:</b> ' + o.extended.firstMinFps + ' fps in the first minute, ' + o.extended.lastMinFps + ' in the last (' + o.extended.dropPct + '% drop); p95 ' + o.extended.firstMinP95 + ' → ' + o.extended.lastMinP95 + ' ms. A big drop means the phone got hot and slowed down.</p>' : '';
     const body = (o.error ? '<p class="muted">' + esc(o.error) + '</p>' : '') +
-      '<p class="muted" style="font-size:.78rem">' + esc(o.device.gpu || '') + ' · DPR ' + o.device.dpr + ' · ' + o.device.viewport.join('×') + (o.cancelled ? ' · <b>cancelled early</b>' : '') + ' · display ' + o.displayFps + ' fps · save ' + (o.save && o.save.untouched ? 'untouched' : 'restored') + '</p>' +
+      '<p class="muted" style="font-size:.78rem">' + esc(o.device.gpu || '') + ' · DPR ' + o.device.dpr + ' · ' + o.device.viewport.join('×') + (o.cancelled ? ' · <b>cancelled early</b>' : '') + ' · display ' + o.displayFps + ' fps' + (((o.phases || []).map((p) => p.pageFrameRate).filter(Boolean).pop() || {}).fps ? ' · rules judge against ' + (o.phases.map((p) => p.pageFrameRate).filter(Boolean).pop().fps) + ' fps' : '') + ' · save ' + (o.save && o.save.untouched ? 'untouched' : 'restored') + '</p>' +
       '<table class="bench-table"><tr><th>Phase</th><th>fps / goal</th><th>p95 ms</th><th>CPU ms</th><th>draws</th><th>tris</th><th>DPR</th></tr>' + (o.phases || []).map(row).join('') + '</table>' +
       '<ul style="font-size:.78rem;padding-left:1.1rem;margin:.5rem 0">' + tiers + '</ul>' + saver + ext +
       '<p class="muted" style="font-size:.74rem">fps: frames the 3D battle drew; goal: its frame budget (60 during moves, 30 when still, 30 in Battery saver). p95: 95 % of frames came at least this fast. CPU: animation, effects and draw submission per frame. GPU time, battery and temperature cannot be read by a web page.</p>' +
