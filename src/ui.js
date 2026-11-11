@@ -84,9 +84,9 @@
     $('#app').appendChild(d); setTimeout(() => d.remove(), 2000);
   };
   UI.levelFx = function (inst, from, to, anchor) {
-    const sp = D.SPECIES[inst.sp], a = R.statsAt(inst.sp, from), b = R.statsAt(inst.sp, to);
+    const sp = D.SPECIES[inst.sp], s = st(), a = R.statsWithGear(s, Object.assign({}, inst, { lv: from })), b = R.statsWithGear(s, Object.assign({}, inst, { lv: to }));
     Au.play('level'); UI.sparkles(anchor, 22);
-    UI.banner('LEVEL UP!', esc(sp.name) + ' Lv ' + from + ' → ' + to + ' &nbsp; HP +' + (b.hp - a.hp) + ' · ATK +' + (b.atk - a.atk) + ' · DEF +' + (b.def - a.def));
+    UI.banner('LEVEL UP!', esc(sp.name) + ' Lv ' + from + ' → ' + to + ' &nbsp; HP +' + (b.hp - a.hp) + ' · ATK +' + (b.atk - a.atk) + ' · DEF +' + (b.def - a.def) + ' · SPD +' + (b.spd - a.spd));
   };
 
   /* ---------- dialogue ---------- */
@@ -148,7 +148,7 @@
         case 'moveUp': break;
         case 'discover': if (s.starter && d.sp !== s.starter) { Au.play('discover'); UI.queue.push({ type: 'reveal', sp: d.sp }); } break;
         case 'hatched': Au.play('hatch'); if (!batchDisc[d.sp]) UI.queue.push({ type: 'reveal', sp: d.sp }); break;
-        case 'evolve': UI.queue.push({ type: 'fn', fn: (done) => UI.evolveFx(d.from, d.to, done) }); break;
+        case 'evolve': UI.queue.push({ type: 'fn', fn: (done) => UI.evolveFx(d.from, d.to, done, d.uid) }); break;
         case 'eggStart': Au.play('ok'); break;
       }
       T.beats(s, ev).forEach((b) => { if (b.type === 'toast') lastToast = b; else UI.queue.push(b); });
@@ -169,7 +169,7 @@
     UI.mountViewer(ov, $('.viewer3d', ov), spId, { intro: 'victory' });
   };
   // Evolution ceremony: the old form glows white, flashes, and the new form appears (live 3D when available).
-  UI.evolveFx = function (fromSp, toSp, done) {
+  UI.evolveFx = function (fromSp, toSp, done, uid) {
     const a = D.SPECIES[fromSp], b = D.SPECIES[toSp];
     const ov = UI.modal('<div class="sheet panel narrow vcard evolve" style="padding:1rem"><h1>What’s happening?</h1><div class="evo-stage"><div class="art evo-from">' + Art.portrait(fromSp) + '</div><div class="art viewer3d evo-to">' + Art.portrait(toSp) + '</div><div class="evo-flash"></div></div><h2 class="evo-name" style="margin:.2rem 0">' + esc(a.name) + '…</h2><p class="muted evo-text" style="margin:.4rem 0 .8rem">' + esc(a.name) + ' is glowing!</p><button class="btn gold" data-act="close" disabled>…</button></div>', { onClose: done, dismiss: false });
     const box = $('.evolve', ov), btn = $('[data-act=close]', ov), calm = UI.calm && UI.calm();
@@ -177,6 +177,8 @@
       if (!ov.parentNode) return; box.classList.add('done'); $('.evo-name', ov).textContent = b.name + '!'; $('.evo-text', ov).textContent = a.name + ' evolved into ' + b.name + '!';
       $('h1', ov).textContent = 'Evolution!'; btn.disabled = false; btn.textContent = 'Wonderful'; Au.play('level'); UI.sparkles($('.evo-to', ov), 30);
       UI.mountViewer(ov, $('.evo-to', ov), toSp, { intro: 'victory' });
+      // Phase 13A: what the evolution changed (stats at the same level, the new move), and the new form's own voice
+      if (UI.P13) UI.P13.evoDone(ov, fromSp, toSp, uid);
     };
     Au.play('hum'); box.classList.add('glow');
     if (calm) finish(); else setTimeout(() => { box.classList.add('flash'); setTimeout(finish, 450); }, 1700);
@@ -263,19 +265,20 @@
   /* ---------- island: see ui-world.js (world view, HUD, Build Mode, panels, quests, navigation) ---------- */
 
   /* ---- feeding ---- */
-  UI.doFeed = function (uid, kind, anchor) {
+  UI.doFeed = function (uid, kind, anchor, o) {
+    o = o || {}; // o.inline (Phase 13A): the details screen shows the gain and any level-up in place, so no banner or toast
     const s = st(), inst = R.inst(s, uid); if (!inst) return null;
     const before = inst.lv, spBefore = inst.sp;
     const r = R.feed(s, uid, kind);
     if (!r.ok) {
       Au.play('no');
-      if (r.reason === 'food') UI.gainFloat(anchor, 'Not enough food', '#ff9b8c');
-      if (r.reason === 'max') UI.toast('Maximum level. There is nothing left to eat that will help. Not that it will stop them.', 't');
+      if (r.reason === 'food' && !o.inline) UI.gainFloat(anchor, 'Not enough food', '#ff9b8c');
+      if (r.reason === 'max' && !o.inline) UI.toast('Maximum level. There is nothing left to eat that will help. Not that it will stop them.', 't');
       UI.afterAction(); return r;
     }
     Au.play('feed'); UI.sparkles(anchor || $('.comp .art'), 8);
-    UI.gainFloat(anchor, '+' + r.xp + ' xp', '#fff0a8');
-    if (r.levels.length) UI.levelFx(inst, before, inst.lv, anchor || $('.comp .art'));
+    if (!o.inline) UI.gainFloat(anchor, '+' + r.xp + ' xp', '#fff0a8');
+    if (r.levels.length && !o.inline) UI.levelFx(inst, before, inst.lv, anchor || $('.comp .art'));
     S.save(); UI.flush(); UI.refresh();
     return r;
   };
@@ -340,6 +343,8 @@
   };
   UI.detail = function (spId, o) {
     o = o || {}; const s = st(), W = A.World;
+    // Phase 13A: a page that is showing one particular Amina keeps showing that one when it is redrawn
+    if (!o.uid && o.ov && o.ov._uid && R.inst(s, o.ov._uid) && R.inst(s, o.ov._uid).sp === spId) o.uid = o.ov._uid;
     let inst = o.uid ? R.inst(s, o.uid) : null; if (inst) spId = inst.sp;
     const sp = D.SPECIES[spId], status = R.status(s, spId), mine = s.aminas.filter((a) => a.sp === spId);
     if (!inst && mine.length) inst = mine.slice().sort((a, b) => b.lv - a.lv)[0];
@@ -373,27 +378,28 @@
       const fam = UI.family(spId);
       const famHtml = '<div class="evo-path">' + fam.map((id, i) => { const known = R.status(s, id) !== 'unknown', own = !!s.owned[id], d = D.SPECIES[id], ev = i ? D.SPECIES[fam[i - 1]].evo : null;
         return (i ? '<div class="evo-arrow">' + I('arrow') + '<small>Lv ' + ev.lv + '</small></div>' : '') + '<div class="evo-node' + (id === spId ? ' cur' : '') + (own ? '' : ' unknown') + '">' + (own ? artBox(id) : silBox(id)) + '<b>' + (known ? esc(d.name) : '???') + '</b><small>Stage ' + d.stage + '</small></div>'; }).join('') + '</div>' +
-        (sp.evo && inst ? '<div class="kv" style="margin-top:.3rem"><b>Progress:</b> Lv ' + inst.lv + ' / ' + sp.evo.lv + '</div><div class="bar xp"><i style="width:' + Math.min(100, Math.round((inst.lv / sp.evo.lv) * 100)) + '%"></i></div>' : '');
+        (UI.P13 ? UI.P13.evoCard(s, inst) : sp.evo && inst ? '<div class="kv" style="margin-top:.3rem"><b>Progress:</b> Lv ' + inst.lv + ' / ' + sp.evo.lv + '</div><div class="bar xp"><i style="width:' + Math.min(100, Math.round((inst.lv / sp.evo.lv) * 100)) + '%"></i></div>' : '');
       const recipes = Object.keys(D.BREED).filter((k) => D.BREED[k].sp === spId);
       const breedHtml = recipes.length ? '<div class="kv"><b>Hatches from:</b> ' + recipes.map((k) => (s.recipes && s.recipes[k] ? k.split('+').map((e) => chip(e)).join(' + ') : '<span class="muted">an undiscovered pairing</span>')).join(' · ') + '</div>' : '';
       const homeType = 'hab_' + sp.el, home = D.BUILDINGS[homeType];
       const homeHtml = home ? '<div class="kv"><b>Best home:</b> ' + esc(home.name) + ' <span class="muted">(' + esc(D.ELEMENTS[sp.el].name) + ' residents earn 50% more)</span></div>' : '';
       const tabs = '<div class="dtabs" role="tablist">' + [['about', 'About'], ['battle', 'Battle'], ['moves', 'Moves'], ['gear', 'Gear'], ['growth', 'Growth']].map(([k, t]) => '<button class="dtab ' + (tab === k ? 'on' : '') + '" role="tab" aria-selected="' + (tab === k) + '" data-act="dTab" data-tab="' + k + '">' + t + '</button>').join('') + '</div>';
       const about = '<div class="dpanel" data-panel="about"' + (tab === 'about' ? '' : ' hidden') + '><div class="kv"><b>Personality:</b> ' + esc(sp.pers) + '</div><div class="kv">' + esc(sp.lore) + '</div><div class="kv"><b>Found:</b> ' + esc(sp.find) + '</div><div class="entnote"><div class="ep">' + Art.entity('n') + '</div><div>“' + esc(sp.ent) + '”</div></div></div>';
-      const battle = '<div class="dpanel" data-panel="battle"' + (tab === 'battle' ? '' : ' hidden') + '><div class="stats">' + [['HP', 'hp'], ['ATK', 'atk'], ['DEF', 'def'], ['SPD', 'spd']].map((k) => '<div class="stat">' + k[0] + '<b>' + stt[k[1]] + '</b>' + (lv < D.MAX_LEVEL ? '<em>+' + (next[k[1]] - stt[k[1]]) + '</em>' : '') + '</div>').join('') + '</div>' + UI.effLines(sp.el) +
+      const battle = '<div class="dpanel" data-panel="battle"' + (tab === 'battle' ? '' : ' hidden') + '>' + (UI.P13 ? UI.P13.stats(s, inst) : '<div class="stats">' + [['HP', 'hp'], ['ATK', 'atk'], ['DEF', 'def'], ['SPD', 'spd']].map((k) => '<div class="stat">' + k[0] + '<b>' + stt[k[1]] + '</b>' + (lv < D.MAX_LEVEL ? '<em>+' + (next[k[1]] - stt[k[1]]) + '</em>' : '') + '</div>').join('') + '</div>') + UI.effLines(sp.el) +
         sp.abil.map((id) => { const ab = D.ABILITIES[id], mlv = (R.moveLevels ? R.moveLevels(inst)[id] : 1) || 1; return '<div class="abil"><b>' + ab.name + '</b> ' + chip(ab.el) + ' <span class="muted">Lv ' + mlv + ' · ' + (R.moveEffect ? esc(R.moveEffect(id, mlv).text) : ab.power ? 'Power ' + ab.power : 'Utility') + (ab.cd ? ' · every ' + (ab.cd + 1) + ' turns' : '') + '</span><br>' + esc(ab.desc) + '</div>'; }).join('') + '<button class="btn small" data-act="dTabGo" data-tab="moves">' + I('up') + 'Upgrade moves</button></div>';
       const gearP = '<div class="dpanel" data-panel="gear"' + (tab === 'gear' ? '' : ' hidden') + '>' + UI.gearHtml(s, inst) + '</div>' +
         '<div class="dpanel" data-panel="moves"' + (tab === 'moves' ? '' : ' hidden') + '>' + (UI.movesHtml ? UI.movesHtml(s, inst) : '') + '</div>';
-      const growth = '<div class="dpanel" data-panel="growth"' + (tab === 'growth' ? '' : ' hidden') + '>' + famHtml + '<div class="kv"><b>Evolution:</b> ' + evo + '</div>' + breedHtml + homeHtml + '</div>';
+      const growth = '<div class="dpanel" data-panel="growth"' + (tab === 'growth' ? '' : ' hidden') + '>' + famHtml + (UI.P13 ? '' : '<div class="kv"><b>Evolution:</b> ' + evo + '</div>') + breedHtml + homeHtml + '</div>';
       const clips = A.C3D && A.C3D.enabled() ? '<div class="clipbar">' + ['move', 'attack', 'hit', 'victory'].concat(Au.hasVoice && Au.hasVoice(spId) ? ['special'] : []).map((c) => '<button class="fchip" data-act="vPlay" data-clip="' + c + '">' + CLIP_LABEL[c] + '</button>').join('') + '</div>' : '';
-      body = '<div class="detail"><div><div class="big art viewer3d">' + Art.portrait(spId) + '</div>' + clips + '</div><div><h2>' + esc(sp.name) + ' ' + chip(sp.el) + '</h2>' + (sp.title ? '<div class="sp-title muted">' + esc(sp.title) + ' · Stage ' + sp.stage + '</div>' : '') + tabs + about + battle + gearP + growth + '</div></div>';
+      body = '<div class="detail"><div><div class="big art viewer3d">' + Art.portrait(spId) + '</div>' + clips + '</div><div><h2>' + esc(sp.name) + ' ' + chip(sp.el) + '</h2>' + (sp.title ? '<div class="sp-title muted">' + esc(sp.title) + ' · Stage ' + sp.stage + '</div>' : '') + (UI.P13 ? UI.P13.head(s, inst) : '') + tabs + about + battle + gearP + growth + '</div></div>';
       body += '<div class="section-t">Your ' + esc(sp.name) + (mine.length > 1 ? 's' : '') + '</div>' + mine.map((a) => {
         const need = R.xpNeed(a.lv), isAct = a.uid === s.active, hm = W.homeOf(s, a.uid);
-        return '<div class="inst"><div class="art">' + Art.portrait(a.sp) + '</div><div class="grow"><b>Lv ' + a.lv + '</b> ' + (isAct ? '<span class="chip light">Companion</span>' : '') + ' <span class="muted" style="font-size:.7rem">' + (hm ? 'Lives in the ' + esc(W.def(hm).name) : isAct ? '' : 'Roams the island') + '</span><div class="bar xp" style="margin-top:.2rem"><i style="width:' + (a.lv >= D.MAX_LEVEL ? 100 : pct(a.xp, need)) + '%"></i></div><span class="muted" style="font-size:.7rem">' + (a.lv >= D.MAX_LEVEL ? 'MAX' : a.xp + ' / ' + need + ' xp') + '</span></div>' +
-          '<button class="btn small gold" data-act="detailFeed" data-uid="' + a.uid + '" data-kind="snack">Snack ' + D.SNACKS.snack.food + '</button><button class="btn small" data-act="detailFeed" data-uid="' + a.uid + '" data-kind="feast">Feast ' + D.SNACKS.feast.food + '</button>' + (isAct ? '' : '<button class="btn small ghost" data-act="makeActive" data-uid="' + a.uid + '">Companion</button>') + (D.SPECIES[a.sp].evo && a.lv >= D.SPECIES[a.sp].evo.lv ? '<button class="btn small gold evo-btn" data-act="evoAsk" data-uid="' + a.uid + '">' + I('spark') + 'Evolve</button>' : '') + '</div>';
+        return '<div class="inst' + (a.uid === inst.uid ? ' cur' : '') + '" data-uid="' + a.uid + '"><div class="art"' + (mine.length > 1 && UI.P13 ? ' data-act="instPick" data-uid="' + a.uid + '" title="Show this one"' : '') + '>' + Art.portrait(a.sp) + '</div><div class="grow"><b>Lv ' + a.lv + '</b> ' + (isAct ? '<span class="chip light">Companion</span>' : '') + ' <span class="muted" style="font-size:.7rem">' + (hm ? 'Lives in the ' + esc(W.def(hm).name) : isAct ? '' : 'Roams the island') + '</span><div class="bar xp" style="margin-top:.2rem"><i style="width:' + (a.lv >= D.MAX_LEVEL ? 100 : pct(a.xp, need)) + '%"></i></div><span class="muted" style="font-size:.7rem">' + (a.lv >= D.MAX_LEVEL ? 'MAX' : a.xp + ' / ' + need + ' xp') + '</span></div>' +
+          '<button class="btn small gold" data-act="detailFeed" data-uid="' + a.uid + '" data-kind="snack">' + I('food') + 'Snack ' + D.SNACKS.snack.food + '</button><button class="btn small" data-act="detailFeed" data-uid="' + a.uid + '" data-kind="feast">' + I('food') + 'Feast ' + D.SNACKS.feast.food + '</button>' + (isAct ? '' : '<button class="btn small ghost" data-act="makeActive" data-uid="' + a.uid + '">Companion</button>') + (D.SPECIES[a.sp].evo && a.lv >= D.SPECIES[a.sp].evo.lv ? '<button class="btn small gold evo-btn" data-act="evoAsk" data-uid="' + a.uid + '">' + I('spark') + 'Evolve</button>' : '') + '</div>';
       }).join('');
     }
     const html = UI.sheet(esc(status === 'unknown' && !ghost ? 'Undiscovered Amina' : sp.name), body, '<button class="btn gold" data-act="close">Close</button>', 'wide');
+    if (o.ov) o.ov._uid = inst && !ghost ? inst.uid : null;
     if (o.ov && o.ov.parentNode && o.ov._sp === spId && o.ov.firstElementChild) {
       // Phase 8: the same Amina redrawn (feeding, companion change, gear): update in place, nothing resets
       const t = document.createElement('div'); t.innerHTML = html;
@@ -409,7 +415,7 @@
       const slot = $('.viewer3d', o.ov); if (keep && slot) slot.replaceWith(keep); else if (live) UI.mountViewer(o.ov, slot, spId);
       return o.ov;
     }
-    const ov = UI.modal(html, { onClose: () => UI.refresh() }); ov._sp = spId; ov._detail = true; ov._tab = tab;
+    const ov = UI.modal(html, { onClose: () => UI.refresh() }); ov._sp = spId; ov._detail = true; ov._tab = tab; ov._uid = inst && !ghost ? inst.uid : null;
     if (live) UI.mountViewer(ov, $('.viewer3d', ov), spId, { intro: 'move' });
     return ov;
   };

@@ -92,7 +92,7 @@
     const a = D.SPECIES[inst.sp], b = D.SPECIES[c.to], seen = s.owned[c.to];
     const req = '<ul class="evo-req"><li class="' + (inst.lv >= c.lv ? 'ok' : 'no') + '">' + I(inst.lv >= c.lv ? 'check' : 'lock') + ' Level ' + c.lv + ' <span class="muted">(now ' + inst.lv + ')</span></li><li class="' + (R.canAfford(s, c.cost) ? 'ok' : 'no') + '">' + I(R.canAfford(s, c.cost) ? 'check' : 'lock') + ' ' + COST(c.cost) + '</li><li class="ok">' + I('check') + ' Keeps its level, experience and equipment</li></ul>';
     const body = '<div class="evo-ask"><div class="evo-pair"><div class="art">' + Art.portrait(inst.sp) + '<b>' + esc(a.name) + '</b></div><div class="evo-arrow">' + I('arrow') + '</div><div class="art ' + (seen ? '' : 'sil') + '">' + Art.portrait(c.to) + '<b>' + (seen ? esc(b.name) : '???') + '</b></div></div>' +
-      '<p>' + (fromNotice ? '<b>' + esc(a.name) + ' is ready to evolve!</b> ' : '') + 'Evolving is your choice. You can do it now or later from its page in Creatures.</p>' + req + (c.ok ? '' : '<p class="bad">' + esc(EVO_WHY[c.reason](c)) + '</p>') + '</div>';
+      '<p>' + (fromNotice ? '<b>' + esc(a.name) + ' is ready to evolve!</b> ' : '') + 'Evolving is your choice. You can do it now or later from its page in Creatures.</p>' + req + (UI.P13 ? UI.P13.evoChanges(R.Prog.evoPreview(s, inst)) : '') + (c.ok ? '' : '<p class="bad">' + esc(EVO_WHY[c.reason](c)) + '</p>') + '</div>';
     let decided = false;
     const ov = UI.modal(UI.sheet('Evolution', body, '<button class="btn ghost" data-act="evoLater">Later</button><button class="btn gold' + (c.ok ? '' : ' off') + '" data-act="evoGo" data-uid="' + uid + '">' + I('spark') + ' Evolve</button>', 'narrow'), { onClose: () => { if (!decided && done) done(); } });
     ov._evoDone = (how) => { decided = true; if (done) done(how); };
@@ -102,12 +102,16 @@
   UI.act('evoGo', (el) => {
     const ov = el.closest('.overlay'), uid = +el.dataset.uid, r = R.evolve(st(), uid);
     if (!r.ok) { Au.play('no'); return; }
-    const cb = ov._evoDone; ov._evoDone = null; UI.close(ov);
+    const cb = ov._evoDone; ov._evoDone = null;
     S.save();
-    // the evolve event plays the ceremony (UI.evolveFx); refresh any open creature page afterwards
-    UI.flush(); UI.refresh(); UI.renderHud && UI.renderHud();
-    const det = [...$('#modal-root').children].find((x) => x._detail); if (det) UI.detail(D.SPECIES[R.inst(st(), uid).sp].id, { uid, ov: det });
+    // The evolve event plays the ceremony (UI.evolveFx). Phase 13A fix: the prompt used to report "finished" twice
+    // when it had been opened by the ready notice (once on closing, once here), which let the next story line start
+    // while the ceremony was still on screen. It now reports once: decided first, then closed.
+    UI.flush();
     if (cb) cb('evolved');
+    UI.close(ov);
+    UI.refresh(); UI.renderHud && UI.renderHud();
+    const det = [...$('#modal-root').children].find((x) => x._detail); if (det) UI.detail(D.SPECIES[R.inst(st(), uid).sp].id, { uid, ov: det });
   });
   UI.act('evoAsk', (el) => UI.evoPrompt(+el.dataset.uid));
   // Notices: every 'evoReady' event becomes a prompt in the beat queue (one at a time, after other beats).
