@@ -187,7 +187,58 @@ All timings (`prep`, `morphCooldown`, `missPenalty`, `swing`, `reach`, `cone`, s
 | `tests/hideseek.test.js`, `tests/browser-hideseek.test.js` (new), `tests/fixtures/*`, `tests/run-all.js` | Tests; the original voting code and the Starter Island map are kept as fixtures. |
 
 ## Tests
-{{TESTS}}
+All testing is desktop Chromium with software WebGL, emulating an 844×390 touch screen. None of it is an iPhone.
+
+**New suites**
+* `tests/hideseek.test.js` (60 checks, rules): **60 of 60**.
+* `tests/browser-hideseek.test.js` (41 checks, the round on screen): **41 of 41**.
+
+Together they cover the 15 required cases:
+
+| # | Case | Result |
+|---|---|---|
+| 1 | Voting works exactly as before | Pass. Lobbies, computer votes and the Seeker choice match the original code on 300 lobbies, and the four voting functions are unchanged line for line. |
+| 2 | Voting picks the Seeker | Pass, by vote, by fallback, and with the player voted Seeker. |
+| 3 | Seeker models load | Pass for the two temporary voxel seekers. The Tripo models were not available to test. |
+| 4 | Hiders can transform | Pass. |
+| 5 | Disguises match scenery | Pass: same model, variant, orientation, material and tint rule, nothing extra attached. |
+| 6 | Hiders move while disguised | Pass, at the disguise's own speed, and not through buildings. |
+| 7 | Change works after the 10 s cooldown | Pass. |
+| 8 | Change is blocked during the cooldown | Pass, including repeated taps and opening and closing the tray. |
+| 9 | Attacks reveal hiders | Pass. |
+| 10 | Hitting scenery gives the 3 s penalty | Pass. |
+| 11 | Inspecting gives no penalty | Pass. |
+| 12 | Bots behave sensibly | Pass over 12 all-computer rounds (all disguised in time, cooldown and penalty respected, the Seeker searches and finds some but not all), plus reaction and movement-spotting checks. |
+| 13 | Rounds, results and rewards | Pass: results for both sides, played and won counted and saved. |
+| 14 | No Hide and Seek regressions | Pass: lobby, vote, counters and the older grid functions. |
+| 15 | Other modes unaffected | Pass: 5v5, Island Defence and the raid preview open and behave as before. |
+
+**Full suite** (26 suites, one at a time, about 25 minutes): 780 checks passed and 6 failed in the 25 suites that
+completed; one suite stopped part-way.
+
+| Suite | In the full run | Cause | After |
+|---|---|---|---|
+| `browser-v06` | Stopped at its Hide and Seek step | It clicked the old grid round, which the 3D round replaces. The test now opens the new round and leaves it. | 48 of 48 alone |
+| `browser-dev8` | 1 failed (pixel bursts remove themselves within a second) | Timing under load; not related to this work. | 42 of 42 alone |
+| `browser-arena7` | 1 failed (leaving battles frees their arenas) | The known timing-sensitive check from Phase 7. | 30 of 30 alone, twice |
+| `browser-perf-fix` | 4 failed | The known timing race in this Phase 7 test (see below). | Still intermittent |
+
+**`browser-perf-fix` is not resolved.** It fails the same 4 checks intermittently on both builds. Run alone,
+alternating between builds:
+
+| Build | Runs | Failed |
+|---|---|---|
+| Phase 12A | 7 | 3 |
+| This branch | 10 | 8 |
+
+That is too few runs to say whether this branch changes the odds. The test starts a simulated slow device after a
+fixed 1.2-second warm-up and fails when the frame-rate estimate has not settled by then. Nothing in the render loop
+or the performance rules was changed on this branch, and the test is left unchanged. It should be watched on the
+next phase.
+
+Screenshots and two gameplay recordings (as a hider, as the Seeker) are in `docs/ui/screens-hs/`. The recordings
+were captured at quarter speed under software graphics and sped back up; they show the game's behaviour, not iPhone
+frame rate.
 
 ## Limitations
 * **Seekers are temporary voxel models.** The Tripo models could not be exported. The GLB loader is in place but has
