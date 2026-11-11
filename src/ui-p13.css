@@ -96,3 +96,11 @@ body.calm .pg-head .bar > i, body.perf-saver .pg-head .bar > i { transition: non
 .evolve.has-result { padding-top: .5rem !important; }
 .evolve.has-result .evo-text { margin: .1rem 0 .2rem !important; font-size: .8rem; }
 .evolve.has-result .evo-name { margin: 0 !important; }
+
+/* Phase 13A final: move upgrade confirmed in place (replaces the full-screen banner) */
+.mv-done { display: flex; align-items: flex-start; gap: .4rem; padding: .35rem .5rem; font-size: .8rem; line-height: 1.3; background: rgba(120, 230, 160, .12); border: 1px solid rgba(120, 230, 160, .45); border-radius: .5rem; }
+.mv-done .ico { width: 1rem; height: 1rem; flex: none; margin-top: .1rem; color: #8ff0b0; }
+.mv-done.in { animation: mvDoneIn .28s ease-out 1; }
+@keyframes mvDoneIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+body.calm .mv-done.in, body.perf-saver .mv-done.in { animation: none; }
+@media (prefers-reduced-motion: reduce) { .mv-done.in { animation: none; } }

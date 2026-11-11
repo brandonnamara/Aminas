@@ -129,7 +129,7 @@
       const m = R.moveInfo(s, inst, slot), ab = m.ab;
       const kind = ab.cd ? 'Signature move · every ' + (ab.cd + 1) + ' turns' : 'Basic move';
       const btn = m.max ? '<span class="chip good">Level 5</span>' : '<button class="btn small ' + (m.ok ? 'gold' : 'off') + '" data-act="mvUp" data-uid="' + inst.uid + '" data-slot="' + slot + '" data-lv="' + m.lv + '"' + (m.ok ? '' : ' aria-disabled="true"') + '>' + I('up') + 'Upgrade · ' + Art.essIcon(m.el) + m.cost + '</button>';
-      return '<div class="mv"><div class="mv-h"><b>' + esc(ab.name) + '</b> ' + chip(ab.el) + ' <span class="mv-lv">Lv ' + m.lv + '</span>' + pips(m.lv) + '</div><small class="muted">' + kind + ' · ' + esc(ab.desc) + '</small>' +
+      return '<div class="mv" data-slot="' + slot + '"><div class="mv-h"><b>' + esc(ab.name) + '</b> ' + chip(ab.el) + ' <span class="mv-lv">Lv ' + m.lv + '</span>' + pips(m.lv) + '</div><small class="muted">' + kind + ' · ' + esc(ab.desc) + '</small>' +
         '<div class="mv-fx"><span>' + esc(m.now.text) + '</span>' + (m.next ? I('arrow') + '<span class="good">' + esc(m.next.text) + '</span>' : '') + '</div>' + (UI.P13 ? UI.P13.track(m) : '') +
         '<div class="mv-cost">' + (m.max ? '<span class="muted">Fully upgraded.</span>' : '<span>' + Art.essIcon(m.el) + ' ' + fmt(m.have) + ' / ' + m.cost + ' ' + esc(PX.essName(m.el)) + '</span>' + (m.reason && m.reason !== 'max' ? ' <span class="bad">' + esc(m.reason === 'essence' && UI.P13 ? UI.P13.essShort(m) : R.MOVE_WHY[m.reason]) + '</span>' : '')) + btn + '</div></div>';
     }).join('') + '<p class="muted small-t">Move levels stay with ' + esc(sp.name) + ' when it evolves: its signature move grows into the next form’s move at the same level.</p></div>';
@@ -146,9 +146,23 @@
     if (!r.ok) { Au.play('no'); if (r.reason !== 'stale') UI.toast(R.MOVE_WHY[r.reason] || 'That did not work.', 't'); UI.refreshMoves(uid); return; }
     mvLast[key] = now; S.save(); R.drain(); R.after(s); Au.play('level');
     UI.pixelBurstAt(el, { n: 22, big: true, color: D.ELEMENTS[r.el].color, color2: '#ffffff', rise: true });
-    UI.banner(D.ABILITIES[r.id].name + ' · Lv ' + r.lv, R.moveEffect(r.id, r.lv).text);
     UI.flush && UI.flush(); UI.refreshMoves(uid);
+    // Phase 13A final: the upgrade is confirmed on the move itself (name, new level, what improved), not by a banner
+    // over the screen. The Amina, tab and scroll position stay as they are.
+    UI.moveDone(uid, slot, r);
   });
+  let mvDoneT = 0;
+  UI.moveDone = function (uid, slot, r) {
+    const was = R.moveEffect(r.id, r.lv - 1).text, now = R.moveEffect(r.id, r.lv).text, name = D.ABILITIES[r.id].name;
+    const quiet = (UI.calm && UI.calm()) || document.body.classList.contains('perf-saver') || document.body.classList.contains('calm');
+    document.querySelectorAll('.moves[data-uid="' + uid + '"] .mv[data-slot="' + slot + '"]').forEach((mv) => {
+      const d = document.createElement('div'); d.className = 'mv-done' + (quiet ? '' : ' in'); d.setAttribute('role', 'status'); d.setAttribute('aria-live', 'polite');
+      d.innerHTML = I('check') + '<span><b>' + esc(name) + '</b> upgraded to <b>Lv ' + r.lv + '</b>: ' + esc(was) + ' → <b class="good">' + esc(now) + '</b> <span class="muted">· ' + r.cost + ' ' + esc(PX.essName(r.el)) + ' used</span></span>';
+      const fx = mv.querySelector('.mv-fx'); (fx || mv.firstChild).insertAdjacentElement('afterend', d);
+      if (!quiet) { const c = mv.querySelector('.pg-tl.cur'); if (c) c.classList.add('pg-pulse'); }
+    });
+    clearTimeout(mvDoneT); mvDoneT = setTimeout(() => document.querySelectorAll('.mv-done').forEach((x) => x.remove()), 5000);
+  };
   // Every open screen that shows this Amina's moves redraws from the same data.
   UI.refreshMoves = function (uid) {
     const inst = R.inst(st(), uid); if (!inst) return;
