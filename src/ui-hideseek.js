@@ -132,7 +132,10 @@
       }
       // Pointer events, not clicks: on a phone a second finger (the thumb on the joystick is the first) never produces a
       // click, and the Seeker must be able to attack while moving. A click that follows the same press is ignored.
-      const press = (el, fn) => { if (!el) return; let t = 0; el.addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); t = performance.now(); fn(e); }); el.addEventListener('click', (e) => { if (performance.now() - t > 500) fn(e); }); };
+      // The click the browser sends after a press is swallowed by a flag, not by a short time window, so a press whose
+      // work takes a while on a slow phone can never count twice. A click with no press before it (keyboard,
+      // assistive tech) still works.
+      const press = (el, fn) => { if (!el) return; let pressed = false, t = 0; el.addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); pressed = true; fn(e); t = performance.now(); }); el.addEventListener('click', (e) => { const dup = pressed && performance.now() - t < 1500; pressed = false; if (!dup) fn(e); }); };
       press(H.btn, act);
       function trayHtml() {
         const me = meH(); if (!me) return '';
@@ -159,8 +162,9 @@
       };
       if (H.tray) {
         H.tray.addEventListener('pointerdown', (e) => { tp = { id: e.pointerId, x: e.clientX, y: e.clientY }; });
-        H.tray.addEventListener('pointerup', (e) => { if (tp && tp.id === e.pointerId && Math.hypot(e.clientX - tp.x, e.clientY - tp.y) < 10) { tapT = performance.now(); choose(e.target); } tp = null; });
-        H.tray.addEventListener('click', (e) => { if (performance.now() - tapT > 500) choose(e.target); });
+        let tapped = false;
+        H.tray.addEventListener('pointerup', (e) => { if (tp && tp.id === e.pointerId && Math.hypot(e.clientX - tp.x, e.clientY - tp.y) < 10) { tapped = true; choose(e.target); tapT = performance.now(); } tp = null; });
+        H.tray.addEventListener('click', (e) => { const dup = tapped && performance.now() - tapT < 1500; tapped = false; if (!dup) choose(e.target); });
       }
       $('[data-hs="leave"]', box).addEventListener('click', () => UI.confirm('Leave the round?', youSeek ? 'If the Seeker leaves, the hiders win.' : 'If you leave, you count as found.', 'Leave', () => { HS.leave(m, you); finish(); }, true));
       $('[data-hs="skip"]', box).addEventListener('click', () => finish());
@@ -184,8 +188,11 @@
       press($('[data-hs="spec-back"]', box), () => specStop('Back to your disguise.'));
 
       /* ---- each frame ---- */
+      // the disguise pictures are drawn one a frame from the start of the round, so the tray opens without a hitch
+      const thumbQ = youSeek ? [] : m.looks.slice();
       function tick(dt) {
         if (ended) return;
+        if (thumbQ.length) view.thumb(thumbQ.shift());
         const k = input.keys; const kx = (k.d || k.arrowright ? 1 : 0) - (k.a || k.arrowleft ? 1 : 0), ky = (k.s || k.arrowdown ? 1 : 0) - (k.w || k.arrowup ? 1 : 0);
         if (k.z || k.c) view.rotate(((k.c ? 1 : 0) - (k.z ? 1 : 0)) * CAMC.keyRate * dt, 0);
         // movement is relative to the screen, so it follows the camera however it is turned
