@@ -280,5 +280,13 @@
     // the built-in voxel seeker of that look; null keeps the voxel seeker.
     seekerGlb: { male: null, female: null },
     seekerLook: { Pip: 'male', Marlo: 'male', Juno: 'female', Fen: 'male', Sable: 'female', Wren: 'female' },
+    // Phase 12C: proximity points for hiders. Distances are in metres; the island's scale is taken from the Seeker,
+    // who stands 1.36 units tall (an adult of about 1.7 m), so one unit (one island cell) is 1.25 m. Points are added
+    // every `tick` seconds of the round clock, `pts` per second for the nearest tier the hider is inside.
+    score: { metresPerUnit: 1.25, tick: 0.25, tiers: [{ within: 3, pts: 5, name: 'Very close' }, { within: 8, pts: 3, name: 'Close' }, { within: 15, pts: 1, name: 'In range' }] },
+    // Phase 12C: the round camera (radians per pixel dragged, degrees for the tilt limits, seconds of smoothing) and
+    // the joystick (radius as a share of the screen height, dead zone and full-speed point as shares of the radius).
+    camera: { sens: 0.0065, pitchSens: 0.004, pitch: 30, pitchMin: 20, pitchMax: 68, smooth: 0.07, keyRate: 1.9 },
+    stick: { radius: 0.12, min: 38, max: 56, dead: 0.14, full: 0.85, minSpeed: 0.3 },
   };
 })(typeof window !== 'undefined' ? window : globalThis);

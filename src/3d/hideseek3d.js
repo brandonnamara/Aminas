@@ -13,7 +13,14 @@
    Cost: one terrain mesh, instanced batches for scenery, one small draw per player, one instanced mesh for all
    effect cubes. The loop runs only during a round, capped at 30 fps (20 in Battery saver), and stops on exit. Shadows
    are redrawn only when a disguised object moves or changes (at most 8 times a second); Battery saver turns them
-   off. Reduce Motion keeps the round fully playable with fewer, shorter effects and no camera shake. */
+   off. Reduce Motion keeps the round fully playable with fewer, shorter effects and no camera shake.
+
+   Camera (Phase 12C): the island's own orthographic view, now free to turn. It orbits the player (or the hider being
+   watched): any angle round, and a limited tilt (D.HIDESEEK.camera.pitchMin..pitchMax) so it can never dip under the
+   terrain. Turning is smoothed. Only the camera turns: nothing in the round reads its angle except the joystick,
+   which is always relative to the screen. So that scenery between the camera and the player never hides the player
+   from themselves, the player's own Seeker shows through it as a flat silhouette, and the marker over the player's
+   own disguise is always drawn on top. Neither is ever shown for anyone else. */
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.170.0/+esm';
 import { VoxGrid, meshGrid, hash, pick } from './voxmesh.js';
 import { PAL, TV, DV, UNIT_PX, HEIGHT_PX, LIGHT } from './voxstyle.js';
@@ -101,7 +108,7 @@ function buildWisp() {
 /* ------------------------------------------------------------------ the view */
 export function createView(host, map, m, opts) {
   opts = opts || {};
-  const R = new THREE.WebGLRenderer({ antialias: !COARSE, alpha: true, powerPreference: 'default' });
+  const R = new THREE.WebGLRenderer({ antialias: !COARSE, alpha: true, powerPreference: 'default', stencil: true });
   R.setClearColor(0x000000, 0); R.outputColorSpace = THREE.SRGBColorSpace; R.toneMapping = THREE.NeutralToneMapping; R.toneMappingExposure = LIGHT.exposure || 1;
   const useShadows = !saver() && tier().shadows !== false; R.shadowMap.enabled = useShadows; R.shadowMap.type = THREE.PCFShadowMap; R.shadowMap.autoUpdate = false;
   R.domElement.className = 'hs3d'; host.appendChild(R.domElement);
@@ -190,9 +197,18 @@ export function createView(host, map, m, opts) {
   // the Seeker
   const sk = m.seeker, glb = A.Data.HIDESEEK.seekerGlb || {}; let seekerObj = buildSeeker(sk.look, opts.seekerColours || {}), mixer = null, clips = {};
   scene.add(seekerObj); const sBlob = new THREE.Mesh(blobGeo, blobMat); scene.add(sBlob);
+  // The player's own Seeker shows through scenery as a flat silhouette, so turning the camera never loses it behind a
+  // building or a tree. Two extra passes over its few small parts, after everything solid is drawn: the first marks
+  // (in the stencil) where the Seeker is actually visible, the second paints the silhouette everywhere else it is.
+  // Only for the player's own Seeker: a computer Seeker behind a wall stays hidden from a hiding player.
+  const silMark = new THREE.MeshBasicMaterial({ colorWrite: false, depthWrite: false, depthFunc: THREE.LessEqualDepth, transparent: true, stencilWrite: true, stencilRef: 1, stencilFunc: THREE.AlwaysStencilFunc, stencilZPass: THREE.ReplaceStencilOp });
+  const silDraw = new THREE.MeshBasicMaterial({ color: '#9fefff', transparent: true, opacity: 0.42, depthTest: false, depthWrite: false, stencilWrite: true, stencilRef: 1, stencilFunc: THREE.NotEqualStencilFunc, stencilZPass: THREE.ReplaceStencilOp });
+  dispose.push(silMark, silDraw);
+  function addSilhouette(obj) { const list = []; obj.traverse((x) => { if (x.isMesh && !x.isSkinnedMesh && !x.userData.sil) list.push(x); }); list.forEach((x) => { const a = new THREE.Mesh(x.geometry, silMark), b = new THREE.Mesh(x.geometry, silDraw); a.renderOrder = 10; b.renderOrder = 11; a.userData.sil = b.userData.sil = true; a.frustumCulled = b.frustumCulled = false; x.add(a); x.add(b); }); return list.length; }
+  let silParts = opts.silhouette ? addSilhouette(seekerObj) : 0;
   if (glb[sk.look]) import('https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/loaders/GLTFLoader.js/+esm').then(({ GLTFLoader }) => new GLTFLoader().load(glb[sk.look], (g) => {
     if (disposed) return; const o = g.scene; const box = new THREE.Box3().setFromObject(o), hgt = box.max.y - box.min.y || 1; o.scale.setScalar(1.36 / hgt);
-    const wrap = new THREE.Group(); wrap.add(o); wrap.userData = { glb: true, P: {} }; scene.remove(seekerObj); seekerObj = wrap; scene.add(wrap);
+    const wrap = new THREE.Group(); wrap.add(o); wrap.userData = { glb: true, P: {} }; scene.remove(seekerObj); seekerObj = wrap; scene.add(wrap); if (opts.silhouette) silParts = addSilhouette(wrap);
     if (g.animations && g.animations.length) { mixer = new THREE.AnimationMixer(o); g.animations.forEach((c) => { const n = c.name.toLowerCase(); ['idle', 'walk', 'attack', 'reveal'].forEach((k) => { if (n.indexOf(k) >= 0 && !clips[k]) clips[k] = mixer.clipAction(c); }); }); if (clips.idle) clips.idle.play(); }
   }, undefined, (e) => console.warn('Seeker model could not be loaded, using the voxel seeker:', e && e.message)));
   const sAnim = { x: sk.x, z: sk.z, yaw: -sk.face, walk: 0, phase: 0, swing: -9, reveal: -9, slump: -9 };
@@ -211,21 +227,35 @@ export function createView(host, map, m, opts) {
   const aimMat = new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.55, depthWrite: false }); dispose.push(aimMat);
   const aim = new THREE.Mesh(ringGeo, aimMat); aim.visible = false; aim.renderOrder = 3; scene.add(aim);
   // the player's own marker (only on the player's screen): a small prism floating above their disguise
-  const mine = new THREE.Mesh(wispGeo, new THREE.MeshBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.85 })); mine.scale.setScalar(0.6); mine.visible = false; mine.renderOrder = 4; scene.add(mine); dispose.push(mine.material);
+  const mine = new THREE.Mesh(wispGeo, new THREE.MeshBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.85, depthTest: false, depthWrite: false })); mine.scale.setScalar(0.6); mine.visible = false; mine.renderOrder = 12; scene.add(mine); dispose.push(mine.material);
 
   /* ---- labels (names over revealed hiders) ---- */
   const labels = document.createElement('div'); labels.className = 'hs-labels'; host.appendChild(labels); const tags = [];
   const tag = (text, x, y, z, cls, life) => { const el = document.createElement('div'); el.className = 'hs-tag3 ' + (cls || ''); el.textContent = text; labels.appendChild(el); tags.push({ el, x, y, z, t: 0, life }); };
 
   /* ---- camera ---- */
+  // yaw: the compass direction the top of the screen points along the ground (the island screen's own view is
+  // -135 degrees); pitch: how far above the horizon the camera sits (the island's is 30 degrees).
+  const CAMC = A.Data.HIDESEEK.camera || {}, DEG = Math.PI / 180;
+  const cam = { yaw: -Math.PI * 0.75, pitch: (CAMC.pitch || 30) * DEG, tyaw: -Math.PI * 0.75, tpitch: (CAMC.pitch || 30) * DEG, min: (CAMC.pitchMin || 20) * DEG, max: (CAMC.pitchMax || 68) * DEG };
+  const camR = new THREE.Vector3(), camU = new THREE.Vector3(), camB = new THREE.Vector3();
+  function basis() { const fx = Math.cos(cam.yaw), fz = Math.sin(cam.yaw), sp = Math.sin(cam.pitch), cp = Math.cos(cam.pitch); camR.set(-fz, 0, fx); camU.set(fx * sp, cp, fz * sp); camB.set(-fx * cp, sp, -fz * cp); }
   const view = { w: 1, h: 1, zoom: opts.zoom || 1.3 }, focus = new THREE.Vector3(m.start.x, 0, m.start.z), fTarget = focus.clone();
   let shake = 0;
   function resize() { const r = host.getBoundingClientRect(); view.w = Math.max(1, Math.round(r.width)); view.h = Math.max(1, Math.round(r.height)); const pr = Math.min(window.devicePixelRatio || 1, tier().prCap || 2); R.setPixelRatio(pr); R.setSize(view.w, view.h, true); }
   function placeCamera() {
-    const ppu = UNIT_PX * view.zoom * Math.min(1.25, Math.max(0.8, view.h / 390));
+    const ppu = UNIT_PX * view.zoom * Math.min(1.25, Math.max(0.8, view.h / 390)); basis();
     camera.left = -view.w / 2 / ppu; camera.right = view.w / 2 / ppu; camera.top = view.h / 2 / ppu; camera.bottom = -view.h / 2 / ppu;
-    const t = focus.clone(); if (shake > 0 && !calm()) { t.addScaledVector(RIGHT, (Math.random() - 0.5) * shake * 0.12); t.y += (Math.random() - 0.5) * shake * 0.08; }
-    camera.position.copy(t).addScaledVector(BACK, 60); camera.lookAt(t); camera.updateProjectionMatrix();
+    const t = focus.clone(); if (shake > 0 && !calm()) { t.addScaledVector(camR, (Math.random() - 0.5) * shake * 0.12); t.y += (Math.random() - 0.5) * shake * 0.08; }
+    camera.up.copy(camU); camera.position.copy(t).addScaledVector(camB, 60); camera.lookAt(t); camera.updateProjectionMatrix();
+  }
+  // ease the camera towards where the player has turned it (straight there with Reduce Motion)
+  function turnCamera(dt) {
+    const k = calm() ? 1 : 1 - Math.exp(-dt / Math.max(0.01, CAMC.smooth || 0.07));
+    cam.yaw += (cam.tyaw - cam.yaw) * k; cam.pitch += (cam.tpitch - cam.pitch) * k;
+    if (Math.abs(cam.tyaw - cam.yaw) < 1e-4) cam.yaw = cam.tyaw; if (Math.abs(cam.tpitch - cam.pitch) < 1e-4) cam.pitch = cam.tpitch;
+    // keep the numbers small after many turns
+    if (Math.abs(cam.tyaw) > 50) { const n = Math.round(cam.tyaw / (Math.PI * 2)) * Math.PI * 2; cam.tyaw -= n; cam.yaw -= n; }
   }
   resize(); const ro = window.ResizeObserver ? new ResizeObserver(resize) : null; if (ro) ro.observe(host);
 
@@ -325,12 +355,12 @@ export function createView(host, map, m, opts) {
     // camera follows the player (or whoever the player is watching)
     const fid = api.focusId, fe = fid === m.seeker.id ? m.seeker : m.hiders.find((q) => q.id === fid);
     if (fe) fTarget.set(fe.x, groundY(fe.x, fe.z) + 0.6, fe.z);
-    focus.lerp(fTarget, Math.min(1, dt * (calm() ? 12 : 6))); placeCamera();
+    focus.lerp(fTarget, Math.min(1, dt * (calm() ? 12 : 6))); turnCamera(dt); placeCamera();
     // aim ring and own marker
     const tgt = api.aim ? api.aim() : null;
     if (tgt) { const o = m.props.find((p) => p.id === tgt.id) || m.hiders.find((h) => h.id === tgt.id), sh = o.shape, r = sh.r != null ? sh.r + 0.12 : Math.max(sh.hx, sh.hz) + 0.15; aim.visible = true; aim.position.set(sh.x, groundY(sh.x, sh.z) + 0.05, sh.z); aim.scale.setScalar(r); aimMat.opacity = 0.35 + 0.2 * Math.sin(clock * 6); aimMat.color.set(A.Rules.HideSeek.attackReady(m) ? '#ffffff' : '#ff9a8a'); } else aim.visible = false;
-    const me = api.mineId && m.hiders.find((h) => h.id === api.mineId && !h.found && h.key);
-    if (me) { const look = A.Rules.HideSeek.look(me.key), md = modelFor(me.model), top = (md && md.geo && md.geo.boundingBox ? md.geo.boundingBox.max.y * (me.ys || 1) : 1.5); mine.visible = true; mine.position.set(me.x, groundY(me.x, me.z) + Math.min(top, 6) + 0.3 + (calm() ? 0 : Math.sin(clock * 3) * 0.06), me.z); mine.rotation.y = calm() ? 0 : clock * 1.5; } else mine.visible = false;
+    const me = api.mineId && m.hiders.find((h) => h.id === api.mineId && !h.found);
+    if (me) { const md = me.key ? modelFor(me.model) : null, top = !me.key ? 0.75 : (md && md.geo && md.geo.boundingBox ? md.geo.boundingBox.max.y * (me.ys || 1) : 1.5); mine.visible = true; mine.position.set(me.x, groundY(me.x, me.z) + Math.min(top, 6) + 0.3 + (calm() ? 0 : Math.sin(clock * 3) * 0.06), me.z); mine.rotation.y = calm() ? 0 : clock * 1.5; } else mine.visible = false;
     if (useShadows && shadowDirty && now - lastShadow > 125) { R.shadowMap.needsUpdate = true; shadowDirty = false; lastShadow = now; }
     const s0 = performance.now(); R.render(scene, camera); api.stats.drawMs = +(performance.now() - s0).toFixed(2); api.stats.frames++;
     raf = requestAnimationFrame(render);
@@ -341,17 +371,30 @@ export function createView(host, map, m, opts) {
     stop() { if (raf) cancelAnimationFrame(raf); raf = 0; },
     running: () => !!raf,
     // a joystick direction on screen (x right, y down) as a direction on the island
-    dirFromScreen(jx, jy) { const up = -jy; return { x: Math.SQRT1_2 * (jx - up), z: Math.SQRT1_2 * (-jx - up) }; },
+    // Relative to the camera as it is now, and true to the screen: the player moves across the screen in the
+    // direction the stick points (the tilt squashes the ground's depth, so "up" is stretched to match), at the
+    // stick's strength.
+    dirFromScreen(jx, jy) {
+      const l = Math.hypot(jx, jy); if (l < 1e-6) return { x: 0, z: 0 };
+      const fx = Math.cos(cam.yaw), fz = Math.sin(cam.yaw), a = jx, b = -jy / Math.max(0.2, Math.sin(cam.pitch));
+      let x = a * -fz + b * fx, z = a * fx + b * fz; const n = Math.hypot(x, z) || 1, k = Math.min(1, l) / n; return { x: x * k, z: z * k };
+    },
+    // Turn the camera by a drag (radians). It only ever changes the view.
+    rotate(dYaw, dPitch) { cam.tyaw += dYaw; cam.tpitch = Math.max(cam.min, Math.min(cam.max, cam.tpitch + (dPitch || 0))); },
+    camera: () => ({ yaw: cam.yaw, pitch: cam.pitch, targetYaw: cam.tyaw, targetPitch: cam.tpitch, min: cam.min, max: cam.max, forward: { x: Math.cos(cam.yaw), z: Math.sin(cam.yaw) }, focus: { x: focus.x, y: focus.y, z: focus.z } }),
+    setCamera(yaw, pitch) { if (yaw != null) cam.tyaw = cam.yaw = yaw; if (pitch != null) cam.tpitch = cam.pitch = Math.max(cam.min, Math.min(cam.max, pitch)); placeCamera(); },
     // the island point under a screen position (for tap-to-face)
-    groundAt(clientX, clientY) { const r = R.domElement.getBoundingClientRect(), nd = new THREE.Vector2((clientX - r.left) / r.width * 2 - 1, -((clientY - r.top) / r.height) * 2 + 1), rc = new THREE.Raycaster(); rc.setFromCamera(nd, camera); const p = new THREE.Vector3(); rc.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0, 1, 0), -focus.y), p); return p ? { x: p.x, z: p.z } : null; },
+    groundAt(clientX, clientY) { const r = R.domElement.getBoundingClientRect(), nd = new THREE.Vector2((clientX - r.left) / r.width * 2 - 1, -((clientY - r.top) / r.height) * 2 + 1), rc = new THREE.Raycaster(); rc.setFromCamera(nd, camera); const p = new THREE.Vector3(); rc.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0, 1, 0), -(focus.y - 0.6)), p); return p ? { x: p.x, z: p.z } : null; },
     screenOf(x, y, z) { const p = new THREE.Vector3(x, y, z).project(camera); return { x: (p.x + 1) / 2 * view.w, y: (1 - p.y) / 2 * view.h }; },
     setZoom(z) { view.zoom = Math.max(0.6, Math.min(4, z)); placeCamera(); },
     snapFocus() { const fe = api.focusId === m.seeker.id ? m.seeker : m.hiders.find((q) => q.id === api.focusId); if (fe) { focus.set(fe.x, groundY(fe.x, fe.z) + 0.6, fe.z); fTarget.copy(focus); } placeCamera(); },
     renderOnce() { sync(0.016); step(0.016); api.snapFocus(); if (useShadows) R.shadowMap.needsUpdate = true; R.render(scene, camera); },
-    info() { let tris = 0, calls = 0; R.info.reset && R.info.reset(); R.render(scene, camera); tris = R.info.render.triangles; calls = R.info.render.calls; return { triangles: tris, calls, geometries: R.info.memory.geometries, shadows: useShadows, lod, fps: saver() ? 20 : 30, seeker: seekerObj.userData.glb ? 'glb' : 'voxel-' + m.seeker.look }; },
+    info() { let tris = 0, calls = 0; R.info.reset && R.info.reset(); R.render(scene, camera); tris = R.info.render.triangles; calls = R.info.render.calls; return { triangles: tris, calls, geometries: R.info.memory.geometries, shadows: useShadows, lod, fps: saver() ? 20 : 30, seeker: seekerObj.userData.glb ? 'glb' : 'voxel-' + m.seeker.look, silhouette: silParts, markerOnTop: mine.material.depthTest === false }; },
     // what a disguised hider looks like next to its genuine twin: their model, material and tint (for the tests)
     compare(hid) { const h = m.hiders.find((q) => q.id === hid); if (!h || !h.key) return null; const v = views.get(hid), src = A.Rules.HideSeek.sourceFor(m, h.key, h.x, h.z), md = modelFor(src.model), b = [...batches.values()].find((x) => x.geo === geoOf(md));
       return { sameGeometry: !!b && v.inst[0].geometry === b.geo, sameMaterial: !!b && v.inst[0].material === b.mat, tintRule: !natureFor(h.model) || (!!v.inst[0].instanceColor && Math.abs(v.inst[0].instanceColor.getX(0) - tintAt(v.tx, v.tz).r) < 1e-5 && Math.abs(v.inst[0].instanceColor.getZ(0) - tintAt(v.tx, v.tz).b) < 1e-5), extraMeshes: v.group.children.length - v.inst.length, model: h.model, look: h.look }; },
+    // the drawn orientation of a disguise (its instance matrix), for checking that the camera never turns it
+    disguiseMatrix(id) { const v = views.get(id); if (!v || !v.inst[0]) return null; const mx = new THREE.Matrix4(); v.inst[0].getMatrixAt(0, mx); return Array.from(mx.elements); },
     thumb(key) { return thumb(key); },
     dispose() {
       disposed = true; api.stop(); if (ro) ro.disconnect();

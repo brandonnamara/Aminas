@@ -76,8 +76,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms)); const SHOTS = proce
   // the joystick
   const box = await page.evaluate(() => { const r = document.querySelector('.hs-zone').getBoundingClientRect(); return [r.left + r.width * 0.4, r.top + r.height * 0.6]; });
   await page.mouse.move(box[0], box[1]); await page.mouse.down(); await page.mouse.move(box[0] + 40, box[1] - 10, { steps: 4 }); await sleep(600);
-  const joy = await page.evaluate(() => { const i = A.UI.HSR.input; return Math.hypot(i.x, i.z); }); await page.mouse.up();
-  ok(joy > 0.5 && (await page.evaluate(() => A.UI.HSR.input.x === 0 && A.UI.HSR.input.z === 0)), 'the on-screen joystick steers, and lets go cleanly');
+  const joy = await page.evaluate(() => { const i = A.UI.HSR.input; return Math.hypot(i.sx, i.sy); }); await page.mouse.up();
+  ok(joy > 0.5 && (await page.evaluate(() => A.UI.HSR.input.sx === 0 && A.UI.HSR.input.sy === 0)), 'the on-screen joystick steers, and lets go cleanly');
 
   /* 7, 8. the 10-second cooldown */
   const cd = await page.evaluate(async () => { const m = A.UI.HSR.m, h = m.hiders.find((q) => q.id === 'you'), H = A.Rules.HideSeek; h.nextMorph = 0; const k1 = m.looks.find((k) => k !== h.key && H.look(k).size === 'small');

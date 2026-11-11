@@ -127,7 +127,7 @@
     const sp = lobby.players.find((p) => p.id === seekerId);
     m.seeker = { id: sp.id, name: sp.name, bot: sp.bot, x: sx, z: sz, face: Math.PI * 0.75, nextAttack: 0, penaltyUntil: 0, attacks: 0, hits: 0, misses: 0, whiffs: 0, swingAt: -9, moved: 0, look: opts.seekerLook || (cfg.seekerLook && cfg.seekerLook[sp.name]) || 'male' };
     const hs = lobby.players.filter((p) => p.id !== seekerId);
-    m.hiders = hs.map((p, i) => { const a = (i / hs.length) * Math.PI * 2 + 0.4, h = { id: p.id, name: p.name, bot: p.bot, x: sx + Math.cos(a) * 1.4, z: sz + Math.sin(a) * 1.4, face: a, key: null, look: null, model: null, shape: null, nextMorph: 0, morphs: 0, moved: 0, found: false, foundAt: null, lastMove: -9, ry: 0 }; h.shape = { x: h.x, z: h.z, r: WISP.r }; return h; });
+    m.hiders = hs.map((p, i) => { const a = (i / hs.length) * Math.PI * 2 + 0.4, h = { id: p.id, name: p.name, bot: p.bot, x: sx + Math.cos(a) * 1.4, z: sz + Math.sin(a) * 1.4, face: a, key: null, look: null, model: null, shape: null, nextMorph: 0, morphs: 0, moved: 0, found: false, foundAt: null, lastMove: -9, ry: 0, scoreQ: 0, tierQ: [0, 0, 0] }; h.shape = { x: h.x, z: h.z, r: WISP.r }; return h; });
     m.hiders.forEach((h) => { if (!HS.free(m, h.shape, h.id)) { const q = HS.findSpot(m, WISP, h.x, h.z, 3, h.id); if (q) { h.x = q.x; h.z = q.z; h.shape.x = q.x; h.shape.z = q.z; } } });
     m.rnd = rnd;
     return m;
@@ -274,7 +274,78 @@
     }
     m.hiders.forEach((h) => { if (h.bot && h.id !== you && !h.found) HS.botHider(m, h, dt); });
     if (m.seeker.bot && m.seeker.id !== you && m.phase === 'seek') HS.botSeeker(m, dt);
+    HS.scoreStep(m);
     HS.check2(m);
+  };
+
+  /* ------------------------------------------------------------------ proximity points (Phase 12C) */
+  // A hider earns points for staying near the Seeker without being found. Points are added on fixed ticks of the
+  // round clock (every D.HIDESEEK.score.tick seconds of the search), never per frame: the clock only moves in
+  // HS.step, so the total is the same at any frame rate, and pausing, resuming or calling this again at the same
+  // moment adds nothing. Scores are kept in whole tick-units (scoreQ) so no rounding builds up.
+  const SC = () => C().score;
+  // Is the straight line between two points all walkable land with no step higher than half a unit?
+  function landLine(m, ax, az, bx, bz) {
+    const n = Math.max(1, Math.ceil(hyp(bx - ax, bz - az) / 0.25)); let prev = HS.cell(m, ax, az); if (!prev || !prev.walk) return false;
+    for (let i = 1; i <= n; i++) { const f = i / n, c = HS.cell(m, ax + (bx - ax) * f, az + (bz - az) * f); if (!c || !c.walk || Math.abs(c.y - prev.y) > 0.5 + 1e-6) return false; prev = c; }
+    return true;
+  }
+  // Walking distance (in units) from the Seeker's cell to every cell the Seeker could reach over the terrain. Kept
+  // until the Seeker changes cell.
+  function walkField(m) {
+    const s = m.seeker, key = Math.floor(s.x) + ',' + Math.floor(s.z); if (m._wf && m._wf.key === key) return m._wf.dist;
+    const dist = new Map(), start = m.cells.get(key); if (start && start.walk) {
+      dist.set(key, 0); const open = [[0, start]];
+      while (open.length) {
+        let bi = 0; for (let i = 1; i < open.length; i++) if (open[i][0] < open[bi][0]) bi = i;
+        const [d0, c0] = open.splice(bi, 1)[0]; if (d0 > dist.get(c0.x + ',' + c0.z)) continue;
+        for (const [dx, dz] of [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]]) {
+          const c1 = m.cells.get((c0.x + dx) + ',' + (c0.z + dz)); if (!c1 || !c1.walk || Math.abs(c1.y - c0.y) > 0.5 + 1e-6) continue;
+          if (dx && dz) { const a = m.cells.get((c0.x + dx) + ',' + c0.z), b = m.cells.get(c0.x + ',' + (c0.z + dz)); if (!a || !a.walk || !b || !b.walk) continue; }
+          const nd = d0 + (dx && dz ? 1.41421356 : 1), k1 = c1.x + ',' + c1.z; if (dist.has(k1) && dist.get(k1) <= nd) continue; dist.set(k1, nd); open.push([nd, c1]);
+        }
+      }
+    }
+    m._wf = { key, dist }; return dist;
+  }
+  // How near a hider is to the Seeker for scoring: { valid, d (units), metres, tier (index into the tiers, -1 if
+  // out of range), rate (points a second), why }. Invalid (no points): not in the search, found, off the playable
+  // island, or cut off from the Seeker by terrain nobody can cross. When ledges, gaps or a cliff lie between the
+  // two, the distance is the way round on foot, not the straight line.
+  HS.proximity = function (m, h) {
+    const none = (why, d) => ({ valid: false, d: d == null ? Infinity : d, metres: d == null ? Infinity : d * SC().metresPerUnit, tier: -1, rate: 0, why });
+    if (!h || h.found || m.over || m.phase !== 'seek') return none('inactive');
+    const s = m.seeker, ch = HS.cell(m, h.x, h.z), cs = HS.cell(m, s.x, s.z);
+    if (!ch || !ch.walk || !cs || !cs.walk) return none('off-island');
+    let d = hyp(h.x - s.x, h.z - s.z, ch.y - cs.y), way = 'direct';
+    if (!landLine(m, s.x, s.z, h.x, h.z)) {
+      const w = walkField(m).get(ch.x + ',' + ch.z); if (w == null) return none('cut-off', d);
+      if (w > d) { d = w; way = 'round'; }
+    }
+    const metres = d * SC().metresPerUnit, tiers = SC().tiers; let tier = -1;
+    for (let i = 0; i < tiers.length; i++) if (i === 0 ? metres < tiers[i].within : metres <= tiers[i].within) { tier = i; break; }
+    // (first tier is "within 3 m"; the others include their outer edge: 3–8 m, 8–15 m; beyond 15 m scores nothing)
+    return { valid: true, d, metres, tier, rate: tier < 0 ? 0 : tiers[tier].pts, way };
+  };
+  HS.scoreStep = function (m) {
+    if (m.phase !== 'seek' || m.over) return 0;
+    const tick = SC().tick, end = C().prep + C().seconds; if (m.scoreT == null) m.scoreT = C().prep;
+    let n = 0;
+    while (m.scoreT + tick <= Math.min(m.t, end) + 1e-9) {
+      m.scoreT += tick; n++;
+      m.hiders.forEach((h) => { if (h.found) return; const p = HS.proximity(m, h); if (p.rate > 0) { h.scoreQ += p.rate; h.tierQ[p.tier]++; } });
+    }
+    return n;
+  };
+  // points so far (whole points; scoreQ counts ticks × points-per-second)
+  HS.points = (h) => Math.floor(h.scoreQ * SC().tick + 1e-9);
+
+  /* ------------------------------------------------------------------ spectating (Phase 12C) */
+  // Who a hiding player may watch: the other hiders still in the round. Never the Seeker, and nobody at all once
+  // the player is the Seeker or has been found. Watching is only a camera: nothing here changes the round.
+  HS.spectatable = function (m, you) {
+    const me = m.hiders.find((h) => h.id === you); if (!me || me.found || m.over) return [];
+    return m.hiders.filter((h) => h.id !== you && !h.found);
   };
   HS.autoDisguise = function (m, h) {
     // the nearest genuine look that fits here; if nothing fits, the nearest place where a small one does
@@ -457,7 +528,8 @@
     return {
       result: m.result, youSeek, youWon, found, total: m.hiders.length, time: Math.round((m.endT || m.t) - C().prep),
       seeker: { name: s.name, attacks: s.attacks, hits: s.hits, misses: s.misses, whiffs: s.whiffs, accuracy: s.attacks ? Math.round(s.hits / Math.max(1, s.hits + s.misses) * 100) : 0 },
-      hiders: m.hiders.map((h) => ({ id: h.id, name: h.name, look: h.look || 'Spirit', found: h.found, left: !!h.left, at: h.foundAt == null ? null : Math.max(0, Math.round(h.foundAt - C().prep)), morphs: h.morphs, moved: +h.moved.toFixed(1) })),
+      hiders: m.hiders.map((h) => ({ id: h.id, name: h.name, look: h.look || 'Spirit', found: h.found, left: !!h.left, at: h.foundAt == null ? null : Math.max(0, Math.round(h.foundAt - C().prep)), morphs: h.morphs, moved: +h.moved.toFixed(1), points: HS.points(h), near: h.tierQ.map((q) => Math.round(q * SC().tick)) })),
+      youPoints: me ? HS.points(me) : null, topPoints: Math.max.apply(null, m.hiders.map((h) => HS.points(h))),
     };
   };
 })(typeof window !== 'undefined' ? window : globalThis);
