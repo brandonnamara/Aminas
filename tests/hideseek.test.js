@@ -148,6 +148,12 @@ ok(sm.youWon === !meSm.found, 'a hider wins by not being found (you: ' + (meSm.f
 { const m2 = HS.makeArena(MAP, L, 'you'); m2.hiders.forEach((h) => (h.found = true)); m2.phase = 'seek'; HS.check2(m2); ok(m2.result === 'seeker' && HS.summary(m2, 'you').youWon, 'the Seeker wins by finding everyone'); }
 { const m3 = HS.makeArena(MAP, L, seeker); HS.leave(m3, 'you'); ok(m3.hiders.find((h) => h.id === 'you').found && m3.hiders.find((h) => h.id === 'you').left, 'a hider who leaves counts as found'); const m4 = HS.makeArena(MAP, L, 'you'); HS.leave(m4, 'you'); ok(m4.over && m4.result === 'hiders', 'a Seeker who leaves concedes'); }
 { const m5 = HS.makeArena(MAP, L, seeker); quiet(m5); runTo(m5, C.prep + 0.1); ok(m5.phase === 'seek' && m5.hiders.every((h) => h.key && h.auto), 'anyone still undisguised when hiding ends becomes the nearest object automatically'); }
+{ // skipping to the results plays the rest of the round out for real
+  const st = S.fresh(), Lb = HS.lobby(st, 6060), mb = HS.makeArena(MAP, Lb, Lb.players[1].id); runTo(mb, C.prep + 3, 'you'); HS.leave(mb, 'you'); const r0 = HS.finish(mb, 'you'), smb = HS.summary(mb, 'you');
+  ok(mb.over && (r0 === 'hiders' ? mb.t >= C.prep + C.seconds - 0.05 && smb.found < 4 : mb.hiders.every((h) => h.found)) && !smb.youWon, 'skipping or leaving lets the computer players finish the round, so the result shown is the real one (' + r0 + ', ' + smb.found + ' of 4 found by the Seeker)'); }
+{ // sliding round a round obstacle instead of sticking to it
+  const st = S.fresh(), Lb = HS.lobby(st, 7070), mb = HS.makeArena(MAP, Lb, Lb.players[1].id); quiet(mb); const h = mb.hiders[0], sk3 = mb.seeker; h.x = sk3.x + 1.0; h.z = sk3.z + 0.12; h.shape.x = h.x; h.shape.z = h.z; const d0 = h.x;
+  for (let i = 0; i < 60; i++) HS.move(mb, h.id, -1, 0, 1 / 30); ok(h.x < sk3.x - 0.3 && hyp(h.x - sk3.x, h.z - sk3.z) >= 0.5, 'a player walking into someone slides around them instead of getting stuck'); }
 ok(C.seconds === 75 && C.lobbySize === 5 && C.prep === 20, 'the search keeps its 75 seconds and 5-player lobby; hiding adds 20 seconds before it');
 
 /* 14, 15. older functions and other modes */

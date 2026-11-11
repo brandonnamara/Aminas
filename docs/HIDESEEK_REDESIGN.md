@@ -33,6 +33,7 @@ screen.
 
 A hider who is found becomes a rising spirit with their name, and the player then watches the Seeker, with
 **Skip to results**. **Leave** asks to confirm. A Seeker who leaves concedes; a hider who leaves counts as found.
+Skipping or leaving lets the computer players finish the round at once, so the results are what really happened.
 
 ## Disguises
 * **The real model, not a lookalike.** A disguise is an exact copy of the nearest genuine object of that kind: the
@@ -69,7 +70,8 @@ How each moves:
 * Buildings shudder and slide.
 
 Each kind has a soft sound (rustle, grind or creak) while moving. At rest a disguise stands exactly like its twin.
-Disguised objects collide with everything, so they cannot pass through buildings or each other.
+Disguised objects collide with everything, so they cannot pass through buildings or each other; walking into
+something round slides around it.
 
 ## The 10-second disguise cooldown
 * **When it starts.** It starts at a successful transformation and is stored on the round's own clock. That clock
@@ -137,8 +139,8 @@ should be rigged, under about 10k triangles each, in `.glb` with those four clip
   * **Attacking.** It walks up to its suspect, faces it and attacks. It respects the penalty and gives up on
     something it can't reach.
 
-  In 40 all-computer rounds it found 2.5 of 4 hiders on average, everyone in 1 round in 8, and hit scenery about
-  1.4 times a round.
+  In 40 all-computer rounds it found 2.7 of 4 hiders on average, everyone in 3 rounds of the 40, and hit scenery
+  about 1.4 times a round.
 
 ## Round timing (recommendation)
 * The search keeps its **75 seconds** and the lobby its 5 players.

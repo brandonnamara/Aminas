@@ -95,8 +95,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms)); const SHOTS = proce
 
   /* hiding ends: the computer Seeker hunts; then spectating when found */
   await page.evaluate(() => { const m = A.UI.HSR.m; m.seeker.bot = true; m.t = A.Data.HIDESEEK.prep - 0.1; });
-  await until(() => A.UI.HSR.m.phase === 'seek'); await sleep(2500);
-  const hunt = await page.evaluate(() => { const s = A.UI.HSR.m.seeker; return { moved: s.moved, phase: document.querySelector('.hs-phase').textContent }; });
+  await until(() => A.UI.HSR.m.phase === 'seek'); await until(() => A.UI.HSR.m.seeker.moved > 0.5, null, 60000).catch(() => {});
+  const hunt = await page.evaluate(() => { const s = A.UI.HSR.m.seeker; s.bot = false; /* stop it here so the frozen hiders by the start are not all found during a slow screenshot */ return { moved: s.moved, phase: document.querySelector('.hs-phase').textContent }; });
   ok(hunt.moved > 0.5 && hunt.phase === 'Search', 'the search starts and the computer Seeker sets off across the island');
   await shot('08-search');
   await page.evaluate(() => { const m = A.UI.HSR.m, h = m.hiders.find((q) => q.id === 'you'); m.seeker.bot = false; const a = m.props[0]; m.seeker.x = h.x - (h.shape.r || h.shape.hx) - 0.4; m.seeker.z = h.z; m.seeker.face = 0; m.seeker.nextAttack = 0; const t = A.Rules.HideSeek.target(m); if (!t || t.id !== 'you') { h.found = true; h.foundAt = m.t; m.events.push({ type: 'reveal', id: 'you', x: h.x, z: h.z, t: m.t, n: ++m.evN }); } else A.Rules.HideSeek.attack(m); });

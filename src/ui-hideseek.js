@@ -69,7 +69,11 @@
         }
         toggleTray();
       }
-      H.btn.addEventListener('click', act);
+      // Pointer events, not clicks: on a phone a second finger (the thumb on the joystick is the first) never produces a
+      // click, and the Seeker must be able to attack while moving. A click that follows the same press is ignored.
+      let pressT = 0;
+      H.btn.addEventListener('pointerdown', (e) => { e.preventDefault(); pressT = performance.now(); act(); });
+      H.btn.addEventListener('click', () => { if (performance.now() - pressT > 500) act(); });
       function trayHtml() {
         const me = m.hiders.find((h) => h.id === you); if (!me) return '';
         const near = []; m.props.forEach((p) => { if (p.key && Math.hypot(p.x - me.x, p.z - me.z) < 4 && near.indexOf(p.key) < 0) near.push(p.key); });
@@ -83,14 +87,21 @@
         if (!open || m.over) { H.tray.classList.remove('on'); H.tray.innerHTML = ''; return; }
         H.tray.innerHTML = trayHtml(); H.tray.classList.add('on');
       }
-      if (H.tray) H.tray.addEventListener('click', (e) => {
-        if (e.target.closest('[data-hs="tray-x"]')) return toggleTray(false);
-        const c = e.target.closest('.hs-card'); if (!c) return; const r = HS.disguise(m, you, c.dataset.k);
+      // the tray: a tap picks a card (also with another finger down); a drag scrolls the strip
+      let tp = null, tapT = 0;
+      const choose = (target) => {
+        if (target.closest('[data-hs="tray-x"]')) return toggleTray(false);
+        const c = target.closest('.hs-card'); if (!c) return; const r = HS.disguise(m, you, c.dataset.k);
         if (r.ok) { say('You are now ' + article(HS.look(r.key).name) + '. Next change in ' + D.HIDESEEK.morphCooldown + 's.', 'good'); toggleTray(false); }
         else if (r.reason === 'cooldown') say('Your disguise is recharging: ' + r.wait.toFixed(1) + 's.', 'warn');
         else if (r.reason === 'room') say('No room for ' + article(HS.look(c.dataset.k).name) + ' here. Move to an open spot.', 'warn');
         else if (r.reason === 'same') toggleTray(false);
-      });
+      };
+      if (H.tray) {
+        H.tray.addEventListener('pointerdown', (e) => { tp = { id: e.pointerId, x: e.clientX, y: e.clientY }; });
+        H.tray.addEventListener('pointerup', (e) => { if (tp && tp.id === e.pointerId && Math.hypot(e.clientX - tp.x, e.clientY - tp.y) < 10) { tapT = performance.now(); choose(e.target); } tp = null; });
+        H.tray.addEventListener('click', (e) => { if (performance.now() - tapT > 500) choose(e.target); });
+      }
       $('[data-hs="leave"]', box).addEventListener('click', () => UI.confirm('Leave the round?', youSeek ? 'If the Seeker leaves, the hiders win.' : 'If you leave, you count as found.', 'Leave', () => { HS.leave(m, you); finish(); }, true));
       $('[data-hs="skip"]', box).addEventListener('click', () => finish());
       // ---- each frame
@@ -130,7 +141,8 @@
       }
       function finish() {
         if (ended) return; ended = true;
-        if (!m.over) { m.over = true; m.result = m.result || (youSeek ? 'hiders' : 'seeker'); m.endT = m.t; }
+        // skipping or leaving: the computer players finish the round at once, so the results are the real ones
+        if (!m.over) HS.finish(m, you);
         const sm = HS.summary(m, you);
         s.hideseek.played++; if (sm.youWon) s.hideseek.won++; S.save();
         R0.summary = sm; close(); results(sm, m);

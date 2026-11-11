@@ -198,7 +198,13 @@
     const shapeAt = (x, z) => (isS ? { x, z, r: 0.28 } : e.shape.r != null ? { x, z, r: e.shape.r } : { x, z, hx: e.shape.hx, hz: e.shape.hz });
     const ok = (x, z) => { const s = shapeAt(x, z); if (!HS.onLand(m, s)) return false; const c0 = HS.cell(m, e.x, e.z), c1 = HS.cell(m, x, z); if (c0 && c1 && Math.abs(c1.y - c0.y) > 0.5 + 1e-6) return false; return HS.free(m, s, e.id, 0); };
     let nx = e.x, nz = e.z;
-    if (ok(e.x + mx, e.z + mz)) { nx = e.x + mx; nz = e.z + mz; } else if (ok(e.x + mx, e.z)) nx = e.x + mx; else if (ok(e.x, e.z + mz)) nz = e.z + mz;
+    if (ok(e.x + mx, e.z + mz)) { nx = e.x + mx; nz = e.z + mz; }
+    else {
+      // blocked: slide around it. Try the heading turned a little either way (round obstacles), then each axis (walls).
+      const a0 = Math.atan2(mz, mx); let done = false;
+      for (const da of [0.5, -0.5, 1.0, -1.0, 1.4, -1.4]) { const k = Math.cos(da), x = e.x + Math.cos(a0 + da) * step * k, z = e.z + Math.sin(a0 + da) * step * k; if (ok(x, z)) { nx = x; nz = z; done = true; break; } }
+      if (!done) { if (ok(e.x + mx, e.z)) nx = e.x + mx; else if (ok(e.x, e.z + mz)) nz = e.z + mz; }
+    }
     const d = hyp(nx - e.x, nz - e.z);
     e.face = Math.atan2(dz, dx);
     if (d > 1e-4) { e.x = nx; e.z = nz; e.moved += d; if (!isS) { e.shape.x = nx; e.shape.z = nz; e.lastMove = m.t; } }
@@ -249,6 +255,9 @@
     else if (m.phase === 'seek' && m.t >= C().prep + C().seconds) { m.over = true; m.result = 'hiders'; m.endT = m.t; ev(m, { type: 'end', result: 'hiders' }); }
     return m.result;
   };
+  // Play the rest of the round out at once (no drawing): used when the player skips to the results or leaves, so the
+  // results are what really happened, not a guess.
+  HS.finish = function (m, you) { let n = 0; while (!m.over && n++ < 20000) HS.step(m, 1 / 30, you); if (!m.over) { m.over = true; m.result = 'hiders'; m.endT = m.t; } return m.result; };
   HS.timeLeft = (m) => (m.phase === 'prep' ? C().prep - m.t : Math.max(0, C().prep + C().seconds - m.t));
   // Leaving the round early: a Seeker who leaves concedes; a hider who leaves counts as found.
   HS.leave = function (m, id) { if (m.over) return; if (id === m.seeker.id) { m.over = true; m.result = 'hiders'; m.endT = m.t; m.left = id; } else { const h = m.hiders.find((q) => q.id === id); if (h && !h.found) { h.found = true; h.foundAt = m.t; h.left = true; } m.left = id; HS.check2(m); } };
