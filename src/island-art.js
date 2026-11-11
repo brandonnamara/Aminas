@@ -1160,6 +1160,8 @@
         const pk = W.prodKind ? W.prodKind(b) : d.produces;
         if (stock >= Math.max(1, Math.min(cap * 0.1, pk === 'gems' || W.isEss(pk) ? 1 : 5))) g += '<g class="collect-b" data-collect="' + b.id + '" data-hl="collect:' + b.id + '" transform="translate(0 ' + (-hgt - 6) + ')">' + Art.bubble(pk, stock >= cap - 0.5) + circ(0, -20, 26, 'transparent') + '</g>';
       }
+      // Phase 13B: the Hatchery says what it is doing (eggs incubating, every slot in use, or an egg ready to hatch)
+      if (b.type === 'hatchery' && b.level >= 1 && b.state !== 'constructing' && b.state !== 'upgrading' && Art.hatchMarker) g += Art.hatchMarker(st, hgt);
       items.push({ id: 'b' + b.id, k: b.x + b.y + s.w + s.h, svg: g + '</g>' });
       // creatures: the companion in front of the hollow, residents beside their homes
       const res = W.residents(st, b);
@@ -1199,6 +1201,15 @@
     else if (kind === 'food') i = path('M0 -4c-4 -3 -10 0 -10 6 0 5 4 8 10 8s10 -3 10 -8c0 -6 -6 -9 -10 -6z', c, ' stroke="#9a2a20" stroke-width="1.6"') + stroke('M0 -4q0 -4 4 -6', '#3f8a3a', 2);
     else i = path('M-8 -4h16l4 5 -12 10 -12 -10z', c, ' stroke="#2a7aa0" stroke-width="1.6"');
     return '<g class="bubble' + (full ? ' full' : '') + '">' + path('M-18 -20a18 18 0 1 1 36 0 18 18 0 0 1 -12 17l-6 8 -6 -8a18 18 0 0 1 -12 -17z', '#ffffff', ' stroke="#2b2147" stroke-width="2.5"') + '<g transform="translate(0 -20)">' + i + '</g></g>';
+  };
+  Art.hatchMarker = function (st, hgt) {
+    const H = A.Rules.Hatch; if (!H) return '';
+    const x = H.status(st); if (x.state === 'idle' || x.state === 'closed') return '';
+    const egg = (dx) => '<g transform="translate(' + dx + ' 0)">' + path('M0 -8c4 0 6.5 5 6.5 9a6.5 6.5 0 0 1 -13 0c0 -4 2.5 -9 6.5 -9z', '#fff4d6', ' stroke="#8a6a3a" stroke-width="1.5"') + '<rect x="-3" y="-2" width="2.4" height="2.4" fill="#ff9ec4"/><rect x="1" y="1.5" width="2.4" height="2.4" fill="#7fd4ff"/></g>';
+    const ready = x.state === 'ready', label = ready ? (x.ready > 1 ? 'Hatch ×' + x.ready : 'Hatch!') : x.used + ' / ' + x.slots + (x.state === 'full' ? ' full' : ''), w = 30 + label.length * 6.4;
+    // sits above the dome's own egg (the voxel model is taller than the 2D picture)
+    return '<g class="hatch-b ' + x.state + '" data-egg="' + x.state + '" transform="translate(0 ' + (-hgt - 62) + ')"><g class="' + (ready ? 'tag' : '') + '"><rect x="' + f1(-w / 2) + '" y="-13" width="' + f1(w) + '" height="26" rx="13" fill="' + (ready ? '#ffd86b' : '#2b2147') + '" stroke="' + (ready ? '#2b2147' : x.state === 'full' ? '#ffd86b' : '#fff') + '" stroke-width="2"/>' + egg(f1(-w / 2 + 13)) +
+      '<text x="' + f1(9) + '" y="4.5" text-anchor="middle" font-size="12.5" font-weight="900" fill="' + (ready ? '#2b2147' : '#fff') + '">' + label + '</text></g>' + '<rect x="' + f1(-w / 2 - 6) + '" y="-20" width="' + f1(w + 12) + '" height="40" fill="transparent"/></g>';
   };
   Art.timerBar = function (pct, label) {
     return '<g class="timerbar"><rect x="-34" y="-14" width="68" height="20" rx="10" fill="#2b2147" stroke="#fff" stroke-width="1.5"/><rect x="-30" y="-10" width="' + f1(60 * Math.max(0, Math.min(1, pct))) + '" height="12" rx="6" fill="#8cff8a"/><text y="1" text-anchor="middle" font-size="10" font-weight="800" fill="#fff" stroke="#2b2147" stroke-width="2.4" paint-order="stroke">' + label + '</text></g>';

@@ -229,6 +229,7 @@
     const seenSlot = {};
     st.eggs = (Array.isArray(st.eggs) ? st.eggs : []).filter((e) => e && e.readyAt > 0 && D.SPECIES[e.sp] && e.slot >= 0 && e.slot < D.MAX_EGG_SLOTS && !seenSlot[e.slot] && (seenSlot[e.slot] = true));
     delete st.egg;
+    if (A.Rules && A.Rules.Hatch) A.Rules.Hatch.repair(st); // Phase 13B: an egg is never further away than the longest incubation
     // equipment: known items, unique iids, gear points at owned items only, each item worn by one Amina
     const iids = {};
     st.items = (Array.isArray(st.items) ? st.items : []).filter((it) => it && D.ITEMS[it.id] && it.iid > 0 && !iids[it.iid] && (iids[it.iid] = true));

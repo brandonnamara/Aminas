@@ -133,8 +133,8 @@
   };
   // Convert the rules' event queue into UI beats + sounds.
   UI.flush = function () {
-    const evs = R.drain(), s = st(), batchDisc = {};
-    evs.forEach((e) => { if (e.name === 'discover') batchDisc[e.data.sp] = true; });
+    const evs = R.drain(), s = st(), batchDisc = {}, batchHatch = {};
+    evs.forEach((e) => { if (e.name === 'discover') batchDisc[e.data.sp] = true; if (e.name === 'hatched') batchHatch[e.data.sp] = true; });
     let lastToast = null;
     evs.forEach((ev) => {
       const d = ev.data;
@@ -146,8 +146,9 @@
         case 'rankUp': UI.banner('RANK ' + d.rank, 'Player Rank increased'); Au.play('level'); break;
         case 'achievement': if (UI.achToast) UI.achToast(d.id); break;
         case 'moveUp': break;
-        case 'discover': if (s.starter && d.sp !== s.starter) { Au.play('discover'); UI.queue.push({ type: 'reveal', sp: d.sp }); } break;
-        case 'hatched': Au.play('hatch'); if (!batchDisc[d.sp]) UI.queue.push({ type: 'reveal', sp: d.sp }); break;
+        case 'discover': if (s.starter && d.sp !== s.starter && !(UI.hatchFx && batchHatch[d.sp])) { Au.play('discover'); UI.queue.push({ type: 'reveal', sp: d.sp }); } break;
+        // Phase 13B: a hatched egg opens in its own short ceremony, which also says whether the Amina is new
+        case 'hatched': if (UI.hatchFx) { const isNew = !!batchDisc[d.sp]; UI.queue.push({ type: 'fn', fn: (done) => UI.hatchFx(d, done, { isNew }) }); } else { Au.play('hatch'); if (!batchDisc[d.sp]) UI.queue.push({ type: 'reveal', sp: d.sp }); } break;
         case 'evolve': UI.queue.push({ type: 'fn', fn: (done) => UI.evolveFx(d.from, d.to, done, d.uid) }); break;
         case 'eggStart': Au.play('ok'); break;
       }

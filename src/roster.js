@@ -128,7 +128,7 @@
     const base = LINE_NAME[L.id] || L.names[0];
     L.ids.forEach((id, i) => { D.V07_NAMES[id] = L.names[i]; });
     L.names = L.ids.map((id, i) => base + D.STAGE_SUFFIX[i]);
-    D.LINES[L.id] = { id: L.id, el: L.el, ids: L.ids.slice(), legendary: !!L.legendary, name: base };
+    D.LINES[L.id] = { id: L.id, el: L.el, ids: L.ids.slice(), legendary: !!L.legendary, name: base, role: L.role };
     L.ids.forEach((id, i) => {
       const stg = i + 1, b = ROLE[L.role], m = STAGE_MULT[i] * (L.legendary ? 1.08 : 1), mv = MOVES[L.el];
       const next = L.ids[i + 1];

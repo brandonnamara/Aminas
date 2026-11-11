@@ -146,6 +146,7 @@
     if (nReady > (UI.eggNotified | 0)) { UI.renderHud(); UI.toast(nReady > 1 ? nReady + ' eggs in the Hatchery are making noises. I’d look into it. Quietly.' : 'Something in the Hatchery is making noises. I’d look into it. Quietly.', 'a'); Au.play('ok'); }
     UI.eggNotified = nReady;
     if (UI.hatchTick) UI.hatchTick();
+    if (UI.P13B) UI.P13B.tick();
     // live timers in an open building / obstacle panel
     const ov = $('#modal-root .overlay:last-child');
     if (ov && ov._live) ov._live();
@@ -175,7 +176,7 @@
     } else if (s.flags.arcDone) h += '<button class="pill mission-pill" data-act="missions"><b>Chapter One complete</b><span class="mt">Sanctuary tasks remain</span></button>';
     if (a && UI.selectorHtml) h += UI.selectorHtml(s);
     const eggReady = R.eggsReady(s) > 0;
-    h += '<div class="nav">' + navBtn('build', 'hammer', 'Build') + navBtn('collection', 'paw', 'Creatures') + navBtn('missions', 'scroll', 'Tasks', { badge: ready || '', hl: 'quests' }) + battleBtn(s) + navBtn('explore', 'compass', 'Explore') + navBtn('hatchery', 'egg', 'Hatchery', { cls: s.struct.hatchery ? '' : 'locked', badge: eggReady ? '!' : '' }) + '</div>';
+    h += '<div class="nav">' + navBtn('build', 'hammer', 'Build') + navBtn('collection', 'paw', 'Creatures') + navBtn('missions', 'scroll', 'Tasks', { badge: ready || '', hl: 'quests' }) + battleBtn(s) + navBtn('explore', 'compass', 'Explore') + navBtn('hatchery', 'egg', 'Hatchery', { cls: s.struct.hatchery ? '' : 'locked', badge: eggReady ? (R.eggsReady(s) > 1 ? R.eggsReady(s) : '!') : '' }) + '</div>';
     return h + zoomBtns();
   };
   const zoomBtns = () => '<div class="zoom"><button class="round sm" data-act="zoom" data-d="1" aria-label="Zoom in">' + I('plus') + '</button><button class="round sm" data-act="zoom" data-d="-1" aria-label="Zoom out">' + I('minus') + '</button></div>';
@@ -265,6 +266,7 @@
       return;
     }
     if (col) { UI.collectAt(col.dataset.collect, px, py); return; }
+    if (el && el.closest('[data-egg]')) { UI.hatchery(); return; } // Phase 13B: the marker over the Hatchery opens it
     // creatures react to a tap first; residents then open their home, the companion and roamers their details
     const cr = el && el.closest('[data-cr]');
     if (cr && A.Life) {
