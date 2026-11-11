@@ -115,8 +115,8 @@ Hiders earn points for staying near the Seeker without being found.
   * either player off the playable island (ledges, floating chunks, outside the map);
   * a hider on land the Seeker can never reach.
 * **Terrain between them.** If the straight line between hider and Seeker crosses ground nobody can walk on (a gap,
-  a ledge, a cliff step), the distance used is the way round on foot. A hider under 4 m away across a gap but 44 m away on
-  foot scores nothing.
+  a ledge, a cliff step), the distance used is the way round on foot. A hider under 4 m away across a gap but 44 m
+  away on foot scores nothing.
 * **On screen.** A chip by the Leave button shows the points and the current bonus, coloured by tier: "43 · +5/s ·
   Very close". During hiding it says "starts with the search"; after being found, "found".
 * **In the results.** A Points column for every hider, with the round's top score starred, and a line for the
@@ -141,10 +141,44 @@ production `main`.
 | `tests/hideseek12c.test.js`, `tests/browser-hideseek12c.test.js` (new), `tests/run-all.js` | Tests. |
 
 ## Tests
-{{TESTS}}
+All testing is desktop Chromium with software WebGL, emulating an 844×390 touch screen. None of it is an iPhone.
+
+**New suites**
+* `tests/hideseek12c.test.js` (30 checks, rules): **30 of 30**. Points by distance, tiers and calibration, frame-rate
+  independence, repeated calls, long gaps, when points start and stop, invalid positions on a test island with a gap,
+  a bridge and an islet, the real Starter Island, results, and who may be spectated.
+* `tests/browser-hideseek12c.test.js` (58 checks, on screen with injected multi-touch): **58 of 58**.
+
+| What you asked to be tested | Result |
+|---|---|
+| Independent camera movement | Pass. Stick and camera drag together, each on its own finger; three fingers with Attack. |
+| Joystick controls | Pass. Dead zone, part and full speed, true diagonals, base following the thumb, release, letting go on loss of focus, movement following the screen after the camera is turned. |
+| Stationary camera rotation | Pass. Turn and tilt with limits, turning back, smoothing, Reduce Motion without easing. |
+| Disguise orientation | Pass. The drawn disguise is identical (position and orientation) before and after turning the camera, and still matches its genuine twin. The Seeker's facing is unchanged by a drag. |
+| Controls not interfering | Pass. Disguise press does not turn the camera; a drag across or ending on a button does not press it; swiping the disguise strip neither turns the camera nor picks a disguise. |
+| Spectator switching | Pass. Blocked before disguising and while moving; start, cycle both ways, return; never the Seeker; nothing added to the watched hider; the stick does not move the disguise; automatic return when the watched hider is found, when the player is found and at round end. |
+| Proximity scoring | Pass. The player scores from their own disguise while watching a hider elsewhere; the watched hider's own score is separate; the chip shows the player's own points. |
+| Frame-rate independence | Pass in the rules (60, 30, 20, 7 and 4 fps and uneven frames give the same total) and live (points equal clock ticks × rate; a 2.5-second pause adds nothing). |
+| Round results | Pass. Points for every hider, the player's line and best, saved; coins, food and gems unchanged. |
+
+**Regression: voting, transformation, attacks, computer players.** The two Hide and Seek suites from the last phase
+pass unchanged in what they check: `tests/hideseek.test.js` **60 of 60** and `tests/browser-hideseek.test.js` **41
+of 41** (one check was updated to read the new joystick's values). They cover the vote matching the original code on
+300 lobbies, disguises, the 10-second cooldown, attacks, the 3-second penalty, line of sight and 12 all-computer
+rounds. An all-computer round is also identical with scoring switched off.
+
+**Full suite** (28 suites, one at a time, about half an hour): **920 of 922 passed.**
+
+| Suite | In the full run | Alone afterwards |
+|---|---|---|
+| `browser-env1` | 1 failed: "tapping the voxel Hatchery opens its panel" | 20 of 20, twice. Phase 12C does not touch the island screen; this looks like timing under load. |
+| `browser-arena7` | 1 failed: "leaving battles frees their arenas" | 30 of 30. The known timing-sensitive check from Phase 7. |
+
+`browser-perf-fix`, intermittent in the last phase, passed 23 of 23 in this run. It is still a timing race and can
+fail again.
 
 ## Recordings
-`docs/ui/screens12c/`: two clips, with the injected touches drawn as white circles.
+`docs/ui/screens12c/`: two clips, with the injected touches drawn as white circles, and nine stills taken from them.
 * `controls-hider.mp4`: walking with the stick while a second finger turns the camera, disguising, looking all round
   the disguise, spectating two other hiders and returning, the points chip counting as the Seeker passes, results
   with points.
@@ -152,7 +186,8 @@ production `main`.
   scenery.
 
 They were captured at quarter speed under software graphics and sped back up, so they show behaviour, not iPhone
-frame rate or touch feel.
+frame rate or touch feel. To keep the clips short, hiding time is cut short in both, and in the hider clip the
+computer Seeker is told not to pick on the player so the spectating can be shown.
 
 ## Limitations
 * **No iPhone testing by me.** See the note at the top.
@@ -162,4 +197,7 @@ frame rate or touch feel.
 * **Walking distance is measured cell to cell**, so "the way round" is accurate to about a metre.
 * **Spectating is allowed during hiding time** once disguised, not only during the search.
 * **No gamepad support** (there was none before).
-* **`browser-perf-fix`** (a Phase 7 timing test) is still intermittent, as reported for the last phase.
+* **Glowing ruin details are visible from new angles.** The Tide Gate's blue crystal and puddle, hidden from the
+  island's usual angle, can be seen from behind. They are part of the island's model.
+* **Three older timing checks are intermittent under load** (`browser-perf-fix`, `browser-arena7`, and this run
+  `browser-env1`). None is in code this phase changed.
