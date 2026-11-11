@@ -100,10 +100,11 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   await page.evaluate(() => { A.UI.queue.length = 0; A.UI.busy = false; A.UI.closeAll(); A.UI.hideSeek(); }); await page.waitForSelector('.hs-lobby');
   await click('[data-act=hsPref][data-p=seeker]'); await click('[data-act=hsVote][data-id=you]'); await shot('29-hs-lobby'); await click('[data-act=hsStart]');
   const seekerTxt = await page.textContent('.overlay .vcard'); ok(/Seeker/.test(seekerTxt), 'the vote assigns a Seeker and says how'); await shot('30-hs-vote');
-  await click('[data-act=hsGo]'); await sleep(300);
-  if (await page.$('.hs-morphs')) { await page.click('.hs-c.free'); await sleep(150); await page.click('#hs-hide'); await sleep(300); ok(!!(await page.$('.hs-prop.me')), 'as a hider you appear as your chosen disguise'); }
-  else { await page.click('.hs-c'); await sleep(200); ok((await page.$$('.hs-c.sr')).length === 1, 'as the Seeker you can search the map'); }
-  await shot('31-hs-match'); await click('#hs-quit'); await page.waitForSelector('#hs-out'); await shot('32-hs-result'); await click('#hs-out'); await page.evaluate(() => A.UI.closeAll());
+  // hs-redesign: the round is now the 3D Starter Island round (tested in browser-hideseek.test.js); here: it opens,
+  // shows the right action for the role, and Leave ends it with the results as before
+  await click('[data-act=hsGo]'); await page.waitForSelector('.hsround .hs-act', { timeout: 90000 }); await sleep(400);
+  ok(await page.evaluate(() => !!A.UI.HSR && A.UI.HSR.m.seeker.id === A.UI.HS.assign.seeker && !!document.querySelector(A.UI.HS.assign.seeker === 'you' ? '.hs-act.attack' : '.hs-act.disguise')), 'the round opens on the Starter Island: the Seeker can attack, a hider can disguise');
+  await shot('31-hs-match'); await click('[data-hs=leave]'); await page.waitForSelector('#cf-yes'); await click('#cf-yes'); await page.waitForSelector('#hs-out'); await shot('32-hs-result'); await click('#hs-out'); await page.evaluate(() => A.UI.closeAll());
   // Island Boss
   await page.evaluate(() => { const s = A.State.state; A.Data.CAMPAIGN.starter.dungeons.slice(0, 9).forEach((id) => (s.dungeon[id] = { clears: 1 })); s.rank = 12; ['lumifern', 'acinus', 'pyrokai'].forEach((sp) => { const a = s.aminas.find((x) => x.sp === sp); if (a) a.lv = 22; }); s.party = s.aminas.slice(0, 3).map((a) => a.uid); A.State.save(); A.UI.closeAll(); A.UI.dungeons(null, 'heartwood'); });
   await page.waitForSelector('.dd'); await shot('33-dungeon10'); await click('[data-act=enterDungeon][data-id=heartwood]'); await click('#pp-go');
