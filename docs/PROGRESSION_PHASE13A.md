@@ -139,7 +139,25 @@ No save change: nothing is added to the save, and older saves read and feed norm
 evolution ceremony, not enough food). `before/` and `after/` hold the full sets.
 
 ## Tests
-{{TESTS}}
+All in desktop Chromium with software WebGL, emulating an 844×390 touch screen. Not an iPhone.
+
+**New suites**
+* `tests/progression13a.test.js` (40 checks, rules): **40 of 40**.
+* `tests/browser-progress13a.test.js` (38 checks, on screen): **38 of 38**.
+
+| What you asked to be verified | Result |
+|---|---|
+| Feeding and resource deductions | Pass. Exact food taken per feed; nothing spent when food is short or at Lv 30; 1 → 12 by feasts costs what the XP table says. |
+| Experience and level calculations | Pass. XP table and cap unchanged; carry-over across a level-up; what a feed button promises equals what the feed does on 400 random Aminas. |
+| Stat progression | Pass. Growth per level unchanged; the gain shown for the next level is the real gain; equipment's share is shown and is what the Amina fights with. |
+| Evolution requirements and results | Pass. Refused below the level, without the cost, and during a run; all 42 evolutions give the form, stats and moves their preview shows; level, XP, gear and move levels kept; a repeated or double-tapped Evolve charges and rewards once. |
+| Attack-move upgrade data | Pass. Five levels, costs 10, 25, 50, 90; four upgrades cost exactly the 175 shown; stale taps and missing essence refused; battles read the same levels. |
+| Details screen persistence | Pass. After feeding: same overlay, same Amina, same tab, same scroll position, same 3D viewer element. |
+| Save/load compatibility | Pass. Nothing added to the save; a saved and reloaded game reads the same; an Amina from an older save (no move levels or gear) reads and feeds normally. |
+| Existing battle and monster functionality | Pass. Battle fighters built as before; the roster, showcase and Phase 8 details suites pass unchanged. |
+
+**Full suite** (30 suites, one at a time): **999 of 1,000 passed.** The one failure is the Phase 7 arena check
+"leaving battles frees their arenas", the known timing-sensitive one. Run alone afterwards it passed 30 of 30.
 
 ## Limitations
 * **Not tested on an iPhone.**
