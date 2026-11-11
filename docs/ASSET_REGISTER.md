@@ -81,3 +81,11 @@ rigging (`src/voxel-rig.js`), the animation clips (`src/3d/showcase.js`, `src/3d
 (`src/3d/combatfx.js`) are written in code. Every monster sound is synthesized while the game runs, with the Web Audio
 API (`src/audio.js`): oscillators, filtered noise and envelopes. There are no recordings, samples or sound libraries,
 so nothing needs a licence or attribution.
+
+## Hide and Seek round (hs-redesign)
+
+**No third-party assets.** The round draws the Starter Island with the island's existing voxel models. The two
+Seeker characters (male and female) are temporary voxel models built in code (`src/3d/hideseek3d.js`,
+`buildSeeker`), standing in until the Tripo models are exported. The round's sounds are synthesized in
+`src/audio.js`. When the Tripo models are added (`assets/seekers/*.glb`, set in `D.HIDESEEK.seekerGlb`), record
+their source and licence here.
