@@ -9,7 +9,7 @@ has not been touched.
 | `672beb5` | 13A finalisation |
 | `bb96448` | 13B Hatchery and breeding |
 | `fb8b988` | 13C Forge and equipment |
-| next commit | 13D economy audit, model, wins-left line, this report |
+| `093ff3a` | 13D economy audit, model, wins-left line, recordings, this report |
 
 **No balance or economy value was changed in any phase.** Costs, XP, feed values, evolution requirements, breeding
 cost, incubation times, Hatchery and Forge levels, recipes, shop prices, merge costs, item bonuses, reward tables
@@ -249,9 +249,14 @@ Saves: nothing is added to the save format. The only load-time change is the egg
 | `gear13c` / `browser-gear13c` | 46 of 46 / 39 of 39 |
 | `economy13d` / `browser-rewards13d` | 14 of 14 / 5 of 5 |
 
-**Complete suite:** see "Complete suite" below (filled in from the final run).
+**Complete suite on the final build** (36 suites, run one at a time with nothing else running): **1,183 of 1,183
+passed, no failures.** This includes the Phase 7 arena check that failed in the Phase 13A run; it is
+timing-sensitive and passed this time.
 
-COMPLETE_SUITE_PLACEHOLDER
+The complete suite was run once, on the final build that contains every phase. After each phase I ran that
+phase's suites and the suites touching the same code, not the whole suite. A complete run started after 13C was
+stopped because I was recording clips at the same time, which made a timing-sensitive performance suite
+(`browser-perf-fix`) fail 4 of 23; the same suite passed 23 of 23 in the clean final run.
 
 ## 8. Screenshots and recordings
 
