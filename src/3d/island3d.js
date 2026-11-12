@@ -15,6 +15,7 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.170.0/+esm';
 import { VoxGrid, meshGrid, hash, pick } from './voxmesh.js';
 import { PAL, TV, DV, UNIT_PX, HEIGHT_PX, MAGIC, LIGHT } from './voxstyle.js';
 import * as VB from './voxbuild.js';
+import * as MS from './modelslots.js'; // Phase 14: imported building models (empty slots load nothing)
 import './library/vegetation.js'; import './library/terrain.js'; import './library/decor.js'; // Phase 2: library kinds used by the island
 
 const A = window.A;
@@ -264,6 +265,7 @@ export function createIsland() {
     Object.assign(sun.shadow.camera, { left: -span, right: span, top: span, bottom: -span, near: 1, far: 70 }); sun.shadow.camera.updateProjectionMatrix();
     state.iid = iid; state.key = key; state.sig = ''; state.shadowDirty = true; state.dirty = true; state.moved = true;
   }
+  let lastSync = null, glbGroups = [];
   function addModel(group, md) {
     if (md.geo) { const m = new THREE.Mesh(md.geo, matSolid); m.castShadow = true; m.receiveShadow = true; group.add(m); }
     if (md.glow) group.add(new THREE.Mesh(md.glow, matGlow));
@@ -273,9 +275,9 @@ export function createIsland() {
   /* ---- buildings, obstacles and scenery: rebuilt as instanced batches whenever the layout changes */
   function sync(items, scenery) { const c0 = performance.now(); try { return sync0(items, scenery); } finally { cost.syncMs = +(performance.now() - c0).toFixed(1); } }
   function sync0(items, scenery) {
-    const sig = JSON.stringify(items) + '|' + state.key;
+    const sig = JSON.stringify(items) + '|' + state.key + '|' + MS.signature();
     if (sig === state.sig) return;
-    state.sig = sig;
+    state.sig = sig; lastSync = [items, scenery]; glbGroups = [];
     groups.things.children.slice().forEach((c) => { groups.things.remove(c); if (c.isInstancedMesh) c.dispose(); });
     if (detail) detail = null;
     const batches = new Map(); // geometry -> { mat, list: [matrix] , sway }
@@ -284,7 +286,13 @@ export function createIsland() {
     items.forEach((it) => {
       for (let y = it.y; y < it.y + it.h; y++) for (let x = it.x; x < it.x + it.w; x++) occupied.add(x + ',' + y);
       const cx = it.x + it.w / 2, cz = it.y + it.h / 2;
-      if (it.k === 'b') { const md = VB.buildingModel({ type: it.type, level: it.level, state: it.state, rot: it.rot }, { w0: it.w0, h0: it.h0 }, { art: it.art, cat: it.cat }); if (md) { push(md.geo, matSolid, cx, 0, cz, 0, false, 1, md.lod && md.lod.geo); push(md.glow, matGlow, cx, 0, cz, 0, false, 1, md.lod && md.lod.glow); } }
+      // Phase 14: a building whose type has an imported model is drawn from it once it has loaded (the voxel model
+      // stands in until then, and stays if loading fails). Ruins and building sites keep their voxel models.
+      const slot = it.k === 'b' && it.state !== 'ruined' && it.state !== 'constructing' ? MS.slotFor(it.type) : null;
+      const inst = slot ? MS.instance(it.type, it.w0, it.h0, it.rot) : null;
+      if (slot && !inst) MS.request(it.type, (ok) => { if (!ok || !lastSync) return; state.sig = ''; sync(lastSync[0], lastSync[1]); state.shadowDirty = true; state.dirty = true; kick(); });
+      if (inst) { inst.position.set(cx, 0, cz); inst.userData.foot = { fx: cx, fz: cz, fw: it.w, fd: it.h }; groups.things.add(inst); glbGroups.push(inst); }
+      else if (it.k === 'b') { const md = VB.buildingModel({ type: it.type, level: it.level, state: it.state, rot: it.rot }, { w0: it.w0, h0: it.h0 }, { art: it.art, cat: it.cat }); if (md) { push(md.geo, matSolid, cx, 0, cz, 0, false, 1, md.lod && md.lod.geo); push(md.glow, matGlow, cx, 0, cz, 0, false, 1, md.lod && md.lod.glow); } }
       else if (it.k === 'l' && it.kind && VB.hasExtra(it.kind)) { const md = VB.extraModel(it.kind, it.on); if (md) { push(md.geo, matSolid, cx, 0, cz, 0, false, 1, md.lod && md.lod.geo); push(md.glow, matGlow, cx, 0, cz, 0, false, 1, md.lod && md.lod.glow); } }
       else if (it.k === 'o') { const md = VB.natureModel(it.type, it.seed, it.w, it.h); if (md) { const ry = (it.seed % 4) * Math.PI / 2, sway = it.type === 'oak' || it.type === 'pine' || it.type === 'bush'; push(md.geo, sway ? matSway : matSolid, cx, 0, cz, ry, sway, 1, md.lod && md.lod.geo, true); push(md.glow, matGlow, cx, 0, cz, ry, false, 1, md.lod && md.lod.glow, true); } }
     });
@@ -486,6 +494,7 @@ export function createIsland() {
   }
   function tickAmbient(t, dt) {
     uni.uTime.value = t;
+    if (glbGroups.length) MS.tick(glbGroups, dt);
     clouds.forEach((c) => { const d = c.userData.drift; if (d) c.position.x = d.x0 + Math.sin(t * d.sp * 0.3 + d.ph) * 1.2; const b = c.userData.bob; if (b) c.position.y = b.y0 + Math.sin(t * 1.2 + b.ph) * 0.06; });
     if (sparks) { const u = sparks.userData, p = sparks.geometry.attributes.position.array; for (let i = 0; i < u.N; i++) { const cx = u.seed[i * 4], cz = u.seed[i * 4 + 1], r = u.seed[i * 4 + 2] * 0.55, ph = u.seed[i * 4 + 3]; let y = p[i * 3 + 1] + dt * 0.35; if (y > 3.4) y = 0.3; const a = ph + t * 0.6 + y * 1.4, rr = r * (0.6 + 0.4 * Math.sin(ph * 3)); p[i * 3] = cx + Math.cos(a) * rr; p[i * 3 + 1] = y; p[i * 3 + 2] = cz + Math.sin(a) * rr; } sparks.geometry.attributes.position.needsUpdate = true; }
     if (motes) { const u = motes.userData, p = u.mp; for (let i = 0; i < u.N; i++) { p[i * 3 + 1] += dt * 0.25; p[i * 3] += Math.sin(t * 0.7 + u.seed[i]) * dt * 0.08; if (p[i * 3 + 1] > 3.2) p[i * 3 + 1] = 0.1; } motes.geometry.attributes.position.needsUpdate = true; }
@@ -525,11 +534,14 @@ export function createIsland() {
     canvas: R.domElement, occCanvas,
     setTerrain, sync, setView, kick, setOverlay, occludedAt,
     redraw() { state.dirty = true; kick(); },
+    // Phase 14: where each imported building model stands, against its building's footprint (tests and the report)
+    spinModels(dt) { MS.tick(glbGroups, dt); },
+    models() { return glbGroups.map((g) => { g.updateMatrixWorld(true); const b = new THREE.Box3().setFromObject(g), f = g.userData.foot, e = g.userData.spin[0]; return { type: g.userData.glb, minY: +b.min.y.toFixed(3), height: +(b.max.y - b.min.y).toFixed(3), w: +(b.max.x - b.min.x).toFixed(3), d: +(b.max.z - b.min.z).toFixed(3), cx: +((b.min.x + b.max.x) / 2).toFixed(3), cz: +((b.min.z + b.max.z) / 2).toFixed(3), fx: f.fx, fz: f.fz, fw: f.fw, fd: f.fd, spin: e ? e.rotation.x + e.rotation.y + e.rotation.z : 0 }; }); },
     has: (k, art, cat, st) => (k === 'b' ? VB.hasBuilding(art, cat) && st !== 'constructing' : k === 'l' ? VB.hasExtra(art) : VB.hasNature(art)),
     // triangles by layer: what the island is made of (for the performance report)
     breakdown() { const t = (o) => (o.geometry && o.geometry.index ? o.geometry.index.count / 3 : 0) * (o.isInstancedMesh ? o.count : 1); const out = { terrain: 0, buildings: 0, nature: 0, detail: 0, far: 0, fx: 0 };
       groups.terrain.traverse((o) => { if (o.isMesh) out.terrain += t(o); }); farGroup.traverse((o) => { if (o.isMesh) out.far += t(o); });
-      groups.things.children.forEach((o) => { if (!o.isMesh || !o.visible) return; if (o === detail) out.detail += t(o); else if (o.material === matSway || o.userData.nature) out.nature += t(o); else out.buildings += t(o); }); Object.keys(out).forEach((k) => (out[k] = Math.round(out[k]))); return out; },
+      groups.things.children.forEach((o) => { if (o.userData.glb) { o.traverse((m) => { if (m.isMesh) out.buildings += t(m); }); return; } if (!o.isMesh || !o.visible) return; if (o === detail) out.detail += t(o); else if (o.material === matSway || o.userData.nature) out.nature += t(o); else out.buildings += t(o); }); Object.keys(out).forEach((k) => (out[k] = Math.round(out[k]))); return out; },
     stats() { const i = R.info; return { frames, avgDrawMs: frames ? +(drawMs / frames).toFixed(2) : 0, calls: i.render.calls, triangles: i.render.triangles, geometries: i.memory.geometries, textures: i.memory.textures, shadow: sun.castShadow, shadowMap: sun.shadow.mapSize.x, shadowType: R.shadowMap.type === THREE.VSMShadowMap ? 'vsm' : 'pcf', detail: detail ? detail.count : 0, grade: { toneMapping: R.toneMapping === THREE.NeutralToneMapping ? 'neutral' : 'none', exposure: R.toneMappingExposure }, tinted: groups.things.children.filter((o) => o.isInstancedMesh && o.instanceColor).length, tier: tier().id, canvas: [R.domElement.width, R.domElement.height], pixelRatio: R.getPixelRatio(), slow, lod: lodOn === 0 ? 'off' : lodOn === 1 ? 'nature' : 'all', terrainMs: cost.terrainMs, syncMs: cost.syncMs, occ: { shown: occ.shown, proxies: occ.data ? occ.data.up.length + occ.data.flat.length : 0, ms: +occ.cost.toFixed(1) } }; },
     dispose() { if (raf) cancelAnimationFrame(raf); raf = 0; clearGroup(groups.terrain); groups.things.children.slice().forEach((c) => { groups.things.remove(c); if (c.isInstancedMesh) c.dispose(); }); state = { things: new Map(), sig: '' }; },
   };

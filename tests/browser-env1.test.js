@@ -36,7 +36,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   await page.screenshot({ path: path.join(SHOTS, 'env1-island.png') });
 
   /* ---------- taps still work ---------- */
-  await ev(() => A.UI.focusBuilding('hatchery', 1.2)); await sleep(900); await calm();
+  await ev(() => A.UI.focusBuilding('hatchery', 1.2)); await sleep(3500); await calm();
   const pt = await ev(() => { const g = document.querySelector('[data-bid="hatchery"]'), r = g.getBoundingClientRect(); for (let dy = 0.55; dy < 0.95; dy += 0.05) { const x = r.left + r.width / 2, y = r.top + r.height * dy, e = document.elementFromPoint(x, y); if (e && e.closest('[data-bid="hatchery"]')) return [x, y]; } return null; });
   ok(!!pt, 'a point on the Hatchery reaches its 2D hit area');
   if (pt) { await page.mouse.click(pt[0], pt[1]); await sleep(700); }

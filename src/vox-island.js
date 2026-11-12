@@ -171,4 +171,6 @@
   V.redraw = () => { if (ctrl && V.on) ctrl.redraw(); };
   V.stats = () => (ctrl ? ctrl.stats() : null);
   V.breakdown = () => (ctrl && ctrl.breakdown ? ctrl.breakdown() : null);
+  V.models = () => (ctrl && ctrl.models ? ctrl.models() : []);
+  V.spinModels = (dt) => ctrl && ctrl.spinModels && ctrl.spinModels(dt);
 })(typeof window !== 'undefined' ? window : globalThis);
