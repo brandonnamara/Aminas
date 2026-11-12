@@ -1,0 +1,68 @@
+/* Aminas — Phase 13C: Forge and equipment refinements. Uses the prismatic tokens (ui-prism.css) and the stat grid
+   from Phase 13A (ui-p13.css). One-off effects only; all off under body.calm / body.perf-saver / reduced motion. */
+
+/* result line (Forge, Gear tab) */
+.fbar { display: flex; align-items: center; gap: .6rem; min-height: 1.7rem; margin: 0 0 .3rem; }
+.fbar .fres { margin: 0 0 0 auto; flex: none; }
+.gx-note { display: flex; align-items: center; gap: .4rem; flex: 1; min-width: 0; font-size: .78rem; line-height: 1.3; }
+.gx-note:empty { visibility: hidden; }
+.gx-note .ico { width: .95rem; height: .95rem; flex: none; }
+.gx-note.good { color: #c9f7d2; } .gx-note.good .ico { color: #8ff0b0; } .gx-note.bad { color: #ffb8b8; }
+.gx-note .btn { flex: none; margin-left: .2rem; }
+.gx-note.said { animation: gxSaid .3s ease-out 1; } @keyframes gxSaid { from { opacity: 0; transform: translateY(-3px); } to { opacity: 1; transform: none; } }
+.gear + .gx-note { margin: .35rem 0 .1rem; }
+
+/* stat rows: before -> after */
+.gx-stats .pg-es.up b { color: #b9ffc8; } .gx-stats .pg-es.down b { color: #ffb0b0; } .gx-stats .pg-es.down em { color: #ff9b8c; } .gx-stats .pg-es.same em { color: var(--pz-muted, #cfc6ee); opacity: .8; }
+.gx-confirm .pg-cap, .fconfirm .pg-cap { margin: .45rem 0 .2rem; font-size: .7rem; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; color: #cfc4ff; }
+.gx-swap { display: grid; grid-template-columns: 1fr auto 1fr; gap: .4rem; align-items: stretch; }
+.gx-item { display: flex; align-items: center; gap: .45rem; padding: .35rem .45rem; border-radius: .6rem; background: rgba(0, 0, 0, .25); border: 1.5px solid rgba(190, 170, 255, .25); min-width: 0; }
+.gx-item > div { min-width: 0; } .gx-item small { display: block; font-size: .62rem; color: var(--muted); } .gx-item b { font-size: .82rem; } .gx-item .tier { margin-left: .1rem; } .gx-item .gicon { flex: none; image-rendering: pixelated; }
+.gx-item.empty { border-style: dashed; } .gx-q { width: 34px; height: 34px; display: grid; place-items: center; opacity: .6; flex: none; } .gx-q .ico { width: 1rem; height: 1rem; }
+.gx-item.r-uncommon { border-color: rgba(143, 227, 154, .55); } .gx-item.r-rare { border-color: rgba(127, 198, 255, .6); } .gx-item.r-epic { border-color: rgba(207, 155, 255, .65); } .gx-item.r-mythic { border-color: rgba(255, 217, 120, .75); }
+.gx-swap .mop { align-self: center; color: var(--gold); } .gx-swap .mop .ico { width: 1rem; height: 1rem; }
+.gx-fine { margin: .4rem 0 0; }
+
+/* what an item would change, in lists */
+.gx-ds { display: flex; gap: .25rem; flex-wrap: wrap; justify-content: flex-end; }
+.fi-b .gx-ds { justify-content: flex-start; margin-top: .15rem; }
+.gx-d { font-size: .68rem; font-weight: 800; padding: .02rem .35rem; border-radius: .4rem; background: rgba(255, 255, 255, .08); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.gx-d.up { color: #b9ffc8; background: rgba(120, 230, 160, .14); } .gx-d.down { color: #ffb0b0; background: rgba(255, 120, 120, .14); } .gx-d.same { color: var(--muted); font-weight: 600; }
+
+/* Gear tab (details) */
+.gx-slot .gx-btns { display: flex; gap: .3rem; flex: none; } .gx-slot .gitem .tier { margin-left: .2rem; }
+.gx-forge { margin-left: .3rem; vertical-align: middle; }
+
+/* Forge: cost table */
+.fcost { width: 100%; border-collapse: collapse; margin: .45rem 0 .2rem; font-size: .8rem; font-variant-numeric: tabular-nums; }
+.fcost th { text-align: right; font-size: .62rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 0 .4rem .15rem; }
+.fcost td { text-align: right; padding: .22rem .4rem; background: rgba(0, 0, 0, .22); } .fcost td:first-child { text-align: left; text-transform: capitalize; } .fcost td .ico { width: .95rem; height: .95rem; vertical-align: -.15rem; }
+.fcost tr.short td { background: rgba(255, 90, 90, .12); }
+.fex { margin: .25rem 0 0; }
+.fown { margin-top: .05rem; }
+.fitem.cannot .gicon { opacity: .8; }
+
+/* Forge: Equipment tab */
+.fpips { display: inline-flex; gap: 2px; } .fpips i { width: .4rem; height: .4rem; border-radius: 1px; background: rgba(255, 255, 255, .16); } .fpips i.on { background: var(--gold, #ffd86b); }
+.fslot { position: relative; } .fslot.on { outline: 2px solid var(--gold, #ffd86b); outline-offset: -2px; }
+.fslot.r-uncommon { box-shadow: inset 0 3px 0 #3f9a3f; } .fslot.r-rare { box-shadow: inset 0 3px 0 #2f6fc4; } .fslot.r-epic { box-shadow: inset 0 3px 0 #8a4ad8; } .fslot.r-mythic { box-shadow: inset 0 3px 0 #ffd86b; }
+.fslot .fi-fx { font-size: .66rem; } .fslot-b { display: flex; gap: .25rem; flex-wrap: wrap; justify-content: center; margin-top: auto; }
+.ffilt { display: flex; gap: .3rem; flex-wrap: wrap; margin: .2rem 0 .3rem; } .ffilt .fchip { min-height: 2rem; padding: .1rem .7rem; font-size: .76rem; font-weight: 800; cursor: pointer; color: inherit; }
+.ffilt .fchip.on { color: #0f1d48; background: linear-gradient(180deg, #f2fdff, #a9eeff 55%, #7ec9ff); } .ffilt .fchip.on .muted { color: #2a3a6a; }
+.fhint { margin: 0 0 .25rem; }
+.fstats .stat em { font-style: normal; font-size: .62rem; }
+
+/* Forge: merge */
+.fready { gap: .35rem; } .fready .mop { color: var(--gold); font-weight: 900; font-size: .8rem; } .fready .mop .ico { width: .9rem; height: .9rem; }
+.mact { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; justify-content: center; } .mact p { margin: 0; flex-basis: 100%; text-align: center; }
+.mres small b { font-weight: 900; }
+
+@media (max-height: 430px) {
+  .fsel { grid-template-columns: 4.6rem 1fr; } .fsel-art .art { width: 4.6rem; height: 4.6rem; }
+  .gx-confirm .sh-body, .fconfirm .sh-body { padding-top: .3rem; }
+}
+/* a newly made item's row lights once */
+.fitem.fresh { animation: gxFresh .7s ease-out 1; } @keyframes gxFresh { from { box-shadow: 0 0 0 2px rgba(255, 216, 107, .9), 0 0 14px rgba(140, 240, 255, .6); } to { box-shadow: 0 0 0 0 rgba(255, 216, 107, 0); } }
+body.calm .fitem.fresh, body.perf-saver .fitem.fresh { animation: none; }
+body.calm .gx-note.said, body.perf-saver .gx-note.said { animation: none; }
+@media (prefers-reduced-motion: reduce) { .gx-note.said, .fitem.fresh { animation: none; } }

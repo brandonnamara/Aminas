@@ -61,7 +61,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   await page.click('.ftab[data-tab=equip]'); await page.waitForSelector('.fmons');
   await page.click('.fmon[data-uid="2"]'); await sleep(150);
   const atk0 = await ev(() => A.Rules.statsWithGear(A.State.state, A.Rules.inst(A.State.state, 2)).atk);
-  await page.click('[data-act=fEquip]'); await sleep(300);
+  await page.click('[data-act=fEquip]'); await sleep(200); await page.click('[data-act=gxConfirm]'); await sleep(300); // Phase 13C: equipping shows a preview first
   const eq = await ev(() => { const s = A.State.state, k = A.Rules.inst(s, 2); return { w: k.gear.weapon && A.Rules.item(s, k.gear.weapon).id, atk: A.Rules.statsWithGear(s, k).atk, fighter: A.Rules.partyFighter(s, k).atk }; });
   ok(eq.w === 'driftclub' && eq.atk > atk0 && eq.fighter === eq.atk, 'Equipment tab: equipping raises Kairyu’s battle attack (' + atk0 + ' → ' + eq.atk + ')');
   ok(/Equipped/.test(await page.textContent('.fpanel')), 'the equipped item is marked as equipped');
