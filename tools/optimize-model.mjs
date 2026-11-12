@@ -1,3 +1,5 @@
+// The game ships two files per model: full (--tris 96000) and lighter (--tris 10000 --color 1024 --normal 512; the
+// simplifier stops where further reduction would change the shape, at about 20,000 to 26,000 triangles).
 // Phase 14: prepares an exported 3D model (.glb, e.g. from Tripo) for the game. Run from a folder where
 // @gltf-transform/cli is installed (it is a build-time tool only; the game does not load it):
 //   node tools/optimize-model.mjs <in.glb> <out.glb> [--tris 96000] [--color 2048] [--normal 1024]

@@ -26,7 +26,7 @@ export function inspect(scene, animations, bytes) {
 function prepare(gltf, slot, bytes) {
   const src = gltf.scene, info = inspect(src, gltf.animations, bytes);
   src.traverse((o) => { if (!o.isMesh) return; o.castShadow = true; o.receiveShadow = true; o.frustumCulled = true;
-    (Array.isArray(o.material) ? o.material : [o.material]).forEach((m) => { if (m.transparent && !(m.alphaTest > 0)) { m.alphaTest = 0.5; m.transparent = false; m.depthWrite = true; } }); });
+    (Array.isArray(o.material) ? o.material : [o.material]).forEach((m) => { if (slot.gain && slot.gain !== 1 && !m.userData.gained) { m.color.multiplyScalar(slot.gain); m.userData.gained = true; } if (m.transparent && !(m.alphaTest > 0)) { m.alphaTest = 0.5; m.transparent = false; m.depthWrite = true; } }); });
   const turn = new THREE.Group(); turn.rotation.y = (slot.yaw || 0) * Math.PI / 180; turn.add(src); turn.updateMatrixWorld(true);
   const box = new THREE.Box3().setFromObject(turn), c = box.getCenter(new THREE.Vector3());
   src.position.x -= 0; turn.position.set(-c.x, -box.min.y, -c.z); // base on the ground, centred on the footprint
