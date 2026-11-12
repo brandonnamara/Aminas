@@ -38,8 +38,11 @@ function prepare(gltf, slot, bytes) {
 // full file is for desktop at High. (A.ModelSlots.forceFull is for tests and screenshots.)
 const TOUCH = !!(window.matchMedia && matchMedia('(pointer: coarse)').matches);
 const wantLite = (slot) => !!(slot.lite && !A.ModelSlots.forceFull && (TOUCH || (A.Perf && ((A.Perf.saver && A.Perf.saver()) || (A.Perf.tier && A.Perf.tier().id !== 'high')))));
+// Battery saver uses a third, much lighter file where the slot has one (--tris 6000 --color 512 --normal 256 --err 0.03)
+const isSaver = () => !!(A.Perf && ((A.Perf.saver && A.Perf.saver()) || A.Perf.forceTier === 'saver'));
+const fileFor = (slot) => (slot.saver && !A.ModelSlots.forceFull && isSaver() ? slot.saver : wantLite(slot) ? slot.lite : slot.url);
 // changes whenever a slot, a model's loading state or the wanted file changes, so the island knows to redraw
-export const signature = () => Object.keys(D.BUILDING_MODELS || {}).map((t) => { const sl = slotFor(t), e = cache.get(t); return sl ? t + ':' + (wantLite(sl) ? sl.lite : sl.url) + ':' + (e ? e.state : '') : ''; }).join('|');
+export const signature = () => Object.keys(D.BUILDING_MODELS || {}).map((t) => { const sl = slotFor(t), e = cache.get(t); return sl ? t + ':' + fileFor(sl) + ':' + (e ? e.state : '') : ''; }).join('|');
 // The model file. Hosts that cannot serve .glb (the development preview) carry the same bytes as base64 in
 // "<name>.glb.json"; that copy is tried only when the .glb itself is not there.
 function getModel(url) {
@@ -51,7 +54,7 @@ export function request(type, onReady) {
   if (e) { if (e.state === 'loading' && onReady) e.waiters.push(onReady); return; }
   e = { state: 'loading', slot, waiters: onReady ? [onReady] : [], info: null, root: null, error: null }; cache.set(type, e);
   const done = (ok, err) => { e.state = ok ? 'ready' : 'failed'; e.error = err ? String(err.message || err) : null; if (!ok) console.warn('Aminas: the ' + type + ' model could not be loaded (' + e.error + '); the built-in model is used.'); e.waiters.splice(0).forEach((f) => { try { f(ok); } catch (x) { /* a redraw must not break loading */ } }); };
-  const lite = wantLite(slot), url = lite ? slot.lite : slot.url; e.url = url; e.lite = lite;
+  const url = fileFor(slot), lite = url !== slot.url; e.url = url; e.lite = lite; e.saver = url === slot.saver;
   Promise.all([import('https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/loaders/GLTFLoader.js/+esm'), getModel(url)])
     .then(([{ GLTFLoader }, buf]) => new Promise((res, rej) => new GLTFLoader().parse(buf, url.replace(/[^/]*$/, ''), (g) => res([g, buf.byteLength]), rej)))
     .then(([g, bytes]) => { const p = prepare(g, slot, bytes); if (!p.info.ok) throw new Error('the model is empty or damaged'); e.root = p.root; e.info = p.info; done(true); })
@@ -60,7 +63,7 @@ export function request(type, onReady) {
 // One building's copy of the model, fitted to a w0 × h0 footprint (cells). Geometry and materials are shared.
 export function instance(type, w0, h0, rot) {
   let e = cache.get(type); const sl = slotFor(type);
-  if (e && e.state !== 'loading' && sl && e.url !== (wantLite(sl) ? sl.lite : sl.url)) { forget(type); e = null; } // the slot or the quality tier changed
+  if (e && e.state !== 'loading' && sl && e.url !== fileFor(sl)) { forget(type); e = null; } // the slot or the quality tier changed
   if (!e || e.state !== 'ready') return null;
   const g = e.root.clone(true), b = e.root.userData.base, fit = e.slot.fit || 0.96, s = Math.min(w0 * fit / b.x, h0 * fit / b.z);
   g.scale.setScalar(s); g.rotation.y = rot ? Math.PI / 2 : 0; g.userData = { glb: type, scale: s, height: b.y * s, spin: [] };
@@ -70,6 +73,6 @@ export function instance(type, w0, h0, rot) {
 }
 // turn the spinning parts (called from the island's slow ambient tick, so it stops at rest and in Battery saver)
 export function tick(groups, dt) { groups.forEach((g) => { const e = cache.get(g.userData.glb); if (!e) return; const ax = e.slot.axis || 'z', w = (e.slot.speed || 6) * Math.PI * 2 / 60; g.userData.spin.forEach((o) => { o.rotation[ax] += w * dt; }); }); }
-export const status = (type) => { const e = cache.get(type); return e ? { state: e.state, error: e.error, info: e.info, url: e.url, lite: e.lite } : { state: slotFor(type) ? 'idle' : 'empty', error: null, info: null }; };
+export const status = (type) => { const e = cache.get(type); return e ? { state: e.state, error: e.error, info: e.info, url: e.url, lite: e.lite, saver: e.saver } : { state: slotFor(type) ? 'idle' : 'empty', error: null, info: null }; };
 export function forget(type) { const e = cache.get(type); if (e && e.root) e.root.traverse((o) => { if (o.isMesh) { o.geometry.dispose(); (Array.isArray(o.material) ? o.material : [o.material]).forEach((m) => { ['map', 'normalMap', 'roughnessMap', 'metalnessMap', 'emissiveMap', 'aoMap'].forEach((k) => m[k] && m[k].dispose()); m.dispose(); }); } }); cache.delete(type); }
 A.ModelSlots = { status, slotFor, forget, inspect };

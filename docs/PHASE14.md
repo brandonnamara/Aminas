@@ -53,7 +53,8 @@ the existing glow materials.
 | Source | `voxel_fortress` | `voxel_farm_house` | `stylized_character`, figure removed |
 | Export | 940,696 triangles, 3 × 4096² | 962,168, 3 × 4096² | 978,173, 3 × 4096² |
 | Full file (desktop, High) | 96,000 triangles, 2048 + 1024 px, 2.8 MB | 95,994, 2.9 MB | 95,996, 2.0 MB |
-| Phone file (touch, Balanced, Battery saver) | 19,672 triangles, 1024 + 512 px, 0.66 MB | 25,585, 0.83 MB | 9,996, 0.39 MB |
+| Phone file (touch screens, Balanced) | 19,672 triangles, 1024 + 512 px, 0.66 MB | 25,585, 0.83 MB | 9,996, 0.39 MB |
+| Battery saver file | 7,580 triangles, 512 + 256 px, 0.30 MB | 12,860, 0.44 MB | 5,000, 0.19 MB |
 | Placement | 3 × 3, turned so the door faces the lower left | 3 × 2, square model overhangs slightly | 3 × 3, turned so the arena opens to the camera |
 | Base sunk into the terrain | 0.22 cells | 0.12 cells | 0.60 cells |
 | Brightness lift | ×1.7 | ×1.45 | ×1.75 |
@@ -127,7 +128,7 @@ integrated.
 
 | Suite | Result |
 |---|---|
-| `browser-models14` (new) | 30 of 30 |
+| `browser-models14` (new) | 31 of 31 |
 | `browser-world14` (new) | 16 of 16 |
 | `browser-arena7` | 30 of 30, three runs (its leak check now measures three rounds; see below) |
 | `browser-env1` | 20 of 20 (its camera wait was lengthened: the island draws slower with the models) |
@@ -137,7 +138,12 @@ integrated.
 the first three") failed once in three runs: the creature-template cache sometimes fills one round later. A
 five-round measurement showed the count settles and stays flat, so the check now asserts that it stops growing.
 
-**Complete suite:** COMPLETE_SUITE_RESULT
+**Complete suite on the final build** (38 suites, one at a time, nothing else running): **1,230 of 1,230 passed.**
+
+An earlier complete run found one real failure, now fixed: `browser-env3` "Battery saver draws far fewer
+triangles" (buildings 53,604 → 28,678, needing under 40%). The phone files were also used in Battery saver, so
+the three models were not reduced further. Each model now has a third, Battery saver file (12,860, 7,580 and
+5,000 triangles, 512 px textures); buildings now drop 53,604 → 16,586 in Battery saver.
 
 ## 8. Known limitations
 
@@ -152,14 +158,14 @@ five-round measurement showed the count settles and stays flat, so the check now
 
 | File | Change |
 |---|---|
-| `src/model-slots.js`, `src/3d/modelslots.js` | Model slots, lighter files, brightness, ground sink, `.glb.json` fallback |
-| `assets/models/` | Six `.glb` files (full and phone) for the Hatchery, Farm and Fire habitat |
+| `src/model-slots.js`, `src/3d/modelslots.js` | Model slots, phone and Battery saver files, brightness, ground sink, `.glb.json` fallback |
+| `assets/models/` | Nine `.glb` files (full, phone, Battery saver) for the Hatchery, Farm and Fire habitat, 8.9 MB in total |
 | `src/3d/island3d.js`, `src/vox-island.js` | Models on the island, scenery layer, old road |
 | `src/3d/library/decor.js`, `src/3d/library/terrain.js` | Library pieces made available as island scenery |
 | `src/3d/arenas.js` | Arena dressing and boss grounds |
 | `src/ui-pve.js`, `src/ui-v07.js`, `src/ui-p14.css` | Loot Ruins presentation and the charm fix |
 | `tools/optimize-model.mjs`, `tools/remove-component.mjs` | Model preparation (build-time only) |
-| `tests/` | Two new suites, three updated |
+| `tests/` | Two new suites; `browser-arena7` and `browser-env1` updated |
 
 Screenshots: `docs/ui/screens14/models/` (Hatchery, Farm and Habitat before and after), `world/` (island, ruins),
 `arenas/` (all ten arenas and boss rooms), `compare/` (six boss rooms before and after).

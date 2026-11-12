@@ -21,14 +21,14 @@
   D.BUILDING_MODELS = {
     // Tripo "voxel_fortress": blue and gold, egg dome, lit entrance. Its door faces +x in the export, so it is turned
     // a quarter turn to face the lower-left like every other building.
-    hatchery: { url: 'assets/models/hatchery.glb', lite: 'assets/models/hatchery-lite.glb', yaw: -90, fit: 1.0, lift: -0.22, gain: 1.7 },
+    hatchery: { url: 'assets/models/hatchery.glb', lite: 'assets/models/hatchery-lite.glb', saver: 'assets/models/hatchery-saver.glb', yaw: -90, fit: 1.0, lift: -0.22, gain: 1.7 },
     // Tripo "voxel_farm_house": red roof, windmill, timber, crop beds. The model is square and the Farm's footprint is
     // 3 × 2, so it is allowed to overhang the short side a little rather than leave a third of the plot empty.
-    farm: { url: 'assets/models/farm.glb', lite: 'assets/models/farm-lite.glb', yaw: 0, fit: 1.15, lift: -0.12, gain: 1.45 },
+    farm: { url: 'assets/models/farm.glb', lite: 'assets/models/farm-lite.glb', saver: 'assets/models/farm-saver.glb', yaw: 0, fit: 1.15, lift: -0.12, gain: 1.45 },
     // Tripo lava habitat (exported as "stylized_character"): the Fire habitat. The export's mesh held three separate
     // shells; the human figure standing on top was one of them and was removed whole (tools/remove-component.mjs).
     // The fortress and its banner pole are untouched.
-    hab_fire: { url: 'assets/models/hab_fire.glb', lite: 'assets/models/hab_fire-lite.glb', yaw: -90, fit: 1.08, lift: -0.6, gain: 1.75 },
+    hab_fire: { url: 'assets/models/hab_fire.glb', lite: 'assets/models/hab_fire-lite.glb', saver: 'assets/models/hab_fire-saver.glb', yaw: -90, fit: 1.08, lift: -0.6, gain: 1.75 },
   };
   // mobile budget used when a model is inspected (docs/PHASE14.md): over these it still loads, with a warning
   D.MODEL_BUDGET = { triangles: 100000, textureSize: 2048, textures: 2, bytes: 4 * 1024 * 1024 };

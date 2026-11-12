@@ -25,7 +25,7 @@ const before = { triangles: Math.round(count()), textures: root.listTextures().m
 root.listExtensionsUsed().filter((e) => e.extensionName === 'EXT_meshopt_compression').forEach((e) => e.dispose());
 await doc.transform(dedup(), weld());
 const ratio = Math.min(1, opt.tris / before.triangles);
-if (ratio < 1) await doc.transform(simplify({ simplifier: MeshoptSimplifier, ratio, error: 0.004, lockBorder: false }));
+if (ratio < 1) await doc.transform(simplify({ simplifier: MeshoptSimplifier, ratio, error: opt.err || 0.004, lockBorder: false }));
 root.listMaterials().forEach((m) => { m.setMetallicRoughnessTexture(null).setMetallicFactor(0).setRoughnessFactor(0.92).setOcclusionTexture(null); });
 await doc.transform(prune(), textureCompress({ encoder: sharp, targetFormat: 'webp', slots: /baseColor|emissive/, resize: [opt.color, opt.color], quality: 90 }), textureCompress({ encoder: sharp, targetFormat: 'webp', slots: /normal/, resize: [opt.normal, opt.normal], quality: 90 }), reorder({ encoder: MeshoptEncoder }), quantize({ quantizePosition: 14, quantizeNormal: 10, quantizeTexcoord: 12 }));
 await io.write(dst, doc);
