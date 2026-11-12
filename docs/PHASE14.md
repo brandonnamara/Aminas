@@ -159,7 +159,7 @@ the three models were not reduced further. Each model now has a third, Battery s
 | File | Change |
 |---|---|
 | `src/model-slots.js`, `src/3d/modelslots.js` | Model slots, phone and Battery saver files, brightness, ground sink, `.glb.json` fallback |
-| `assets/models/` | Nine `.glb` files (full, phone, Battery saver) for the Hatchery, Farm and Fire habitat, 8.9 MB in total |
+| `assets/models/` | Nine `.glb` files (full, phone, Battery saver) for the Hatchery, Farm and Fire habitat, 11 MB in total |
 | `src/3d/island3d.js`, `src/vox-island.js` | Models on the island, scenery layer, old road |
 | `src/3d/library/decor.js`, `src/3d/library/terrain.js` | Library pieces made available as island scenery |
 | `src/3d/arenas.js` | Arena dressing and boss grounds |
