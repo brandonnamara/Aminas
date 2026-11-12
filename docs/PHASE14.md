@@ -1,140 +1,165 @@
-# Aminas · Phase 14: world and environment polish — progress report (Tripo integration)
+# Aminas · Phase 14: world, environment and Tripo integration
 
-**Branch:** `p14-world`, created from `p13-core` (`f25eb9d`, Phase 13 complete). Production `main` (`0fc9e36`) is
-not in its history and has not been touched.
+**Branch:** `p14-world`, from `p13-core` (`f25eb9d`). Production `main` (`0fc9e36`) is untouched.
 
-**Status: Part 2 (Tripo assets) is done for the Hatchery and the Farm. The Habitat is waiting on a decision.
-Parts 3 to 6 (island, dungeon, boss arena and exploration polish) have not been started.**
+**Testing:** desktop Chromium with software graphics at 844×390. **Nothing was tested on an iPhone.** Software
+rendering gives triangle and draw-call counts that are real, but its frame times are not comparable with a phone
+GPU, so no frame rate is claimed.
 
-All testing is desktop Chromium with software graphics at 844×390. **Nothing was tested on an iPhone**, and
-frame rates measured with software graphics are not meaningful, so none are quoted.
+No economy, production, reward, battle or save value was changed. No monster model was changed.
 
-No gameplay, production, economy or save value was changed.
+## 1. Environment audit
 
-## 1. Where the models came from
+### Already at the standard (not rebuilt)
+* **The Art Bible** (`docs/art-bible/`, four documents) is complete: direction, scale, construction, colour,
+  materials, lighting, effects, budgets, pipeline and four island profiles. The work follows it.
+* **The voxel library** (`src/3d/library/`): about 60 kinds of terrain, vegetation, decor and architecture, many
+  of which were not yet used on the island.
+* **The island renderer:** one terrain mesh, instanced models, shadows drawn once per change, a 12 fps ambient tick
+  that stops at rest, in the background and in Battery saver, quality tiers and LOD.
+* **Groves, meadow detail, cliff vines and moss, waterfalls with mist, clouds, motes and the jetty** (Environment
+  Phases 1 to 4).
+* **Arenas:** ten distinct dungeons with their own floors, props, lighting, fog, particles and a boss room each.
 
-Tripo Studio opened in Chrome but an onboarding survey covered the library, and a download would have landed on a
-computer this chat cannot reach. The twelve `.glb` files you attached are what was used. No model was rebuilt from
-a screenshot and none was substituted.
+### Gaps found
+* **Island:** nothing on the ground spoke of the past except the story ruins; most library pieces (column ruins,
+  rune stones, stone pillars, willows, glowcaps, roots, log piles, pots) were unused.
+* **Arenas:** a floor, a few props and a soft painted backdrop, with an empty band between them. The boss room added
+  one structure but the boss stood on the same floor as any foe.
+* **Loot Ruins:** no record of what had been found where, and a charm found in a ruin appeared as a separate banner
+  that covered the result sheet's title.
+* **Tripo buildings:** darker than the island and standing on top of the ground instead of in it.
 
-## 2. Catalogue of the twelve supplied models
+### Asset reuse
+The new island scenery is entirely existing library pieces. The arena dressing reuses the arena kit's blocks and
+the existing glow materials.
 
-Every file has the same technical shape: one mesh, one opaque material, colour + normal + metal/roughness textures
-at 4096 × 4096, no skeleton, no animation, no separate parts, pivot at the centre of the model (not its base),
-about one unit across. They are far too heavy to ship as exported.
+### Rendering concerns
+* **The island is over the Art Bible's budget** (under 180,000 triangles, under 80 draw calls) and was before this
+  phase: 194,000 to 200,000 triangles with voxel buildings alone. See section 5.
+* Each imported model adds two textures, about 7 MB of GPU memory on phones (27 MB with the full files).
 
-| File | What it is | Triangles | File | Game role | Existing equivalent | Suitability | Priority |
-|---|---|---|---|---|---|---|---|
-| `voxel_fortress` | **The Hatchery**: blue and gold, three eggs, banners, lit door | 940,696 | 12.2 MB | Hatchery | Voxel Hatchery | Good after reduction | **Installed** |
-| `voxel_farm_house` | **The Farm**: red roof, windmill, timber, crop beds | 962,168 | 14.4 MB | Berry Farm | Voxel Farm | Good after reduction | **Installed** |
-| `stylized_character` | **The lava Habitat**, with a smooth, non-voxel human figure standing on top, fused into the same mesh | 978,173 | 12.6 MB | Fire habitat | Voxel Fire habitat | Blocked by the figure | Needs your decision |
-| `voxel_dragon` | Red dragon on a lava and grass base | 955,729 | 12.8 MB | Fire creature or boss | Fire lines in the roster | Static; has a base | Hold: needs approval |
-| `voxel_dragon_0` | Blue crystal dragon on a glowing disc | 1,889,467 | 19.7 MB | Water or crystal creature, boss | — | Static; has a base | Hold |
-| `voxel_dragon_1` | Blue crystal dragon, no base | 1,867,201 | 19.5 MB | As above | — | Static | Hold |
-| `dragon_2` | Grey and ice-blue dragon | 1,979,650 | 23.0 MB | Wind or ice creature | — | Static | Hold |
-| `voxel_creature` | Blue and tan quadruped with a cannon back | 967,233 | 14.0 MB | Metal or water creature | Resembles "Cannonis" in the project files | Static | Hold |
-| `voxel_crystal_creature` | White round creature, teal face, on a disc | 974,995 | 10.6 MB | Light or water creature | — | Static; has a base | Hold |
-| `voxel_crystal_fairy` | White fairy with halo and teal wings, on a disc | 972,128 | 11.7 MB | Light creature | — | Static; has a base | Hold |
-| `voxel_mage` | Dark robed figure with a purple orb, on a disc | 1,844,142 | 18.0 MB | Dark character, the Entity or an NPC | — | Static; has a base | Hold |
-| `jester_voxel` | Purple and gold jester | 1,968,906 | 17.2 MB | Character or NPC | — | Static | Hold |
+### Recommendations (not done in this phase)
+1. Measure the island on your iPhone with the three models in place before adding anything more to it.
+2. Bring the island back under budget with LOD on the meadow detail at mid zoom (it is about 31,000 triangles).
+3. Cliffs, waterfalls and lighting were already at the standard of Environment Phase 4; I did not change them.
+4. Use the unused library architecture (`T.arch`, `T.monolithRing`, `D.obelisk`) for the other islands when they
+   get their 3D phase, not on the Starter Island.
 
-"Static" means no skeleton: the game's creatures walk, attack and react from built-in animation, so using any of
-these as a creature means either a still figure or a separate rigging step. None has been added to the game, and
-no approved monster model was replaced.
+## 2. Tripo integration (final)
 
-## 3. What was installed
+| | Hatchery | Farm | Fire habitat |
+|---|---|---|---|
+| Source | `voxel_fortress` | `voxel_farm_house` | `stylized_character`, figure removed |
+| Export | 940,696 triangles, 3 × 4096² | 962,168, 3 × 4096² | 978,173, 3 × 4096² |
+| Full file (desktop, High) | 96,000 triangles, 2048 + 1024 px, 2.8 MB | 95,994, 2.9 MB | 95,996, 2.0 MB |
+| Phone file (touch, Balanced, Battery saver) | 19,672 triangles, 1024 + 512 px, 0.66 MB | 25,585, 0.83 MB | 9,996, 0.39 MB |
+| Placement | 3 × 3, turned so the door faces the lower left | 3 × 2, square model overhangs slightly | 3 × 3, turned so the arena opens to the camera |
+| Base sunk into the terrain | 0.22 cells | 0.12 cells | 0.60 cells |
+| Brightness lift | ×1.7 | ×1.45 | ×1.75 |
 
-| | Hatchery | Farm |
-|---|---|---|
-| Source | `voxel_fortress` | `voxel_farm_house` |
-| Building | Old Hatchery, 3 × 3 cells | Berry Farm, 3 × 2 cells |
-| Full file (desktop, High) | 96,000 triangles, 2048 colour + 1024 normal, 2.8 MB | 95,994 triangles, same textures, 2.9 MB |
-| Lighter file (phones, Balanced, Battery saver) | 47,988 triangles, 1024 px, 1.1 MB | 47,966 triangles, 1024 px, 1.2 MB |
-| Orientation | Turned a quarter turn so the door faces the lower-left like every building | As exported |
-| Scale and pivot | Fitted to the plot, base on the ground, centred; 2.8 cells tall | Square model on a 3 × 2 plot: allowed to overhang the short side slightly |
-| Texture memory (full) | about 27 MB | about 27 MB |
+**The figure.** The Habitat export's mesh is three unconnected shells: the fortress (720,419 triangles), a banner
+pole (10,030) and the human figure (247,724). The figure shared no vertex with the fortress, so it was removed
+whole and nothing was repaired or rebuilt (`tools/remove-component.mjs`). The fortress is untouched; the render at
+full, standard and phone detail shows no hole.
 
-**Preparation** (`tools/optimize-model.mjs`, a build-time tool only): triangle count reduced with meshoptimizer,
-textures resized and stored as WebP, the metal/roughness texture dropped (the models are matte). Shape, UVs,
-colours and normals are otherwise untouched: nothing is smoothed and the blocks stay blocks.
+**Brightness.** The models' own colours are multiplied evenly (a per-model `gain`). It adds no glow, changes no hue
+and leaves the lava's own bright colours as they were. The island's lighting is unchanged.
 
-**In the game** (`src/model-slots.js`, `src/3d/modelslots.js`): a building type with a model slot is drawn from
-the model; everything else about the building comes from the existing building system. The voxel model shows
-while the file loads and stays if it fails. Ruins and building sites keep their voxel models. Nothing about models
-is saved. The model loader is only fetched when a building with a model is on the island.
+**Integration.** The model replaces only the picture. Footprint, placement, moving, turning, upgrades, production,
+residents, breeding, hatching, taps and save data are the existing building system's. While a model loads, or if it
+fails, the voxel building is drawn. Nothing about models is saved. The development preview cannot serve `.glb`
+files, so it carries the same bytes in `.glb.json`; the branch has the `.glb` files.
 
-**Checked against your list:** mesh integrity (no bad vertices), triangle counts, texture sizes, materials (one,
-opaque), UVs present, scale, orientation, pivot (corrected on load), transparency (none), animation (none),
-mobile cost (below). Collision does not apply: placement uses the building's grid footprint, which is unchanged.
+**Windmill:** stationary, as you asked. **Other models:** catalogued (`claude/phase14-tripo-CHANGES.md`), none
+integrated.
 
-**Windmill:** the Farm's sails cannot turn. The export is a single fused mesh with no separate sail part. The
-game is ready for it: a part named in the slot's `spin` option turns slowly with the island's ambient animation
-and stops for Reduce Motion and Battery saver (tested with a stand-in model). It needs an export with the sails
-as their own part.
+## 3. Starter Island
 
-## 4. The Habitat: not installed
+* **Old stonework in the scenery:** standing and fallen column ruins and faintly glowing rune stones in the glades,
+  on the ledges and on the loose chunks around the island, with stone pillars and roots on the rim and willows,
+  glowcaps, log piles and pots in the woods. Only on hills, ledges and chunks, which are never built on.
+* **The old road:** a line of worn flagstones, some tilted or mossed, a few with a pale fleck, running down the
+  island in a gentle curve. Ground detail only: invisible to placement, hidden under buildings, not saved.
+* **The three Tripo buildings** sit in the ground at the island's brightness.
+* Not changed: terrain shapes, cliffs, waterfalls, water, lighting, clouds (already at the Art Bible standard).
 
-The game has seven habitat types (Nature, Water, Earth, Fire, Light, Dark, Wind). The lava and fortress model
-matches the **Fire habitat** (`hab_fire`); the other six keep their own models whatever is decided.
+## 4. Dungeons and boss arenas
 
-The export has a smooth, non-voxel human figure standing on the fortress, in the same mesh. I have not installed
-it, and I have not cut the figure out myself, because that means editing your model. Options:
+* **A middle distance for every arena:** two rows of structures between the floor and the far backdrop, built
+  for each place: ruined columns, arches and walls on the Forgotten Road; pillars, beams and banners in the
+  Gathering Hall; chimneys in the Cold Kiln; bookshelves and arches in the Hollow Veil; lantern trees in the
+  Lantern Orchard; cliffs on the Windworn Stair; crystal shards in the Resonance Scar; root arches in the Heartwood;
+  coral in the Drowned Steps. They fade toward the arena's fog with distance. 190 to 250 blocks per arena.
+* **Ground detail** at the floor's edges, never in the fighters' lane.
+* **Boss rooms:** a framed boss ground with glowing corner studs, two braziers in the dungeon's own light, two
+  banners, and (in seven of the ten) the boss's treasure: an open chest, spilled coins and a fallen column.
+* Not changed: encounters, bosses, abilities, rewards, the boss introduction, transitions between battles.
 
-1. **Re-export from Tripo without the figure** (best result).
-2. **I remove the figure** by deleting its part of the mesh. Likely clean if it is a separate shell; it may leave
-   a small hole where the feet meet the stone.
-3. Use it as it is.
+## 5. Performance (software rendering, desktop Chromium; counts are real, frame times are not phone figures)
 
-## 5. Things you should look at
+| Scene | Draw calls | Triangles | Textures |
+|---|---|---|---|
+| Island, voxel buildings (before) | 71 | 200,738 | 2 |
+| Island, three models, phone files | 69 | 231,043 | 8 |
+| Island, + scenery and old road (now, phone) | 76 | 231,417 | 8 |
+| Island, three models at full files (desktop High, calculated) | about 76 | about 463,000 | 8 |
+| Boss arena, average of three (before) | 38 | 13,266 | — |
+| Boss arena, average of three (now) | 41 | 16,558 | — |
 
-* **The models are darker than the island around them.** The Hatchery reads as deep navy beside the bright
-  voxel buildings. I left the colours alone. I can lift them slightly if you want.
-* **They bring their own patch of ground** (grass and rock base) and use smaller blocks than the island's own
-  buildings, so they read as more detailed miniatures. That is the models' identity; say if you want the base
-  sunk into the terrain.
-* **The Farm looks small on its 3 × 2 plot** because the model is square.
-* **Cost.** The island was about 194,000 triangles. With both models it is about 272,000 on phones (lighter
-  files) and about 369,000 on desktop at High, plus four to six more textures. The island reached 60 fps at High
-  on your iPhone before this; that needs re-checking on the device with the models in.
-* **One existing island test needed a longer wait** (`browser-env1`, "tapping the voxel Hatchery opens its
-  panel"): with software graphics the island draws slower with the models, so the camera had not settled when the
-  test tapped. It passes with the longer wait. This is a sign of the extra drawing cost, not a functional fault.
+* Mobile now adds about 31,000 triangles to the island for the three models (was 78,000 with the earlier phone
+  files). The scenery and road added about 400 triangles and 7 draw calls.
+* GPU geometry counts return to the same value after repeated boss battles (no leak), measured over five rounds.
+* No new continuous animation. Battery saver and Reduce Motion behave as before; the result-sheet effect is off
+  under both.
 
-## 6. Tests
+## 6. Exploration
 
-`tests/browser-models14.test.js`: **28 of 28**. It covers:
+* **Loot Ruins:** "Stories found 1 of 3" across the top; each ruin says how often it has been searched, names the
+  story found there or says something is still hidden, and mentions that a charm can turn up; a ruin ready to
+  search is outlined.
+* **Result:** the first search's story is presented as a "New discovery". **Fix:** a charm found in a ruin is now
+  shown among the finds with where to equip it; before, a separate banner opened over the sheet and covered its
+  title.
+* Rewards, chances and rest times are unchanged.
 
-| Brief item | Result |
+## 7. Tests
+
+| Suite | Result |
 |---|---|
-| Model loading and rendering | Both load within the budget; a missing file falls back to the voxel model with no error |
-| Hatchery interaction and breeding | Breeding lays an egg; the Hatchery screen opens |
-| Farm production and upgrades | Food produced and collected; upgrade cost unchanged |
-| Habitat production and assignment | Fire habitat (voxel) takes an Amina and produces |
-| Placement and movement | The Farm moves and turns; the model follows and still fits |
-| Save and load | Nothing about models in the save; reload gives the same buildings and egg |
-| Asset loading and memory | Triangles, texture sizes, file sizes and texture memory asserted; lighter files on touch screens |
+| `browser-models14` (new) | 30 of 30 |
+| `browser-world14` (new) | 16 of 16 |
+| `browser-arena7` | 30 of 30, three runs (its leak check now measures three rounds; see below) |
+| `browser-env1` | 20 of 20 (its camera wait was lengthened: the island draws slower with the models) |
+| `browser-perf-fix`, `browser-hatchery13b` | 23 of 23, 35 of 35 |
 
-Also run after the change: `browser-env1` 20 of 20 (with the longer wait), `browser-hatchery13b` 35 of 35.
+**Arena leak check.** With the fuller arenas the existing check ("geometries after three more boss battles ≤ after
+the first three") failed once in three runs: the creature-template cache sometimes fills one round later. A
+five-round measurement showed the count settles and stays flat, so the check now asserts that it stops growing.
 
-**The complete suite has not been run on this branch yet.**
+**Complete suite:** COMPLETE_SUITE_RESULT
 
-## 7. Not done
+## 8. Known limitations
 
-* Part 1 audit write-up, and Parts 3 to 6: island terrain, vegetation, water, lighting and storytelling; dungeon
-  environments; boss arenas; exploration presentation.
-* Part 7 beyond the lighter model files.
-* Gameplay recordings.
+* **Not tested on an iPhone.** The island is over the Art Bible's triangle budget, as it was before this phase.
+* The Farm's windmill is still; its sails are not a separate part.
+* Cliffs, waterfalls, water and island lighting were not changed.
+* Battle transitions and boss introductions were not changed.
+* No gameplay recordings were made in this phase; screenshots only.
+* The Habitat's lava is part of its texture and does not glow at night.
 
-## Files
+## 9. Files
 
 | File | Change |
 |---|---|
-| `src/model-slots.js` (new) | The three slots and the mobile budget |
-| `src/3d/modelslots.js` (new) | Loading, inspection, fitting, lighter files, turning parts |
-| `src/3d/island3d.js`, `src/vox-island.js` | Draw a building from its model; read-outs for tests |
-| `assets/models/` (new) | `hatchery.glb`, `hatchery-lite.glb`, `farm.glb`, `farm-lite.glb` (8.1 MB in total) |
-| `tools/optimize-model.mjs` (new) | Prepares an exported model |
-| `index.html` | One script |
-| `tests/browser-models14.test.js`, `tests/fixtures/` (new), `tests/browser-env1.test.js`, `tests/run-all.js` | Tests |
+| `src/model-slots.js`, `src/3d/modelslots.js` | Model slots, lighter files, brightness, ground sink, `.glb.json` fallback |
+| `assets/models/` | Six `.glb` files (full and phone) for the Hatchery, Farm and Fire habitat |
+| `src/3d/island3d.js`, `src/vox-island.js` | Models on the island, scenery layer, old road |
+| `src/3d/library/decor.js`, `src/3d/library/terrain.js` | Library pieces made available as island scenery |
+| `src/3d/arenas.js` | Arena dressing and boss grounds |
+| `src/ui-pve.js`, `src/ui-v07.js`, `src/ui-p14.css` | Loot Ruins presentation and the charm fix |
+| `tools/optimize-model.mjs`, `tools/remove-component.mjs` | Model preparation (build-time only) |
+| `tests/` | Two new suites, three updated |
 
-Screenshots: `docs/ui/screens14/models/` (`compare-hatchery-farm.png`, `before-voxel.png`, `after-tripo.png`).
+Screenshots: `docs/ui/screens14/models/` (Hatchery, Farm and Habitat before and after), `world/` (island, ruins),
+`arenas/` (all ten arenas and boss rooms), `compare/` (six boss rooms before and after).
