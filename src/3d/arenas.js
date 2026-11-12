@@ -355,6 +355,72 @@ function backdrop(T, cfg, fog, r, layers) {
   return out;
 }
 
+/* ------------------------------------------------------------------ Phase 14: set dressing
+   Every arena gets a middle distance: a band of sharp voxel structures between the arena floor and the soft far
+   backdrop (so the place has depth and architecture, not just a floor), small ground details at the edges, and
+   in a boss room a marked boss ground with braziers in the place's own light, banners, and old treasure where the
+   dungeon does not already have its own. All of it is plain blocks, which the merge step folds into the arena's
+   single mesh: no extra draw calls except two shared glow materials. Nothing here touches the fighters' lane. */
+const DRESS = {
+  forgottenroad:  { band: ['tree', 'ruinwall', 'tree', 'column', 'tree', 'arch', 'tree', 'rock'], a: '#8f959f', b: '#7d838d', leaf: ['#3f8a3a', '#57a84a', '#2f7430'], trunk: '#6a4424', ground: ['#9aa0a8', '#6fbf55', '#fff2a8'], glow: '#ffd86b', banner: '#d8b24a', treasure: true },
+  gatheringhall:  { band: ['pillar', 'beam', 'pillar', 'table', 'pillar', 'beam', 'pillar', 'barrels'], a: '#5a3c26', b: '#472e1c', ground: ['#6a4a30', '#8a6844', '#ffd890'], glow: '#ffb84a', banner: '#a8392e', treasure: true },
+  reliquary:      { band: ['column', 'arch', 'tree', 'ruinwall', 'column', 'tree', 'arch', 'rock'], a: '#7f8f7a', b: '#6a7a66', leaf: ['#3a7a44', '#4f9a52', '#2a6236'], trunk: '#5a4428', ground: ['#8a9a86', '#5aa04a', '#d8ffb0'], glow: '#b8ff9a', banner: '#4f9a52', treasure: false },
+  drownedsteps:   { band: ['rock', 'coral', 'arch', 'rock', 'coral', 'column', 'rock', 'coral'], a: '#4a6a7c', b: '#3c586a', coral: ['#ff8a8a', '#ffb070', '#c48aff'], ground: ['#5a7a8c', '#7fd6d0', '#bfefff'], glow: '#7fe9ff', banner: '#3aa6c4', treasure: false },
+  coldkiln:       { band: ['chimney', 'ruinwall', 'chimney', 'rock', 'arch', 'chimney', 'ruinwall', 'chimney'], a: '#7a3a26', b: '#62301f', ground: ['#5a3020', '#3a2a26', '#ff9a4a'], glow: '#ff8a3a', banner: '#c4502a', treasure: true },
+  hollowveil:     { band: ['arch', 'column', 'arch', 'shelf', 'arch', 'column', 'shelf', 'arch'], a: '#342a52', b: '#2a2144', ground: ['#3a3058', '#5a4a8a', '#c9b8ff'], glow: '#b9a2ff', banner: '#6a4ab8', treasure: true },
+  lanternorchard: { band: ['lantree', 'fence', 'lantree', 'lantree', 'fence', 'lantree', 'rock', 'lantree'], a: '#5a4a3a', b: '#4a3c30', leaf: ['#4a5a8a', '#5a6aa0', '#3a4870'], trunk: '#4a3626', ground: ['#5a5a7a', '#7a7aa0', '#ffe9a0'], glow: '#ffd070', banner: '#e0b84a', treasure: true },
+  windstair:      { band: ['cliff', 'column', 'cliff', 'arch', 'cliff', 'rock', 'cliff', 'column'], a: '#9aa8b4', b: '#8494a2', ground: ['#aab8c4', '#c8d8e0', '#e8fff8'], glow: '#bff4ff', banner: '#4ab8c4', treasure: true },
+  resonancescar:  { band: ['shard', 'rock', 'shard', 'shard', 'arch', 'shard', 'rock', 'shard'], a: '#4a3a6a', b: '#3c2e58', ground: ['#5a4a7a', '#8a5ab0', '#ff9ede'], glow: '#ff8ad8', banner: '#b84a9a', treasure: true },
+  heartwood:      { band: ['root', 'tree', 'root', 'rock', 'root', 'tree', 'root', 'tree'], a: '#4a3626', b: '#3a2a1e', leaf: ['#2a5a34', '#3a7444', '#1e4428'], trunk: '#3a2a1e', ground: ['#4a3a2a', '#3a6a3a', '#fff4c0'], glow: '#ffe9a0', banner: '#5a9a4a', treasure: true },
+};
+function dress(K, r, key, def, o) {
+  const d = DRESS[key]; if (!d) return 0;
+  const fog = new THREE.Color(def.fog || '#808080'), tmp = new THREE.Color(); let n = 0;
+  // colours sink toward the arena's fog with distance, which is what separates the layers
+  const far = (c, t) => '#' + tmp.set(c).lerp(fog, t).getHexString();
+  const B = (c, x, y, z, w, h, dd, opt) => { n++; return K.box(c, x, y, z, w, h, dd, opt); };
+  const pick = (a) => a[Math.floor(r() * a.length)];
+  const P = {
+    column(x, z, s, t) { const h = 3 + Math.floor(r() * 4), broken = r() < 0.45; for (let i = 0; i < h; i++) B(far(i % 2 ? d.a : d.b, t), x + (r() - 0.5) * 0.04, i * 0.5 * s, z, 0.52 * s, 0.5 * s, 0.52 * s); B(far(d.b, t), x, 0, z, 0.8 * s, 0.18 * s, 0.8 * s); if (!broken) B(far(d.a, t), x, h * 0.5 * s, z, 0.78 * s, 0.2 * s, 0.78 * s); else B(far(d.a, t), x + 0.7 * s, 0, z + 0.3, 0.5 * s, 0.4 * s, 0.9 * s, { ry: 0.5 }); },
+    pillar(x, z, s, t) { for (let i = 0; i < 9; i++) B(far(i % 3 ? d.a : d.b, t), x, i * 0.5 * s, z, 0.5 * s, 0.5 * s, 0.5 * s); B(far(d.b, t), x, 0, z, 0.8 * s, 0.3 * s, 0.8 * s); B(far(d.b, t), x, 4.3 * s, z, 1.3 * s, 0.26 * s, 0.6 * s); B(d.glow, x, 2.1 * s, z + 0.3 * s, 0.2 * s, 0.26 * s, 0.14 * s, { e: d.glow, ei: 1.5 }); },
+    beam(x, z, s, t) { B(far(d.b, t), x, 4.0 * s, z, 2.6 * s, 0.3 * s, 0.4 * s); B(far(d.banner, t * 0.6), x, 2.6 * s, z + 0.05, 0.7 * s, 1.4 * s, 0.06); B(far(d.glow, t * 0.5), x, 3.0 * s, z + 0.1, 0.3 * s, 0.3 * s, 0.03); },
+    arch(x, z, s, t) { const h = 5 + Math.floor(r() * 2); [-0.9, 0.9].forEach((dx) => { for (let i = 0; i < h; i++) B(far(i % 2 ? d.a : d.b, t), x + dx * s, i * 0.5 * s, z, 0.5 * s, 0.5 * s, 0.5 * s); }); B(far(d.a, t), x, h * 0.5 * s, z, 2.5 * s, 0.4 * s, 0.56 * s); B(far(d.b, t), x, (h * 0.5 + 0.4) * s, z, 1.3 * s, 0.3 * s, 0.5 * s); B(far(d.b, t), x - 0.5 * s, (h * 0.5 - 0.3) * s, z, 0.3 * s, 0.3 * s, 0.5 * s); B(far(d.b, t), x + 0.5 * s, (h * 0.5 - 0.3) * s, z, 0.3 * s, 0.3 * s, 0.5 * s); },
+    ruinwall(x, z, s, t) { for (let i = -2; i <= 2; i++) { const h = 1 + Math.floor(r() * 3) + (Math.abs(i) === 2 ? 1 : 0); for (let j = 0; j < h; j++) if (r() > 0.08) B(far((i + j) % 2 ? d.a : d.b, t), x + i * 0.52 * s + (j % 2) * 0.12, j * 0.42 * s, z, 0.5 * s, 0.42 * s, 0.46 * s); } B(far(d.b, t), x + 1.7 * s, 0, z + 0.5, 0.5 * s, 0.3 * s, 0.4 * s, { ry: 0.7 }); },
+    rock(x, z, s, t) { B(far(d.b, t), x, 0, z, 1.5 * s, 0.6 * s, 1.1 * s); B(far(d.a, t), x + 0.15 * s, 0.6 * s, z, 1.0 * s, 0.5 * s, 0.8 * s); B(far(d.b, t), x - 0.1 * s, 1.1 * s, z, 0.5 * s, 0.35 * s, 0.45 * s); B(far(d.a, t), x + 1.0 * s, 0, z + 0.2, 0.5 * s, 0.35 * s, 0.5 * s); },
+    cliff(x, z, s, t) { const h = 4 + Math.floor(r() * 4); for (let i = 0; i < h; i++) B(far(i % 2 ? d.a : d.b, t), x + (r() - 0.5) * 0.5, i * 0.7 * s, z, (2.2 - i * 0.18) * s, 0.7 * s, 1.2 * s); B(far('#ffffff', t + 0.2), x, h * 0.7 * s, z, 0.9 * s, 0.14 * s, 0.8 * s); },
+    tree(x, z, s, t) { const L = d.leaf, tr = far(d.trunk, t); B(tr, x, 0, z, 0.34 * s, 1.5 * s, 0.34 * s); B(far(L[0], t), x, 1.2 * s, z, 1.7 * s, 0.7 * s, 1.5 * s); B(far(L[1], t), x - 0.25 * s, 1.8 * s, z, 1.3 * s, 0.6 * s, 1.2 * s); B(far(L[2], t), x + 0.5 * s, 1.5 * s, z + 0.2, 0.8 * s, 0.6 * s, 0.9 * s); B(far(L[1], t), x + 0.1 * s, 2.35 * s, z, 0.8 * s, 0.45 * s, 0.8 * s); B(far(L[0], t), x, 2.75 * s, z, 0.4 * s, 0.3 * s, 0.4 * s); },
+    lantree(x, z, s, t) { P.tree(x, z, s, t); [[-0.6, 1.3], [0.7, 1.6], [0.1, 1.05]].forEach(([dx, dy]) => B(d.glow, x + dx * s, dy * s, z + 0.6 * s, 0.16 * s, 0.22 * s, 0.16 * s, { e: d.glow, ei: 1.5 })); },
+    fence(x, z, s, t) { for (let i = -2; i <= 2; i++) B(far(d.a, t), x + i * 0.6 * s, 0, z, 0.12 * s, 0.7 * s, 0.12 * s); B(far(d.b, t), x, 0.45 * s, z, 2.6 * s, 0.1 * s, 0.08 * s); B(far(d.b, t), x, 0.2 * s, z, 2.6 * s, 0.1 * s, 0.08 * s); },
+    table(x, z, s, t) { B(far(d.a, t), x, 0.5 * s, z, 2.4 * s, 0.14 * s, 0.9 * s); [-1, 1].forEach((k) => B(far(d.b, t), x + k * 1.0 * s, 0, z, 0.16 * s, 0.5 * s, 0.7 * s)); B(far('#e8dcc0', t), x - 0.5 * s, 0.64 * s, z, 0.3 * s, 0.06 * s, 0.3 * s); B(d.glow, x + 0.4 * s, 0.64 * s, z, 0.12 * s, 0.3 * s, 0.12 * s, { e: d.glow, ei: 1.5 }); },
+    barrels(x, z, s, t) { [[0, 0, 0], [0.7, 0, 0.1], [0.35, 0.7, 0.05]].forEach(([dx, dy, dz]) => { B(far(d.a, t), x + dx * s, dy * s, z + dz, 0.6 * s, 0.7 * s, 0.6 * s); B(far('#8a8a90', t), x + dx * s, (dy + 0.25) * s, z + dz, 0.64 * s, 0.08 * s, 0.64 * s); }); },
+    shelf(x, z, s, t) { B(far(d.b, t), x, 0, z, 1.8 * s, 3.2 * s, 0.4 * s); for (let j = 0; j < 4; j++) for (let i = -2; i <= 2; i++) if (r() > 0.2) B(far(pick(['#7a4a8a', '#4a6a9a', '#9a8a5a', '#8a4a5a']), t), x + i * 0.3 * s, (0.3 + j * 0.75) * s, z + 0.2 * s, 0.22 * s, (0.4 + r() * 0.2) * s, 0.1 * s); },
+    chimney(x, z, s, t) { const h = 6 + Math.floor(r() * 4); for (let i = 0; i < h; i++) B(far(i % 3 === 2 ? '#3a2a26' : i % 2 ? d.a : d.b, t), x, i * 0.5 * s, z, (0.9 - i * 0.03) * s, 0.5 * s, (0.9 - i * 0.03) * s); B(far('#3a2a26', t), x, h * 0.5 * s, z, 0.9 * s, 0.2 * s, 0.9 * s); B(d.glow, x, 0.5 * s, z + 0.46 * s, 0.4 * s, 0.4 * s, 0.04, { e: d.glow, ei: 1.5 }); },
+    shard(x, z, s, t) { const h = 2.4 + r() * 2.6, tilt = (r() - 0.5) * 0.5; B(far(d.a, t), x, 0, z, 0.7 * s, h * s, 0.6 * s, { rz: tilt }); B(far(d.b, t), x + 0.5 * s, 0, z + 0.2, 0.4 * s, h * 0.55 * s, 0.4 * s, { rz: tilt - 0.2 }); B(d.glow, x - Math.sin(tilt) * h * s, h * s * Math.cos(tilt), z, 0.34 * s, 0.4 * s, 0.3 * s, { e: d.glow, ei: 1.5 }); },
+    coral(x, z, s, t) { const c = d.coral; for (let i = 0; i < 5; i++) { const cc = far(pick(c), t), bx = x + (r() - 0.5) * 1.4 * s, h = (0.6 + r() * 1.2) * s; B(cc, bx, 0, z + (r() - 0.5) * 0.5, 0.2 * s, h, 0.2 * s); B(cc, bx + 0.22 * s, h * 0.5, z, 0.3 * s, 0.16 * s, 0.16 * s); B(cc, bx + 0.36 * s, h * 0.5, z, 0.14 * s, 0.5 * s, 0.14 * s); } B(far(d.b, t), x, 0, z, 1.6 * s, 0.3 * s, 0.9 * s); },
+    root(x, z, s, t) { for (let i = 0; i < 9; i++) { const a = (i / 8) * Math.PI; B(far(i % 2 ? d.a : d.b, t), x - Math.cos(a) * 1.6 * s, Math.sin(a) * 2.2 * s, z, 0.6 * s, 0.55 * s, 0.6 * s); } B(far(d.b, t), x - 1.6 * s, 0, z, 0.9 * s, 0.5 * s, 0.9 * s); B(far(d.b, t), x + 1.6 * s, 0, z, 0.9 * s, 0.5 * s, 0.9 * s); B(d.glow, x, 1.5 * s, z, 0.16 * s, 0.2 * s, 0.16 * s, { e: d.glow, ei: 1.5 }); },
+  };
+  // the band: a near row just past the floor's back edge and a larger, hazier row behind it; two flanking pieces
+  d.band.forEach((k, i) => { const x = -8.2 + i * 2.35 + (r() - 0.5) * 0.7; if (o.boss && Math.abs(x - 0.8) < 3.2) return; P[k](x, -5.5 - r() * 0.5, 1.05, 0.14); });
+  d.band.forEach((k, i) => { const kk = d.band[(i + 3) % d.band.length]; P[kk](-9.6 + i * 2.75 + (r() - 0.5) * 0.9, -8.6 - r() * 0.8, 1.35, 0.42); });
+  P[d.band[0]](-6.6, -3.0, 1, 0.06); P[d.band[2]](6.8, -3.3, 1, 0.06); P[d.band[3]](-7.6, -0.6, 0.9, 0.1); P[d.band[1] === 'beam' ? d.band[0] : d.band[1]](7.8, -1.0, 0.9, 0.1);
+  // ground details at the edges of the floor (never in the fighters' lane)
+  for (let i = 0; i < 34; i++) { const a = r() * Math.PI * 2, rad = 0.72 + r() * 0.26, x = Math.cos(a) * 6.4 * rad, z = Math.sin(a) * 4.8 * rad - 1; if (Math.abs(x) < 3.3 && z > -3.2) continue; const c = d.ground[i % 3 === 2 ? 2 : i % 2], sz = 0.1 + r() * 0.16; B(c, x, 0, z, sz, i % 3 === 2 ? 0.06 : sz * (0.5 + r()), sz); }
+  if (o.boss) {
+    // the boss's ground: a low stone frame with glowing corner studs
+    const bx = 0.8, bz = -1.6, w = 3.5, dd = 2.5;
+    [[0, -dd / 2, w, 0.16], [0, dd / 2, w, 0.16], [-w / 2, 0, 0.16, dd], [w / 2, 0, 0.16, dd]].forEach(([dx, dz, sx, sz]) => B(d.b, bx + dx, 0, bz + dz, sx, 0.07, sz));
+    [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(([i, j]) => { B(d.a, bx + i * w / 2, 0, bz + j * dd / 2, 0.3, 0.2, 0.3); B(d.glow, bx + i * w / 2, 0.2, bz + j * dd / 2, 0.16, 0.1, 0.16, { e: d.glow, ei: 1.5 }); });
+    // braziers in the place's own light, and banners
+    [[-2.3, -3.3], [4.0, -3.3]].forEach(([x, z], i) => { B(d.b, x, 0, z, 0.6, 0.3, 0.6); B(d.a, x, 0.3, z, 0.32, 0.9, 0.32); B(d.b, x, 1.2, z, 0.7, 0.18, 0.7); K.box(d.glow, x, 1.38, z, 0.4, 0.34, 0.4, { e: d.glow, ei: 1.5, spin: i ? null : 'flicker' }); n++; });
+    [[-4.2, -5.2], [5.8, -5.2]].forEach(([x, z]) => { B(d.b, x, 0, z, 0.14, 3.4, 0.14); B(d.banner, x + 0.42, 1.9, z, 0.7, 1.4, 0.05); B(d.glow, x + 0.42, 2.5, z + 0.04, 0.26, 0.26, 0.03, { e: d.glow, ei: 1.5 }); B(d.banner, x + 0.42, 1.7, z, 0.34, 0.2, 0.05); });
+    // what the boss has been keeping: an old chest, spilled coins, a fallen column
+    if (d.treasure) { const tx = 5.0, tz = -2.4; B('#6a4424', tx, 0, tz, 0.8, 0.44, 0.52); B('#8a5a30', tx, 0.44, tz - 0.06, 0.8, 0.2, 0.4, { rx: -0.35 }); B('#e8c04a', tx, 0.16, tz + 0.27, 0.84, 0.08, 0.02); B('#e8c04a', tx, 0.3, tz + 0.27, 0.14, 0.14, 0.03);
+      for (let i = 0; i < 9; i++) B(i % 3 ? '#ffd86b' : '#fff0a8', tx - 0.2 + (r() - 0.3) * 1.3, 0, tz + 0.5 + r() * 0.6, 0.1, 0.04, 0.1);
+      B(d.a, tx + 0.9, 0, tz - 0.9, 0.5, 0.5, 1.7, { ry: 0.5 }); B(d.b, tx + 0.2, 0, tz - 1.2, 0.6, 0.3, 0.6); }
+  }
+  return n;
+}
+
 // Builds an arena into `scene`; returns { def, group, update(t), dispose() }. o: { boss, island }
 export function buildArena(scene, id, o) {
   o = o || {}; const key = arenaFor(id);
@@ -368,6 +434,7 @@ export function buildArena(scene, id, o) {
   };
   const K = kit(add, T, r);
   def.build(add, T, r, K, o);
+  const dressed = dress(K, rnd(key.length * 131 + (o.boss ? 5 : 3)), key, def, o); // Phase 14 (own random stream: the arena's own build is unchanged)
   mergeStatic(group, new Set(anim.map((a) => a.mesh)), T);
   // Phase 7 atmosphere (the living-pixel motes stay for boss rooms, on top of the arena's own particles)
   const mt = o.boss ? motes(T, def.motes || '#ffffff', 30) : null; if (mt) group.add(mt);
