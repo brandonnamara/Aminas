@@ -56,4 +56,5 @@ export const TERRAIN = T;
 
 // island use (Phase 2 validation): rocks and crystals as scenery kinds; seed picks the variant / hue
 if (!N.mossyRock) N.mossyRock = (m, s) => T.mossyRock(m, (s - 1) % 2);
+if (!N.stonePillars) N.stonePillars = (m, s) => T.stonePillars(m, s); // Phase 14: weathered stacks on the island's ledges
 if (!N.crystals) N.crystals = (m, s) => T.crystals(m, 0, { hue: ['egg', 'moon', 'spirit'][(s - 1) % 3] });

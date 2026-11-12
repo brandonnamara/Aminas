@@ -51,6 +51,14 @@
         else kind = grove < 0.4 ? (v > 0.22 ? 'pine' : v > 0.1 ? 'fernLarge' : 'bush') : grove < 0.68 ? (v > 0.86 ? 'oakOld' : v > 0.3 ? 'oak' : v > 0.18 ? 'roundBush' : 'mushrooms') : (v > 0.5 ? 'birch' : v > 0.25 ? 'blossom' : 'flowerBush');
       } else if (c.kind === 'chunk' && v > 0.35) kind = v > 0.75 ? 'pine' : v > 0.55 ? 'oak' : 'mossyRock';
       else if (c.kind === 'ledge' && c.top >= -24) kind = v > 0.9 ? 'pine' : v > 0.8 ? 'bush' : v > 0.72 ? 'mossyRock' : v > 0.68 ? 'crystals' : v > 0.6 ? 'tallGrass' : null;
+      // Phase 14: a second, sparse layer on the same never-built ground. Old stonework (a standing or fallen column,
+      // a rune stone that still glows faintly) in the glades and on the ledges, as if a path once ran here; willows
+      // and glowcaps in the deepest groves; weathered stone stacks and exposed roots on the rim; and things people
+      // left by the woods (a log pile, a few pots). It has its own random stream, so the existing groves stay put.
+      const q = hash(c.x, c.y, 9), q2 = hash(c.x, c.y, 10);
+      if (c.kind === 'hill') { if (q < 0.09) kind = q2 < 0.5 ? 'columnRuin' : 'runeStone'; else if (q < 0.16 && dense >= 0.34) kind = grove >= 0.68 ? 'willow' : 'glowcap'; else if (q < 0.19 && dense < 0.34) kind = q2 < 0.5 ? 'logPile' : 'pots'; else if (q < 0.24 && kind === null) kind = 'roots'; }
+      else if (c.kind === 'ledge' && c.top >= -24) { if (q < 0.14) kind = q2 < 0.4 ? 'columnRuin' : q2 < 0.7 ? 'stonePillars' : 'runeStone'; else if (q < 0.22 && kind === null) kind = 'roots'; }
+      else if (c.kind === 'chunk' && q < 0.3) kind = q2 < 0.5 ? 'runeStone' : 'crystals';
       if (kind && kind in KNOWN) {
         const big = kind === 'oak' ? 0.72 + hash(c.x, c.y, 6) * 0.25 : kind === 'oakOld' ? 0.8 : kind === 'pine' ? 0.8 + hash(c.x, c.y, 6) * 0.35 : 0.85 + hash(c.x, c.y, 6) * 0.25;
         out.push({ kind, seed: Math.floor(v * 1000), cx: c.x, cz: c.y, x: c.x + 0.5 + (hash(c.x, c.y, 3) - 0.5) * 0.3, y, z: c.y + 0.5 + (hash(c.x, c.y, 4) - 0.5) * 0.3, ry: Math.floor(hash(c.x, c.y, 5) * 4) * Math.PI / 2, s: c.kind === 'chunk' ? 0.75 : big, still: STILL[kind] });
@@ -63,8 +71,8 @@
     });
     return out;
   }
-  const KNOWN = { oak: 1, pine: 1, birch: 1, bush: 1, blossom: 1, fern: 1, oakOld: 1, roundBush: 1, flowerBush: 1, flowerPatch: 1, tallGrass: 1, fernLarge: 1, mushrooms: 1, mossyRock: 1, crystals: 1, vines: 1, hangingMoss: 1 };
-  const STILL = { mossyRock: true, crystals: true, mushrooms: true, flowerPatch: true, vines: true, hangingMoss: true }; // no sway
+  const KNOWN = { columnRuin: 1, runeStone: 1, stonePillars: 1, willow: 1, glowcap: 1, roots: 1, logPile: 1, pots: 1, oak: 1, pine: 1, birch: 1, bush: 1, blossom: 1, fern: 1, oakOld: 1, roundBush: 1, flowerBush: 1, flowerPatch: 1, tallGrass: 1, fernLarge: 1, mushrooms: 1, mossyRock: 1, crystals: 1, vines: 1, hangingMoss: 1 };
+  const STILL = { columnRuin: true, runeStone: true, stonePillars: true, glowcap: true, roots: true, logPile: true, pots: true, mossyRock: true, crystals: true, mushrooms: true, flowerPatch: true, vines: true, hangingMoss: true }; // no sway
   let sceneryCache = null;
 
   // Called by UI.renderWorld whenever the island's terrain is (re)drawn.

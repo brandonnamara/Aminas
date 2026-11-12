@@ -343,6 +343,19 @@ export function createIsland() {
       const [X, Z] = k.split(',').map(Number), c = v.c; if (occupied.has(c.x + ',' + c.y)) return;
       const y0 = v.top * TV, h = hash(X, Z, 91);
       if ((c.kind === 'grass' || c.kind === 'hill') && v.top >= 0) {
+        // Phase 14: the old road. Long before the Sanctuary, a paved way ran down the island from the Tide Gate. What
+        // is left are worn flagstones sunk into the grass in a wandering line, a few tilted, a few mossed over, and
+        // here and there a pale fleck that still catches the light. They are ground detail only: flat, never in the
+        // way of building, and hidden under whatever is placed on them.
+        const rd = Math.abs((c.x - c.y) + 5 + Math.sin((c.x + c.y) * 0.35) * 1.4), hr = hash(X, Z, 140);
+        if (rd < 1.2 && hr < 0.62) {
+          const x = X * TV + 0.04 + hash(X, Z, 141) * 0.2, z = Z * TV + 0.04 + hash(Z, X, 142) * 0.2, hs = hash(X, Z, 143), wide = hs < 0.5;
+          list.push([x, y0, z, wide ? 4 : 3, 1, wide ? 3 : 4, pick(PAL.pathStone, hs * 8)]);
+          if (hs > 0.86) list.push([x + DV, y0 + DV, z, 2, 1, 1, pick(PAL.pathStone, hr * 9)]);          // a broken slab, tilted up
+          else if (hs > 0.7) list.push([x + DV, y0 + DV, z + DV, 1, 1, 1, PAL.grassDark[0]]);             // moss on it
+          else if (hs < 0.035) list.push([x + DV, y0 + DV, z + DV, 1, 1, 1, '#c8f6ff']);                  // a pale fleck
+          return;
+        }
         // Phase 1.1: flowers gather in meadow patches and grass clumps thin out in the open, so the ground reads
         // as calm grass with a few bright drifts, instead of an even sprinkle everywhere
         const patch = vnoise(X * 0.16, Z * 0.16, 17), tall = vnoise(X * 0.22, Z * 0.22, 18), lush = vnoise(X * 0.11, Z * 0.11, 23), h2 = hash(X, Z, 101), h3 = hash(X, Z, 102);

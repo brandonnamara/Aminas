@@ -4,7 +4,7 @@
    waterfalls, mist, motes, magic sparks, clouds) live in island3d.js and are catalogued as systems. */
 import { PAL, MAGIC, EL } from '../voxstyle.js';
 import { hash, pick } from '../voxmesh.js';
-import { H, B, X } from '../voxbuild.js';
+import { H, B, X, N } from '../voxbuild.js';
 import { MAT } from './kit.js';
 
 const D = {};
@@ -50,3 +50,9 @@ export { EL };
 if (!X.crate) X.crate = (m) => D.crate(m, 3);
 if (!X.barrel) X.barrel = (m) => D.barrel(m);
 if (!X.sacks) X.sacks = (m) => D.sacks(m);
+// island use (Phase 14): signs of whoever was here before, as scenery on ground that is never built on. The seed
+// (1 to 3) picks the variant: a standing or a fallen column; a rune stone in one of three quiet glows.
+if (!N.columnRuin) N.columnRuin = (m, s) => D.columnRuin(m, s === 2 ? 2 : 1);
+if (!N.runeStone) N.runeStone = (m, s) => D.runeStone(m, s);
+if (!N.pots) N.pots = (m, s) => D.pots(m, s);
+if (!N.logPile) N.logPile = (m, s) => D.logPile(m, s);

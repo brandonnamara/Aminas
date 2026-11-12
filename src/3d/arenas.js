@@ -456,7 +456,7 @@ export function buildArena(scene, id, o) {
   let rig = null; const col = new THREE.Color(), key0 = L ? L.key[1] : 0;
   return {
     def, group, key, light: L,
-    atmo: { tier, backdropLayers: bd.length, particles: AT.particles ? AT.particles.kind : null, count: amb ? amb.mesh.count : 0, shafts: sh ? Math.min(AT.shafts.n, shMax) : 0, backdrop: AT.backdrop ? AT.backdrop.kind : null, boss: !!o.boss, island: !!o.island },
+    atmo: { tier, backdropLayers: bd.length, particles: AT.particles ? AT.particles.kind : null, count: amb ? amb.mesh.count : 0, shafts: sh ? Math.min(AT.shafts.n, shMax) : 0, backdrop: AT.backdrop ? AT.backdrop.kind : null, boss: !!o.boss, island: !!o.island, dressed },
     bindLights(g) { rig = g; },
     update(t, dt) {
       const quiet = still();
