@@ -40,13 +40,19 @@ const TOUCH = !!(window.matchMedia && matchMedia('(pointer: coarse)').matches);
 const wantLite = (slot) => !!(slot.lite && !A.ModelSlots.forceFull && (TOUCH || (A.Perf && ((A.Perf.saver && A.Perf.saver()) || (A.Perf.tier && A.Perf.tier().id !== 'high')))));
 // changes whenever a slot, a model's loading state or the wanted file changes, so the island knows to redraw
 export const signature = () => Object.keys(D.BUILDING_MODELS || {}).map((t) => { const sl = slotFor(t), e = cache.get(t); return sl ? t + ':' + (wantLite(sl) ? sl.lite : sl.url) + ':' + (e ? e.state : '') : ''; }).join('|');
+// The model file. Hosts that cannot serve .glb (the development preview) carry the same bytes as base64 in
+// "<name>.glb.json"; that copy is tried only when the .glb itself is not there.
+function getModel(url) {
+  return fetch(url).then((r) => { if (r.ok) return r.arrayBuffer(); const st = r.status;
+    return fetch(url + '.json').then((j) => { if (!j.ok) throw new Error('HTTP ' + st); return j.json(); }).then((d) => { const bin = atob(d.glb), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return u.buffer; }); });
+}
 export function request(type, onReady) {
   const slot = slotFor(type); if (!slot) return; let e = cache.get(type);
   if (e) { if (e.state === 'loading' && onReady) e.waiters.push(onReady); return; }
   e = { state: 'loading', slot, waiters: onReady ? [onReady] : [], info: null, root: null, error: null }; cache.set(type, e);
   const done = (ok, err) => { e.state = ok ? 'ready' : 'failed'; e.error = err ? String(err.message || err) : null; if (!ok) console.warn('Aminas: the ' + type + ' model could not be loaded (' + e.error + '); the built-in model is used.'); e.waiters.splice(0).forEach((f) => { try { f(ok); } catch (x) { /* a redraw must not break loading */ } }); };
   const lite = wantLite(slot), url = lite ? slot.lite : slot.url; e.url = url; e.lite = lite;
-  Promise.all([import('https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/loaders/GLTFLoader.js/+esm'), fetch(url).then((r) => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.arrayBuffer(); })])
+  Promise.all([import('https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/loaders/GLTFLoader.js/+esm'), getModel(url)])
     .then(([{ GLTFLoader }, buf]) => new Promise((res, rej) => new GLTFLoader().parse(buf, url.replace(/[^/]*$/, ''), (g) => res([g, buf.byteLength]), rej)))
     .then(([g, bytes]) => { const p = prepare(g, slot, bytes); if (!p.info.ok) throw new Error('the model is empty or damaged'); e.root = p.root; e.info = p.info; done(true); })
     .catch((err) => done(false, err));
