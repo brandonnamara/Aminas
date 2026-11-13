@@ -3,7 +3,7 @@
 // Phase 15 below. The battle uses fixed rolls and the attacker always moves first, so both runs play the same turns.
 // Run: node tools/proto15-battle.js
 const { chromium } = require('playwright'); const serve = require('../tests/server'); const fs = require('fs'), path = require('path'), { execSync } = require('child_process');
-const OUT = path.join(__dirname, '..', 'docs', 'ui', 'screens15', 'combat'), TMP = process.env.P15_TMP || '/tmp/p15battle';
+const OUT = process.env.P15_OUT || path.join(__dirname, '..', 'docs', 'ui', 'screens15', 'combat'), TMP = process.env.P15_TMP || '/tmp/p15battle';
 const FIGHTS = [
   { id: 'aurelith', foe: 'eclipsar', presses: ['glowpulse', 'solarflare'], arena: 'heartwood' },
   { id: 'ignivor', foe: 'calyxar', presses: ['emberflick', 'inferno'], arena: 'heartwood' },
@@ -11,6 +11,7 @@ const FIGHTS = [
   { id: 'lumifern', foe: 'umbrit', presses: ['glowpulse', 'sunsprout'], arena: 'heartwood' },
   { id: 'meta', foe: 'rockraki', presses: ['gearstrike', 'overclock'], arena: 'heartwood' },
 ];
+if (process.env.P15_FIGHTS) { FIGHTS.length = 0; JSON.parse(process.env.P15_FIGHTS).forEach((f) => FIGHTS.push(Object.assign({ arena: 'heartwood' }, f))); }   // Phase 15B: other fights
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 (async () => {
   fs.mkdirSync(OUT, { recursive: true }); fs.mkdirSync(TMP, { recursive: true });

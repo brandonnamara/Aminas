@@ -332,4 +332,22 @@
     K.sym((sd) => K.leaves(m, [S(0.2), g.top + S(0.4), sd * S(2.9)], [S(1.6), S(0.8), S(1.4)], MS, 70 + sd, { n: 4, dome: true, mode: 'under' }));
     return m;
   };
+  /* ================================================================ ZEPHYR: the same feather vanes as the fire bird */
+  H.zephyr = function (m, stage) {
+    const g = m.geo; if (!g || !m.rig) return m;
+    const S = g.S, BL = '#3d6bff', SK = '#3dbbff', ICE = '#7fe8ff', W = '#ffffff', GD = '#ffd166', IN = '#2a3b8f';
+    K.sym((sd) => K.wing(m, [g.shoulder[0], g.shoulder[1], sd * g.shoulder[2]], sd, S(10 + stage * 2), { cols: [W, SK, BL, IN], membrane: SK, up: 1.2, back: 0.55, droop: 0.9, featherLen: 0.75, feathers: 6 + stage, bone: 1.1, boneCol: GD, glowTips: stage === 3 ? ICE : null }));
+    return m;
+  };
+
+  /* ================================================================ LUMI II–III: keep the crown on the finer grid
+     The three small crown blocks and the chest gem were written in single blocks; on the finer grid they are drawn
+     again at their original size so the silhouette's crown stays. */
+  H.lumi = function (m, stage, d) {
+    if (stage < 2) return m;
+    const k = [0.9, 1.1, 1.3][stage - 1] * d, S = (v) => v * k, W = '#ffffff', CY = '#3fd6ff', c = [0, S(7) + S(5), 0];
+    for (let i = -1; i <= 1; i++) m.box(c[0] + (i * 2 - 1) * d, c[1] + S(6.5), c[2] - d, c[0] + i * 2 * d, c[1] + S(6.5) + (i ? 2 : 3) * d, c[2], W);
+    const fy = 28 * Math.PI / 180, gem = K.surface(m, [c[0], c[1] - S(5.5), c[2]], 28, 0, 30); if (gem) m.ellipsoid(gem[0], gem[1], gem[2], 1.2 * d, 1.6 * d, 1.2 * d, K.glow(CY));
+    return m;
+  };
 })(typeof window !== 'undefined' ? window : globalThis);
