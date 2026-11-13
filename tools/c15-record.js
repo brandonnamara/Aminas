@@ -30,8 +30,8 @@ const SC = {
     for (let r = 0; r < S.rows.length; r++) { const row = S.rows[r], dir = path.join(TMP, name + '-' + r); fs.rmSync(dir, { recursive: true, force: true }); fs.mkdirSync(dir, { recursive: true });
       const ctx = await browser.newContext({ viewport: { width: 844, height: 390 }, deviceScaleFactor: 1, hasTouch: true, isMobile: true }); const page = await ctx.newPage(); page.setDefaultTimeout(600000);
       page.on('pageerror', (e) => console.log('pageerror', e.message));
-      await page.goto(srv.url + row.q); await page.waitForFunction(() => window.A && A.UI && A.UI.showIsland && A.C3D && A.Proto15);
-      await page.evaluate((row) => { if (!row.q) { try { localStorage.setItem('aminas.proto15', '0'); } catch (e) {} } A.Perf.reportSlow = () => {}; const s = A.State.newGame(); s.phase = 'play'; s.introDone = true; s.avatar.made = true; s.starter = 'lumifern'; s.settings.creatures3d = true; s.settings.sfx = false; s.settings.reduceMotion = !!row.calm; s.settings.batterySaver = !!row.saver; A.Rules.drain(); if (A.UI.queue) A.UI.queue.length = 0; A.State.save(); A.UI.showIsland(); if (A.Perf.apply) A.Perf.apply(); }, row);
+      await page.clock.install(); await page.goto(srv.url + row.q); await page.waitForFunction(() => window.A && A.UI && A.UI.showIsland && A.C3D && A.Proto15);
+      await page.evaluate((row) => { if (!row.q) { try { localStorage.setItem('aminas.proto15', '0'); } catch (e) {} } A.Perf.reportSlow = () => {}; const s = A.State.newGame(); s.phase = 'play'; s.introDone = true; s.avatar.made = true; s.starter = 'lumifern'; s.settings.creatures3d = true; s.settings.sfx = false; s.settings.reduceMotion = !!row.calm; s.settings.batterySaver = !!row.saver; A.Rules.drain(); if (A.UI.queue) A.UI.queue.length = 0; A.State.save(); A.UI.showIsland(); if (A.Perf.apply) A.Perf.apply(); if (!row.saver) A.Perf.forceTier = 'high'; }, row);   // the same arena detail in every row (the saver row keeps its own)
       await page.waitForSelector('#world', { timeout: 60000 });
       await page.evaluate(async () => { for (let i = 0; i < 20; i++) { await new Promise((r) => setTimeout(r, 100)); document.querySelectorAll('.dlg .dlg-skip').forEach((b) => b.click()); A.UI.closeAll(); } document.querySelectorAll('.dlg').forEach((x) => x.remove()); });
       const press = await page.evaluate(async (S) => {
@@ -39,7 +39,7 @@ const SC = {
         A.UI.closeAll(); A.UI.startBattle({ kind: 'test', b: Bt.create([f], e, { rng: () => (S.rng == null ? 0.5 : S.rng) }), d: 'heartwood', label: 'Phase 15C review', finish: () => {} });
         for (let i = 0; i < 150 && !(A.UI.B.stage && A.UI.B.stage.is3d && !A.UI.B.busy); i++) await new Promise((r) => setTimeout(r, 100));
         await new Promise((r) => setTimeout(r, 1500)); return typeof S.press === 'number' ? A.Data.SPECIES[S.id].abil[S.press] : S.press; }, S);
-      await page.clock.install(); await page.clock.runFor(200);
+      const now = await page.evaluate(() => Date.now()); await page.clock.pauseAt(now + 1500); await page.clock.runFor(200);
       await page.evaluate((id) => { const b = document.querySelector('.abtn.ready[data-id="' + id + '"]'); if (b) b.click(); }, press);
       const n = Math.round(S.secs * FPS);
       for (let i = 0; i < n; i++) { await page.clock.runFor(1000 / FPS); await page.screenshot({ path: path.join(dir, String(i).padStart(4, '0') + '.png') }); }

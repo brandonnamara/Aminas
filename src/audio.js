@@ -406,12 +406,12 @@
         osc(X, h, last ? 0.6 : 0.22, 'triangle', (last ? 1760 : 2637 - i * 60), null, last ? 0.03 : 0.014, { attack: 0.002 }); if (last) kick(X, h, 160, 55, 0.22, 0.09); else nz(X, h, 0.04, 0.02, 'highpass', 3200); }
       nz(X, t + 1.18, 0.3, 0.02, 'bandpass', 3000, 900, 1); osc(X, t + 1.2, 0.26, 'sine', 880, 330, 0.02);
     },
-    guard: (X, t) => { osc(X, t, 0.35, 'sine', 300, 300, 0.03, { am: [18, 0.4], attack: 0.03 }); osc(X, t + 0.02, 0.3, 'triangle', 600, 900, 0.015); },
-    heal: (X, t) => [1047, 1319, 1568, 2093].forEach((f, i) => osc(X, t + i * 0.06, 0.4, 'sine', f, null, 0.016, { echo: true, attack: 0.01 })),
-    status: (X, t) => { osc(X, t, 0.18, 'triangle', 700, 420, 0.018); nz(X, t, 0.12, 0.014, 'bandpass', 1400, 600, 1.2); },
-    super: (X, t) => { osc(X, t, 0.25, 'triangle', 1568, 2093, 0.018, { attack: 0.003 }); osc(X, t + 0.05, 0.3, 'sine', 3136, null, 0.012, { attack: 0.003 }); },
-    faint: (X, t) => { osc(X, t, 0.7, 'sine', 330, 110, 0.03, { lp: 900 }); nz(X, t + 0.5, 0.3, 0.02, 'lowpass', 500); },
-    victory: (X, t) => [523, 659, 784, 1047].forEach((f, i) => osc(X, t + i * 0.09, i === 3 ? 0.6 : 0.2, 'triangle', f, null, 0.022, { attack: 0.005 })),
+    guard: (X, t) => { osc(X, t, 0.35, 'sine', 300, 300, 0.066, { am: [18, 0.4], attack: 0.03 }); osc(X, t + 0.02, 0.3, 'triangle', 600, 900, 0.033); },
+    heal: (X, t) => [1047, 1319, 1568, 2093].forEach((f, i) => osc(X, t + i * 0.06, 0.4, 'sine', f, null, 0.035, { echo: true, attack: 0.01 })),
+    status: (X, t) => { osc(X, t, 0.18, 'triangle', 700, 420, 0.04); nz(X, t, 0.12, 0.031, 'bandpass', 1400, 600, 1.2); },
+    super: (X, t) => { osc(X, t, 0.25, 'triangle', 1568, 2093, 0.04, { attack: 0.003 }); osc(X, t + 0.05, 0.3, 'sine', 3136, null, 0.026, { attack: 0.003 }); },
+    faint: (X, t) => { osc(X, t, 0.7, 'sine', 330, 110, 0.066, { lp: 900 }); nz(X, t + 0.5, 0.3, 0.044, 'lowpass', 500); },
+    victory: (X, t) => [523, 659, 784, 1047].forEach((f, i) => osc(X, t + i * 0.09, i === 3 ? 0.6 : 0.2, 'triangle', f, null, 0.048, { attack: 0.005 })),
   };
   let seqLive = 0;
   Au.seq15 = function (name, o) {

@@ -31,11 +31,12 @@ function swordGeometry() {
   const EDGE = '#eef3f8', INNER = '#b8c3d1', SEG = '#8794a6', GRIP = '#2b3240', CORE = '#7fd0ff', NODE = '#bfe9ff';
   for (let y = -5; y <= -1; y++) m.set(0, y, 0, GRIP);                       // grip
   m.set(0, -6, 0, CORE, 1);                                                   // glowing pommel cell
-  for (let z = -3; z <= 3; z++) for (let x = -1; x <= 1; x++) for (let y = 0; y <= 1; y++) m.set(x, y, z, Math.abs(z) === 3 && y === 1 && x === 0 ? NODE : SEG, Math.abs(z) === 3 && y === 1 && x === 0 ? 1 : 0);
-  for (let y = 2; y <= 19; y++) { const w = y < 15 ? 1 : Math.max(0, Math.round((19 - y) / 4));
-    for (let z = -w; z <= w; z++) { const core = z === 0 && y >= 3 && y <= 14, seg = y % 4 === 0 && z !== 0; m.set(0, y, z, core ? CORE : seg ? SEG : Math.abs(z) === w && w > 0 ? EDGE : INNER, core ? 1 : 0); } }
-  const s = 0.019, fix = (g) => { if (!g) return null; g.translate(-0.5, 0.5, -0.5); g.scale(s, s, s); return g; };   // grip at the origin, blade along +y
-  SWORD = { metal: fix(voxelGeometry(m, false)), glow: fix(voxelGeometry(m, true)), len: 20 * s };
+  for (let z = -4; z <= 4; z++) for (let x = -1; x <= 1; x++) for (let y = 0; y <= 1; y++) m.set(x, y, z, Math.abs(z) === 4 && y === 1 && x === 0 ? NODE : SEG, Math.abs(z) === 4 && y === 1 && x === 0 ? 1 : 0);
+  for (let y = 2; y <= 21; y++) { const w = y < 16 ? 2 : Math.max(0, Math.round((21 - y) / 2.5));
+    for (let z = -w; z <= w; z++) { const core = z === 0 && y >= 3 && y <= 16, seg = y % 4 === 0 && z !== 0; m.set(0, y, z, core ? CORE : seg ? SEG : Math.abs(z) === w && w > 0 ? EDGE : INNER, core ? 1 : 0); } }
+  for (let y = 3; y <= 16; y++) { m.set(1, y, 0, CORE, 1); m.set(-1, y, 0, CORE, 1); }   // a raised glowing spine on both faces
+  const s = 0.024, fix = (g) => { if (!g) return null; g.translate(-0.5, 0.5, -0.5); g.scale(s, s, s); return g; };   // grip at the origin, blade along +y
+  SWORD = { metal: fix(voxelGeometry(m, false)), glow: fix(voxelGeometry(m, true)), len: 22 * s };
   return SWORD;
 }
 
@@ -71,7 +72,7 @@ function nineSwords(api, who) {
   // last blade always lands with the hit
   const impact = (i) => { const p = strike(i), last = i === NINE - 1;
     st.hit[i] = true; st.hitAt[i] = +api.now().toFixed(3);
-    if (last) { api.fx.glow(p, '#ffffff', 2.2, 0.3); api.fx.shockwave(api.slot(tgt).group.position, '#7fd0ff', 1.2 * sc); api.fx.burst(p, ['#ffffff', '#bfe9ff', '#7fd0ff'], 14, { speed: 2.2, life: 0.4, size: 0.04, grav: 1.2 }); if (api.shake) api.shake(0.22); }
+    if (last) { api.fx.glow(p, '#e8f6ff', 1.3, 0.22); api.fx.shockwave(api.slot(tgt).group.position, '#7fd0ff', 1.2 * sc); api.fx.burst(p, ['#ffffff', '#bfe9ff', '#7fd0ff'], 14, { speed: 2.2, life: 0.4, size: 0.04, grav: 1.2 }); if (api.shake) api.shake(0.22); }
     else if (i % 3 === 1) { api.fx.burst(p, ['#ffd27a', '#ffffff'], 6, { speed: 2.6, life: 0.22, size: 0.03, grav: 3 }); api.fx.glow(p, '#ffd27a', 0.7, 0.14); }
     else { api.fx.glow(p, '#bfe9ff', 0.8, 0.16); for (let k = 0; k < N(api, 5); k++) api.fx.spawn(p, V3((i % 2 ? 1 : -1) * (1.5 + rnd(1)), rnd(1.4), rnd(0.6)), { color: k % 2 ? '#ffffff' : '#7fd0ff', life: 0.18, size: 0.025, grav: 2, spin: 0 }); } };
   st.tgt = tgt; st.shift = 0;
