@@ -40,6 +40,7 @@
     V.joint(m, 'tail', [S(-7.5), S(lo + 2.5), 0], null);
     if (P.tail !== false) V.inPart(m, 'tail', () => m.capsule(tb, tt, S(1.3), S(0.8), P.tailCol || P.body));
     m.part = null;
+    m.geo = { S, hc, hr, at, fd, sv, sn, fy: fy * 180 / Math.PI, tb, tailTip: tt, lo, neckTop };   // Phase 15B: read by the refined roster's species work
     return { S, hc, hr, at, fy: fy * 180 / Math.PI, tailTip: tt, lo, neckTop };
   }
   const eyes = (m, g, o) => K.eyes(m, [g.hc[0], g.hc[1], g.hc[2]], Object.assign({ yaw: g.fy, ang: 34, el: 14, size: 2, tall: 2, white: '#ffffff', pupil: '#0b0f1e' }, o));

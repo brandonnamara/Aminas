@@ -43,12 +43,12 @@
     return out;
   };
   // Tapered spike / hair tuft from base along dir
-  K.tuft = function (m, base, dir, len, r0, col, mode) { const d = norm(dir); return m.capsule(base, add(base, d, len), r0, Math.max(0.45, r0 * 0.25), col, mode); };
+  K.tuft = function (m, base, dir, len, r0, col, mode) { const d = norm(dir); return m.capsule(base, add(base, d, len), r0, Math.max(0.45 * V.detail(), r0 * 0.25), col, mode); };
   // A flame: a bent stack of tapering blobs, brighter (and glowing) towards the core. cols: [outer, mid, core]
   K.flame = function (m, base, dir, len, r, cols, seed, o) {
     o = o || {}; let d = norm(dir), p = base.slice(); const n = Math.max(3, R(len / 1.6));
     for (let i = 0; i < n; i++) {
-      const t = i / n, rr = Math.max(0.5, r * (1 - t * 0.85));
+      const t = i / n, rr = Math.max(0.5 * V.detail(), r * (1 - t * 0.85));
       const wob = [(V.hash(i, seed, 1, 3) - 0.5) * 0.9, 0, (V.hash(i, seed, 2, 3) - 0.5) * 0.9];
       const q = add(p, norm([d[0] + wob[0] + (o.lean || 0) * t, d[1], d[2] + wob[2]]), len / n);
       m.capsule(p, q, rr, rr * 0.85, (x, y, z) => {
@@ -69,24 +69,24 @@
   };
   // Feathered / membrane wing on side sd (+1 = +z). root: shoulder; span; o: {cols:[...rows], up, back, droop, membrane}
   K.wing = function (m, root, sd, span, o) {
-    o = o || {}; const cols = o.cols || ['#ffffff'];
+    o = o || {}; const cols = o.cols || ['#ffffff'], D = V.detail(), bone = (o.bone || 1.1) * D;
     const elbow = add(root, norm([-(o.back || 0.4), o.up == null ? 1 : o.up, sd * 1.1]), span * 0.45);
     const tip = add(elbow, norm([-(o.back || 0.4) * 1.4, (o.up == null ? 1 : o.up) * 0.7, sd * 0.9]), span * 0.6);
-    m.capsule(root, elbow, o.bone || 1.1, (o.bone || 1.1) * 0.8, o.boneCol || cols[0]);
-    m.capsule(elbow, tip, (o.bone || 1.1) * 0.8, 0.5, o.boneCol || cols[0]);
+    m.capsule(root, elbow, bone, bone * 0.8, o.boneCol || cols[0]);
+    m.capsule(elbow, tip, bone * 0.8, 0.5 * D, o.boneCol || cols[0]);
     const n = o.feathers || 7;
     for (let i = 0; i <= n; i++) {
       const t = i / n, s = t < 0.5 ? add(root, [elbow[0] - root[0], elbow[1] - root[1], elbow[2] - root[2]], t * 2) : add(elbow, [tip[0] - elbow[0], tip[1] - elbow[1], tip[2] - elbow[2]], (t - 0.5) * 2);
       const L = span * (o.featherLen || 0.55) * (0.55 + t * 0.6) * (o.membrane ? 1 : 1);
       const fd = norm([-(o.sweep || 0.9) - t * 0.5, -(o.droop || 0.9), sd * (0.25 + t * 0.35)]);
       const rows = cols.length;
-      m.capsule(s, add(s, fd, L), o.membrane ? 1.1 : 0.85, 0.55, (x, y, z, tt) => {
+      m.capsule(s, add(s, fd, L), (o.membrane ? 1.1 : 0.85) * D, 0.55 * D, (x, y, z, tt) => {
         const c = cols[Math.min(rows - 1, Math.floor(tt * rows))];
         return o.glowTips && tt > 0.75 ? { c: o.glowTips, g: 1 } : c;
       });
       if (o.membrane && i < n) { // fill between this finger and the next
         const s2 = i + 1 <= n / 2 ? add(root, [elbow[0] - root[0], elbow[1] - root[1], elbow[2] - root[2]], ((i + 1) / n) * 2) : add(elbow, [tip[0] - elbow[0], tip[1] - elbow[1], tip[2] - elbow[2]], ((i + 1) / n - 0.5) * 2);
-        for (let u = 0.25; u < 1; u += 0.25) m.capsule(add(s, [s2[0] - s[0], s2[1] - s[1], s2[2] - s[2]], u), add(add(s, [s2[0] - s[0], s2[1] - s[1], s2[2] - s[2]], u), fd, L * 0.85), 0.7, 0.5, o.membrane, 'under');
+        for (let u = 0.25; u < 1; u += 0.25) m.capsule(add(s, [s2[0] - s[0], s2[1] - s[1], s2[2] - s[2]], u), add(add(s, [s2[0] - s[0], s2[1] - s[1], s2[2] - s[2]], u), fd, L * 0.85), 0.7 * D, 0.5 * D, o.membrane, 'under');
       }
     }
     return { elbow, tip };
@@ -98,7 +98,7 @@
     for (let i = 0; i < n; i++) {
       const u = V.hash(i, seed, 7, 1) * Math.PI * 2, v = (o.dome ? 0.15 : -0.4) + V.hash(i, seed, 8, 1) * (o.dome ? 0.85 : 1.4);
       const p = [c[0] + Math.cos(u) * Math.cos(v) * r[0], c[1] + Math.sin(v) * r[1], c[2] + Math.sin(u) * Math.cos(v) * r[2]];
-      const br = 1.1 + V.hash(i, seed, 9, 1) * 1.3;
+      const br = (1.1 + V.hash(i, seed, 9, 1) * 1.3) * V.detail();
       m.ellipsoid(p[0], p[1], p[2], br, br * 0.8, br, cols[i % cols.length], o.mode);
       pts.push(p.map(R));
     }
@@ -112,6 +112,7 @@
       let q = p.slice(); for (let k = 0; k < 4 && m.has(q[0], q[1] + 1, q[2]); k++) q[1]++;
       const c = typeof col === 'function' ? col(i) : col;
       m.set(q[0], q[1] + 1, q[2], c, o.g || 0);
+      const sz = Math.round(V.detail()); if (sz > 1) for (let a = 0; a < sz; a++) for (let b = 0; b < sz; b++) for (let e = 0; e < sz; e++) m.set(q[0] + a, q[1] + 1 + b, q[2] + e, c, o.g || 0);
       if (o.big) { m.set(q[0] + 1, q[1] + 1, q[2], c, o.g || 0); m.set(q[0], q[1] + 1, q[2] + 1, c, o.g || 0); m.set(q[0], q[1] + 2, q[2], o.hi || c, o.g || 0); }
     });
   };
@@ -143,9 +144,10 @@
       const p = [R(c[0] + Math.cos(u) * d), R(c[1] + h), R(c[2] + Math.sin(u) * d * (r[2] / r[0]))];
       if (m.has(p[0], p[1], p[2])) continue;
       m.set(p[0], p[1], p[2], cols[i % cols.length], g == null ? 1 : g);
+      const sz = Math.round(V.detail()); if (sz > 1) m.box(p[0], p[1], p[2], p[0] + sz - 1, p[1] + sz - 1, p[2] + sz - 1, { c: cols[i % cols.length], g: g == null ? 1 : g });
       if (V.hash(i, seed, 4, 9) > 0.6) m.set(p[0] + 1, p[1], p[2], cols[i % cols.length], g == null ? 1 : g);
     }
   };
   // Simple claws / toes at a foot centre, pointing +x
-  K.toes = function (m, x, y, z, n, col, len) { for (let i = 0; i < n; i++) { const zz = z + (i - (n - 1) / 2) * 1.2; m.box(x, y, zz, x + (len || 1), y, zz, col); } };
+  K.toes = function (m, x, y, z, n, col, len) { const D = V.detail(), w = Math.max(1, Math.round(D)) - 1; for (let i = 0; i < n; i++) { const zz = z + (i - (n - 1) / 2) * 1.2 * D; m.box(x, y, zz, x + (len || 1) * D, y + w, zz + w, col); } };
 })(typeof window !== 'undefined' ? window : globalThis);

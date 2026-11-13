@@ -49,7 +49,7 @@
         K.eyes(m, hc, { yaw: fy * 180 / Math.PI, ang: 42, el: 18, size: P.eyeSize || 1, tall: 1, iris: P.eye, white: P.eyeWhite, pupil: '#120808', lid: P.lid });
       });
       V.emit(m, mn, snout, hn);
-      out.push({ hc, hr, snout });
+      out.push({ hc, hr, snout, n0, n1, n2 });
     }
     // spine spikes
     if (P.spikes) V.inPart(m, 'core', () => { for (let i = 0; i < 6; i++) K.tuft(m, [S(3 - i * 2), S(lo + 5.6 - i * 0.3), 0], [-0.6, 1, 0], S(1.8), S(0.8), P.spikes); });
@@ -59,6 +59,7 @@
     V.inPart(m, 'tail', () => { for (let i = 0; i < tp.length - 1; i++) m.capsule(tp[i], tp[i + 1], S(2.2) * (1 - i * 0.2), S(2.2) * (1 - (i + 1) * 0.2), P.tailCol || P.body); });
     m.part = null;
     const shoulder = [S(1), S(lo + 5.2), S(1.8)];
+    m.geo = { S, lo, heads: out, tp, shoulder };   // Phase 15B: read by the refined roster's species work
     return { S, lo, heads: out, tailTip: tp[tp.length - 1], shoulder };
   }
 

@@ -53,6 +53,7 @@
     V.joint(m, 'tail', [S(-6.5), S(8), 0], null);
     V.inPart(m, 'tail', () => { for (let i = 0; i < tail.length - 1; i++) m.capsule(tail[i], tail[i + 1], S(1.3) * (1 - i * 0.05), S(1.3) * (1 - (i + 1) * 0.05), P.tail || body); });
     m.part = null;
+    m.geo = { hc, hr, at, fd, mz, S };   // Phase 15B: read by the refined roster's species work
     return { hc, hr, fy: P.faceYaw == null ? 32 : P.faceYaw, tailTip: tail[tail.length - 1], S };
   }
   function eyes(m, g, P) { K.eyes(m, [g.hc[0], g.hc[1] - g.S(0.2), g.hc[2]], { yaw: g.fy, ang: 30, el: 12, size: 2, tall: 2, iris: P.eye, pupil: P.pupil || '#0a0a14', white: '#ffffff', lid: P.lid }); }

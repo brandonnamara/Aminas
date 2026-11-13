@@ -33,6 +33,7 @@
     V.inPart(m, 'head', () => m.ellipsoid(hc[0], hc[1], hc[2], S(P.head || 3), S((P.head || 3) * (P.headY || 1)), S(P.head || 3), P.headCol || P.body));
     V.emit(m, 'mouth', [hc[0] + S(P.head || 3), hc[1] - S(0.8), 0], 'head'); V.emit(m, 'chest', [S(0.3) + S(W), S(L + T * 0.7), 0], null);
     m.part = null;
+    m.geo = { S, hc, hr: S(P.head || 3), hand, top: S(L + T), sh };   // Phase 15B: read by the refined roster's species work
     return { S, hc, hr: S(P.head || 3), hand, top: S(L + T), sh, L: S(L) };
   }
   const front = (m, c, yaw, el) => K.surface(m, c, yaw, el || 0, 30);

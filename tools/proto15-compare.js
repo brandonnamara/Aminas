@@ -9,9 +9,9 @@ const ALL = ['lumifern', 'solarbloom', 'aurelith', 'igniflare', 'pyronix', 'igni
   const page = await (await browser.newContext({ viewport: { width: 844, height: 390 }, deviceScaleFactor: 1 })).newPage(); page.setDefaultTimeout(900000);
   page.on('pageerror', (e) => console.log('pageerror', e.message)); page.on('console', (m) => { if (m.type() === 'error') console.log('console', m.text()); });
   await page.goto(srv.url); await page.waitForFunction(() => window.A && A.UI && A.C3D && A.Proto15);
-  const res = await page.evaluate(async (IDS) => {
+  const res = await page.evaluate(async ([IDS, CELL]) => {
     const C = await import('/src/3d/creature3d.js'); await import('/src/3d/showcase.js'); await import('/src/3d/roster.js'); try { await import('/src/3d/proto15.js'); } catch (e) { console.error('proto15 module: ' + e.message); }
-    const SC = await import('/src/3d/showcase.js'); const THREE = C.THREE, D = A.Data, cell = 300;
+    const SC = await import('/src/3d/showcase.js'); const THREE = C.THREE, D = A.Data, cell = CELL;
     const R = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true, alpha: true }); R.setSize(cell, cell); R.outputColorSpace = THREE.SRGBColorSpace; R.toneMapping = THREE.ACESFilmicToneMapping;
     const scene = new THREE.Scene(); C.studioLights(scene, 'studio'); const cam = new THREE.PerspectiveCamera(26, 1, 0.1, 50);
     const out = {}, shots = {};
@@ -32,7 +32,7 @@ const ALL = ['lumifern', 'solarbloom', 'aurelith', 'igniflare', 'pyronix', 'igni
       out[id] = o;
     }
     return { out, shots };
-  }, IDS);
+  }, [IDS, +process.env.CELL || 300]);
   Object.entries(res.shots).forEach(([k, a]) => a.forEach((d, i) => fs.writeFileSync(path.join(OUT, 'models', k + '-' + i + '.png'), Buffer.from(d.split(',')[1], 'base64'))));
   fs.writeFileSync(path.join(OUT, process.argv[3] ? 'roster15b-models.json' : 'proto15-models.json'), JSON.stringify(res.out, null, 1));
   Object.entries(res.out).forEach(([id, o]) => console.log(id.padEnd(11), 'cur', JSON.stringify([o.cur.voxels, o.cur.tris, o.cur.parts.length, o.cur.ok]), ' p15', JSON.stringify([o.p15.voxels, o.p15.tris, o.p15.parts.length, o.p15.ok, o.p15.buildMs, o.p15.errors.slice(0, 3)])));
