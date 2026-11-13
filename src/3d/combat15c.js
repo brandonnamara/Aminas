@@ -115,11 +115,62 @@ function nineSwords(api, who) {
 export let last9 = null;   // diagnostics for tests
 
 /* ================================================================= signatures: the moves with their own sequence */
+/* Phase 15D: three more signature sequences. Each plays on its line's existing special clip; its impact is driven
+   by the rule engine's hit (onHit), so it can never land early or late, and nothing lingers if the battle ends. */
+let pending = null;   // { tgt, fn } — the impact of the signature sequence in flight
+const onHitOnce = (api, tgt, fn) => { pending = { tgt, fn, done: false }; const p = pending; api.own(() => { p.done = true; if (pending === p) pending = null; }); };
+function lumiferSolarFlare(api, who) {   // Lumifern III, Solar Flare: petals, soft light, a flowing ribbon, a bloom
+  const tgt = api.other(who), calm = api.calm(), a = api.chest(who), sc = api.slot(who).group.scale.x, PET = ['#fff7c8', '#ffe28a', '#ffd86b', '#c8f59a', '#ffffff'];
+  api.fx.glow(a, '#fff2b0', 1.0, 0.45);
+  if (!calm) for (let i = 0; i < N(api, 18); i++) api.at(i * 0.016, () => { const ang = i * 0.75, r = (0.45 + (i % 3) * 0.08) * sc, p = a.clone().add(V3(cos(ang) * r, -0.25 + i * 0.02, sin(ang) * r));
+    api.fx.spawn(p, V3(-sin(ang) * 0.9, 0.55, cos(ang) * 0.9), { color: PET[i % 5], life: 0.42, size: 0.035, grav: -0.2, drag: 0.6, spin: 5 }); });
+  const n = N(api, 16);
+  for (let i = 0; i <= n; i++) api.at(0.3 + (i / n) * 0.22, () => { const k = i / n, p = api.chest(who).lerp(api.chest(tgt), k); p.y += sin(k * Math.PI) * 0.4 + sin(k * TAU * 1.5) * 0.06; p.z += cos(k * TAU) * 0.08;
+    api.fx.spawn(p, V3(0, 0.15, 0), { color: PET[i % 5], life: 0.3, size: 0.04, grav: -0.1, spin: 6 }); });
+  onHitOnce(api, tgt, () => { const b = api.chest(tgt), g = api.slot(tgt).group.position;
+    api.fx.glow(b, '#ffe9a0', 1.4, 0.35);
+    for (let i = 0; i < N(api, 14); i++) { const ang = (i / 14) * TAU; api.fx.spawn(b, V3(cos(ang) * 1.3, sin(ang) * 0.9 + 0.3, sin(ang) * 0.5), { color: PET[i % 5], life: 0.5, size: 0.045, grav: 0.6, drag: 1.2, spin: 7 }); }
+    if (!calm) for (let i = 0; i < N(api, 10); i++) api.at(0.1 + i * 0.04, () => api.fx.spawn(g.clone().add(V3(rnd(0.7), 1.0 + Math.random() * 0.4, rnd(0.5))), V3(rnd(0.3), -0.35, rnd(0.3)), { color: PET[i % 5], life: 1.0, size: 0.035, grav: 0.15, drag: 0.4, spin: 3 })); });
+  if (api.cam && !calm) { api.at(0.28, () => api.cam.focus(api.chest(tgt), 0.6)); api.at(0.95, () => api.cam.release()); }
+  audio('bloom');
+}
+function igniflareInferno(api, who) {   // Igniflare III, Inferno: wing gusts, a gathering fireball, a launch, a firestorm
+  const tgt = api.other(who), calm = api.calm(), sc = api.slot(who).group.scale.x, F = ['#c41010', '#ff4500', '#ff8000', '#ffe600'];
+  const mouth = () => api.from(who, 'mouth');
+  [0.06, 0.2].forEach((t) => api.at(t, () => { const g = api.slot(who).group.position; for (let i = 0; i < N(api, 10); i++) { const ang = (i / 10) * TAU; api.fx.spawn(g.clone().setY(0.08), V3(cos(ang) * 1.5, 0.15, sin(ang) * 1.5), { color: i % 2 ? '#7a3a2a' : '#ff8000', life: 0.32, size: 0.045, grav: 0, drag: 1, spin: 2 }); } }));
+  for (let i = 0; i < N(api, 20); i++) api.at(0.04 + i * 0.016, () => { const m0 = mouth(), d = V3(rnd(2), rnd(2), rnd(2)).normalize().multiplyScalar(0.45 * sc); api.fx.spawn(m0.clone().add(d), d.clone().multiplyScalar(-1 / 0.16), { color: F[i % 4], life: 0.16, size: 0.04, grav: 0, spin: 4 }); });
+  api.at(0.3, () => api.fx.glow(mouth(), '#ffb040', 1.2, 0.18));
+  api.at(0.36, () => api.fx.projectile(mouth(), api.chest(tgt), 'fire', { dur: 0.12, cols: F }));
+  onHitOnce(api, tgt, () => { const g = api.slot(tgt).group.position, s2 = api.slot(tgt).group.scale.x;
+    api.fx.column(g, F, 14, { r: 0.35 * s2, rise: 1.5, life: 0.55, size: 0.06 });
+    for (let i = 0; i < N(api, 16); i++) { const ang = (i / 16) * TAU; api.fx.spawn(g.clone().add(V3(0, 0.06, 0)), V3(cos(ang) * 1.8, 0.25, sin(ang) * 1.8), { color: F[i % 4], life: 0.45, size: 0.05, grav: 0, drag: 1.4, spin: 3 }); }
+    if (!calm) { if (api.shake) api.shake(0.16); for (let i = 0; i < N(api, 8); i++) api.at(0.25 + i * 0.05, () => api.fx.spawn(g.clone().add(V3(rnd(0.6), 0.4 + Math.random() * 0.8, rnd(0.5))), V3(0, 0.6, 0), { color: i % 2 ? '#5a4a4a' : '#7a6a6a', life: 0.7, size: 0.06, grav: -0.4, drag: 0.8, spin: 1 })); } });
+  if (api.cam && !calm) { api.at(0.32, () => api.cam.focus(api.chest(tgt), 0.75)); api.at(0.9, () => api.cam.release()); }
+  audio('inferno');
+}
+function zeepOverclock(api, who) {   // Zeep III, Overclock: a charging ring that spins up, a locked-on beam, a hex burst
+  const tgt = api.other(who), calm = api.calm(), sc = api.slot(who).group.scale.x, c0 = api.chest(who), t0 = api.now(), CY = ['#22d8ff', '#9ff0ff', '#ffffff'];
+  const n = N(api, 12), tick = () => { const t = api.now() - t0; if (t > 0.5) return false; const spin = 4 + t * 26;
+    if (Math.floor(t * 60) % 2 === 0) for (let i = 0; i < n; i += 3) { const ang = (i / n) * TAU + t * spin, r = (0.62 - t * 0.5) * sc; api.fx.spawn(c0.clone().add(V3(cos(ang) * r, 0.05 + t * 0.2, sin(ang) * r)), V3(0, 0, 0), { color: CY[i % 3], life: 0.06, size: 0.035, grav: 0, spin: 0 }); }
+    return true; };
+  if (!calm) api.tick(tick);
+  api.at(0.34, () => api.fx.glow(api.head(who), '#9ff0ff', 1.0, 0.2));
+  api.at(0.4, () => { const a = api.from(who, 'mouth'), b = api.chest(tgt), m = N(api, 14); for (let i = 0; i <= m; i++) { const k = i / m; api.fx.spawn(a.clone().lerp(b, k), V3(0, 0, 0), { color: i % 2 ? '#22d8ff' : '#ffffff', life: 0.14 + k * 0.08, size: 0.03, grav: 0, spin: 0 }); } });
+  onHitOnce(api, tgt, () => { const b = api.chest(tgt), g = api.slot(tgt).group.position;
+    api.fx.glow(b, '#9ff0ff', 1.3, 0.25);
+    for (let i = 0; i < 6; i++) { const ang = (i / 6) * TAU; for (let j = 1; j <= 3; j++) api.fx.spawn(b, V3(cos(ang) * j * 0.6, sin(ang) * j * 0.6, 0.2), { color: j === 3 ? '#ffffff' : '#22d8ff', life: 0.3, size: 0.035, grav: 0, drag: 2, spin: 0 }); }
+    api.fx.shockwave(g, '#22d8ff', 0.9); if (!calm && api.shake) api.shake(0.1); });
+  if (api.cam && !calm) { api.at(0.3, () => api.cam.focus(api.chest(tgt), 0.6)); api.at(0.8, () => api.cam.release()); }
+  audio('overclockZ');
+}
 const SIG = {
   // Atem III only (Atem-01 and Atem-02 keep their own presentations)
-  overclock: { match: (sp) => sp === 'atem' && A().Proto15.active(sp), clip: 'special9', hold: (o) => (o.calm ? 360 : SWORD_HOLD_MS), run: nineSwords },
+  overclock: [{ match: (sp) => sp === 'atem' && A().Proto15.active(sp), clip: 'special9', hold: (o) => (o.calm ? 360 : SWORD_HOLD_MS), run: nineSwords },
+    { match: (sp) => sp === 'zeep3', clip: 'special', hold: () => 160, run: zeepOverclock }],
+  solarflare: [{ match: (sp) => sp === 'aurelith', clip: 'special', hold: () => 180, run: lumiferSolarFlare }],
+  inferno: [{ match: (sp) => sp === 'ignivor', clip: 'special', hold: () => 140, run: igniflareInferno }],
 };
-export function sig(spId, abil) { if (!on()) return null; const s = SIG[abil]; return s && s.match(spId) ? s : null; }
+export function sig(spId, abil) { if (!on()) return null; const l = SIG[abil]; return (l && l.find((s) => s.match(spId))) || null; }
 export function hold(spId, abil, o) { const s = sig(spId, abil); return s ? s.hold(o || {}) : 0; }
 
 /* ================================================================= roster-wide special flourishes (specials only) */
@@ -163,9 +214,9 @@ const F = {
       api.fx.burst(g.clone().setY(0.06), ['#c2b59b', '#a8987a'], 8, { speed: 0.9, up: 0.3, life: 0.45, size: 0.05, grav: 2 }); if (api.shake) api.shake(0.12); }); },
 };
 F.zephyr = F.pyrospark;
-const MOVE_SKIP = { overclock: 1 };   // moves with a full signature sequence of their own
+const MOVE_SKIP = { overclock: 1, solarflare: 1, inferno: 1 };   // with a signature of their own (other species with these moves keep their flourish)   // moves with a full signature sequence of their own
 Object.keys(STYLE).forEach((key) => { const orig = STYLE[key]; STYLE[key] = (api, who, info) => { orig(api, who, info);
-  try { if (!on() || !info || !info.special || (api.calm && api.calm()) || MOVE_SKIP[info.abil]) return; const ln = lineOf(api.slot(who).spId), f = F[ln]; if (f) f(api, who, api.other(who), info); } catch (e) { /* decoration only */ } }; });
+  try { if (!on() || !info || !info.special || (api.calm && api.calm())) return;   // (moves with a signature sequence never reach here) const ln = lineOf(api.slot(who).spId), f = F[ln]; if (f) f(api, who, api.other(who), info); } catch (e) { /* decoration only */ } }; });
 export const FLOURISH_LINES = Object.keys(F);
 
 /* ================================================================= camera on specials (any line) */
@@ -196,7 +247,9 @@ export function status(api, who, color) {
   const g = api.slot(who).group.position, s = api.slot(who).group.scale.x, n = N(api, 14);
   for (let i = 0; i < n; i++) { const ang = (i / n) * TAU; api.fx.spawn(g.clone().add(V3(cos(ang) * 0.5 * s, 0.06, sin(ang) * 0.5 * s)), V3(-cos(ang) * 0.25, 0.25, -sin(ang) * 0.25), { color: i % 2 ? color : '#ffffff', life: 0.5, size: 0.04, grav: 0, spin: 1 }); }
 }
-export function hit(api, who, el, eff) { if (!on()) return; if (last9 && !last9.done && last9.tgt === who && last9.landNow) last9.landNow(); if (eff === 'super') audio('super'); }
+export function hit(api, who, el, eff) { if (!on()) return; if (last9 && !last9.done && last9.tgt === who && last9.landNow) last9.landNow();
+  if (pending && !pending.done && pending.tgt === who) { const p = pending; p.done = true; pending = null; try { p.fn(); } catch (e) { /* decoration only */ } }
+  if (eff === 'super') audio('super'); }
 export function faint(api, who) {
   if (!on()) return; audio('faint', { delay: 0.1 }); if (api.calm()) return;
   const g = api.slot(who).group.position, n = N(api, 12);

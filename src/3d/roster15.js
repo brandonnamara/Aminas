@@ -25,8 +25,11 @@ const bump = (t, a, b) => (t <= a || t >= b ? 0 : sin(PI * (t - a) / (b - a)) **
 const F = (D, n, f) => Array.from({ length: n + 1 }, (_, i) => [D * i / n, f(D * i / n)]);
 
 /* each spec: clip name -> (k, D) => tracks; `replace` lists clips whose same-named tracks the spec replaces */
+/* Phase 15D: body-specific defensive poses (guard). Same 0.7 s clip, same guard rules; each body type braces its own
+   way and is back at rest by the end (so it returns cleanly to idle). */
+const HOLD = (D, v) => [[0, Z3], [D * 0.26, v], [D * 0.72, v], [D, Z3]], HOLDP = (D, v) => [[0, Z3], [D * 0.26, v], [D * 0.72, v], [D, Z3]];
 const SPEC = {
-  bat: { tracks: {
+  bat: { replace: { guard: 1 }, tracks: {
     idle: (k, D) => [k.pair('wingL', 'wingR', F(D, 36, (t) => [0.05 * sin(t / D * TAU * 2) - 0.45 * bump(t, D * 0.55, D * 0.8), 0.18 * bump(t, D * 0.55, D * 0.8), 0])),
       k.R('earL', [[0, Z3], [D * 0.3, Z3], [D * 0.32, [0.35, 0, 0]], [D * 0.36, Z3], [D, Z3]]), k.R('earR', [[0, Z3], [D * 0.7, Z3], [D * 0.72, [0.35, 0, 0]], [D * 0.76, Z3], [D, Z3]], true)],
     ready: (k, D) => [k.pair('wingL', 'wingR', [[0, Z3], [D * 0.35, [-0.45, 0.15, 0]], [D * 0.7, [-0.15, 0, 0]], [D, Z3]])],
@@ -35,12 +38,13 @@ const SPEC = {
     hit: (k, D) => [k.pair('wingL', 'wingR', [[0, Z3], [0.08, [0.3, 0.35, 0]], [0.3, [0.1, 0.1, 0]], [D, Z3]])],
     hitBig: (k, D) => [k.pair('wingL', 'wingR', [[0, Z3], [0.1, [0.45, 0.45, 0]], [0.45, [0.15, 0.1, 0]], [D, Z3]])],
     heal: (k, D) => [k.pair('wingL', 'wingR', [[0, Z3], [D * 0.35, [0.1, 0.55, 0]], [D * 0.7, [0.1, 0.5, 0]], [D, Z3]])],
-    guard: (k, D) => [k.pair('wingL', 'wingR', [[0, Z3], [D * 0.25, [0.15, 0.75, 0]], [D * 0.75, [0.15, 0.75, 0]], [D, Z3]])],
+    guard: (k, D) => [k.pair('wingL', 'wingR', [[0, Z3], [D * 0.25, [0.15, 0.75, 0]], [D * 0.75, [0.15, 0.75, 0]], [D, Z3]]), k.R('head', HOLD(D, [0, 0, -0.3]))],   // wings wrapped round, head tucked
     victory: (k, D) => [k.pair('wingL', 'wingR', F(D, 32, (t) => [-0.7 * Math.abs(sin(t / D * TAU * 2)) * sin(t / D * PI), 0, 0]))],
     defeat: (k, D) => [k.pair('wingL', 'wingR', [[0, Z3], [0.3, [-0.3, 0, 0]], [D, [0.55, 0.25, 0]]])],
     move: (k, D) => [k.pair('wingL', 'wingR', F(D, 16, (t) => [-0.35 * Math.abs(sin(t / D * TAU)), 0, 0]))],
   } },
-  fox: { tracks: {
+  fox: { replace: { guard: 1 }, tracks: {
+    guard: (k, D) => [k.pair('earL', 'earR', HOLD(D, [0.15, 0, 0.75])), k.P('rig', HOLDP(D, [0, -0.07, 0]), true), k.R('head', HOLD(D, [0, 0, -0.18])), k.R('tail', HOLD(D, [0, 0.7, 0.15]))],   // crouched low, ears flat, tail swept round
     idle: (k, D) => [k.pair('earL', 'earR', [[0, Z3], [D * 0.4, Z3], [D * 0.43, [-0.25, 0, -0.15]], [D * 0.5, Z3], [D * 0.82, Z3], [D * 0.84, [0.3, 0, 0]], [D * 0.88, Z3], [D, Z3]])],
     ready: (k, D) => [k.pair('earL', 'earR', [[0, Z3], [D * 0.3, [0, 0, -0.25]], [D * 0.7, [0, 0, -0.2]], [D, Z3]])],
     attack: (k, D) => [k.pair('earL', 'earR', [[0, Z3], [0.2, [0.1, 0, 0.55]], [0.4, [0.1, 0, 0.6]], [0.7, Z3], [D, Z3]])],
@@ -50,22 +54,34 @@ const SPEC = {
     victory: (k, D) => [k.pair('earL', 'earR', F(D, 24, (t) => [0.2 * sin(t / D * TAU * 3) * sin(t / D * PI), 0, -0.2 * sin(t / D * PI)]))],
     defeat: (k, D) => [k.pair('earL', 'earR', [[0, Z3], [D, [0.5, 0, 0.6]]])],
   } },
-  serpent: { replace: { idle: 1 }, tracks: {
+  serpent: { replace: { idle: 1, guard: 1 }, tracks: {
+    guard: (k, D) => [k.R('neck', HOLD(D, [0, 0, -0.42])), k.R('head', HOLD(D, [0, 0, 0.36])), k.R('tail', HOLD(D, [0, 0.55, 0.05])), k.R('jaw', HOLD(D, [0, 0, -0.25]))],   // coils back, head drawn in, mouth open in warning
     idle: (k, D) => [k.R('neck', F(D, 24, (t) => [0.04 * sin(t / D * TAU * 2), 0.16 * sin(t / D * TAU), 0.05 * sin(t / D * TAU * 2)])),
       k.R('head', F(D, 24, (t) => [0, -0.13 * sin(t / D * TAU - 0.9), 0.06 * sin(t / D * TAU * 2 - 0.9)])),
       k.R('tail', F(D, 24, (t) => [0, 0.32 * sin(t / D * TAU + 1.3), 0.06 * sin(t / D * TAU * 2 + 1.3)]))],
   } },
-  monkey: { replace: { idle: 1 }, tracks: {
+  monkey: { replace: { idle: 1, guard: 1 }, tracks: {
+    guard: (k, D) => [k.R('armL', HOLD(D, [-0.5, 0, 1.25])), k.R('armR', HOLD(D, [-0.5, 0, 1.25]), true), k.R('head', HOLD(D, [0, 0, -0.3])), k.P('rig', HOLDP(D, [0, -0.05, 0]), true)],   // arms crossed up in front of the face
     idle: (k, D) => [k.R('armR', [[0, Z3], [D * 0.52, Z3], [D * 0.6, [0.35, 0, 1.7]], [D * 0.64, [0.35, 0, 1.85]], [D * 0.68, [0.35, 0, 1.7]], [D * 0.72, [0.35, 0, 1.85]], [D * 0.76, [0.35, 0, 1.7]], [D * 0.86, Z3], [D, Z3]], true)],
   } },
-  mech: { replace: { idle: 1 }, tracks: {
+  mech: { replace: { idle: 1, guard: 1 }, tracks: {
+    guard: (k, D) => [k.P('head', HOLDP(D, [-1.6, -1.2, 0])), k.R('head', HOLD(D, [0, 0, -0.12])), k.P('rig', HOLDP(D, [0, -0.06, 0]), true)],   // head retracts into the shell, body clamps down
     idle: (k, D) => [k.R('head', [[0, Z3], [D * 0.2, Z3], [D * 0.23, [0, 0.3, 0]], [D * 0.45, [0, 0.3, 0]], [D * 0.48, [0, 0.3, 0.12]], [D * 0.6, [0, 0.3, 0.12]], [D * 0.63, [0, -0.2, 0]], [D * 0.8, [0, -0.2, 0]], [D * 0.83, Z3], [D, Z3]])],
   } },
-  bird: { tracks: {
+  bird: { replace: { guard: 1 }, tracks: {
+    guard: (k, D) => [k.pair('wingL', 'wingR', HOLD(D, [0.3, 0.95, 0])), k.R('head', HOLD(D, [0, 0, -0.28]))],   // wings folded forward as a shield
     idle: (k, D) => [k.pair('wingL', 'wingR', F(D, 36, (t) => [-0.25 * bump(t, D * 0.3, D * 0.36) - 0.25 * bump(t, D * 0.38, D * 0.44), 0, 0]))],
   } },
-  heavy: { tracks: {} },
-  quad: { tracks: {} }, jester: { tracks: {} }, float: { tracks: {} },
+  heavy: { replace: { guard: 1 }, tracks: {
+    guard: (k, D) => [k.P('rig', HOLDP(D, [0, -0.1, 0]), true), k.P('head', HOLDP(D, [-1.8, -0.6, 0])), k.R('head', HOLD(D, [0, 0, -0.2])), k.R('armL', HOLD(D, [-0.3, 0, 0.9])), k.R('armR', HOLD(D, [-0.3, 0, 0.9]), true)],   // braced low and heavy, head drawn back (into the shell for Cannonis)
+  } },
+  quad: { replace: { guard: 1 }, tracks: {
+    guard: (k, D) => [k.R('head', HOLD(D, [0, 0, -0.5])), k.R('neck', HOLD(D, [0, 0, -0.3])), k.P('rig', HOLDP(D, [0, -0.06, 0]), true)],   // head lowered, antlers forward
+  } },
+  jester: { replace: { guard: 1 }, tracks: {
+    guard: (k, D) => [k.R('armL', HOLD(D, [-0.65, 0, 1.6])), k.R('armR', HOLD(D, [-0.65, 0, 1.6]), true), k.R('head', HOLD(D, [0, 0.25, -0.12])), k.P('rig', HOLDP(D, [0, -0.04, 0]), true)],   // arms flung up over the face, a sly glance
+  } },
+  float: { tracks: {} },
 };
 const has = (clip, name) => clip.tracks.some((t) => t.name.split('.')[0] === name);
 function overlay(root, line, clips) {

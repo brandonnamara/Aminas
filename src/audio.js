@@ -406,6 +406,11 @@
         osc(X, h, last ? 0.6 : 0.22, 'triangle', (last ? 1760 : 2637 - i * 60), null, last ? 0.03 : 0.014, { attack: 0.002 }); if (last) kick(X, h, 160, 55, 0.22, 0.09); else nz(X, h, 0.04, 0.02, 'highpass', 3200); }
       nz(X, t + 1.18, 0.3, 0.02, 'bandpass', 3000, 900, 1); osc(X, t + 1.2, 0.26, 'sine', 880, 330, 0.02);
     },
+    // Phase 15D signatures: Lumifern's bloom (soft rising chimes), Igniflare's inferno (roar of flame, a deep thump),
+    // Zeep's overclock (a servo spin-up, a lock-on blip, a crisp electric crack)
+    bloom: (X, t) => { [784, 988, 1175, 1568].forEach((f, i) => osc(X, t + 0.05 + i * 0.07, 0.5, 'sine', f, null, 0.022, { echo: true, attack: 0.02 })); nz(X, t + 0.3, 0.4, 0.02, 'bandpass', 2400, 4000, 0.8); osc(X, t + 0.55, 0.6, 'triangle', 2093, null, 0.018, { echo: true, attack: 0.01 }); },
+    inferno: (X, t) => { nz(X, t, 0.4, 0.05, 'lowpass', 400, 1600); nz(X, t + 0.36, 0.5, 0.06, 'bandpass', 900, 300, 0.7); kick(X, t + 0.5, 90, 38, 0.3, 0.09); },
+    overclockZ: (X, t) => { osc(X, t, 0.4, 'sawtooth', 120, 900, 0.025, { lp: 2600 }); osc(X, t + 0.38, 0.05, 'square', 2200, null, 0.02, { lp: 5000 }); nz(X, t + 0.5, 0.12, 0.05, 'highpass', 3000); osc(X, t + 0.5, 0.18, 'square', 1400, 300, 0.02, { lp: 4000 }); },
     guard: (X, t) => { osc(X, t, 0.35, 'sine', 300, 300, 0.066, { am: [18, 0.4], attack: 0.03 }); osc(X, t + 0.02, 0.3, 'triangle', 600, 900, 0.033); },
     heal: (X, t) => [1047, 1319, 1568, 2093].forEach((f, i) => osc(X, t + i * 0.06, 0.4, 'sine', f, null, 0.035, { echo: true, attack: 0.01 })),
     status: (X, t) => { osc(X, t, 0.18, 'triangle', 700, 420, 0.04); nz(X, t, 0.12, 0.031, 'bandpass', 1400, 600, 1.2); },
