@@ -319,7 +319,7 @@
      Rig: torso on the waist, head, shoulder → forearm, thigh → shin, the ring, and the hair in four locks (two per
      side), each with a tip, so the cables flow with a lag. */
   V.register('meta15', function (stage) {
-    const m = new V.Model(), k = [1.3, 1.45, 1.6][stage - 1], S = (v) => v * k;
+    const m = new V.Model(), k = [1.3, 1.45, 1.6][stage - 1] * V.detail(), S = (v) => v * k;   // Phase 15D: V.detail() for the finer refinement
     const GR = ['#e2e7f2', '#c4cde0', '#a3aec6', '#828ea8'], CY = '#5fd0ff', BL = '#2f8cff', WH = '#f2f8ff', FACE = '#cfd8ea', GD = '#e8b84a', TAB = '#e9ecf8';
     const L = stage === 1 ? 9.5 : 10.5, T = stage === 1 ? 6.2 : 7, W = 1.7;
     const smooth = (x, y, z) => (y % 7 === 0 ? GR[2] : GR[1]);
@@ -408,6 +408,13 @@
      effects, combat accents and sound layers. Nothing is saved with the game; the choice lives in this browser only. */
   const LINES15 = { lumifern: 'lumifern15', igniflare: 'igniflare15', atem: 'atem15', meta: 'meta15' };
   const PROTO_LINES = { lumifern: 1, igniflare: 1, atem: 1, meta: 1 };
+  /* Phase 15D: prototype lines refined on a finer block grid (the builder scales with V.detail()), then dressed by
+     V.PROTO15D_HOOKS[line] (src/voxel-proto15d.js). High uses the first grid, phones the second; Battery Saver keeps
+     the coarser 15A saver copy. */
+  const PROTO_D = { meta: [1.55, 1.25], lumifern: [1, 1] };   // Lumifern's builder is already fine-grained: only its dressing changes
+  Object.keys(PROTO_D).forEach((ln) => { const base = LINES15[ln];
+    [['d', 0], ['dm', 1]].forEach(([suf, i]) => V.register(base + suf, (st) => { const d = PROTO_D[ln][i];
+      return V.withDetail(d, () => { let m = V.SPECIES[base](st); const h = V.PROTO15D_HOOKS && V.PROTO15D_HOOKS[ln]; if (h) m = h(m, st, d, suf === 'dm' ? 'm' : 'h') || m; return m; }); })); });
   // Battery Saver copies of the hand-built prototypes: the same model on a coarser grid (each block of the coarse grid
   // takes the most common colour and part of the blocks inside it; glow and rig joints carry over)
   V.resample = function (src, f) {
@@ -440,7 +447,7 @@
     lod() { try { if (A.Perf && ((A.Perf.saver && A.Perf.saver()) || A.Perf.forceTier === 'saver')) return 's'; const touch = root.navigator && (root.navigator.maxTouchPoints > 0 || 'ontouchstart' in root);
       return touch || (A.Perf && A.Perf.tier && A.Perf.tier().id !== 'high') ? 'm' : 'h'; } catch (e) { return 'h'; } },
     voxFor(spId, lvl) { const sp = A.Data && A.Data.SPECIES[spId]; if (!sp || !LINES15[sp.line]) return null; const base = LINES15[sp.line], l = lvl || A.Proto15.lod();
-      if (PROTO_LINES[sp.line]) return l === 's' ? base + 's' : base;
+      if (PROTO_LINES[sp.line]) return l === 's' ? base + 's' : PROTO_D[sp.line] ? base + (l === 'm' ? 'dm' : 'd') : base;
       return l === 's' ? null : l === 'm' ? base + 'm' : base; },
     addLines(map) { Object.keys(map).forEach((ln) => { LINES15[ln] = map[ln] + '15'; if (A.Proto15.LINES.indexOf(ln) < 0) A.Proto15.LINES.push(ln); }); },
   };

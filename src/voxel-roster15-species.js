@@ -221,21 +221,51 @@
      Brief: refine face, hands, posture, movement; keep it monkey-like (not a dragon), blue and white. A heavier brow,
      a curved smile and nostrils on the pale muzzle, tan inner ears, and real hands: four fingers curled over the
      ground and a thumb, on the same arm joints. */
-  H.kairyu = function (m, stage) {
+  // shared primate face and hands (Kairyu in 15B; Gaiaroki and Pyrokai in 15D, in their own colours)
+  function primateFace(m, o) {
     const g = m.geo; if (!g || !m.rig) return m;
-    const S = g.S, at = g.at, NV = '#0a2a6a', TAN = '#d6b88a', W = '#e0f6ff', BL = '#0d3fc2';
+    const S = g.S, at = g.at;
     V.inPart(m, 'head', () => {
-      K.sym((sd) => { const b = at(S(3.0), S(2.1), sd * S(1.6)); m.capsule(b, at(S(2.2), S(2.4), sd * S(3.6)), Math.max(0.6, S(0.6)), Math.max(0.55, S(0.45)), BL); });
-      let prev = null; for (let i = 0; i <= 8; i++) { const t = i / 8 - 0.5, q = at(S(6.2) - Math.abs(t) * S(1.2), -S(2.3) + t * t * S(2.4), t * S(3.0)); if (prev) m.capsule(prev, q, Math.max(0.55, S(0.25)), Math.max(0.55, S(0.25)), NV, 'paint'); prev = q; }
-      K.sym((sd) => { const q = K.surface(m, at(0, -S(1.0), sd * S(0.55)), 32, 0, 20); if (q) { m.set(q[0], q[1], q[2], NV); } });
-      K.sym((sd) => { const e = at(-S(0.3), S(0.6), sd * S(6.0)); m.ellipsoid(e[0], e[1], e[2], S(0.9), S(1.2), S(0.6), TAN, 'paint'); });
+      K.sym((sd) => { const b = at(S(3.0), S(2.1), sd * S(1.6)); m.capsule(b, at(S(2.2), S(2.4), sd * S(3.6)), Math.max(0.6, S(o.browR || 0.6)), Math.max(0.55, S(0.45)), o.brow); });
+      let prev = null; for (let i = 0; i <= 8; i++) { const t = i / 8 - 0.5, q = at(S(6.2) - Math.abs(t) * S(1.2), -S(2.3) + t * t * S(2.4), t * S(3.0)); if (prev) m.capsule(prev, q, Math.max(0.55, S(0.25)), Math.max(0.55, S(0.25)), o.mouth, 'paint'); prev = q; }
+      K.sym((sd) => { const q = K.surface(m, at(0, -S(1.0), sd * S(0.55)), 32, 0, 20); if (q) { m.set(q[0], q[1], q[2], o.mouth); } });
+      K.sym((sd) => { const e = at(-S(0.3), S(0.6), sd * S(6.0)); m.ellipsoid(e[0], e[1], e[2], S(0.9), S(1.2), S(0.6), o.earIn, 'paint'); });
+      if (o.extra) o.extra(m, g, S, at);
     });
-    K.sym((sd) => V.inPart(m, 'arm' + (sd > 0 ? 'L' : 'R'), () => {
+    if (o.hands) K.sym((sd) => { if (o.skipHand && o.skipHand(sd)) return; V.inPart(m, 'arm' + (sd > 0 ? 'L' : 'R'), () => {
       const z = sd * S(4.4);
-      for (let f = 0; f < 4; f++) { const fz = z + (f - 1.5) * S(0.75), b = [S(7.4), S(1.2), fz]; m.capsule(b, [S(8.4), S(0.9), fz], Math.max(0.55, S(0.42)), Math.max(0.5, S(0.36)), W); m.capsule([S(8.4), S(0.9), fz], [S(8.7), S(0.3), fz], Math.max(0.5, S(0.36)), 0.5, W); }
-      const tb = [S(6.6), S(1.4), z - sd * S(1.4)]; m.capsule(tb, [S(7.6), S(0.6), z - sd * S(1.9)], Math.max(0.55, S(0.4)), 0.5, W);
-      m.set(R(S(6.3)), R(S(1.9)), R(z), TAN);
-    }));
+      for (let f = 0; f < 4; f++) { const fz = z + (f - 1.5) * S(0.75), b = [S(7.4), S(1.2), fz]; m.capsule(b, [S(8.4), S(0.9), fz], Math.max(0.55, S(0.42)), Math.max(0.5, S(0.36)), o.hands); m.capsule([S(8.4), S(0.9), fz], [S(8.7), S(0.3), fz], Math.max(0.5, S(0.36)), 0.5, o.claw || o.hands); }
+      const tb = [S(6.6), S(1.4), z - sd * S(1.4)]; m.capsule(tb, [S(7.6), S(0.6), z - sd * S(1.9)], Math.max(0.55, S(0.4)), 0.5, o.hands);
+      m.set(R(S(6.3)), R(S(1.9)), R(z), o.earIn);
+    }); });
+    return m;
+  }
+  H.kairyu = (m) => primateFace(m, { brow: '#0d3fc2', mouth: '#0a2a6a', earIn: '#d6b88a', hands: '#e0f6ff' });
+  /* Phase 15D: Gaiaroki and Pyrokai heads. Gaiaroki (earth ape): a heavy stone brow with moss eyebrows, a wide mouth,
+     nostrils, hands on the open side (its boulder fist stays as it is). Pyrokai (blue-flame ape): a dark brow on the
+     white face with small blue-flame brows that flicker with its mane, a grin, nostrils, white hands. */
+  H.gaiaroki = (m, stage) => primateFace(m, { brow: '#4a4a4a', browR: 0.75, mouth: '#4a3626', earIn: '#c9a96b', hands: '#8b6f47', claw: '#c9a96b', skipHand: (sd) => sd > 0 || stage === 3,
+    extra: (m, g, S, at) => K.sym((sd) => { const b = at(S(3.1), S(2.8), sd * S(2.2)); for (let i = 0; i < 3; i++) K.tuft(m, K.add(b, [-0.3, 0.1, sd], S(i * 0.6)), [-0.3, 0.9, sd * 0.4], S(1.2), Math.max(0.55, S(0.45)), ['#7aa437', '#8fc04a', '#5e8a2a'][i]); }) });
+  H.pyrokai = (m) => primateFace(m, { brow: '#323a55', mouth: '#2a2f45', earIn: '#c9b0b8', hands: '#e6f3ff',
+    extra: (m, g, S, at) => K.sym((sd) => { const b = at(S(2.9), S(2.7), sd * S(2.4)); K.flame(m, b, [-0.4, 1, sd * 0.4], S(1.8), Math.max(0.6, S(0.55)), ['#3b8fff', '#00d1ff', '#e6f3ff'], 61 + sd); }) });
+  /* Phase 15D: Pyro-Cell faces. The eyes were single blocks lost among the glowing cracks; now a cooled-rock face
+     plate frames two larger glowing eyes under a heavy brow, with a molten grin. Body untouched. */
+  H.pyrocell = function (m, stage) {
+    if (!m.rig) return m;
+    const D = V.detail(), RK = ['#2a2426', '#3a3234', '#4a4044', '#1e1a1c'], OR = '#ff4500', YL = '#ffb020';
+    const g = m.geo, S = stage === 1 ? (v) => v * D : g.S, hc = stage === 1 ? [0, S(8.2), 0] : g.hc, hr = stage === 1 ? S(5) : g.hr, yaw = stage === 1 ? 25 : 22;
+    const fy = yaw * Math.PI / 180, fd = [Math.cos(fy), 0, Math.sin(fy)], sv = [-Math.sin(fy), 0, Math.cos(fy)];
+    const part = (m.v.get(R(hc[0]) + ',' + R(hc[1]) + ',' + R(hc[2])) || {}).p || (stage === 1 ? 'core' : 'head');
+    const face = K.surface(m, hc, yaw, 0, 6); if (!face) return m;
+    const at = (u, side) => [face[0] + sv[0] * side - fd[0] * S(0.2), face[1] + u, face[2] + sv[2] * side - fd[2] * S(0.2)];
+    V.inPart(m, part, () => {
+      m.ellipsoid(face[0], face[1] - S(0.3), face[2], S(stage === 1 ? 2.6 : 1.9) * 1.1, S(stage === 1 ? 2.2 : 1.8), S(stage === 1 ? 2.6 : 1.9) * 1.1, (x, y, z) => RK[V.cells(x, y, z, 1.6, 9).id % 3], 'paint');
+      m.rig.eyes = m.rig.eyes.filter((e) => e.part !== part);
+      K.eyes(m, hc, { yaw, ang: stage === 1 ? 24 : 30, el: stage === 1 ? 4 : 10, size: 2, tall: 2, white: YL, pupil: '#3a0a00', iris: '#ffd040', glow: true });
+      K.sym((sd) => { const b = at(S(1.25), sd * S(0.5)); m.capsule(b, at(S(1.55), sd * S(stage === 1 ? 2.6 : 2.1)), Math.max(0.6, S(0.5)), Math.max(0.55, S(0.4)), RK[3]); });
+      let prev = null; for (let i = 0; i <= 6; i++) { const t = i / 6 - 0.5, q = at(-S(1.4) + t * t * S(1.6), t * S(stage === 1 ? 2.8 : 2.2)); if (prev) m.capsule(prev, q, Math.max(0.55, S(0.28)), Math.max(0.55, S(0.28)), K.glow(OR, 0.9), 'paint'); prev = q; }
+    });
+    if (m.rig.emit.mouth) m.rig.emit.mouth.at = at(-S(1.4), 0);
     return m;
   };
   /* ================================================================ AQUAFLORA line: the serpent
