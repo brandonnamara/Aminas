@@ -58,7 +58,9 @@ let pass = 0, fail = 0; const ok = (c, m) => { if (c) { pass++; console.log('  o
       out[id] = o; }
     return out; });
   const ids = Object.keys(md);
-  ok(ids.every((id) => md[id].h.proto && md[id].h.ok && md[id].m.ok && md[id].h.clips.length >= 12), 'all ' + ids.length + ' updated forms load at High and phone detail and validate (no missing geometry, all clips)');
+  const CORE = ['idle', 'ready', 'attack', 'special', 'hit', 'hitBig', 'heal', 'guard', 'victory', 'defeat', 'move'];   // (blink too, except Meta, whose eyes are light and have no lids, as in 15A)
+  const badF = ids.filter((id) => !(md[id].h.proto && md[id].h.ok && md[id].m.ok && CORE.every((c) => md[id].h.clips.indexOf(c) >= 0) && (/^meta/.test(id) || md[id].h.clips.indexOf('blink') >= 0)));
+  ok(!badF.length, 'all ' + ids.length + ' updated forms load at High and phone detail and validate (no missing geometry, every clip they had)' + (badF.length ? ': ' + badF.map((id) => id + JSON.stringify({ p: md[id].h.proto, ok: md[id].h.ok, m: md[id].m.ok, c: md[id].h.clips.length })).join(' ') : ''));
   ok(ids.every((id) => md[id].h.tris <= 20000), 'every updated form stays inside the 20,000-triangle model budget (largest ' + Math.max(...ids.map((id) => md[id].h.tris)) + ')');
   ['aquaflora2', 'aquaflora3'].forEach((id) => { const p = md[id].h.parts;
     ok(!p.some((x) => /^leg/.test(x)) && ['neck', 'head', 'jaw', 'tail'].every((x) => p.indexOf(x) >= 0), id + ': a continuous serpent (neck, head, jaw, tail; no legs)'); });
@@ -102,11 +104,13 @@ let pass = 0, fail = 0; const ok = (c, m) => { if (c) { pass++; console.log('  o
   ok(!FL.is3d && FL.enemyHp >= 0 && FL.seq.indexOf('bloom') < 0, '2D fallback: Solar Flare resolves without the 3D sequence');
 
   /* ================= 3. status chips ================= */
+  await page.evaluate(() => { window.__stxNew = []; new MutationObserver(() => { document.querySelectorAll('.stx.stx-new').forEach((c) => { if (window.__stxNew.indexOf(c.dataset.k) < 0) window.__stxNew.push(c.dataset.k); }); }).observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ['class'] }); });
   const ST = await fight(page, 'igniflare', 'acinus', ['flarebite'], { rng: 0.05 });
   ok(ST.chips.e.indexOf('burn') >= 0 && ST.stE.indexOf('burn') >= 0, 'status chip: the foe\'s burn shows while it is burning (chips ' + ST.chips.e.join(',') + ' / state ' + ST.stE.join(',') + ')');
   ok(ST.stE.every((k) => ST.chips.e.indexOf(k) >= 0) && ST.chips.e.filter((k) => ['burn', 'soak', 'stun', 'regen', 'silence', 'weak'].indexOf(k) >= 0).every((k) => ST.stE.indexOf(k) >= 0), 'status chips match the battle state exactly (no missing or stale chips)');
-  const pulse = await page.evaluate(() => { const c = document.querySelector('#fs-e .stx'); return c ? { cls: c.className, anim: getComputedStyle(c).animationName } : null; });
-  ok(pulse && /stx-new/.test(pulse.cls), 'a newly applied status chip is marked to pulse once (' + (pulse && pulse.anim) + ')');
+  const pulse = await page.evaluate(() => window.__stxNew.slice());
+  ok(pulse.indexOf('burn') >= 0, 'a newly applied status chip pulses once as it appears (seen: ' + pulse.join(',') + ')');
+  await page.evaluate(() => { const c = document.querySelector('#fs-e .stx'); if (c) c.classList.add('stx-new'); });
   await page.evaluate(() => { A.State.state.settings.reduceMotion = true; document.documentElement.classList.add('calm'); document.body.classList.add('calm'); });
   const calmAnim = await page.evaluate(() => { const c = document.querySelector('#fs-e .stx'); return c ? getComputedStyle(c).animationName : 'none'; });
   ok(calmAnim === 'none', 'with Reduce Motion the chips do not animate (' + calmAnim + ')');
