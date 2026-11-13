@@ -401,10 +401,28 @@
     return m;
   });
 
+  ['lumifern15', 'igniflare15', 'atem15', 'meta15'].forEach((id) => V.register(id + 's', (stage) => V.resample(V.model(id, stage), 0.62)));
+
   /* ================================================================= the developer switch
      Off by default. On: the three lines use these models in 3D (battle, viewer), with their Phase 15 clips, move
      effects, combat accents and sound layers. Nothing is saved with the game; the choice lives in this browser only. */
   const LINES15 = { lumifern: 'lumifern15', igniflare: 'igniflare15', atem: 'atem15', meta: 'meta15' };
+  const PROTO_LINES = { lumifern: 1, igniflare: 1, atem: 1, meta: 1 };
+  // Battery Saver copies of the hand-built prototypes: the same model on a coarser grid (each block of the coarse grid
+  // takes the most common colour and part of the blocks inside it; glow and rig joints carry over)
+  V.resample = function (src, f) {
+    const cells = new Map(), key = (x, y, z) => x + ',' + y + ',' + z;
+    src.v.forEach((v, k) => { const p = k.split(',').map(Number), q = key(Math.floor(p[0] * f), Math.floor(p[1] * f), Math.floor(p[2] * f)); let c = cells.get(q); if (!c) cells.set(q, c = { n: 0, cols: new Map() }); c.n++;
+      const id = v.c + '|' + (v.g > 0.5 ? 1 : 0) + '|' + (v.p || ''); c.cols.set(id, (c.cols.get(id) || 0) + 1); });
+    const m = new V.Model(), need = Math.max(1, Math.floor(1 / (f * f * f) * 0.3));
+    cells.forEach((c, q) => { if (c.n < need) return; let best = null, bn = -1; c.cols.forEach((n, id) => { if (n > bn) { bn = n; best = id; } }); const [col, g, part] = best.split('|'), p = q.split(',').map(Number);
+      m.part = part || null; m.set(p[0], p[1], p[2], col, +g); });
+    m.part = null;
+    if (src.pivots) { m.pivots = {}; Object.keys(src.pivots).forEach((n) => { const pv = src.pivots[n]; m.pivots[n] = Object.assign({}, pv, { at: pv.at.map((v) => v * f) }); }); }
+    if (src.hid) { m.hid = new Map(); src.hid.forEach((v, k) => { const p = k.split(',').map(Number); m.hid.set(key(Math.floor(p[0] * f), Math.floor(p[1] * f), Math.floor(p[2] * f)), v); }); }
+    if (src.rig) m.rig = Object.assign({}, src.rig, { done: true });
+    return m;
+  };
   const KEY = 'aminas.proto15';
   let on = false;
   const devOK = !!(A.Data && A.Data.DEV_TOOLS);   // a developer build only
@@ -416,6 +434,13 @@
     // set(true|false): remembered in this browser; the 3D views pick it up on the next model build (reload to be sure)
     set(v) { on = !!v && devOK; try { if (root.localStorage) root.localStorage.setItem(KEY, on ? '1' : '0'); } catch (e) {} return on; },
     active(spId) { if (!on) return false; const sp = A.Data && A.Data.SPECIES[spId]; return !!(sp && LINES15[sp.line]); },
-    voxFor(spId) { const sp = A.Data && A.Data.SPECIES[spId]; return sp && LINES15[sp.line] ? LINES15[sp.line] : null; },
+    // Phase 15B: the model for this device. High (desktop High tier), phones ('m'), Battery Saver ('s'): the Phase 15A
+    // prototypes use a coarser copy of themselves; the rest of the roster falls back to its production model.
+    lod() { try { if (A.Perf && ((A.Perf.saver && A.Perf.saver()) || A.Perf.forceTier === 'saver')) return 's'; const touch = root.navigator && (root.navigator.maxTouchPoints > 0 || 'ontouchstart' in root);
+      return touch || (A.Perf && A.Perf.tier && A.Perf.tier().id !== 'high') ? 'm' : 'h'; } catch (e) { return 'h'; } },
+    voxFor(spId, lvl) { const sp = A.Data && A.Data.SPECIES[spId]; if (!sp || !LINES15[sp.line]) return null; const base = LINES15[sp.line], l = lvl || A.Proto15.lod();
+      if (PROTO_LINES[sp.line]) return l === 's' ? base + 's' : base;
+      return l === 's' ? null : l === 'm' ? base + 'm' : base; },
+    addLines(map) { Object.keys(map).forEach((ln) => { LINES15[ln] = map[ln] + '15'; if (A.Proto15.LINES.indexOf(ln) < 0) A.Proto15.LINES.push(ln); }); },
   };
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -1006,7 +1006,7 @@ export const PROTO_HOOKS = {};
 export function buildVoxel(spec, o) {
   const Vx = window.A && window.A.Voxel, art = spec.art, P15 = window.A && window.A.Proto15;
   const proto = o && o.proto != null ? !!o.proto : !!(P15 && P15.active(spec.id));
-  const vox = proto && P15 && P15.voxFor(spec.id) ? P15.voxFor(spec.id) : art.vox;
+  const pv = proto && P15 ? P15.voxFor(spec.id, o && o.lod) : null, vox = pv || art.vox;   // Phase 15B: o.lod picks a detail level
   const m = Vx.model(vox, art.st || 1);
   const root = pivot('amina'), rig = pivot('rig'); root.add(rig);
   const body = pivot('body'); rig.add(body);

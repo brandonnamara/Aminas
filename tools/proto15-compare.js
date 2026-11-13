@@ -2,7 +2,7 @@
 // records model metrics for both. Run: node tools/proto15-compare.js [outDir]
 const { chromium } = require('playwright'); const serve = require('../tests/server'); const fs = require('fs'), path = require('path');
 const OUT = process.argv[2] || path.join(__dirname, '..', 'docs', 'ui', 'screens15');
-const IDS = ['lumifern', 'solarbloom', 'aurelith', 'igniflare', 'pyronix', 'ignivor', 'atem1', 'atem2', 'atem', 'meta1', 'meta2', 'meta'];
+const ALL = ['lumifern', 'solarbloom', 'aurelith', 'igniflare', 'pyronix', 'ignivor', 'atem1', 'atem2', 'atem', 'meta1', 'meta2', 'meta'], IDS = process.argv[3] ? process.argv[3].split(',') : ALL;
 (async () => {
   fs.mkdirSync(path.join(OUT, 'models'), { recursive: true });
   const srv = await serve(); const browser = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
@@ -20,8 +20,8 @@ const IDS = ['lumifern', 'solarbloom', 'aurelith', 'igniflare', 'pyronix', 'igni
     for (const id of IDS) {
       const sp = D.SPECIES[id], o = {};
       for (const proto of [false, true]) {
-        const t0 = performance.now(); const r = C.buildVoxel(sp, { proto }); const ms = performance.now() - t0, v = C.validate(r.root, r.clips);
-        const m = A.Voxel.model(proto ? A.Proto15.voxFor(id) : sp.art.vox, sp.art.st); let glow = 0; const cols = new Set(); m.v.forEach((x) => { cols.add(x.c); if (x.g > 0.5) glow++; });
+        const t0 = performance.now(); const r = C.buildVoxel(sp, { proto: proto && !!A.Proto15.voxFor(id, 'h') }); if (proto && !A.Proto15.voxFor(id, 'h')) console.error('no refined model for ' + id); const ms = performance.now() - t0, v = C.validate(r.root, r.clips);
+        const m = A.Voxel.model(proto ? A.Proto15.voxFor(id, 'h') : sp.art.vox, sp.art.st); let glow = 0; const cols = new Set(); m.v.forEach((x) => { cols.add(x.c); if (x.g > 0.5) glow++; });
         let bones = 0, mats = new Set(); r.root.traverse((x) => { if (x.isBone) bones++; if (x.isMesh) mats.add(x.material.uuid); });
         const yaw = SC.VIEW_YAW[id] != null ? SC.VIEW_YAW[id] : -0.6;
         const mixer = new THREE.AnimationMixer(r.root); const idle = r.clips.find((c) => c.name === 'idle'); if (idle) { mixer.clipAction(idle).play(); mixer.update(0.01); }
@@ -34,7 +34,7 @@ const IDS = ['lumifern', 'solarbloom', 'aurelith', 'igniflare', 'pyronix', 'igni
     return { out, shots };
   }, IDS);
   Object.entries(res.shots).forEach(([k, a]) => a.forEach((d, i) => fs.writeFileSync(path.join(OUT, 'models', k + '-' + i + '.png'), Buffer.from(d.split(',')[1], 'base64'))));
-  fs.writeFileSync(path.join(OUT, 'proto15-models.json'), JSON.stringify(res.out, null, 1));
+  fs.writeFileSync(path.join(OUT, process.argv[3] ? 'roster15b-models.json' : 'proto15-models.json'), JSON.stringify(res.out, null, 1));
   Object.entries(res.out).forEach(([id, o]) => console.log(id.padEnd(11), 'cur', JSON.stringify([o.cur.voxels, o.cur.tris, o.cur.parts.length, o.cur.ok]), ' p15', JSON.stringify([o.p15.voxels, o.p15.tris, o.p15.parts.length, o.p15.ok, o.p15.buildMs, o.p15.errors.slice(0, 3)])));
   await browser.close(); srv.close();
 })();

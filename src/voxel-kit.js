@@ -28,16 +28,16 @@
     [1, -1].forEach((sd) => {
       const deg = (o.yaw || 0) + sd * (o.ang || 30), p = K.surface(m, c, deg, o.el || 10, 30); if (!p) return;
       const a = deg * Math.PI / 180, t = [-Math.sin(a), 0, Math.cos(a)]; // tangent across the face
-      const sz = o.size || 1, cells = [];
-      for (let i = 0; i < sz; i++) for (let j = 0; j < (o.tall || sz); j++) cells.push([R(p[0] + t[0] * i * sd), p[1] + j, R(p[2] + t[2] * i * sd), i, j]);
+      const D = V.detail ? V.detail() : 1, sz = Math.max(1, Math.round((o.size || 1) * D)), tl = Math.max(1, Math.round((o.tall || o.size || 1) * D)), cells = [];   // Phase 15B: eyes keep their size on a finer grid
+      for (let i = 0; i < sz; i++) for (let j = 0; j < tl; j++) cells.push([R(p[0] + t[0] * i * sd), p[1] + j, R(p[2] + t[2] * i * sd), i, j]);
       cells.forEach(([x, y, z, i, j]) => {
         // bring the eye voxel to the surface along the outward direction so it is never buried
         let q = [x, y, z]; for (let k = 0; k < 3 && !m.has(q[0], q[1], q[2]); k++) q = [R(q[0] - Math.cos(a)), q[1], R(q[2] - Math.sin(a))];
-        const top = j === (o.tall || sz) - 1, inner = sz > 1 && i === 0;
+        const top = j === tl - 1, inner = sz > 1 && i === 0;
         const col = o.white && top && !inner ? o.white : sz > 1 && !top && inner && o.pupil ? o.pupil : o.iris;
         m.set(q[0], q[1], q[2], col, col === o.iris && o.glow !== false ? 1 : 0);
       });
-      if (o.lid) m.set(p[0], p[1] + (o.tall || sz), p[2], o.lid);
+      if (o.lid) m.set(p[0], p[1] + tl, p[2], o.lid);
       out.push(p);
     });
     return out;

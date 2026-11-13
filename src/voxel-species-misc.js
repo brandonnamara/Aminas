@@ -39,7 +39,7 @@
 
   /* ===== Voltar I → II → III (Dark): the sparkling jester. Card palette #8B00B8 #FFA500 #4169E1 #FFFFFF #7FFFE0 #1A1A6B. ===== */
   V.register('voltar', function (stage) {
-    const m = new V.Model(), k = [0.95, 1.1, 1.35][stage - 1];
+    const m = new V.Model(), k = [0.95, 1.1, 1.35][stage - 1] * V.detail();
     const PU = ['#8b00b8', '#6a0090', '#a020d0'], GD = '#ffa500', GL = '#ffd700', W = '#ffffff', MG = stage === 1 ? '#4169e1' : '#ff00ff', CY = '#00e6ff';
     const g = biped(m, k, { body: K.cellsOf(PU, 1.8, 2), leg1: PU[0], leg2: (x, y) => (y < 2 * k ? GD : PU[1]), foot: PU[1], legLen: 6, torso: 5, width: 2.4, hand: W, arm1: PU[2], arm2: PU[0], headCol: W, head: 2.9, armFwd: 0.6 });
     const S = g.S;
@@ -72,7 +72,7 @@
 
   /* ===== Zeep I → II → III (Metal): the tiny shell of forgotten technology. Dark blocks, cyan circuit seams. ===== */
   V.register('zeep', function (stage) {
-    const m = new V.Model(), k = [0.85, 1.2, 1.55][stage - 1], S = (v) => v * k;
+    const m = new V.Model(), k = [0.85, 1.2, 1.55][stage - 1] * V.detail(), S = (v) => v * k;
     const DK = ['#12161c', '#1b2129', '#262e38', '#0c0f14'], CY = '#22d8ff', ICE = '#9ff0ff';
     V.rigStart(m, 'construct');   // Phase 8B: shell, head, four stubby legs, tail crystal
     m.ellipsoid(0, S(6), 0, S(7), S(5.6), S(6.2), DK[1]);
@@ -97,7 +97,7 @@
 
   /* ===== Lumi I → II → III (Light): the soft spark. White block shell, glowing cyan face. ===== */
   V.register('lumi', function (stage) {
-    const m = new V.Model(), k = [0.9, 1.1, 1.3][stage - 1], S = (v) => v * k;
+    const m = new V.Model(), k = [0.9, 1.1, 1.3][stage - 1] * V.detail(), S = (v) => v * k;
     const W = ['#ffffff', '#eef3f8', '#dde6ef'], CY = '#3fd6ff', ICE = '#a9ecff', NV = '#0b3a66', lift = S(5);
     const c = [0, S(7) + lift, 0];
     V.rigStart(m, 'float');   // Phase 8B: a floating shell; wisps and fins drift as an aura, wings and the ring move on their own
@@ -153,7 +153,7 @@
       m.part = null;
       return m;
     }
-    const k = stage === 2 ? 1 : 1.35;
+    const k = (stage === 2 ? 1 : 1.35) * V.detail();
     const g = biped(m, k, { body: circuit, leg1: wood, legLen: stage === 2 ? 6 : 8, torso: 6, width: 2.8, thigh: 2, arm: 1.3, headCol: wood, head: 3.4, chest: 1.2, hand: WD[1] });
     const S = g.S;
     K.recolour(m, (x, y, z) => !m.has(x, y + 1, z) && V.hash(x, y, z, 3) < 0.6, (x, y, z) => MS[V.cells(x, y, z, 1.8, 6).id % 4]);
@@ -171,11 +171,11 @@
   /* ===== Pyro-Cell → Pyro-Forge → Pyro-Core (Earth): the molten guardian. Card palette #800000 #A15D38 #FF4500 #FF0000 #808080.
      Only the final form has supplied art; the first two forms are new provisional designs. ===== */
   V.register('pyrocell', function (stage) {
-    const m = new V.Model(), k = [0.9, 1, 1.25][stage - 1];
+    const m = new V.Model(), k = [0.9, 1, 1.25][stage - 1] * V.detail();
     const RK = ['#2a2426', '#3a3234', '#4a4044', '#1e1a1c'], OR = '#ff4500', RD = '#ff2000', YL = '#ffb020';
     const rock = (x, y, z) => { const c = V.cells(x, y, z, 2.6, 3); return c.edge < 0.3 ? K.glow(V.hash(x, y, z, 2) < 0.5 ? OR : RD, V.hash(x, y, z, 4) < 0.06 ? 1 : 0.45) : RK[c.id % 4]; };
     if (stage === 1) {
-      const S = (v) => v * 1.0;
+      const S = (v) => v * V.detail();
       V.rigStart(m, 'pebble');   // Phase 8B: a molten pebble with two stubby arms
       m.ellipsoid(0, S(6), 0, S(5.5), S(5), S(5), rock);
       K.sym((sd) => { const n = sd > 0 ? 'armL' : 'armR'; m.box(S(-2), 0, sd * S(2.6) - 1, S(1), S(2.5), sd * S(2.6) + 1, RK[1]); V.joint(m, n, [S(1.2), S(5.8), sd * S(4.4)], null); V.inPart(m, n, () => m.capsule([S(1), S(6), sd * S(4.6)], [S(3), S(2.8), sd * S(5.2)], S(1.4), S(1.6), rock)); V.emit(m, sd > 0 ? 'handL' : 'handR', [S(3.2), S(2.4), sd * S(5.2)], n); });
@@ -198,7 +198,7 @@
   /* ===== Meta (Metal): the second Tech Amina. Long wired hair tipped with data cubes, a halo of light.
      Only the final form has supplied art; Meta-01 and Meta-02 are new provisional designs. ===== */
   V.register('meta', function (stage) {
-    const m = new V.Model(), k = [0.95, 1.1, 1.3][stage - 1];
+    const m = new V.Model(), k = [0.95, 1.1, 1.3][stage - 1] * V.detail();
     const WH = ['#eef4ff', '#cfdcf0', '#b4c6e2'], BL = '#2f8cff', CY = '#5fd0ff';
     const skin = (x, y, z) => (V.hash(x, y, z, 3) < 0.1 ? K.glow(CY, 0.6) : WH[V.cells(x, y, z, 1.6, 2).id % 3]);
     const g = biped(m, k, { body: skin, legLen: 10, torso: 7, width: 2, thigh: 1.4, shin: 1, arm: 0.9, chest: 1.1, headCol: WH[0], head: 2.4, hand: WH[1], armFwd: 0.2 });
@@ -218,7 +218,7 @@
   /* ===== Atem (Metal): the first Tech Amina. Armoured giant whose arms become blades.
      Only the final form has supplied art; Atem-01 and Atem-02 are new provisional designs. ===== */
   V.register('atem', function (stage) {
-    const m = new V.Model(), k = [0.95, 1.1, 1.3][stage - 1];
+    const m = new V.Model(), k = [0.95, 1.1, 1.3][stage - 1] * V.detail();
     const AR = ['#e8eef8', '#c3cfe0', '#9aa8bf', '#7d8aa3'], BL = '#2f7bff', CY = '#7fd0ff';
     const plate = (x, y, z) => { const c = V.cells(x, y, z, 2, 6); return c.edge < 0.18 ? K.glow(BL, 0.4) : AR[c.id % 4]; };
     const g = biped(m, k, { body: plate, legLen: 10, torso: 8, width: 3, thigh: 2, shin: 1.6, arm: 1.6, chest: 1.3, headCol: plate, head: 2.4, neck: 1, armFwd: 0.8 });
@@ -237,7 +237,7 @@
 
   /* ===== Lumifern → Solarbloom → Aurelith (Light starter). Kept from v0.6 and rebuilt in blocks; Aurelith is a new third form. ===== */
   V.register('lumifern', function (stage) {
-    const m = new V.Model(), k = [1, 1.25, 1.5][stage - 1], S = (v) => v * k;
+    const m = new V.Model(), k = [1, 1.25, 1.5][stage - 1] * V.detail(), S = (v) => v * k;
     const GR = ['#bff58a', '#a6e870', '#d2fb9e'], CR = '#fff7c8', YL = '#ffd86b', GD = '#ffcf4a', LF = ['#7fcf5a', '#9fe36a'];
     const lo = stage === 1 ? 0 : 2.5;
     const bc = [0, S(5 + lo), 0];
@@ -269,7 +269,7 @@
 
   /* ===== Umbrit → Duskmantle → Eclipsar (Dark starter). Kept from v0.6 and rebuilt in blocks; Eclipsar is a new third form. ===== */
   V.register('umbrit', function (stage) {
-    const m = new V.Model(), k = [1, 1.25, 1.5][stage - 1], S = (v) => v * k;
+    const m = new V.Model(), k = [1, 1.25, 1.5][stage - 1] * V.detail(), S = (v) => v * k;
     const PU = ['#5a4a9a', '#4a3a88', '#6a58b0'], PL = '#a89be0', CR = '#f4e9ff', GL = '#b9a2ff', NV = '#1e1640';
     const lo = stage === 1 ? 0 : 3;
     const bc = [0, S(5 + lo), 0];

@@ -123,7 +123,7 @@ const templates = new Map(); // spId -> Promise<{ root, clips, refs }>
 const isVox = (id) => !!(A.Voxel && D.SPECIES[id] && D.SPECIES[id].art && A.Voxel.has(D.SPECIES[id].art.vox));
 const heroUrl = (id) => (!isVox(id) && C.HERO_IDS.indexOf(id) >= 0 ? 'assets/creatures/' + id + '.glb' : null);
 // Phase 15: a prototype model (developer switch, A.Proto15) is cached under its own key, so switching never mixes them
-const tkey = (spId) => (A.Proto15 && A.Proto15.active(spId) ? spId + '#p15' : spId);
+const tkey = (spId) => (A.Proto15 && A.Proto15.active(spId) ? spId + '#p15' + A.Proto15.lod() : spId);   // per detail level
 function template(spId) {
   const tk = tkey(spId);
   if (templates.has(tk)) return templates.get(tk);

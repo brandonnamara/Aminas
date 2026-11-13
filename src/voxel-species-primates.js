@@ -59,7 +59,7 @@
 
   /* ===== Gaiaroki → Terraki → Rockraki (Earth). Card palette #6B4E32 #8B6F47 #C9A96B #7AA437 #4A4A4A. ===== */
   V.register('gaiaroki', function (stage) {
-    const m = new V.Model(), k = [1, 1.2, 1.42][stage - 1];
+    const m = new V.Model(), k = [1, 1.2, 1.42][stage - 1] * V.detail();
     const BR = ['#6b4e32', '#8b6f47', '#7a5c3a'], MOSS = ['#7aa437', '#8fc04a', '#5e8a2a'], ST = ['#4a4a4a', '#6a6a66', '#858078'];
     const P = { body: K.cellsOf(BR, 2.4, 3), belly: '#a8875a', paw: '#8b6f47', face: '#c9a96b', ear: '#8b6f47', earIn: '#c9a96b', eye: '#ffc93a', nose: '#4a3626', tail: K.cellsOf(BR, 2, 4) };
     const g = primate(m, k, P), S = g.S;
@@ -80,7 +80,7 @@
 
   /* ===== Kairyu → Tidalong → Oceanfang (Water). Card palette #0A4BFF #3EC8FF #7FF0FF #E0F6FF #D6B88A. ===== */
   V.register('kairyu', function (stage) {
-    const m = new V.Model(), k = [1, 1.2, 1.42][stage - 1];
+    const m = new V.Model(), k = [1, 1.2, 1.42][stage - 1] * V.detail();
     const BL = ['#0a4bff', '#1e5fe6', '#0d3fc2'], LB = '#3ec8ff', ICE = '#7ff0ff', W = '#e0f6ff', TAN = '#d6b88a';
     const P = { body: K.cellsOf(BL, 2.3, 7), belly: W, paw: W, face: W, ear: BL[0], earIn: TAN, eye: '#2ee6ff', nose: '#0a2a6a', mouth: '#0a2a6a', tail: K.cellsOf([BL[0], LB], 2, 8) };
     const g = primate(m, k, P), S = g.S;
@@ -98,7 +98,7 @@
 
   /* ===== Pyrokai → Emberkai → Infernokai (Fire, blue flame). Card palette #00D1FF #3B8FFF #7A8BFF #E6F3FF #1A1F2B. ===== */
   V.register('pyrokai', function (stage) {
-    const m = new V.Model(), k = [1, 1.2, 1.42][stage - 1];
+    const m = new V.Model(), k = [1, 1.2, 1.42][stage - 1] * V.detail();
     const DK = ['#1a1f2b', '#262d40', '#323a55'], CY = '#00d1ff', BL = '#3b8fff', W = '#e6f3ff', LAV = '#7a8bff';
     const P = { body: (x, y, z) => (V.hash(x, y, z, 2) < 0.035 ? { c: CY, g: 0.5 } : DK[V.cells(x, y, z, 2.2, 5).id % 3]), belly: '#c9d6f0', paw: W, face: W, ear: DK[1], earIn: '#c9b0b8', eye: '#22d8ff', nose: '#2a2f45', tail: K.cellsOf(DK, 2, 6) };
     const g = primate(m, k, P), S = g.S;

@@ -28,7 +28,7 @@
      A hunched, four-legged shell beast with a living cannon grown into its back. Palette from the card:
      #298BFF #52C3FF #7FD8FF #E6E6E6 and warm stone. */
   V.register('cannonis', function (stage) {
-    const m = new V.Model(), k = [1, 1.2, 1.42][stage - 1], S = (v) => v * k;
+    const m = new V.Model(), k = [1, 1.2, 1.42][stage - 1] * V.detail(), S = (v) => v * k;
     const BL = '#298bff', BD = '#1d68c9', BM = '#3d9cff', CY = '#52c3ff', ICE = '#7fd8ff', W = '#e6e6e6', ST = ['#e6e6e6', '#d4cdbd', '#c2b59b', '#a8987a'], DARK = '#0f2038';
     const shellC = [S(-1), S(11), 0];
     V.rigStart(m, 'shellbeast');   // Phase 8B: shell body, head and jaw, four legs, tail, the living cannon

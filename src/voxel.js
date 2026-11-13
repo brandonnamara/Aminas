@@ -18,6 +18,7 @@
   V.hash = (x, y, z, s) => { let h = (x * 374761393 + y * 668265263 + z * 2147483647 + (s | 0) * 1442695041) | 0; h = (h ^ (h >>> 13)) * 1274126177; h ^= h >>> 16; return (h >>> 0) / 4294967296; };
   // Cellular plates: returns {id, edge} where edge is the gap to the second-nearest cell centre (small = seam).
   V.cells = function (x, y, z, size, seed) {
+    size *= V.detail ? V.detail() : 1;   // Phase 15B: patterns keep their scale on a finer grid
     const cx = Math.floor(x / size), cy = Math.floor(y / size), cz = Math.floor(z / size);
     let d1 = 1e9, d2 = 1e9, id = 0;
     for (let i = -1; i <= 1; i++) for (let j = -1; j <= 1; j++) for (let k = -1; k <= 1; k++) {
@@ -31,6 +32,12 @@
 
   /* ---------- models ---------- */
   // A model is a sparse map "x,y,z" -> {c: colour, g: glow 0..1}. y is up; the creature faces +x.
+  // Phase 15B: a detail factor for the code-built species. Their builders multiply their scale by it, so the same
+  // shapes are sculpted on a finer block grid (1 = the production models, unchanged). Cell patterns and eyes scale
+  // with it so colours and faces keep their proportions. Used only to build the refined models (src/voxel-roster15.js).
+  let DETAIL = 1;
+  V.detail = () => DETAIL;
+  V.withDetail = function (d, fn) { const was = DETAIL; DETAIL = d; try { return fn(); } finally { DETAIL = was; } };
   V.Model = function () { this.v = new Map(); this.min = [1e9, 1e9, 1e9]; this.max = [-1e9, -1e9, -1e9]; };
   const P = V.Model.prototype;
   const key = (x, y, z) => x + ',' + y + ',' + z;

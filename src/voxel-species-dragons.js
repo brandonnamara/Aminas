@@ -64,7 +64,7 @@
 
   /* ===== Igniflare → Pyronix → Ignivor (Fire / Flying). Red scales, cream belly, obsidian wings and horns, a flame tail. ===== */
   V.register('igniflare', function (stage) {
-    const m = new V.Model(), k = [0.8, 1.15, 1.45][stage - 1];
+    const m = new V.Model(), k = [0.8, 1.15, 1.45][stage - 1] * V.detail();
     const RD = ['#c81e1e', '#a81414', '#e03a2a', '#8e1010'], OB = ['#2a1416', '#3a1a1c'], CR = '#f2dcc0', FL = ['#ff4500', '#ff9a1a', '#fff1a0'];
     const g = dragon(m, k, { body: K.cellsOf(RD, 1.8, 3), belly: K.cellsOf([CR, '#e6cba8'], 1.5, 4), leg: stage === 1 ? 4 : 6, girth: stage === 1 ? 4 : 3.6, head: stage === 1 ? 3.6 : 2.7, snoutLen: stage === 1 ? 1.1 : 1.5, neck: stage === 1 ? 0.5 : 3, horn: OB[0], hornLen: stage === 1 ? 2.4 : 3.8, eye: '#ffb000', jaw: RD[3], teeth: '#ffffff', spikes: stage > 1 ? OB[1] : null, claw: '#f6eedd', tailN: stage === 1 ? 4 : 5, faceYaw: stage === 1 ? 32 : 22 });
     const S = g.S;
@@ -76,7 +76,7 @@
 
   /* ===== Zephyr → Aeolus → Stormbringer (Wind). Card palette #3DBBFF #7FE8FF #FFFFFF #FFD166 #2A3B8F. ===== */
   V.register('zephyr', function (stage) {
-    const m = new V.Model(), k = [0.85, 1.15, 1.42][stage - 1];
+    const m = new V.Model(), k = [0.85, 1.15, 1.42][stage - 1] * V.detail();
     const BL = '#3d6bff', SK = '#3dbbff', ICE = '#7fe8ff', W = '#ffffff', GD = '#ffd166', IN = '#2a3b8f';
     const g = dragon(m, k, { body: (x, y, z) => (y < 8 * k ? [IN, BL][V.cells(x, y, z, 2, 2).id % 2] : [W, '#eef2ff', '#dfe7ff', BL][V.cells(x, y, z, 2, 2).id % 4]), belly: W, leg: 6, girth: 3.4, head: 2.5, snoutLen: 1.25, snoutCol: W, headCol: W, neckCol: K.cellsOf([W, '#eef2ff', SK], 1.6, 3), neck: 2.5, eye: '#29b6ff', claw: GD, leg1: K.cellsOf([IN, BL, W], 1.5, 5), crest: (i) => (i % 2 ? GD : BL), crestN: 3 + stage, tailCol: K.cellsOf([IN, BL], 1.6, 6), faceYaw: 24 });
     const S = g.S;
@@ -119,7 +119,7 @@
       m.part = null;
       return m;
     }
-    const k = stage === 2 ? 1.1 : 1.4;
+    const k = (stage === 2 ? 1.1 : 1.4) * V.detail();
     const g = dragon(m, k, { body, belly: W, leg: stage === 2 ? 6 : 7, girth: 3.2, head: 2.4, snoutLen: 1.5, neck: stage === 2 ? 6 : 5, eye: '#ff3a5a', claw: W, leg1: K.cellsOf([DP, '#1a5fb0', SEG[0]], 1.5, 3), jaw: SEG[2], teeth: W, tailN: 5, faceYaw: 20 });
     const S = g.S;
     g.heads.forEach((h) => coralFan(m, [h.hc[0] - S(1.5), h.hc[1] + S(1.5), 0], [-0.8, 1, 0], 5 + stage, S(4.5), 2));
@@ -134,7 +134,7 @@
 
   /* ===== Aimza (Resonance): I The Awakening (white), II The Second Head, III The Third Head (black, cyan glow). ===== */
   V.register('aimza', function (stage) {
-    const m = new V.Model(), k = [0.9, 1.2, 1.45][stage - 1];
+    const m = new V.Model(), k = [0.9, 1.2, 1.45][stage - 1] * V.detail();
     const CY = '#1fe0ff', SOFT = '#7ff0ff';
     const WH = ['#e9eef4', '#cfd8e2', '#b6c2cf'], BK = ['#14181f', '#1e2430', '#2a3140'];
     const pal = stage === 1 ? WH : BK, glowP = stage === 1 ? 0.12 : 0.18;
@@ -149,7 +149,7 @@
   /* ===== Pyro-Spark → Pyro-Hawk → Pyro-Phoenix (Fire). Card palette #FF0000 #FF8000 #FFFF00 #8B4513.
      Only the final form has supplied art; the first two forms are new provisional designs. ===== */
   V.register('pyrospark', function (stage) {
-    const m = new V.Model(), k = [0.85, 1.1, 1.4][stage - 1], S = (v) => v * k;
+    const m = new V.Model(), k = [0.85, 1.1, 1.4][stage - 1] * V.detail(), S = (v) => v * k;
     const RD = ['#c41010', '#e02a10', '#9a0c0c'], OR = '#ff8000', YL = '#ffe600', BR = '#8b4513';
     const body = K.cellsOf(RD, 1.8, 3), lo = stage === 1 ? 2 : 3;
     V.rigStart(m, 'bird');   // Phase 8B: body, head (beak, crest), legs, wings, tail plumes

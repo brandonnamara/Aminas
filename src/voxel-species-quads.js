@@ -58,7 +58,7 @@
 
   /* ===== Emberix → Flaremon → Infernox (Fire, frost-blue flame). Card palette #FFFFFF #B3E5FF #00D1FF #4A9BFF #2B3A4A. ===== */
   V.register('emberix', function (stage) {
-    const m = new V.Model(), k = [1, 1.2, 1.42][stage - 1];
+    const m = new V.Model(), k = [1, 1.2, 1.42][stage - 1] * V.detail();
     const W = ['#ffffff', '#eef4ff', '#dfe9fb'], ICE = '#b3e5ff', CY = '#00d1ff', BL = '#4a9bff', NV = '#2b3a4a';
     const fl = [BL, CY, '#ffffff'];
     const g = quad(m, k, { body: K.cellsOf(W, 2.2, 3), leg: 7.5, girth: 3.4, leg2: (x, y) => (y < 3 * k ? BL : W[0]), paw: '#ffffff', claw: BL, head: 3.6, snout: 0.55, nose: '#4a6a9a', tailUp: 6, tailCol: W[1], neck: 0.5 });
@@ -75,7 +75,7 @@
 
   /* ===== Acinus → Berrant → Calyxar (Nature / Rock). Card palette #5E8F3A #8FAE5A #C9B98A #6B4F3A #B33A3A #F4E9D7. ===== */
   V.register('acinus', function (stage) {
-    const m = new V.Model(), k = [1, 1.25, 1.5][stage - 1];
+    const m = new V.Model(), k = [1, 1.25, 1.5][stage - 1] * V.detail();
     const ST = ['#c9b98a', '#a8946a', '#8b7a5a', '#6b4f3a'], GR = ['#5e8f3a', '#8fae5a', '#4a7a2e', '#6f9a3e'], BER = '#b33a3a', FL = '#f4e9d7';
     const g = quad(m, k, { body: K.cellsOf(ST, 2.4, 5), leg: 5.5, girth: 4.3, stance: 3.2, thigh: 2.4, leg1: K.cellsOf(ST, 2, 6), leg2: K.cellsOf([ST[3], ST[2]], 1.6, 7), paw: ST[3], claw: '#e8dcc0', headCol: K.cellsOf([GR[0], GR[3]], 1.8, 8), muzzle: '#9fb86a', head: 3.4, snout: 0.6, nose: '#2e3a1e', tailUp: 1, tailCol: ST[2], neck: -1.5 });
     const S = g.S;
@@ -95,7 +95,7 @@
 
   /* ===== Sylvaneer → Sylvaneer II → Sylvaneer III (Nature). Card palette moss greens, bark browns, glowing rune. ===== */
   V.register('sylvaneer', function (stage) {
-    const m = new V.Model(), k = [1, 1.18, 1.36][stage - 1];
+    const m = new V.Model(), k = [1, 1.18, 1.36][stage - 1] * V.detail();
     const BK = ['#8b5a2b', '#6b4423', '#7a4e26'], MS = ['#8fd14f', '#6fb43a', '#a6e05a', '#4f8f2e'], CR = '#e6d2a8', RUNE = '#7dff6a';
     const AC = stage === 3 ? ['#3ec8ff', '#7ff0ff'] : null;
     const g = quad(m, k, { body: K.cellsOf(BK, 2.4, 2), leg: 11, girth: 3.4, thigh: 1.8, leg2: K.cellsOf([BK[1], '#4a2f18'], 1.6, 3), paw: '#3a2414', head: 3, snout: 0.5, muzzle: CR, nose: '#2a1a10', tailUp: 2, neck: 2.5, faceYaw: 28 });
