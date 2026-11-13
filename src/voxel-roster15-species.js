@@ -104,37 +104,46 @@
      fuller towards its flame. */
   H.emberix = function (m, stage) {
     const g = m.geo; if (!g || !m.rig) return m;
-    const S = g.S, hr = g.hr, at = g.at, W = ['#ffffff', '#eef4ff', '#dfe9fb'], ICE = '#b3e5ff', BL = '#4a9bff', NV = '#2b3a4a';
-    // old ear tufts (unjointed blue and ice blocks above the head)
-    const eb = (sd) => at(-S(0.5), S(2.6), sd * S(2.2)), del = [];
-    m.v.forEach((v, k) => { if (v.c !== BL && v.c !== ICE) return; const p = k.split(',').map(Number); if (p[1] < g.hc[1] + S(1.6)) return;
-      if ([1, -1].some((sd) => { const b = eb(sd); return Math.hypot(p[0] - b[0], p[2] - b[2]) < S(2.4) && p[1] < b[1] + S(4); })) del.push(k); });
-    del.forEach((k) => m.v.delete(k));
-    K.sym((sd) => {
-      const n = sd > 0 ? 'earL' : 'earR', b = at(-S(0.6), S(2.2), sd * S(1.9));
-      V.joint(m, n, b, 'head');
-      V.inPart(m, n, () => blade(m, b, [-0.2, 1, sd * 0.32], g.sv.map((c) => c * sd), S(4.2), S(1.9), S(1.0), (u, v, w) => {
-        if (u > 0.74) return BL;
-        if (w > 0.05 && Math.abs(v) < 0.55 && u > 0.08) return ICE;
-        return W[u > 0.5 ? 1 : 0];
-      }, (u) => (u < 0.2 ? 0.8 + u : 1.02 - u)));
-    });
+    const S = g.S, hr = g.hr, hc = g.hc, at = g.at, fd = g.fd, W = ['#ffffff', '#eef4ff', '#dfe9fb'], ICE = '#b3e5ff', BL = '#4a9bff', NV = '#2b3a4a', CY = '#00d1ff';
+    /* Phase 15D: the head is rebuilt as a fox's (the 15B pass only tapered the old muzzle). The old head blocks go,
+       except the flame mane; the new head sits on the same neck and joint: a narrower cranium, a long tapering
+       muzzle with a dark nose and a mouth line, an ice-blue mask from the eyes down the muzzle, almond eyes, cheek
+       ruffs, and tall pointed ears on their own joints. Palette, flame mane and silhouette are the line's own. */
+    const del = [];
+    m.v.forEach((v, k) => { const q = k.split(',').map(Number); if (v.g > 0.3 || v.c === CY || v.c === BL && q[1] < hc[1] - hr * 0.2) return;
+      const d = Math.hypot(q[0] - hc[0], q[1] - hc[1], q[2] - hc[2]), t = (q[0] - hc[0]) * fd[0] + (q[2] - hc[2]) * fd[2];
+      if ((v.p === 'head' || !v.p) && (d <= hr * 1.25 || (t > hr * 0.3 && d <= hr * 2.2))) del.push(k);
+      else if ((v.c === BL || v.c === ICE) && q[1] > hc[1] + hr * 0.4 && d < hr * 2.4) del.push(k); });
+    del.forEach((k) => m.v.delete(k)); if (m.hid) [...m.hid.keys()].forEach((k) => { const q = k.split(',').map(Number); if (Math.hypot(q[0] - hc[0], q[1] - hc[1], q[2] - hc[2]) <= hr * 1.6) m.hid.delete(k); });
+    m.rig.eyes = m.rig.eyes.filter((e) => e.part !== 'head');
     V.inPart(m, 'head', () => {
-      // tapered fox snout over the old muzzle, a dark nose at the tip, the mouth line and white cheek ruffs
-      const a0 = at(hr * 0.55, -hr * 0.3, 0), tip = at(hr * 1.38, -hr * 0.42, 0), ax = [tip[0] - a0[0], tip[1] - a0[1], tip[2] - a0[2]], al = dot(ax, ax);
-      // carve the blunt muzzle down to a taper first (only the part in front of the eyes)
-      const cut = []; m.v.forEach((v, k) => { if (v.p !== 'head') return; const p = k.split(',').map(Number), t = (p[0] - g.hc[0]) * g.fd[0] + (p[2] - g.hc[2]) * g.fd[2]; if (t < hr * 0.6) return;
-        const s = Math.max(0, Math.min(1, ((p[0] - a0[0]) * ax[0] + (p[1] - a0[1]) * ax[1] + (p[2] - a0[2]) * ax[2]) / al)), q = [a0[0] + ax[0] * s, a0[1] + ax[1] * s, a0[2] + ax[2] * s];
-        if (Math.hypot(p[0] - q[0], p[1] - q[1], p[2] - q[2]) > hr * (0.5 - 0.3 * s) + 0.6) cut.push(k); });
-      cut.forEach((k) => m.v.delete(k));
-      m.capsule(a0, tip, hr * 0.44, hr * 0.17, (x, y, z) => (y < tip[1] - hr * 0.12 ? W[2] : W[0]));
-      m.ellipsoid(tip[0] + g.fd[0] * S(0.3), tip[1] + S(0.15), tip[2] + g.fd[2] * S(0.3), S(0.55), S(0.45), S(0.55), NV);
-      K.sym((sd) => m.capsule(at(hr * 1.2, -hr * 0.55, sd * hr * 0.12), at(hr * 0.55, -hr * 0.52, sd * hr * 0.42), Math.max(0.5, S(0.22)), 0.45, '#6a7d96', 'paint'));
-      K.sym((sd) => { const c0 = at(hr * 0.1, -hr * 0.45, sd * hr * 0.78); K.tuft(m, c0, [-0.5, -0.55, sd * 0.7], S(2.2), S(1.0), W[0]); K.tuft(m, K.add(c0, [0, S(0.8), 0], 1), [-0.7, -0.2, sd * 0.7], S(1.8), S(0.8), W[1]); });
+      const fur = (x, y, z) => W[V.cells(x, y, z, 1.4 * V.detail(), 91).id % 3 === 0 ? 1 : 0];
+      m.ellipsoid(hc[0], hc[1], hc[2], hr * 0.92, hr * 0.84, hr * 0.86, fur);
+      const a0 = at(hr * 0.35, -hr * 0.22, 0), tip = at(hr * 1.62, -hr * 0.5, 0);
+      m.capsule(a0, tip, hr * 0.52, hr * 0.15, (x, y, z) => (y < hc[1] - hr * 0.52 ? W[2] : fur(x, y, z)));
+      m.ellipsoid(tip[0] + fd[0] * S(0.25), tip[1] + S(0.2), tip[2] + fd[2] * S(0.25), S(0.62), S(0.48), S(0.62), NV);
+      // mouth line, a slight smile, and the ice mask from each eye down the muzzle
+      K.sym((sd) => m.capsule(at(hr * 1.45, -hr * 0.62, sd * hr * 0.08), at(hr * 0.62, -hr * 0.55, sd * hr * 0.4), Math.max(0.55, S(0.24)), 0.5, '#6a7d96', 'paint'));
+      K.sym((sd) => m.capsule(at(hr * 0.62, hr * 0.02, sd * hr * 0.5), at(hr * 1.2, -hr * 0.26, sd * hr * 0.14), Math.max(0.55, S(0.32)), 0.5, ICE, 'paint'));
+      // cheek ruffs, swept back
+      K.sym((sd) => { const c0 = at(hr * 0.1, -hr * 0.4, sd * hr * 0.72); K.tuft(m, c0, [-0.55, -0.5, sd * 0.75], S(2.5), S(1.1), W[0]); K.tuft(m, K.add(c0, [0, S(0.9), 0], 1), [-0.75, -0.15, sd * 0.7], S(2.1), S(0.9), W[1]); K.tuft(m, K.add(c0, [0, -S(0.9), 0], 1), [-0.4, -0.8, sd * 0.6], S(1.7), S(0.8), W[2]); });
     });
-    if (m.rig.emit.mouth) m.rig.emit.mouth.at = at(hr * 1.45, -hr * 0.45, 0);
-    // fuller brush tail, widest just below the flame
-    V.inPart(m, 'tail', () => m.capsule(g.tb, g.tailTip, S(1.5), S(2.3), (x, y, z) => W[V.cells(x, y, z, 1.6, 77).id % 3], 'under'));
+    V.inPart(m, 'head', () => K.eyes(m, [hc[0], hc[1], hc[2]], { yaw: g.fy, ang: 30, el: 12, size: 2, tall: 2, white: '#ffffff', pupil: '#0b0f1e', iris: '#18b8ff', lid: NV }));
+    // tall fox ears with ice hollows and blue tips, on their own joints so they move on their own
+    K.sym((sd) => {
+      const n = sd > 0 ? 'earL' : 'earR', b = at(-hr * 0.12, hr * 0.62, sd * hr * 0.5);
+      V.joint(m, n, b, 'head');
+      V.inPart(m, n, () => blade(m, b, [-0.18, 1, sd * 0.3], g.sv.map((c) => c * sd), S(4.9), S(2.15), S(1.0), (u, v, w) => {
+        if (u > 0.76) return BL;
+        if (w > 0.05 && Math.abs(v) < 0.55 && u > 0.06) return u > 0.5 ? '#d6f1ff' : ICE;
+        return W[u > 0.5 ? 1 : 0];
+      }, (u) => (u < 0.18 ? 0.82 + u : 1.02 - u)));
+    });
+    if (m.rig.emit.mouth) m.rig.emit.mouth.at = at(hr * 1.68, -hr * 0.52, 0);
+    // a fuller brush tail that curves up into its flame, ice-blue beneath
+    const tb = g.tb, tt = g.tailTip, mid = [tb[0] - S(2.6), tb[1] + S(0.6), 0];
+    V.inPart(m, 'tail', () => { const col = (x, y, z) => (y < mid[1] - S(1.2) ? ICE : W[V.cells(x, y, z, 1.6, 77).id % 3]);
+      m.capsule(tb, mid, S(1.4), S(2.4), col, 'under'); m.capsule(mid, tt, S(2.4), S(1.8), col, 'under'); });
     return m;
   };
 
@@ -246,22 +255,57 @@
       K.sym((sd) => V.inPart(m, 'head', () => blade(m, add(hc, [-0.6 * f, 0, sd * 1.9 * f], 1), [-1, 0.25, sd * 0.6], [0, 1, 0], f * 2.6, f * 1.1, f * 0.6, finCol, (u) => 1 - u * 0.8)));
       return m;
     }
-    const g = m.geo; if (!g) return m; const S = g.S, h = g.heads[0];
-    // dorsal frill: head → neck → back, as overlapping fin blades along the spine
-    const spine = [h.n2, h.n1, h.n0, [S(0), S(g.lo + 4.6), 0], [S(-4), S(g.lo + 4.2), 0], g.tp[0]];
-    for (let i = 0; i < spine.length - 1; i++) { const a = spine[i], b = spine[i + 1], part = i < 2 ? 'head' : 'core';
-      for (let t = 0; t < 1; t += 0.25) { const p = [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t], tg = norm([b[0] - a[0], b[1] - a[1], b[2] - a[2]]);
-        const base = [p[0], p[1] + S(i < 2 ? 1.6 : 2.6), p[2]];
-        V.inPart(m, part, () => blade(m, base, [-0.5, 1, 0], tg, S(1.7 + (i === 2 ? 0.6 : 0)), S(1.2), Math.max(1, S(0.5)), finCol, (u) => 1 - u * 0.55, 'under')); } }
-    // cheek fins
-    g.heads.forEach((hh) => K.sym((sd) => V.inPart(m, 'head', () => blade(m, [hh.hc[0] - S(0.6), hh.hc[1] - S(0.2), hh.hc[2] + sd * hh.hr * 0.9], [-1, 0.3, sd * 0.7], [0, 1, 0], S(2.6), S(1.0), Math.max(1, S(0.45)), finCol, (u) => 1 - u * 0.8))));
-    // side fins behind the shoulders
-    K.sym((sd) => V.inPart(m, 'core', () => blade(m, [S(1.5), S(g.lo + 2.4), sd * S(3.0)], [-0.8, -0.2, sd * 1], [0, 1, 0], S(3.4), S(1.4), Math.max(1, S(0.5)), finCol, (u) => (u < 0.3 ? 0.6 + u : 1.05 - u))));
-    // tail fluke
-    const tt = g.tp[g.tp.length - 1], tq = g.tp[g.tp.length - 2], td = norm([tt[0] - tq[0], tt[1] - tq[1], tt[2] - tq[2]]);
-    V.inPart(m, 'tail', () => [1, -1].forEach((s) => blade(m, tt, [td[0], td[1] + s * 0.9, td[2]], [0, 0, 1], S(3.6), S(1.3), Math.max(1, S(0.55)), finCol, (u) => (u < 0.4 ? 0.5 + u : 1.1 - u))));
-    return m;
+    return serpent15(m, stage);
   };
+  /* Phase 15D (approved): Aquaflora II and III lose their legs and become continuous serpents. The head is the line's
+     own, taken block for block from its builder (same place, same face, eyes, jaw, horns and coral crest); everything
+     below it is new: an S-curved neck rising from a ground coil that ends in a finned tail, sculpted as one smooth
+     chain of voxel capsules, with the line's turquoise segment pattern, white belly, coral fans along the back, a
+     finned frill, side fins and a tail fluke. Aquaflora III is the same serpent, larger, with an extra half-coil,
+     more coral and its water ribbons. */
+  const catmull = (P, n) => { const out = [];
+    for (let i = 0; i < P.length - 1; i++) { const p0 = P[Math.max(0, i - 1)], p1 = P[i], p2 = P[i + 1], p3 = P[Math.min(P.length - 1, i + 2)];
+      for (let k = 0; k < n; k++) { const t = k / n, t2 = t * t, t3 = t2 * t; out.push([0, 1, 2].map((a) => 0.5 * (2 * p1[a] + (-p0[a] + p2[a]) * t + (2 * p0[a] - 5 * p1[a] + 4 * p2[a] - p3[a]) * t2 + (-p0[a] + 3 * p1[a] - 3 * p2[a] + p3[a]) * t3))); } }
+    out.push(P[P.length - 1].slice()); return out; };
+  function serpent15(src, stage) {
+    const g = src.geo, S = g.S, h = g.heads[0], hc = h.hc, hr = h.hr, n = new V.Model();
+    const SEG = ['#00b8a8', '#00d1c6', '#13a98f'], MINT = '#7fffb8', W = '#f5f7ff';
+    const body = (x, y, z) => (V.hash(x, y, z, 5) < 0.06 ? K.glow(MINT, 1) : SEG[V.cells(x, y, z, 2, 4).id % 3]);
+    V.rigStart(n, 'serpent');
+    // the path, head to tail: down the neck in an S, into a ground coil, out to a lifted tail
+    const big = stage === 3, P = [h.n2, h.n1, [S(0.6), S(13.4), S(-2.4)], [S(-2.6), S(9), S(1.2)], [S(-0.6), S(5), S(4.2)], [S(4.4), S(3.2), S(3.6)], [S(6.2), S(2.4), S(-1.6)],
+      [S(1.6), S(2.2), S(-6.2)], [S(-5), S(2.2), S(-5.6)], [S(-8.4), S(2.2), S(0)], [S(-5.4), S(2.2), S(5.6)], [S(0.4), S(2.2), S(7.4)]];
+    if (big) P.push([S(6.4), S(2.4), S(6.6)], [S(10.4), S(3.2), S(3)], [S(12), S(5.2), S(-1.4)], [S(11), S(7.6), S(-4.4)]);
+    else P.push([S(5.6), S(2.6), S(6.4)], [S(8.6), S(3.8), S(3.6)], [S(9.4), S(6), S(0.6)]);
+    const pts = catmull(P, 6), N = pts.length - 1, iNeck = 6 * 4, iTail = 6 * (P.length - 4);
+    const rad = (i) => { const t = i / N; return S(big ? 2.5 : 2.2) * (t < 0.12 ? 0.6 + t * 3.4 : t < 0.55 ? 1 : Math.max(0.22, 1 - (t - 0.55) * 1.7)); };
+    V.joint(n, 'neck', pts[iNeck], null); V.joint(n, 'tail', pts[iTail], null);
+    for (let i = 0; i < N; i++) V.inPart(n, i < iNeck ? 'neck' : i < iTail ? 'core' : 'tail', () => n.capsule(pts[i], pts[i + 1], rad(i), rad(i + 1), body));
+    K.recolour(n, (x, y, z) => !n.has(x, y - 1, z) && y > S(2.2) && y < hc[1] - hr * 1.6, () => W);
+    // the line's own head, block for block, in its place (the neck below it is the new body's)
+    const keep = (p, k) => { const q = k.split(',').map(Number); return (p === 'head' || p === 'jaw' || !p) && Math.hypot(q[0] - hc[0], q[1] - hc[1], q[2] - hc[2]) <= hr * 2.5 && q[1] > h.n2[1] - S(1.2); };
+    V.joint(n, 'head', h.n2, 'neck');
+    if (src.rig.joints.jaw) V.joint(n, 'jaw', src.rig.joints.jaw.at, 'head');
+    src.v.forEach((v, k) => { if (!keep(v.p, k)) return; const q = k.split(',').map(Number); n.part = v.p === 'jaw' ? 'jaw' : 'head'; n.partForce = true; n.set(q[0], q[1], q[2], v.c, v.g); });
+    n.part = null; n.partForce = false;
+    n.rig.eyes = (src.rig.eyes || []).map((e) => Object.assign({}, e, { part: 'head' })); n.rig.jaws = src.rig.jaws || [];
+    if (src.hid) { n.hid = n.hid || new Map(); src.hid.forEach((v, k) => n.hid.set(k, Object.assign({}, v))); }
+    Object.keys(src.rig.emit).forEach((k) => { n.rig.emit[k] = Object.assign({}, src.rig.emit[k], { parent: 'head' }); });
+    // coral fans and the finned frill along the back, fins at the sides, a fluke at the tail tip
+    for (let i = iNeck + 3; i < iTail; i += 7) { const a = pts[i], b = pts[i + 1], tg = norm([b[0] - a[0], b[1] - a[1], b[2] - a[2]]);
+      V.inPart(n, 'core', () => V.coralFan15(n, [a[0], a[1] + rad(i) * 0.75, a[2]], [-tg[0] * 0.6, 1, -tg[2] * 0.6], 2, S(2.6), 10 + i)); }
+    for (let i = 2; i < iTail + 8; i += 2) { const a = pts[i], b = pts[i + 1], tg = norm([b[0] - a[0], b[1] - a[1], b[2] - a[2]]), up = Math.abs(tg[1]) > 0.7 ? [-1, 0, 0] : [0, 1, 0];
+      const base = [a[0] + up[0] * rad(i) * 0.8, a[1] + up[1] * rad(i) * 0.8, a[2] + up[2] * rad(i) * 0.8];
+      V.inPart(n, i < iNeck ? 'neck' : i < iTail ? 'core' : 'tail', () => blade(n, base, [up[0] - tg[0] * 0.4, up[1] - tg[1] * 0.4, up[2] - tg[2] * 0.4], tg, S(1.4 + 0.6 * Math.sin(i / (iTail + 8) * Math.PI)), S(1.1), Math.max(1, S(0.45)), finCol, (u) => 1 - u * 0.6, 'under')); }
+    [iNeck + 2, iNeck + 14].forEach((i, j) => K.sym((sd) => { const a = pts[i]; V.inPart(n, 'core', () => blade(n, [a[0], a[1], a[2] + sd * rad(i) * 0.8], [-0.7, -0.15 - j * 0.1, sd], [0, 1, 0], S(3.2 - j * 0.6), S(1.3), Math.max(1, S(0.5)), finCol, (u) => (u < 0.3 ? 0.6 + u : 1.05 - u))); }));
+    K.sym((sd) => V.inPart(n, 'head', () => blade(n, [hc[0] - S(0.6), hc[1] - S(0.2), hc[2] + sd * hr * 0.9], [-1, 0.3, sd * 0.7], [0, 1, 0], S(2.6), S(1.0), Math.max(1, S(0.45)), finCol, (u) => 1 - u * 0.8)));
+    const tt = pts[N], tq = pts[N - 2], td = norm([tt[0] - tq[0], tt[1] - tq[1], tt[2] - tq[2]]);
+    V.inPart(n, 'tail', () => [1, -1].forEach((sg) => blade(n, tt, [td[0], td[1] + sg * 0.9, td[2]], [0, 0, 1], S(big ? 4.2 : 3.4), S(1.3), Math.max(1, S(0.55)), finCol, (u) => (u < 0.4 ? 0.5 + u : 1.1 - u))));
+    // Aquaflora III keeps its water ribbons
+    if (big) src.v.forEach((v, k) => { if (v.p !== 'aura') return; const q = k.split(',').map(Number); if (!n.has(q[0], q[1], q[2])) { n.part = 'aura'; n.set(q[0], q[1], q[2], v.c, v.g); } });
+    n.part = null; n.geo = Object.assign({}, g, { serpent: pts });
+    return n;
+  }
 
   /* ================================================================ PYRO-SPARK line: the fire bird
      Brief: head and beak, feather and wing structure, flight, the fiery tail. Same red, orange and gold. A hooked,

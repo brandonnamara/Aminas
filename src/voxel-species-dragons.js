@@ -94,6 +94,7 @@
 
   /* ===== Aquaflora → Aquaflora II → Aquaflora III (Water). Card palette #083D8B #00D1C6 #FF6B9D #F5F7FF #7FFFB8. ===== */
   const CORAL = ['#ff6b9d', '#ff9a3c', '#b45cff', '#ff7ad9'];
+  V.coralFan15 = (...a) => coralFan(...a);   // Phase 15D: the refined Aquaflora serpent re-uses the line's coral fans
   function coralFan(m, base, dir, n, len, seed) {
     for (let i = 0; i < n; i++) { const a = (i / Math.max(1, n - 1) - 0.5) * 1.6; const b = K.add(base, [0, 0, Math.sin(a) * 0.8], 1); const tip = K.add(b, K.norm([dir[0] - 0.3 + Math.cos(a) * 0.2, dir[1], dir[2] + Math.sin(a)]), len * (0.7 + V.hash(i, seed, 1, 2) * 0.5));
       m.capsule(b, tip, 0.9, 0.5, CORAL[(i + seed) % 4]); const mid = K.add(b, K.norm([tip[0] - b[0], tip[1] - b[1], tip[2] - b[2]]), len * 0.45); K.tuft(m, mid, [-0.3, 0.8, Math.sin(a) + 0.4], len * 0.4, 0.6, CORAL[(i + seed + 1) % 4]); }
