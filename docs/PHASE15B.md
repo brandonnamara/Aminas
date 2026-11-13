@@ -92,3 +92,24 @@ used.
 - `tools/roster15-measure.js`
 - `tools/roster15-portraits.js`
 - `tools/proto15-anim.js` and `tools/proto15-battle.js`, which now take `P15_OUT` and `P15_FIGHTS`.
+
+## Results
+
+- **Regression:** 41 suites, 1,319 checks, 0 failures (`docs/ui/screens15b/full-suite-15b.log`). This includes the new `browser-roster15b` suite (37 checks).
+  - In `browser-proto15`, the "production monster" example moved from Rockraki to Aimza II, because the switch now also covers Gaiaroki's line. The panel lists the 12 prototype forms as before. No threshold was changed.
+  - Two refined-only tweaks (Zephyr vanes, Lumi crown) landed while the run was under way. Production is fingerprinted unchanged, and the roster suite ran on the final code.
+- **Costs** (`roster15b-measure.json`; desktop software WebGL, not an iPhone), across the 48 roster forms:
+  - Triangles: production average 3,950, High 8,018, phone 5,595.
+  - Every model is under the 20,000 budget, at 2 draw calls per model.
+  - Flagged against the per-level targets:
+    - **Phone over 8,000:** Eclipsar 8,524, Cannonis I 13,918, Shellfin 11,000, Calyxar 8,676, Stormbringer 8,858.
+    - **High over 12,000:** Cannonis I 13,918, Shellfin 14,294.
+- **Recordings and comparisons** are in `docs/ui/screens15b/`: `evolution-1.jpg` and `evolution-2.jpg`, `anim/`, `combat/` and `models/`.
+
+## Known limitations
+
+- Nothing was tested on an iPhone.
+- Aquaflora II–III keep their legs. A legless body would be a redesign and needs approval.
+- Emberix's muzzle is tapered, not rebuilt.
+- Gaiaroki, Pyro-Cell, Sylvaneer, Pyrokai and Lumi I get the finer grid and shading only.
+- No Tripo assets were used; the five look-alikes remain unconfirmed.
