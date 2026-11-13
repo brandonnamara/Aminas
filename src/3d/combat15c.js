@@ -42,8 +42,10 @@ function swordGeometry() {
 
 /* ================================================================= Atem III: nine swords on Overclock */
 const NINE = 9, LEN = [1, 0.92, 1.06, 0.96, 1.1, 0.9, 1.02, 0.94, 1.08];
-const T9 = { prep: 0, summon: 0.18, form: 0.46, aim: 0.64, launch: 0.8, hit0: 0.84, step: 0.025, back: 1.12, end: 1.52 };
-export const SWORD_HOLD_MS = 560;   // the extra wait in the battle UI after this move only (its last blade lands with the hit)
+// Phase 15D tuning: the same six stages, compressed (0.80 s to the last strike instead of 1.04 s), and the strikes
+// spaced 30 ms apart instead of 25 ms so each of the nine reads (and sounds) as its own hit
+const T9 = { prep: 0, summon: 0.12, form: 0.3, aim: 0.42, launch: 0.52, hit0: 0.56, step: 0.03, back: 0.9, end: 1.28 };
+export const SWORD_HOLD_MS = 330;   // 15C: 560 ms   // the extra wait in the battle UI after this move only (its last blade lands with the hit)
 function nineSwords(api, who) {
   const tgt = api.other(who), calm = api.calm(), saver = api.saver ? api.saver() : false, G = swordGeometry(), t0 = api.now();
   const metalMat = new THREE.MeshLambertMaterial({ vertexColors: true }), glowMat = new THREE.MeshBasicMaterial({ vertexColors: true, toneMapped: false, transparent: true, opacity: 1 });
@@ -64,7 +66,7 @@ function nineSwords(api, who) {
   api.fx.glow(chestA, '#bfe9ff', 1.2, 0.5);
   if (!calm) for (let i = 0; i < N(api, 16); i++) api.at(i * 0.01, () => { const d = V3(rnd(2), rnd(1.2) + 0.3, rnd(2)).normalize().multiplyScalar(0.6 * sc); api.fx.spawn(chestA.clone().add(d), d.clone().multiplyScalar(-1 / 0.18), { color: i % 2 ? '#bfe9ff' : '#7fd0ff', life: 0.18, size: 0.03, grav: 0, spin: 3 }); });
   // 2. summoning: each blade assembles from fragments that converge on its place
-  for (let i = 0; i < NINE; i++) { const tb = T9.summon + i * 0.03; st.born[i] = tb;
+  for (let i = 0; i < NINE; i++) { const tb = T9.summon + i * 0.024; st.born[i] = tb;
     if (!calm) api.at(tb - api.now() + t0, () => { const p = orbit(i, tb + 0.12); for (let k = 0; k < (saver ? 2 : 5); k++) { const d = V3(rnd(1), rnd(1), rnd(1)).normalize().multiplyScalar(0.28 * sc); api.fx.spawn(p.clone().add(d), d.clone().multiplyScalar(-1 / 0.12), { color: k % 2 ? '#c9d3df' : '#8794a6', life: 0.12, size: 0.028, grav: 0, spin: 8 }); } }); }
   if (api.cam && !calm) { api.cam.focus(chestA, 0.6); api.at(T9.aim, () => api.cam.focus(chestA.clone().lerp(chestT, 0.5), 0.8)); api.at(T9.hit0 + 0.05, () => api.cam.focus(chestT, 1)); api.at(T9.back + 0.1, () => api.cam.release()); }
   // 5. impacts: nine distinct ones (cut, pierce, cut… the last heavy). They are driven by the sequence's own time, and
@@ -84,7 +86,7 @@ function nineSwords(api, who) {
     for (let i = 0; i < NINE; i++) if (!st.hit[i] && t >= T9.hit0 + i * T9.step) impact(i);
     for (let i = 0; i < NINE; i++) {
       let p, s = 0, look = null;
-      const born = st.born[i], launch = T9.launch + i * 0.022, land = T9.hit0 + i * T9.step;
+      const born = st.born[i], launch = T9.launch + i * T9.step, land = T9.hit0 + i * T9.step;
       if (t < born) s = 0;
       else if (t < launch) {   // 2–4: materialise, orbit, then turn to the target
         s = calm ? (t - born < 0.12 ? (t - born) / 0.12 : 1) : ease((t - born) / 0.12);
@@ -165,7 +167,7 @@ function zeepOverclock(api, who) {   // Zeep III, Overclock: a charging ring tha
 }
 const SIG = {
   // Atem III only (Atem-01 and Atem-02 keep their own presentations)
-  overclock: [{ match: (sp) => sp === 'atem' && A().Proto15.active(sp), clip: 'special9', hold: (o) => (o.calm ? 360 : SWORD_HOLD_MS), run: nineSwords },
+  overclock: [{ match: (sp) => sp === 'atem' && A().Proto15.active(sp), clip: 'special9', hold: () => SWORD_HOLD_MS, run: nineSwords },
     { match: (sp) => sp === 'zeep3', clip: 'special', hold: () => 160, run: zeepOverclock }],
   solarflare: [{ match: (sp) => sp === 'aurelith', clip: 'special', hold: () => 180, run: lumiferSolarFlare }],
   inferno: [{ match: (sp) => sp === 'ignivor', clip: 'special', hold: () => 140, run: igniflareInferno }],
@@ -214,9 +216,9 @@ const F = {
       api.fx.burst(g.clone().setY(0.06), ['#c2b59b', '#a8987a'], 8, { speed: 0.9, up: 0.3, life: 0.45, size: 0.05, grav: 2 }); if (api.shake) api.shake(0.12); }); },
 };
 F.zephyr = F.pyrospark;
-const MOVE_SKIP = { overclock: 1, solarflare: 1, inferno: 1 };   // with a signature of their own (other species with these moves keep their flourish)   // moves with a full signature sequence of their own
 Object.keys(STYLE).forEach((key) => { const orig = STYLE[key]; STYLE[key] = (api, who, info) => { orig(api, who, info);
-  try { if (!on() || !info || !info.special || (api.calm && api.calm())) return;   // (moves with a signature sequence never reach here) const ln = lineOf(api.slot(who).spId), f = F[ln]; if (f) f(api, who, api.other(who), info); } catch (e) { /* decoration only */ } }; });
+  try { if (!on() || !info || !info.special || (api.calm && api.calm())) return;   // (moves with a signature sequence never reach here)
+    const ln = lineOf(api.slot(who).spId), f = F[ln]; if (f) f(api, who, api.other(who), info); } catch (e) { /* decoration only */ } }; });
 export const FLOURISH_LINES = Object.keys(F);
 
 /* ================================================================= camera on specials (any line) */

@@ -72,7 +72,9 @@
     ['h', 'm'].forEach((lvl) => V.register(vox + '15' + (lvl === 'm' ? 'm' : ''), function (stage) {
       const d = V.detailFor15(vox, stage, lvl);
       return V.withDetail(d, () => { let m = UPSCALE[vox] && UPSCALE[vox].includes(stage) ? V.upscale(V.withDetail(1, () => V.SPECIES[vox](stage)), d) : V.SPECIES[vox](stage);
-        if (HOOKS[vox]) m = HOOKS[vox](m, stage, d, lvl) || m; V.shade15(m); return m; });
+        // Phase 15D: on phones, forms that get no finer grid (the largest ones) skip the shading pass, which breaks up
+        // the merged faces and was most of their extra cost; High keeps it
+        if (HOOKS[vox]) m = HOOKS[vox](m, stage, d, lvl) || m; if (!(lvl === 'm' && d <= 1)) V.shade15(m); return m; });
     }));
   });
   P15.addLines(lines);

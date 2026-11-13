@@ -398,13 +398,15 @@
   const SEQ15 = {
     // Atem III, nine blades: activation hum, nine assembly clicks, a held resonance, nine launches and nine ringing
     // impacts (the last one heaviest), then the blades retracting. t is when the sequence starts.
-    atem9: (X, t) => {
-      osc(X, t, 0.32, 'sawtooth', 90, 420, 0.035, { lp: 1400, attack: 0.04 }); osc(X, t + 0.05, 0.4, 'sine', 220, 440, 0.03, { attack: 0.06 });
-      for (let i = 0; i < 9; i++) { const c = t + 0.3 + i * 0.035; osc(X, c, 0.05, 'square', 1500 + i * 90, 1100 + i * 90, 0.012, { lp: 4200 }); nz(X, c, 0.03, 0.02, 'highpass', 4500); }
-      osc(X, t + 0.36, 0.48, 'triangle', 330, 330, 0.02, { am: [14, 0.5], attack: 0.08 });
-      for (let i = 0; i < 9; i++) { const l = t + 0.8 + i * 0.022, h = t + 0.84 + i * 0.025, last = i === 8; nz(X, l, 0.08, 0.018, 'bandpass', 1800, 4200, 1.4);
-        osc(X, h, last ? 0.6 : 0.22, 'triangle', (last ? 1760 : 2637 - i * 60), null, last ? 0.03 : 0.014, { attack: 0.002 }); if (last) kick(X, h, 160, 55, 0.22, 0.09); else nz(X, h, 0.04, 0.02, 'highpass', 3200); }
-      nz(X, t + 1.18, 0.3, 0.02, 'bandpass', 3000, 900, 1); osc(X, t + 1.2, 0.26, 'sine', 880, 330, 0.02);
+    atem9: (X, t) => {   // Phase 15D: retimed to the tuned sequence; nine short, distinct strikes rising in pitch (a pentatonic run), the last one heavy but no louder than before
+      osc(X, t, 0.26, 'sawtooth', 90, 420, 0.03, { lp: 1400, attack: 0.04 }); osc(X, t + 0.04, 0.32, 'sine', 220, 440, 0.026, { attack: 0.05 });
+      for (let i = 0; i < 9; i++) { const c = t + 0.13 + i * 0.024; osc(X, c, 0.04, 'square', 1500 + i * 90, 1100 + i * 90, 0.01, { lp: 4200 }); }
+      osc(X, t + 0.28, 0.3, 'triangle', 330, 330, 0.016, { am: [14, 0.5], attack: 0.06 });
+      const PENT = [1319, 1480, 1661, 1976, 2217, 2637, 2960, 3322];
+      for (let i = 0; i < 9; i++) { const l = t + 0.52 + i * 0.03, h = t + 0.56 + i * 0.03, last = i === 8; nz(X, l, 0.05, 0.012, 'bandpass', 2200, 4200, 1.6);
+        if (last) { osc(X, h, 0.45, 'triangle', 1760, null, 0.024, { attack: 0.002 }); kick(X, h, 150, 55, 0.2, 0.07); }
+        else { osc(X, h, 0.07, 'triangle', PENT[i], null, 0.016, { attack: 0.001 }); nz(X, h, 0.02, 0.014, 'highpass', 5000); } }
+      nz(X, t + 0.92, 0.26, 0.016, 'bandpass', 3000, 900, 1); osc(X, t + 0.94, 0.22, 'sine', 880, 330, 0.016);
     },
     // Phase 15D signatures: Lumifern's bloom (soft rising chimes), Igniflare's inferno (roar of flame, a deep thump),
     // Zeep's overclock (a servo spin-up, a lock-on blip, a crisp electric crack)
@@ -423,7 +425,7 @@
     o = o || {}; const fn = SEQ15[name], P = root.A && root.A.Proto15;
     if (!fn || !P || !P.enabled() || !Au.sfxOn || !ctx || ctx.state !== 'running' || seqLive >= 2) return false;
     if (!mBus) mBus = bus(ctx, master);
-    seqLive++; setTimeout(() => { seqLive = Math.max(0, seqLive - 1); }, name === 'atem9' ? 1500 : 700);
+    seqLive++; setTimeout(() => { seqLive = Math.max(0, seqLive - 1); }, name === 'atem9' ? 1250 : 700);
     try { fn({ c: ctx, out: mBus.out, echo: mBus.echo }, ctx.currentTime + 0.01 + (o.delay || 0)); } catch (e) { /* audio is optional */ }
     return true;
   };

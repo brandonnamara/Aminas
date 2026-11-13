@@ -295,6 +295,12 @@
     const extra = e ? (b.enemy.islandBoss ? ['islandboss'] : b.enemy.boss ? ['guardian'] : []) : [];
     const sts = chipsFor(e ? d.eSt : d.pSt, e ? d.eWeak : d.pWeak, e ? d.eGuard : d.pGuard, extra) + (e ? '' : synChips(b.syn));
     putHtml('fs-' + w, sts);
+    // Phase 15D (developer switch): a chip that has just appeared pulses once, so a new status is noticed the moment it
+    // lands (no pulse with Reduce Motion: the 'calm' root class turns the animation off). The chips themselves are
+    // the existing ones, built from the battle's status state on every render.
+    if (A.Proto15 && A.Proto15.enabled()) { const box = $('#fs-' + w), prev = (U.stPrev = U.stPrev || {})[w] || {}, now = {};
+      if (box) box.querySelectorAll('.stx').forEach((c) => { const k = c.dataset.k; now[k] = 1; if (!prev[k]) c.classList.add('stx-new'); });
+      U.stPrev[w] = now; }
     pan.classList.toggle('crit', frac > 0 && frac < 0.25); pan.classList.toggle('acting', U.acting === w);
     pan.classList.toggle('mine', w === 'p' && !U.busy && !b.over && !b.pending);
   }

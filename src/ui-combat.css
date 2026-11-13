@@ -372,3 +372,9 @@ body.perf-hidden .battle *, body.perf-hidden .rtile * { animation-play-state: pa
   .abtn .ab-main small { font-size: .6rem; } .abtn .ab-fx { display: none; }
   .b-turn { font-size: .68rem; padding: .14rem .55rem; }
 }
+
+/* Phase 15D (developer switch): a newly applied status chip pulses once; never with Reduce Motion */
+@keyframes stxIn { 0% { transform: scale(1.6); filter: brightness(1.8); } 60% { transform: scale(.92); } 100% { transform: scale(1); filter: none; } }
+.stx.stx-new { animation: stxIn .5s cubic-bezier(.2,.9,.3,1.2) both; }
+.calm .stx.stx-new { animation: none; }
+@media (prefers-reduced-motion: reduce) { .stx.stx-new { animation: none; } }
