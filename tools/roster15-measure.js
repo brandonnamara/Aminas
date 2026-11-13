@@ -8,8 +8,8 @@ const { chromium } = require('playwright'); const serve = require('../tests/serv
   const res = await p.evaluate(async () => { const C = await import('/src/3d/creature3d.js'); await import('/src/3d/runtime.js'); const out = {};
     const cost = (r) => { let t = 0, d = 0; r.root.traverse((x) => { if (x.isMesh && x.geometry) { d++; t += (x.geometry.index ? x.geometry.index.count : x.geometry.attributes.position.count) / 3; } }); return [Math.round(t), d]; };
     for (const id of Object.keys(A.Data.SPECIES)) { const sp = A.Data.SPECIES[id]; if (!A.Proto15.voxFor(id, 'h')) continue; const o = { line: sp.line, proto: A.Proto15.PROTO.indexOf(sp.line) >= 0 };
-      o.prod = cost(C.buildVoxel(sp)).concat(A.Voxel.model(sp.art.vox, sp.art.st).v.size);
-      for (const l of ['h', 'm', 's']) { const vx = A.Proto15.voxFor(id, l); o[l] = vx ? cost(C.buildVoxel(sp, { proto: true, lod: l })).concat(A.Voxel.model(vx, sp.art.st).v.size) : null; }
+      A.Proto15.set(false); o.prod = cost(C.buildVoxel(sp)).concat(A.Voxel.model(sp.art.vox, sp.art.st).v.size);
+      A.Proto15.set(true); for (const l of ['h', 'm', 's']) { const vx = A.Proto15.voxFor(id, l); o[l] = vx ? cost(C.buildVoxel(sp, { proto: true, lod: l })).concat(A.Voxel.model(vx, sp.art.st).v.size) : null; }
       out[id] = o; }
     return out; });
   fs.writeFileSync(process.argv[2] || 'docs/ui/screens15b/roster15b-measure.json', JSON.stringify(res, null, 1)); console.log(Object.keys(res).length, 'forms measured');
