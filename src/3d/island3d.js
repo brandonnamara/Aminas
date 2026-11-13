@@ -30,6 +30,24 @@ const saver = () => !!(A && A.Perf && (A.Perf.saver() || A.Perf.forceTier === 's
 // camera basis: screen-right = (1,0,-1)/√2, screen-up = (-16, 39.19, -16)/45.25, toward the viewer = r × u
 const RIGHT = new THREE.Vector3(1, 0, -1).normalize(), UP = new THREE.Vector3(-16, HEIGHT_PX, -16).normalize();
 const BACK = new THREE.Vector3().crossVectors(RIGHT, UP).normalize();
+/* Phase 14 finalisation: the island's camera never turns (it pans and zooms only), so from the front it only ever
+   sees faces turned toward BACK. Everything solid on the island is drawn twice from now on, at no cost in draw calls
+   on screen: a "view" copy holding only the faces the camera can see (about half), drawn by the camera; and the full
+   model, kept on layer 1, which only the sun's shadow camera draws (shadows are drawn once per change, not per
+   frame). What the player sees is pixel-for-pixel the same; the GPU processes about half the triangles per frame. */
+const SHADOW_LAYER = 1, viewCache = new Map();
+// the faces of `geo` that face `dir` (a direction in the geometry's own frame); kept geometry shares its attributes
+function facing(geo, dir, key, margin) {
+  if (!geo || !geo.index) return geo; const k = key || geo.uuid + '|' + (dir === DOWN_ONLY ? 'down' : dir.x.toFixed(3) + ',' + dir.z.toFixed(3)); let g = viewCache.get(k); if (g) return g;
+  const p = geo.attributes.position, ix = geo.index.array, keep = [], a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3(), m = margin || 0;
+  for (let i = 0; i < ix.length; i += 3) { a.fromBufferAttribute(p, ix[i]); b.fromBufferAttribute(p, ix[i + 1]).sub(a); c.fromBufferAttribute(p, ix[i + 2]).sub(a); const n = b.cross(c); const l = n.length(); if (l > 0 && (dir === DOWN_ONLY ? n.y / l > -0.5 : n.dot(dir) / l > -m)) keep.push(ix[i], ix[i + 1], ix[i + 2]); }
+  g = new THREE.BufferGeometry(); Object.keys(geo.attributes).forEach((n) => g.setAttribute(n, geo.attributes[n])); g.setIndex(keep.length && Math.max(...keep.slice(0, 1)) >= 0 && p.count > 65535 ? new THREE.Uint32BufferAttribute(keep, 1) : new THREE.Uint16BufferAttribute(keep, 1));
+  g.boundingBox = geo.boundingBox; g.boundingSphere = geo.boundingSphere; if (!g.boundingSphere) g.computeBoundingSphere(); g.userData.view = true; if (!/^terrain\|/.test(k)) viewCache.set(k, g); return g;
+}
+// BACK seen from an object turned by `ry` about the vertical
+const backFor = (ry) => new THREE.Vector3().copy(BACK).applyAxisAngle(new THREE.Vector3(0, 1, 0), -(ry || 0));
+const DOWN_ONLY = new THREE.Vector3(0, 1e-3, 0); // keeps every face that does not point down (seen from some quarter turn)
+const quarter = (ry) => (((Math.round((ry || 0) / (Math.PI / 2)) % 4) + 4) % 4);
 // a 2D world point (px, at ground height 0) to 3D
 const fromIso = (wx, wy) => { const a = wx / 32, b = wy / 16; return new THREE.Vector3((a + b) / 2, 0, (b - a) / 2); };
 
@@ -172,7 +190,7 @@ export function createIsland() {
   camera.up.copy(UP);
   // Phase 1.1 light: warmer, brighter sun and a stronger sky fill so shadows stay soft and colourful, never murky
   const hemi = new THREE.HemisphereLight(LIGHT.sky, LIGHT.ground, LIGHT.hemi); scene.add(hemi);
-  const sun = new THREE.DirectionalLight(LIGHT.sun, LIGHT.sunI); sun.castShadow = true;
+  const sun = new THREE.DirectionalLight(LIGHT.sun, LIGHT.sunI); sun.castShadow = true; sun.shadow.camera.layers.enable(SHADOW_LAYER);
   sun.shadow.mapSize.set(tier().shadowMap, tier().shadowMap); sun.shadow.bias = -0.0008; sun.shadow.normalBias = 0.02; sun.shadow.radius = 3; sun.shadow.blurSamples = 10;
   scene.add(sun); scene.add(sun.target);
   const groups = { terrain: new THREE.Group(), things: new THREE.Group(), fx: new THREE.Group() };
@@ -203,7 +221,8 @@ export function createIsland() {
     clearGroup(groups.terrain); clouds = [];
     const t = buildTerrain(cols, (extras || []).filter((e) => e.kind === 'jetty' || e.kind === 'skiff').map((e) => [e.x, e.z])); terr = t;
     const geo = meshGrid(t.g, { size: TV, shadeFaces: false }); disposables.push(geo);
-    const m = new THREE.Mesh(geo, matTerrain); m.castShadow = true; m.receiveShadow = true; groups.terrain.add(m);
+    const m = new THREE.Mesh(facing(geo, BACK, 'terrain|' + key), matTerrain); m.receiveShadow = true; groups.terrain.add(m); disposables.push(m.geometry);
+    const ms = new THREE.Mesh(geo, matTerrain); ms.castShadow = true; ms.layers.set(SHADOW_LAYER); ms.userData.shadowOnly = true; groups.terrain.add(ms);
     // water: subdivided quads that ripple (vertex shader) with a sheen
     if (t.water.length) {
       const pos = [], idx = []; let n = 0;
@@ -281,7 +300,7 @@ export function createIsland() {
     groups.things.children.slice().forEach((c) => { groups.things.remove(c); if (c.isInstancedMesh) c.dispose(); });
     if (detail) detail = null;
     const batches = new Map(); // geometry -> { mat, list: [matrix] , sway }
-    const push = (geo, mat, x, y, z, ry, sway, s, lgeo, nature) => { if (!geo) return; const k = geo.uuid + mat.uuid; let bt = batches.get(k); if (!bt) batches.set(k, (bt = { geo, mat, list: [], sway, lgeo, nature })); bt.list.push(new THREE.Matrix4().compose(new THREE.Vector3(x, y, z), new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), ry || 0), new THREE.Vector3(s || 1, s || 1, s || 1))); };
+    const push = (geo, mat, x, y, z, ry, sway, s, lgeo, nature) => { if (!geo) return; const k = geo.uuid + mat.uuid; let bt = batches.get(k); if (!bt) batches.set(k, (bt = { geo, mat, list: [], qs: [], sway, lgeo, nature })); bt.qs.push(quarter(ry)); bt.list.push(new THREE.Matrix4().compose(new THREE.Vector3(x, y, z), new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), ry || 0), new THREE.Vector3(s || 1, s || 1, s || 1))); };
     const occupied = new Set();
     items.forEach((it) => {
       for (let y = it.y; y < it.y + it.h; y++) for (let x = it.x; x < it.x + it.w; x++) occupied.add(x + ',' + y);
@@ -291,7 +310,11 @@ export function createIsland() {
       const slot = it.k === 'b' && it.state !== 'ruined' && it.state !== 'constructing' ? MS.slotFor(it.type) : null;
       const inst = slot ? MS.instance(it.type, it.w0, it.h0, it.rot) : null;
       if (slot && !inst) MS.request(it.type, (ok) => { if (!ok || !lastSync) return; state.sig = ''; sync(lastSync[0], lastSync[1]); state.shadowDirty = true; state.dirty = true; kick(); });
-      if (inst) { inst.position.set(cx, 0, cz); inst.userData.foot = { fx: cx, fz: cz, fw: it.w, fd: it.h }; groups.things.add(inst); glbGroups.push(inst); }
+      if (inst) { inst.position.set(cx, 0, cz); inst.userData.foot = { fx: cx, fz: cz, fw: it.w, fd: it.h }; groups.things.add(inst); glbGroups.push(inst);
+        // the model's view copy and its shadow twin (see facing() above)
+        inst.updateMatrixWorld(true); const twin = inst.clone(true); twin.userData = { shadowOnly: true }; twin.traverse((o) => { o.layers.set(SHADOW_LAYER); if (o.isMesh) { o.castShadow = true; o.receiveShadow = false; } });
+        let mi = 0; inst.traverse((o) => { if (!o.isMesh) return; const d = BACK.clone().transformDirection(o.matrixWorld.clone().invert()); o.geometry = facing(o.geometry, d, 'glb|' + it.type + '|' + (it.rot ? 1 : 0) + '|' + (mi++) + '|' + o.geometry.uuid, 0.02); o.castShadow = false; o.receiveShadow = true; });
+        groups.things.add(twin); }
       else if (it.k === 'b') { const md = VB.buildingModel({ type: it.type, level: it.level, state: it.state, rot: it.rot }, { w0: it.w0, h0: it.h0 }, { art: it.art, cat: it.cat }); if (md) { push(md.geo, matSolid, cx, 0, cz, 0, false, 1, md.lod && md.lod.geo); push(md.glow, matGlow, cx, 0, cz, 0, false, 1, md.lod && md.lod.glow); } }
       else if (it.k === 'l' && it.kind && VB.hasExtra(it.kind)) { const md = VB.extraModel(it.kind, it.on); if (md) { push(md.geo, matSolid, cx, 0, cz, 0, false, 1, md.lod && md.lod.geo); push(md.glow, matGlow, cx, 0, cz, 0, false, 1, md.lod && md.lod.glow); } }
       else if (it.k === 'o') { const md = VB.natureModel(it.type, it.seed, it.w, it.h); if (md) { const ry = (it.seed % 4) * Math.PI / 2, sway = it.type === 'oak' || it.type === 'pine' || it.type === 'bush'; push(md.geo, sway ? matSway : matSolid, cx, 0, cz, ry, sway, 1, md.lod && md.lod.geo, true); push(md.glow, matGlow, cx, 0, cz, ry, false, 1, md.lod && md.lod.glow, true); } }
@@ -299,11 +322,20 @@ export function createIsland() {
     // scenery trees on hills, ledges and loose chunks, and meadow details, skipping anything occupied
     (scenery || []).forEach((sc) => { if (occupied.has(sc.cx + ',' + sc.cz)) return; const md = VB.natureModel(sc.kind, sc.seed); if (md) { push(md.geo, sc.still ? matSolid : matSway, sc.x, sc.y, sc.z, sc.ry, !sc.still, sc.s, md.lod && md.lod.geo, true); push(md.glow, matGlow, sc.x, sc.y, sc.z, sc.ry, false, sc.s, md.lod && md.lod.glow, true); } });
     lodPairs = [];
-    batches.forEach((bt) => {
+    // A batch whose copies face several ways is split by quarter turn only where that saves enough triangles to be
+    // worth a draw call (12,000 or more; below that, no extra draw calls at all); a small batch keeps one draw call and loses only its downward faces.
+    const split = [];
+    batches.forEach((bt) => { const tris = (bt.geo.index ? bt.geo.index.count / 3 : 0) * bt.list.length, qset = [...new Set(bt.qs)];
+      if (qset.length === 1 || tris < 12000) { split.push(Object.assign({}, bt, { q: qset.length === 1 ? qset[0] : null })); return; }
+      qset.forEach((q) => { const idx = bt.qs.map((v, i) => (v === q ? i : -1)).filter((i) => i >= 0); split.push(Object.assign({}, bt, { q, list: idx.map((i) => bt.list[i]) })); }); });
+    split.forEach((bt) => {
       // Phase 4: every tree, bush and rock gets its own small shift in brightness and warmth (a sunnier or a shadier
       // specimen), so a grove of the same species reads as individuals rather than copies
       const tint = bt.nature && bt.mat !== matGlow ? bt.list.map((m) => { const e = m.elements, a = hash(Math.round(e[12] * 16), Math.round(e[14] * 16), 131), w = hash(Math.round(e[14] * 16), Math.round(e[12] * 16), 132) - 0.5, l = 0.9 + a * 0.16; return new THREE.Color(l * (1 + w * 0.08), l, l * (1 - w * 0.1)); }) : null;
-      const make = (geo) => { const im = new THREE.InstancedMesh(geo, bt.mat, bt.list.length); bt.list.forEach((m, i) => { im.setMatrixAt(i, m); if (tint) im.setColorAt(i, tint[i]); }); im.instanceMatrix.needsUpdate = true; if (tint) im.instanceColor.needsUpdate = true; if (bt.mat !== matGlow) { im.castShadow = true; im.receiveShadow = true; } im.computeBoundingSphere(); groups.things.add(im); return im; };
+      // the view copy (faces the camera can see, for this quarter turn) is drawn; the full model only casts shadows
+      const dir = bt.q == null ? DOWN_ONLY : backFor(bt.q * Math.PI / 2);
+      const inst = (geo) => { const im = new THREE.InstancedMesh(geo, bt.mat, bt.list.length); bt.list.forEach((m, i) => { im.setMatrixAt(i, m); if (tint) im.setColorAt(i, tint[i]); }); im.instanceMatrix.needsUpdate = true; if (tint) im.instanceColor.needsUpdate = true; im.computeBoundingSphere(); groups.things.add(im); return im; };
+      const make = (geo) => { const im = inst(facing(geo, dir)); if (bt.mat !== matGlow) { im.receiveShadow = true; const sh = inst(geo); sh.castShadow = true; sh.layers.set(SHADOW_LAYER); sh.userData.shadowOnly = true; im.userData.twin = sh; } return im; };
       const full = make(bt.geo); full.userData.nature = !!bt.nature; if (bt.lgeo) { const lo = make(bt.lgeo); lo.userData.nature = !!bt.nature; lodPairs.push([full, lo, !!bt.nature]); }
     });
     applyLod(true);
@@ -385,7 +417,7 @@ export function createIsland() {
         else list.push([x, ty, z, 1, 1, 1, pick(PAL.pathStone, w)]); } // a pebble
     });
     if (!list.length) return;
-    const geo = new THREE.BoxGeometry(DV, DV, DV); geo.translate(DV / 2, DV / 2, DV / 2); { const ix = Array.from(geo.index.array); ix.splice(18, 6); geo.setIndex(ix); geo.clearGroups(); } // Phase 4: no bottom face (it sits on the ground): 10 triangles a piece instead of 12 disposables.push(geo);
+    const geo = new THREE.BoxGeometry(DV, DV, DV); geo.translate(DV / 2, DV / 2, DV / 2); { const ix = Array.from(geo.index.array); geo.setIndex(ix.slice(0, 6).concat(ix.slice(12, 18), ix.slice(24, 30))); geo.clearGroups(); } /* Phase 14: only the three faces the fixed camera sees (+X, +Y, +Z): 6 triangles a piece (was 10) */ // Phase 4: no bottom face (it sits on the ground): 10 triangles a piece instead of 12 disposables.push(geo);
     const im = new THREE.InstancedMesh(geo, new THREE.MeshLambertMaterial(), list.length), m = new THREE.Matrix4(), c = new THREE.Color();
     list.forEach(([x, y, z, sx, sy, sz, col], i) => { m.makeScale(sx, sy, sz).setPosition(x, y, z); im.setMatrixAt(i, m); im.setColorAt(i, c.set(col)); });
     im.instanceMatrix.needsUpdate = true; im.instanceColor.needsUpdate = true; im.receiveShadow = true; detail = im; groups.things.add(im);
@@ -466,7 +498,7 @@ export function createIsland() {
   function applyLod(force) {
     const T = tier(), v = state.view, far = !!(v && (v.z < LOD_Z || T.natureLod)), sv = T.buildingLod, key = (far ? 1 : 0) + (sv ? 2 : 0);
     if (!force && key === lodOn) return; lodOn = key;
-    lodPairs.forEach(([full, lo, nature]) => { const on = sv || (far && nature); full.visible = !on; lo.visible = on; }); state.shadowDirty = true;
+    lodPairs.forEach(([full, lo, nature]) => { const on = sv || (far && nature); full.visible = !on; lo.visible = on; if (full.userData.twin) full.userData.twin.visible = !on; if (lo.userData.twin) lo.userData.twin.visible = on; }); state.shadowDirty = true;
   }
 
   /* ---- camera: same view as the 2D layer ---- */
@@ -553,8 +585,8 @@ export function createIsland() {
     has: (k, art, cat, st) => (k === 'b' ? VB.hasBuilding(art, cat) && st !== 'constructing' : k === 'l' ? VB.hasExtra(art) : VB.hasNature(art)),
     // triangles by layer: what the island is made of (for the performance report)
     breakdown() { const t = (o) => (o.geometry && o.geometry.index ? o.geometry.index.count / 3 : 0) * (o.isInstancedMesh ? o.count : 1); const out = { terrain: 0, buildings: 0, nature: 0, detail: 0, far: 0, fx: 0 };
-      groups.terrain.traverse((o) => { if (o.isMesh) out.terrain += t(o); }); farGroup.traverse((o) => { if (o.isMesh) out.far += t(o); });
-      groups.things.children.forEach((o) => { if (o.userData.glb) { o.traverse((m) => { if (m.isMesh) out.buildings += t(m); }); return; } if (!o.isMesh || !o.visible) return; if (o === detail) out.detail += t(o); else if (o.material === matSway || o.userData.nature) out.nature += t(o); else out.buildings += t(o); }); Object.keys(out).forEach((k) => (out[k] = Math.round(out[k]))); return out; },
+      groups.terrain.traverse((o) => { if (o.isMesh && !o.userData.shadowOnly) out.terrain += t(o); }); farGroup.traverse((o) => { if (o.isMesh) out.far += t(o); });
+      groups.things.children.forEach((o) => { if (o.userData.shadowOnly) return; if (o.userData.glb) { o.traverse((m) => { if (m.isMesh) out.buildings += t(m); }); return; } if (!o.isMesh || !o.visible) return; if (o === detail) out.detail += t(o); else if (o.material === matSway || o.userData.nature) out.nature += t(o); else out.buildings += t(o); }); Object.keys(out).forEach((k) => (out[k] = Math.round(out[k]))); return out; },
     stats() { const i = R.info; return { frames, avgDrawMs: frames ? +(drawMs / frames).toFixed(2) : 0, calls: i.render.calls, triangles: i.render.triangles, geometries: i.memory.geometries, textures: i.memory.textures, shadow: sun.castShadow, shadowMap: sun.shadow.mapSize.x, shadowType: R.shadowMap.type === THREE.VSMShadowMap ? 'vsm' : 'pcf', detail: detail ? detail.count : 0, grade: { toneMapping: R.toneMapping === THREE.NeutralToneMapping ? 'neutral' : 'none', exposure: R.toneMappingExposure }, tinted: groups.things.children.filter((o) => o.isInstancedMesh && o.instanceColor).length, tier: tier().id, canvas: [R.domElement.width, R.domElement.height], pixelRatio: R.getPixelRatio(), slow, lod: lodOn === 0 ? 'off' : lodOn === 1 ? 'nature' : 'all', terrainMs: cost.terrainMs, syncMs: cost.syncMs, occ: { shown: occ.shown, proxies: occ.data ? occ.data.up.length + occ.data.flat.length : 0, ms: +occ.cost.toFixed(1) } }; },
     dispose() { if (raf) cancelAnimationFrame(raf); raf = 0; clearGroup(groups.terrain); groups.things.children.slice().forEach((c) => { groups.things.remove(c); if (c.isInstancedMesh) c.dispose(); }); state = { things: new Map(), sig: '' }; },
   };

@@ -33,7 +33,7 @@ let pass = 0, fail = 0; const ok = (c, m) => { if (c) { pass++; console.log('  o
   await mark(); await page.evaluate(() => { A.State.state.settings.batterySaver = false; A.Perf.apply(); A.UI.renderWorld(true); A.VoxIsland.redraw(); }); await settle('balanced'); await page.waitForTimeout(500);
   const back = await read(); const anim = await page.evaluate(() => getComputedStyle(document.querySelector('.backdrop .sea-waves .wv')).animationName);
   ok(back.st.detail === bal.st.detail && back.st.tier === 'balanced' && anim === 'seaWave', 'leaving Battery saver restores the detail and the moving sea');
-  ok(hi.b.buildings === bal.b.buildings && bal.b.buildings > 40000, 'architecture keeps full detail on High and Balanced (' + bal.b.buildings + ' triangles)');
+  ok(hi.b.buildings === bal.b.buildings && bal.b.buildings > 20000, 'architecture keeps full detail on High and Balanced (' + bal.b.buildings + ' triangles drawn; Phase 14 draws only the faces the camera sees, so this is about half the model)');
   ok(errors.length === 0, 'no script errors' + (errors.length ? ': ' + errors.slice(0, 3).join(' | ') : ''));
   console.log((fail ? 'FAILED' : 'PASSED') + ': ' + pass + ' passed, ' + fail + ' failed (browser-env4)');
   await browser.close(); srv.close(); process.exitCode = fail ? 1 : 0;
