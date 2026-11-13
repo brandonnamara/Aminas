@@ -10,6 +10,7 @@ import { Fx, FocusMarks, ELFX } from './combatfx.js';
 import * as SC from './showcase.js';   // Phase 8: bespoke clips (registered on import), living details, move choreography
 import './roster.js';                  // Phase 8B: the rest of the roster (clips, living details, moves) registered on import
 import { hitAccent } from './proto15.js'; // Phase 15 prototypes (developer switch only): clips, moves, hit accents
+import * as C15 from './combat15c.js';   // Phase 15C (developer switch only): signature sequences, camera, impact feedback
 const THREE = C.THREE;
 const A = window.A, D = A.Data;
 
@@ -297,13 +298,19 @@ export async function createBattle(container, o) {
   let shake = 0, telegraph = false, t0 = 0;
   const camBase = new THREE.Vector3(-0.35, 1.7, 5.0), look = new THREE.Vector3(0.05, 0.62, -0.15);
   // Phase 7 camera: a gentle push towards whoever unleashes an ultimate, and a short punch-in on big hits
-  const cam = { push: 0, pushTo: 0, toward: new THREE.Vector3(), punch: 0 }, camTmp = new THREE.Vector3(), lookTmp = new THREE.Vector3();
+  const cam = { push: 0, pushTo: 0, toward: new THREE.Vector3(), punch: 0, focus: 0, focusTo: 0, fv: new THREE.Vector3() }, camTmp = new THREE.Vector3(), lookTmp = new THREE.Vector3();
+  // Phase 15C: per-frame presentation updaters (the nine swords) and things to release if the battle ends mid-sequence
+  const ticks = [], owned = []; let lastHitAt = -1;
   // Phase 14 finalisation: the boss introduction. The camera opens close on the boss, holds while it rears up (its own
   // approved 'special' clip, or 'attack' where it has none), then eases back to the battle view. About 1.6 s; a tap
   // ends it at once (skipIntro); skipped entirely for Reduce Motion and Battery saver.
   const intro = { t: -1, len: 1.6, hold: 0.45, done: null }, introTgt = new THREE.Vector3(), introPos = new THREE.Vector3(), INTRO_OFF = new THREE.Vector3(0.9, 0.45, 2.8); // framed from the boss's own side, so the player's Amina is out of shot
   // Phase 7 timeline: effects scheduled against the battle's own clock (they line up with the animation, not with timers)
   const timeline = []; let clockT = 0; const at = (delay, fn) => timeline.push({ t: clockT + delay, fn });
+  // Phase 15C: the presentation API handed to move sequences (the camera, per-frame updaters, clean-up on dispose)
+  const camApi = { focus: (v, w) => { cam.fv.copy(v); cam.focusTo = Math.max(0, Math.min(1, w == null ? 1 : w)); }, release: () => { cam.focusTo = 0; } };
+  const mkApi = () => ({ fx, at, slot: (w) => slots[w], other, calm, saver, chest, head, scene, cam: camApi, now: () => clockT, tick: (fn) => ticks.push(fn), own: (fn) => owned.push(fn),
+    shake: (v) => { if (!calm()) shake = Math.max(shake, v); }, from: (w, node) => { const r = slots[w].root, o = r.getObjectByName(node) || r.getObjectByName('mouth') || r.getObjectByName('handR'); return o ? o.getWorldPosition(new THREE.Vector3()) : chest(w); } });
   // Phase 7 focus: who is active, who is targeted (driven by the battle UI, see ui2.js syncArena)
   const focus = { active: null, target: null, mode: null, preview: null, key: '' };
   const SIDE = { p: '#8ff0ff', e: '#ff7aa0' }, TARGET = '#ff7aa0';
@@ -324,17 +331,20 @@ export async function createBattle(container, o) {
       t0 = t; clockT += dt;
       for (let i = timeline.length - 1; i >= 0; i--) if (timeline[i].t <= clockT) { const ev = timeline[i]; timeline.splice(i, 1); try { ev.fn(); } catch (e) { /* an effect never stops a battle */ } }
       const still = calm(), hold = fx.frozen > 0 ? 0 : dt;   // a super-effective hit freezes the fighters for a beat
+      for (let i = ticks.length - 1; i >= 0; i--) { let keep = false; try { keep = ticks[i](dt) !== false; } catch (e) { keep = false; } if (!keep) ticks.splice(i, 1); }
       slots.p.update(hold); slots.e.update(hold); arena.update(t, dt); bursts.update(dt); fx.update(dt); marks.update(dt, t, still); if (aura) aura.update(t, dt);
       ring.material.opacity = telegraph ? 0.45 + Math.sin(t * 8) * 0.3 : Math.max(0, ring.material.opacity - dt * 2);
       if (bossRune) bossRune.rotation.z += dt * 0.25;
       if (prism && !still) { prism.material.color.setHSL((t * 0.12) % 1, 0.85, 0.62); prismUp.material.color.setHSL((t * 0.12 + 0.5) % 1, 0.85, 0.66); prism.rotation.z += dt * 0.4; prismUp.material.opacity = 0.24 + Math.sin(t * 2.2) * 0.1; }
       dome.material.opacity += ((barrier ? 0.28 : 0) - dome.material.opacity) * Math.min(1, dt * 6);
-      cam.push += (cam.pushTo - cam.push) * Math.min(1, dt * 5); cam.punch = Math.max(0, cam.punch - dt * 3.5);
+      cam.push += (cam.pushTo - cam.push) * Math.min(1, dt * 5); cam.punch = Math.max(0, cam.punch - dt * 3.5); cam.focus += ((still ? 0 : cam.focusTo) - cam.focus) * Math.min(1, dt * 4);
       camera.position.copy(camBase); lookTmp.copy(look);
       if (intro.t >= 0) { intro.t += dt; const k0 = intro.t < intro.hold ? 1 : Math.max(0, 1 - (intro.t - intro.hold) / (intro.len - intro.hold)), k = k0 * k0 * (3 - 2 * k0);
         introTgt.copy(chest('e')); introPos.copy(introTgt).add(INTRO_OFF); camera.position.lerp(introPos, 0.7 * k); lookTmp.lerp(introTgt, 0.8 * k);
         if (intro.t >= intro.len) { intro.t = -1; const d = intro.done; intro.done = null; if (d) d(); } }
       if (cam.push > 0.002 && !still) { camTmp.copy(cam.toward).sub(camBase).multiplyScalar(0.16 * cam.push); camera.position.add(camTmp); lookTmp.lerp(cam.toward, 0.25 * cam.push); }
+      // Phase 15C: target framing on specials (eases in and back; never with Reduce Motion)
+      if (cam.focus > 0.002 && !still) { camTmp.copy(cam.fv).sub(camera.position).multiplyScalar(0.1 * cam.focus); camTmp.y *= 0.4; camera.position.add(camTmp); lookTmp.lerp(cam.fv, 0.35 * cam.focus); }
       if (shake > 0 && !still) { shake -= dt; camera.position.x += (Math.random() - 0.5) * shake * 0.25; camera.position.y += (Math.random() - 0.5) * shake * 0.2; }
       const fov = 36 - (still ? 0 : cam.punch * 2.2); if (Math.abs(camera.fov - fov) > 0.01) { camera.fov = fov; camera.updateProjectionMatrix(); }
       camera.lookAt(lookTmp);
@@ -362,6 +372,7 @@ export async function createBattle(container, o) {
       if (key === focus.key) return; const was = focus.key; focus.key = key; focus.active = f.active || null; focus.target = f.target || null; focus.mode = f.mode || null;
       note(key); applyFocus(); boost(600);
       // its turn begins: the active Amina plays its battle-ready move (once per turn, not with Reduce motion)
+      if (f.mode === 'turn') cam.focusTo = 0;   // Phase 15C: a new turn always returns the camera to the battle view
       if (f.mode === 'turn' && f.active && !calm()) slots[f.active].play('ready');
       void was;
     },
@@ -371,10 +382,13 @@ export async function createBattle(container, o) {
     use(who, kind, info) {
       boost(1600); info = info || {}; const a = slots[who], tgt = other(who), pf = a.profile || {}, el = info.el || elOf(who);
       // Phase 8B: a shot leaves from the named point, else the creature's mouth, else its hand, else its chest
-      const api = { fx, at, slot: (w) => slots[w], other, calm, chest, head, from: (w, node) => { const r = slots[w].root, o = r.getObjectByName(node) || r.getObjectByName('mouth') || r.getObjectByName('handR'); return o ? o.getWorldPosition(new THREE.Vector3()) : chest(w); } };
+      const api = mkApi();
       if (kind !== 'attack') { const clip = info.type === 'heal' ? 'heal' : info.type === 'guard' ? 'guard' : 'move'; note('use:' + who + ':' + clip); SC.choreograph(api, who, a.spId, info.abil, info); return a.play(clip); }
       const mv = SC.SHOWCASE_IDS.indexOf(a.spId) >= 0 && A.Showcase && A.Showcase.moves && A.Showcase.moves[info.abil];
       const ult = mv && mv.ult === false ? !!info.boss : !!(info.special || info.boss), clip = mv && mv.clip ? mv.clip : ult ? 'special' : 'attack', F = ELFX[el] || ELFX.light;
+      // Phase 15C: a move with its own signature sequence (Atem III's nine swords) plays that instead
+      const sig = C15.sig(a.spId, info.abil);
+      if (sig) { const sc = a.actions[sig.clip] ? sig.clip : clip; note('use:' + who + ':' + sc); note('move:' + who + ':' + info.abil); try { sig.run(api, who, info); } catch (e) { /* an effect never stops a battle */ } return a.play(sc); }
       note('use:' + who + ':' + clip);
       if (ult) {
         // the ultimate: the attacker gathers its element in a rising column while the camera leans in
@@ -382,28 +396,31 @@ export async function createBattle(container, o) {
         if (!calm()) { cam.toward.copy(chest(who)); cam.pushTo = 1; at(0.62, () => { cam.pushTo = 0; }); }
       }
       const contact = ult ? 0.4 : 0.34, ranged = pf.ranged || ult || info.type === 'drain' || info.type === 'weaken';
+      if (ult) C15.specialCamera(api, who, contact);
       if (SC.choreograph(api, who, a.spId, info.abil, info)) note('move:' + who + ':' + info.abil);
       else if (ranged) at(Math.max(0.05, contact - 0.2), () => { fx.projectile(chest(who), chest(tgt), el, { dur: 0.2, big: ult }); });
       else at(contact, () => { fx.slash(chest(tgt), el, who === 'p' ? 1 : -1); });
       return a.play(clip);
     },
     async hit(who, el, eff, info) {
-      boost(1200); info = info || {}; const a = slots[who]; const big = eff === 'super' || info.big;
+      boost(1200); info = info || {}; const a = slots[who]; const big = eff === 'super' || info.big; lastHitAt = clockT;
       a.flash(elCol(el)); marks.strike(who); note('hit:' + who + ':' + (eff || 'normal'));
       fx.impact(chest(who), el, eff === 'super' ? 'super' : info.big ? 'big' : eff === 'weak' ? 'weak' : 'normal');
       shake = big ? 0.35 : eff === 'weak' ? 0.08 : 0.18;
       if (eff === 'super') { fx.freeze(80); cam.punch = 1; } else if (info.big) cam.punch = 0.6;
-      hitAccent({ fx, at, slot: (w) => slots[w], chest, calm }, who, el, eff, info);
+      hitAccent({ fx, at, slot: (w) => slots[w], chest, calm }, who, el, eff, info); C15.hit(mkApi(), who, el, eff);
       return a.play(big ? 'hitBig' : 'hit');
     },
-    heal(who) { boost(1000); const a = slots[who]; fx.column(a.group.position, ['#e8ffe8', '#9dffb0', '#5fe08a'], 12, { r: 0.5 * a.group.scale.x, rise: 1.0 }); fx.glow(chest(who), '#9dffb0', 1.3, 0.5); a.flash('#9dffb0'); note('heal:' + who); },
-    guard(who) { boost(800); const a = slots[who]; fx.column(a.group.position, ['#e8f6ff', '#9ad4ff', '#5aa8e8'], 10, { r: 0.68 * a.group.scale.x, rise: 0.55, life: 0.55, size: 0.07 }); note('guard:' + who); },
-    status(who, color) { fx.burst(head(who), [color, '#ffffff'], 7, { speed: 0.8, life: 0.5, size: 0.05, grav: 0.4 }); },
-    faint(who) { boost(); note('faint:' + who); slots[who].setOutline(null, 0); marks.ring(who, null, 0); marks.reticle(who, 0); fx.burst(slots[who].group.position.clone().setY(0.1), ['#cfc6ee', '#9a90c0'], 10, { speed: 0.7, up: 0.3, life: 0.6, size: 0.06, grav: 0.6 }); return slots[who].play('defeat'); },
+    heal(who) { boost(1000); const a = slots[who]; fx.column(a.group.position, ['#e8ffe8', '#9dffb0', '#5fe08a'], 12, { r: 0.5 * a.group.scale.x, rise: 1.0 }); fx.glow(chest(who), '#9dffb0', 1.3, 0.5); a.flash('#9dffb0'); note('heal:' + who); C15.heal(mkApi(), who); },
+    guard(who) { boost(800); const a = slots[who]; fx.column(a.group.position, ['#e8f6ff', '#9ad4ff', '#5aa8e8'], 10, { r: 0.68 * a.group.scale.x, rise: 0.55, life: 0.55, size: 0.07 }); note('guard:' + who); C15.guard(mkApi(), who); },
+    status(who, color) { note('status:' + who); fx.burst(head(who), [color, '#ffffff'], 7, { speed: 0.8, life: 0.5, size: 0.05, grav: 0.4 }); C15.status(mkApi(), who, color); },
+    // Phase 15C: extra milliseconds the battle UI waits after this move (only signature sequences ask for any)
+    hold(who, abil) { const a = slots[who]; return a ? C15.hold(a.spId, abil, { calm: calm(), saver: saver() }) : 0; },
+    faint(who) { boost(); note('faint:' + who); slots[who].setOutline(null, 0); marks.ring(who, null, 0); marks.reticle(who, 0); fx.burst(slots[who].group.position.clone().setY(0.1), ['#cfc6ee', '#9a90c0'], 10, { speed: 0.7, up: 0.3, life: 0.6, size: 0.06, grav: 0.6 }); C15.faint(mkApi(), who); return slots[who].play('defeat'); },
     victory(who) {
       boost(2500); note('victory:' + who); focus.key = ''; focus.active = focus.target = null; applyFocus();
       const a = slots[who], F = ELFX[elOf(who)] || ELFX.light; marks.ring(who, '#ffd978', 1);
-      fx.column(a.group.position, F.c.concat(['#ffd978']), 18, { r: 0.6 * a.group.scale.x, rise: 1.8, life: 1.0, size: 0.06 });
+      fx.column(a.group.position, F.c.concat(['#ffd978']), 18, { r: 0.6 * a.group.scale.x, rise: 1.8, life: 1.0, size: 0.06 }); C15.victory(mkApi(), who);
       return a.play('victory', { loop: true });
     },
     async swap(who, spId) {
@@ -414,10 +431,10 @@ export async function createBattle(container, o) {
     setBarrier(on) { barrier = !!on; },
     setElement(el) { fx.burst(head('e'), [elCol(el), '#ffffff'], 14, { speed: 1.4, life: 0.7, size: 0.06 }); },
     // diagnostics for tests: what the arena is showing and what is alive
-    debug() { return { focus: { active: focus.active, target: focus.target, mode: focus.mode, preview: focus.preview }, marks: marks.state(), fx: fx.live(), cubes: fx.p.length, shots: fx.shots.length, timeline: timeline.length, log: log.slice(), profiles: { p: slots.p.profile, e: slots.e.profile }, clips: { p: Object.keys(slots.p.actions), e: Object.keys(slots.e.actions) }, playing: { p: slots.p.current && slots.p.current.getClip().name, e: slots.e.current && slots.e.current.getClip().name }, arena: arena.key, atmosphere: arena.atmo || null }; },
+    debug() { return { c15: { ticks: ticks.length, owned: owned.length, clock: +clockT.toFixed(3), lastHitAt: +lastHitAt.toFixed(3), camFocus: +cam.focus.toFixed(3), swords: C15.last9 ? { caught: C15.last9.caught || 0, hits: C15.last9.hit.filter(Boolean).length, hitAt: C15.last9.hitAt.slice(), start: C15.last9.start, done: C15.last9.done, visible: C15.last9.visible, maxVisible: C15.last9.maxVisible } : null }, focus: { active: focus.active, target: focus.target, mode: focus.mode, preview: focus.preview }, marks: marks.state(), fx: fx.live(), cubes: fx.p.length, shots: fx.shots.length, timeline: timeline.length, log: log.slice(), profiles: { p: slots.p.profile, e: slots.e.profile }, clips: { p: Object.keys(slots.p.actions), e: Object.keys(slots.e.actions) }, playing: { p: slots.p.current && slots.p.current.getClip().name, e: slots.e.current && slots.e.current.getClip().name }, arena: arena.key, atmosphere: arena.atmo || null }; },
     dispose() {
       if (active === view) { active = null; stop(); } if (renderer && renderer.domElement.parentNode === container) container.removeChild(renderer.domElement);
-      timeline.length = 0;
+      timeline.length = 0; ticks.length = 0; owned.forEach((f) => { try { f(); } catch (e) { /* already gone */ } }); owned.length = 0;
       slots.p.dispose(); slots.e.dispose(); bursts.dispose(); fx.dispose(); marks.dispose(); arena.dispose(); scene.remove(lights); ring.geometry.dispose(); ring.material.dispose();
       if (bossRune) { bossRune.geometry.dispose(); bossRune.material.dispose(); }
       if (prism) { [prism, prismUp].forEach((m) => { scene.remove(m); m.geometry.dispose(); m.material.dispose(); }); }

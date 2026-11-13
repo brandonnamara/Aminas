@@ -128,6 +128,7 @@
   Au.suspend = function () { if (musicTimer) { clearInterval(musicTimer); musicTimer = null; } if (ctx && ctx.state === 'running') { suspendedByUs = true; try { ctx.suspend(); } catch (e) {} } };
   Au.resume = function () { if (ctx && suspendedByUs) { suspendedByUs = false; try { ctx.resume(); } catch (e) {} } if (ctx) Au.applyMusic(); };
   Au.ctxState = () => (ctx ? ctx.state : 'none');
+  Au.context = () => ctx;   // Phase 15C: for tests of interruption handling
   Au.musicRunning = () => !!musicTimer;
   Au.setMode = function (m) { if (Au.mode !== m) { Au.mode = m; Au.applyMusic(); } };
   Au.setPrefs = function (s) { Au.sfxOn = !!s.sfx; Au.musicOn = !!s.music; if (ctx) session(); Au.applyMusic(); };
@@ -386,6 +387,45 @@
     const C = root.OfflineAudioContext || root.webkitOfflineAudioContext; if (!C) return null;
     const rate = 44100, c = new C(1, Math.ceil(rate * (seconds || 1.6)), rate), b = bus(c, c.destination);
     voiceOf(sp)[cue]({ c, out: b.out, echo: b.echo }, 0.02, { heads: VOICED[sp] }); const L = layer15(sp, cue); if (L) L({ c, out: b.out, echo: b.echo }, 0.02);
+    const buf = await c.startRendering(), d = buf.getChannelData(0), n = d.length, ab = new ArrayBuffer(44 + n * 2), dv = new DataView(ab);
+    const w = (o, s) => { for (let i = 0; i < s.length; i++) dv.setUint8(o + i, s.charCodeAt(i)); };
+    w(0, 'RIFF'); dv.setUint32(4, 36 + n * 2, true); w(8, 'WAVE'); w(12, 'fmt '); dv.setUint32(16, 16, true); dv.setUint16(20, 1, true); dv.setUint16(22, 1, true); dv.setUint32(24, rate, true); dv.setUint32(28, rate * 2, true); dv.setUint16(32, 2, true); dv.setUint16(34, 16, true); w(36, 'data'); dv.setUint32(40, n * 2, true);
+    let peak = 0; for (let i = 0; i < n; i++) { const v = Math.max(-1, Math.min(1, d[i])); peak = Math.max(peak, Math.abs(v)); dv.setInt16(44 + i * 2, v * 32767, true); }
+    return { wav: ab, peak, seconds: n / rate };
+  };
+  /* Phase 15C (developer switch only): presentation sequences for the battle stage, synthesised here (no recorded
+     audio). They play through the same monster bus and compressor, at most two at once, so nothing stacks up. */
+  const SEQ15 = {
+    // Atem III, nine blades: activation hum, nine assembly clicks, a held resonance, nine launches and nine ringing
+    // impacts (the last one heaviest), then the blades retracting. t is when the sequence starts.
+    atem9: (X, t) => {
+      osc(X, t, 0.32, 'sawtooth', 90, 420, 0.035, { lp: 1400, attack: 0.04 }); osc(X, t + 0.05, 0.4, 'sine', 220, 440, 0.03, { attack: 0.06 });
+      for (let i = 0; i < 9; i++) { const c = t + 0.3 + i * 0.035; osc(X, c, 0.05, 'square', 1500 + i * 90, 1100 + i * 90, 0.012, { lp: 4200 }); nz(X, c, 0.03, 0.02, 'highpass', 4500); }
+      osc(X, t + 0.36, 0.48, 'triangle', 330, 330, 0.02, { am: [14, 0.5], attack: 0.08 });
+      for (let i = 0; i < 9; i++) { const l = t + 0.8 + i * 0.022, h = t + 0.84 + i * 0.025, last = i === 8; nz(X, l, 0.08, 0.018, 'bandpass', 1800, 4200, 1.4);
+        osc(X, h, last ? 0.6 : 0.22, 'triangle', (last ? 1760 : 2637 - i * 60), null, last ? 0.03 : 0.014, { attack: 0.002 }); if (last) kick(X, h, 160, 55, 0.22, 0.09); else nz(X, h, 0.04, 0.02, 'highpass', 3200); }
+      nz(X, t + 1.18, 0.3, 0.02, 'bandpass', 3000, 900, 1); osc(X, t + 1.2, 0.26, 'sine', 880, 330, 0.02);
+    },
+    guard: (X, t) => { osc(X, t, 0.35, 'sine', 300, 300, 0.03, { am: [18, 0.4], attack: 0.03 }); osc(X, t + 0.02, 0.3, 'triangle', 600, 900, 0.015); },
+    heal: (X, t) => [1047, 1319, 1568, 2093].forEach((f, i) => osc(X, t + i * 0.06, 0.4, 'sine', f, null, 0.016, { echo: true, attack: 0.01 })),
+    status: (X, t) => { osc(X, t, 0.18, 'triangle', 700, 420, 0.018); nz(X, t, 0.12, 0.014, 'bandpass', 1400, 600, 1.2); },
+    super: (X, t) => { osc(X, t, 0.25, 'triangle', 1568, 2093, 0.018, { attack: 0.003 }); osc(X, t + 0.05, 0.3, 'sine', 3136, null, 0.012, { attack: 0.003 }); },
+    faint: (X, t) => { osc(X, t, 0.7, 'sine', 330, 110, 0.03, { lp: 900 }); nz(X, t + 0.5, 0.3, 0.02, 'lowpass', 500); },
+    victory: (X, t) => [523, 659, 784, 1047].forEach((f, i) => osc(X, t + i * 0.09, i === 3 ? 0.6 : 0.2, 'triangle', f, null, 0.022, { attack: 0.005 })),
+  };
+  let seqLive = 0;
+  Au.seq15 = function (name, o) {
+    o = o || {}; const fn = SEQ15[name], P = root.A && root.A.Proto15;
+    if (!fn || !P || !P.enabled() || !Au.sfxOn || !ctx || ctx.state !== 'running' || seqLive >= 2) return false;
+    if (!mBus) mBus = bus(ctx, master);
+    seqLive++; setTimeout(() => { seqLive = Math.max(0, seqLive - 1); }, name === 'atem9' ? 1500 : 700);
+    try { fn({ c: ctx, out: mBus.out, echo: mBus.echo }, ctx.currentTime + 0.01 + (o.delay || 0)); } catch (e) { /* audio is optional */ }
+    return true;
+  };
+  Au.SEQ15 = Object.keys(SEQ15);
+  Au.renderSeq15 = async function (name, seconds) {
+    const C = root.OfflineAudioContext || root.webkitOfflineAudioContext; if (!C || !SEQ15[name]) return null;
+    const rate = 44100, c = new C(1, Math.ceil(rate * (seconds || 1.6)), rate), b = bus(c, c.destination); SEQ15[name]({ c, out: b.out, echo: b.echo }, 0.02);
     const buf = await c.startRendering(), d = buf.getChannelData(0), n = d.length, ab = new ArrayBuffer(44 + n * 2), dv = new DataView(ab);
     const w = (o, s) => { for (let i = 0; i < s.length; i++) dv.setUint8(o + i, s.charCodeAt(i)); };
     w(0, 'RIFF'); dv.setUint32(4, 36 + n * 2, true); w(8, 'WAVE'); w(12, 'fmt '); dv.setUint32(16, 16, true); dv.setUint16(20, 1, true); dv.setUint16(22, 1, true); dv.setUint32(24, rate, true); dv.setUint32(28, rate * 2, true); dv.setUint16(32, 2, true); dv.setUint16(34, 16, true); w(36, 'data'); dv.setUint32(40, n * 2, true);

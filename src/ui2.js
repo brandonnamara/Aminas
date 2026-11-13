@@ -444,7 +444,8 @@
           const mSp = spOf(e.who); if (Au.hasVoice && Au.hasVoice(mSp)) { const mo = A.Showcase && A.Showcase.moves && A.Showcase.moves[e.abil]; Au.monster(mSp, ty === 'heal' ? 'heal' : ty === 'guard' ? 'guard' : mo && mo.cue ? mo.cue : ab.cd > 0 ? 'special' : 'attack'); }
           if (ty === 'guard') { if (!(Au.hasVoice && Au.hasVoice(mSp))) Au.play('guard'); stg.guard(e.who); }
           if (e.boss) setTele(null);
-          await sleep(e.boss ? 620 : 480); break;
+          // Phase 15C: a signature sequence (developer switch only) may ask for a little longer before its hit lands
+          await sleep((e.boss ? 620 : 480) + (stg.hold ? stg.hold(e.who, e.abil) || 0 : 0)); break;
         }
         case 'shieldHit':
           d.eShield = e.shield; floatAt('e', e.broke ? 'Barrier broken!' : '-' + e.absorbed + ' barrier', e.broke ? 'super' : 'status');
