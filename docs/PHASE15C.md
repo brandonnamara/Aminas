@@ -91,3 +91,31 @@ existing interruption recovery is untouched.
 - **`tools/c15-record.js`:** deterministic recordings. Playwright's clock advances exactly 1/30 s per captured frame, so a slow software renderer still records the real timing.
 - **`tools/c15-measure.js`:** rendering costs.
 - **`tools/c15-audio.js`:** offline WAV renders.
+
+## Results
+
+### Regression
+
+The full suite was 42 suites and 1,352 checks: **1,351 passed, 1 failed** (`docs/ui/screens15c/full-suite-15c.log`). It
+includes the new `browser-combat15c` suite (33 checks).
+
+- **The failure:** `browser-arena7`, "leaving battles frees their arenas…". In the full run the geometry count went 14, 17, 17. The check allows +2 between the first two rounds, and the count stopped growing after that. That test's own note says the count "can settle one round later".
+- **Isolated reruns** on the same code passed 3 of 3, each holding steady across rounds (20/20/20, 23/23/23, 20/20/20) (`arena7-reruns.log`).
+- **One earlier failure** came from a rerun while the full suite was running at the same time. That rerun failed a different check, and I don't count it.
+- **The 15C code builds no geometry with the switch off**, which is how that test runs. I did not change the threshold, and I report the failure as an intermittent result.
+
+### Costs
+
+These are desktop software rendering figures (`c15-measure.json`), not iPhone frame times.
+
+- **Atem III Overclock:**
+  - Peak draw calls: 30 off, 40 on, 36 with Battery Saver, 39 with Reduce Motion.
+  - Peak effect cubes: 112 off, 152 on, 73 with Battery Saver, 21 with Reduce Motion.
+- **Other specials:** draw calls are unchanged (29–35). Cubes rise by about 30–45 with the switch on, and fall to roughly half with Battery Saver and about a fifth with Reduce Motion.
+- **Budgets:** everything is inside the 240-cube pool and the 60-draw-call budget.
+- **Memory:** one sword geometry pair is cached after first use; nothing else is retained after a battle.
+
+### Media
+
+- `docs/ui/screens15c/rec/`: 14 deterministic recordings.
+- `docs/ui/screens15c/audio/`: 7 WAV files.

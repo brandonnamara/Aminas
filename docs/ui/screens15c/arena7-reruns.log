@@ -1,0 +1,8 @@
+  ok  leaving battles frees their arenas, effects and highlights (GPU geometries after three boss battles: 20, after three more: 20, after three more: 20)
+PASSED: 30 passed, 0 failed (browser-arena7)
+  ok  leaving battles frees their arenas, effects and highlights (GPU geometries after three boss battles: 23, after three more: 23, after three more: 23)
+PASSED: 30 passed, 0 failed (browser-arena7)
+  ok  leaving battles frees their arenas, effects and highlights (GPU geometries after three boss battles: 20, after three more: 20, after three more: 20)
+PASSED: 30 passed, 0 failed (browser-arena7)
+
+[exited with code 0]
