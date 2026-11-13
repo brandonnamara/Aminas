@@ -340,8 +340,68 @@ function atemClips(root, spId) {
   return out;
 }
 
+
+/* ================================================================= META (peace: communicative, curious, kind)
+   Smooth and composed, never servo-stiff like Atem: her limbs ease into place, while the wired hair moves as four locks
+   whose tips lag behind the roots, so the cables flow. Idle: a curious head tilt and a small wave hello. Attack: the hair
+   lashes forward (her lore: the hair is her weapon). Special: arms rise, the cables spread and lift, the ring turns, then
+   she sends it all forward. */
+function metaClips(root, spId) {
+  const st = stageOf(spId), k = kit(root), { R, S, clip } = k, Pw = (n, keys) => k.P(n, keys, true);
+  const amp = [1.1, 1, 0.9][st - 1];
+  // hair: keys written for the left locks (+z swings the cables forward, -x spreads them outward); the right mirrors
+  const hair = (f, ft) => ['F', 'B'].flatMap((fb, i) => [R('hairL' + fb, f(i)), R('hairR' + fb, f(i), true), R('hairL' + fb + 'T', ft(i)), R('hairR' + fb + 'T', ft(i), true)]);
+  const arms = (l, r) => [R('armL', l), R('armR', r || l)], fores = (l, r) => [R('foreL', l), R('foreR', r || l)];
+  const legs = (l, r) => [R('legL', l), R('legR', r || l)], shins = (l, r) => [R('shinL', l), R('shinR', r || l)];
+  const out = [];
+  { const D = +(5.0 * [1, 1.08, 1.16][st - 1]).toFixed(2), N = Math.ceil(D / 0.033), ph = (t) => (t / D) * TAU, tilt = (t) => bump(t, D * 0.22, D * 0.42), wave = (t) => bump(t, D * 0.58, D * 0.86);
+    out.push(clip('idle', D, [
+      S('body', F(D, N, (t) => { const b = 0.018 * sin(ph(t) * 2); return [1 + b, 1 + b * 0.6, 1 + b]; })),
+      Pw('rig', F(D, N, (t) => [0, 0.01 * sin(ph(t) * 2), 0])), R('torso', F(D, N, (t) => [0, 0.06 * sin(ph(t)), 0.03 * sin(ph(t) * 2)])),
+      R('head', F(D, N, (t) => [0.22 * tilt(t), 0.1 * sin(ph(t) + 0.5), 0.05 * tilt(t)])),
+      R('ring', F(D, N, (t) => [0.3 * sin(ph(t)), 0, 0])),
+      R('armR', F(D, N, (t) => [-0.35 * wave(t), 0, 1.7 * wave(t)])), R('foreR', F(D, N, (t) => [0.35 * sin((t - D * 0.6) * 14) * wave(t), 0, 0.9 * wave(t)])),
+      R('armL', F(D, N, (t) => [0, 0, 0.05 * sin(ph(t) + 1)])),
+      hair((i) => F(D, N, (t) => [-0.05 - 0.05 * sin(ph(t) * 2 + i), 0.04 * sin(ph(t) + i), 0.1 * sin(ph(t) * 2 + i * 1.3)]), (i) => F(D, N, (t) => [-0.1 * sin(ph(t) * 2 + i - 0.9), 0, 0.2 * sin(ph(t) * 2 + i * 1.3 - 0.9)])) ])); }
+  out.push(clip('ready', 0.75, [ Pw('rig', [[0, Z3], [0.3, [0, 0.03, 0]], [0.75, Z3]]), arms([[0, Z3], [0.3, [-0.25, 0, 0.35]], [0.75, Z3]], [[0, Z3], [0.3, [0.25, 0, 0.35]], [0.75, Z3]]),
+    R('ring', [[0, Z3], [0.4, [0.6, 0, 0]], [0.75, Z3]]), hair(() => [[0, Z3], [0.3, [-0.2, 0, -0.25]], [0.75, Z3]], () => [[0, Z3], [0.4, [-0.25, 0, -0.35]], [0.75, Z3]]) ]));
+  // attack: the cables draw back, then lash forward together (contact 0.34); the tips crack a beat later
+  out.push(clip('attack', 0.9, [
+    Pw('rig', [[0, Z3], [0.18, [0, 0, -0.06]], [0.34, [0, 0.02, 0.26 * amp]], [0.55, [0, 0, 0.12]], [0.9, Z3]]),
+    R('rig', [[0, Z3], [0.18, [-0.1, 0, 0]], [0.34, [0.12, 0, 0]], [0.9, Z3]]), R('torso', [[0, Z3], [0.18, [0, 0.25, 0]], [0.34, [0, -0.2, 0]], [0.6, Z3], [0.9, Z3]]),
+    R('armR', [[0, Z3], [0.18, [0, 0, -0.3]], [0.34, [0, 0, 1.3]], [0.55, [0, 0, 1.0]], [0.9, Z3]]), R('foreR', [[0, Z3], [0.34, [0, 0, 0.2]], [0.9, Z3]]),
+    hair((i) => [[0, Z3], [0.18, [-0.15, 0, -0.7]], [0.32, [0.1, 0, 1.1 - i * 0.2]], [0.5, [0, 0, 0.6]], [0.9, Z3]], (i) => [[0, Z3], [0.2, [0, 0, -0.6]], [0.38, [0, 0, 0.9 - i * 0.2]], [0.55, [0, 0, -0.2]], [0.9, Z3]]),
+    R('head', [[0, Z3], [0.18, [0, 0, 0.12]], [0.34, [0, 0, -0.12]], [0.9, Z3]]) ]));
+  // special: arms rise, cables spread wide and lift, the ring spins; then everything is sent forward (contact 0.40)
+  out.push(clip('special', 1.1, [
+    Pw('rig', [[0, Z3], [0.28, [0, 0.14 * amp, -0.05]], [0.4, [0, 0.1, 0.22 * amp]], [0.72, [0, 0.04, 0.08]], [1.1, Z3]]), R('rig', [[0, Z3], [0.28, [-0.15, 0, 0]], [0.4, [0.1, 0, 0]], [1.1, Z3]]),
+    arms([[0, Z3], [0.28, [-0.9, 0, 0.8]], [0.4, [-0.3, 0, 1.3]], [0.75, [-0.2, 0, 0.6]], [1.1, Z3]], [[0, Z3], [0.28, [0.9, 0, 0.8]], [0.4, [0.3, 0, 1.3]], [0.75, [0.2, 0, 0.6]], [1.1, Z3]]),
+    fores([[0, Z3], [0.28, [0, 0, 0.5]], [0.4, [0, 0, 0.1]], [1.1, Z3]]), R('ring', F(1.1, 33, (t) => [1.4 * bump(t, 0.05, 1.0), 0, 0])),
+    hair((i) => [[0, Z3], [0.28, [-0.7 + i * 0.15, 0, -0.3]], [0.42, [-0.2, 0, 1.0]], [0.75, [-0.1, 0, 0.3]], [1.1, Z3]], (i) => [[0, Z3], [0.3, [-0.5, 0, -0.4]], [0.46, [0, 0, 0.8]], [0.8, [0, 0, 0.1]], [1.1, Z3]]),
+    R('head', [[0, Z3], [0.28, [0, 0, 0.25]], [0.42, [0, 0, -0.1]], [1.1, Z3]]) ]));
+  out.push(clip('hit', 0.55, [ Pw('rig', [[0, Z3], [0.08, [0, 0.02, -0.13]], [0.55, Z3]]), R('rig', [[0, Z3], [0.08, [-0.18, 0, 0.06]], [0.55, Z3]]), R('head', [[0, Z3], [0.08, [0, 0.15, 0.2]], [0.55, Z3]]),
+    arms([[0, Z3], [0.08, [0, 0, -0.25]], [0.55, Z3]]), hair(() => [[0, Z3], [0.1, [0, 0, 0.5]], [0.3, [0, 0, -0.15]], [0.55, Z3]], () => [[0, Z3], [0.14, [0, 0, 0.7]], [0.34, [0, 0, -0.2]], [0.55, Z3]]) ]));
+  out.push(clip('hitBig', 0.8, [ Pw('rig', [[0, Z3], [0.1, [0, 0.06, -0.28]], [0.4, [0, 0, -0.12]], [0.8, Z3]]), R('rig', [[0, Z3], [0.1, [-0.35, 0.3, 0.12]], [0.4, [-0.05, 0.05, 0]], [0.8, Z3]]),
+    arms([[0, Z3], [0.1, [-0.4, 0, -0.3]], [0.5, Z3], [0.8, Z3]], [[0, Z3], [0.1, [0.4, 0, -0.3]], [0.5, Z3], [0.8, Z3]]), hair(() => [[0, Z3], [0.12, [-0.3, 0, 0.8]], [0.4, [0, 0, -0.2]], [0.8, Z3]], () => [[0, Z3], [0.16, [-0.3, 0, 0.9]], [0.45, [0, 0, -0.3]], [0.8, Z3]]) ]));
+  out.push(clip('heal', 0.9, [ Pw('rig', [[0, Z3], [0.35, [0, 0.05, 0]], [0.9, Z3]]), arms([[0, Z3], [0.35, [-0.6, 0, 0.3]], [0.9, Z3]], [[0, Z3], [0.35, [0.6, 0, 0.3]], [0.9, Z3]]), R('head', [[0, Z3], [0.35, [0, 0, 0.25]], [0.9, Z3]]),
+    hair(() => [[0, Z3], [0.35, [-0.35, 0, -0.2]], [0.9, Z3]], () => [[0, Z3], [0.42, [-0.3, 0, -0.3]], [0.9, Z3]]), R('ring', [[0, Z3], [0.5, [0.8, 0, 0]], [0.9, Z3]]) ]));
+  out.push(clip('guard', 0.7, [ arms([[0, Z3], [0.18, [0.35, 0, 1.0]], [0.5, [0.35, 0, 1.0]], [0.7, Z3]], [[0, Z3], [0.18, [-0.35, 0, 1.0]], [0.5, [-0.35, 0, 1.0]], [0.7, Z3]]), fores([[0, Z3], [0.2, [0, 0, 0.8]], [0.5, [0, 0, 0.8]], [0.7, Z3]]),
+    hair(() => [[0, Z3], [0.2, [0.3, 0, 0.9]], [0.5, [0.3, 0, 0.9]], [0.7, Z3]], () => [[0, Z3], [0.24, [0.3, 0, 0.6]], [0.5, [0.3, 0, 0.6]], [0.7, Z3]]), Pw('rig', [[0, Z3], [0.2, [0, -0.02, -0.03]], [0.7, Z3]]) ]));
+  out.push(clip('victory', 1.6, [ R('armR', F(1.6, 48, (t) => [-0.4 * bump(t, 0.05, 1.5), 0, 2.0 * bump(t, 0.05, 1.5)])), R('foreR', F(1.6, 48, (t) => [0.4 * sin(t * 12) * bump(t, 0.2, 1.4), 0, 0.8 * bump(t, 0.05, 1.5)])),
+    Pw('rig', F(1.6, 32, (t) => [0, 0.05 * bump(t, 0.1, 1.5), 0])), R('ring', F(1.6, 32, (t) => [1.2 * bump(t, 0.1, 1.5), 0, 0])), R('head', F(1.6, 32, (t) => [0.15 * bump(t, 0.2, 1.3), 0, 0.15 * bump(t, 0.1, 1.5)])),
+    hair((i) => F(1.6, 32, (t) => [-0.3 * bump(t, 0.1, 1.5), 0, 0.2 * sin(t * 6 + i) * bump(t, 0.1, 1.5)]), (i) => F(1.6, 32, (t) => [-0.2 * bump(t, 0.1, 1.5), 0, 0.3 * sin(t * 6 + i - 0.9) * bump(t, 0.1, 1.5)])) ]));
+  out.push(clip('defeat', 1.2, [ legs([[0, Z3], [0.5, Z3], [0.85, [0, 0, 0.9]], [1.2, [0, 0, 0.9]]]), shins([[0, Z3], [0.5, Z3], [0.85, [0, 0, -1.4]], [1.2, [0, 0, -1.4]]]),
+    Pw('rig', [[0, Z3], [0.5, Z3], [0.85, [0, -0.11, -0.03]], [1.2, [0, -0.11, -0.03]]]), R('head', [[0, Z3], [0.6, [0, 0, -0.3]], [1.2, [0, 0, -0.45]]]), R('torso', [[0, Z3], [0.8, [0, 0, -0.2]], [1.2, [0, 0, -0.25]]]),
+    arms([[0, Z3], [1.2, [0, 0, -0.15]]]), hair(() => [[0, Z3], [1.2, [0.15, 0, 0.3]]], () => [[0, Z3], [1.2, [0.1, 0, 0.4]]]), R('ring', [[0, Z3], [1.2, [0, 0, -0.25]]]) ]));
+  { const M = 0.9, ph = (t) => (t / M) * TAU;
+    out.push(clip('move', M, [ legs(F(M, 24, (t) => [0, 0, 0.32 * sin(ph(t))]), F(M, 24, (t) => [0, 0, -0.32 * sin(ph(t))])), shins(F(M, 24, (t) => [0, 0, -0.3 * Math.max(0, sin(ph(t) + 1))]), F(M, 24, (t) => [0, 0, -0.3 * Math.max(0, sin(ph(t) + 1 + PI))])),
+      arms(F(M, 24, (t) => [0, 0, -0.18 * sin(ph(t))]), F(M, 24, (t) => [0, 0, 0.18 * sin(ph(t))])), Pw('rig', F(M, 24, (t) => [0, 0.015 * Math.abs(sin(ph(t))), 0])),
+      hair(() => F(M, 24, (t) => [0, 0, -0.25 - 0.06 * sin(ph(t) * 2)]), () => F(M, 24, (t) => [0, 0, -0.3 - 0.1 * sin(ph(t) * 2 - 0.8)])) ])); }
+  return out;
+}
+
 /* ================================================================= registration */
-const LINE_CLIPS = { lumifern: lumifernClips, igniflare: dragonClips, atem: atemClips };
+const LINE_CLIPS = { lumifern: lumifernClips, igniflare: dragonClips, atem: atemClips, meta: metaClips };
 Object.values(window.A.Data.SPECIES).forEach((sp) => { const fn = LINE_CLIPS[sp.line]; if (fn) PROTO_HOOKS[sp.id] = (root, profile, base) => (root.userData.parts ? fn(root, sp.id) : base); });
 export const PROTO_IDS = Object.keys(PROTO_HOOKS);
 const on = (api, who) => !!(window.A.Proto15 && window.A.Proto15.active(api.slot(who).spId));
@@ -429,9 +489,30 @@ const P15 = {
     for (let k2 = 0; k2 < 2; k2++) api.at(0.44 + k2 * 0.05, () => { let a = api.chest(who); const b = api.chest(tgt); for (let i = 1; i <= 4; i++) { const q = a.clone().lerp(b, 0.25).add(V3(rnd(0.25), rnd(0.25), rnd(0.25))); if (i === 4) q.copy(b); line(api, a, q, c, 4, { life: 0.12, j: 0.02 }); a = q; } });
     api.at(0.5, () => { api.fx.glow(api.chest(tgt), '#7fd0ff', 1.4, 0.25); groundRing(api, spot(api, tgt), 0.3, c, 14, 1.3, 0.4); }); },
 };
+/* Meta uses the same four metal moves as Atem, performed with her wired hair: cables of light lash out from her head,
+   a lattice of data cubes forms her wall, and the cables arc current into the foe. */
+const META15 = {
+  gearstrike(api, who) { const tgt = api.other(who), c = ['#eaf6ff', '#5fd0ff', '#2f8cff'], h = () => api.head(who);
+    gather(api, h, c, 6, 0.25, 0.1, 0.26);
+    for (let k2 = 0; k2 < 3; k2++) api.at(0.28 + k2 * 0.02, () => { const a = h().add(V3(0, -0.1 * k2, 0)), b = api.chest(tgt).add(V3(0, (k2 - 1) * 0.12, 0)), n = N(api, 10); for (let i = 0; i <= n; i++) { const t = i / n, p = a.clone().lerp(b, t); p.y += sin(t * PI) * (0.25 + k2 * 0.1); api.fx.spawn(p, V3(0, 0, 0), { color: c[(i + k2) % 3], life: 0.12 + t * 0.12, size: 0.04, grav: 0, spin: 2 }); } });
+    api.at(0.36, () => { api.fx.burst(api.chest(tgt), ['#ffffff', '#5fd0ff', '#eaf6ff'], 12, { speed: 1.8, life: 0.3, size: 0.045, grav: 1 }); groundRing(api, spot(api, tgt), 0.22, ['#5fd0ff', '#eaf6ff'], 10, 1.0, 0.35); }); },
+  ironwall(api, who) { const tgt = api.other(who), a = spot(api, who), d = spot(api, tgt).sub(a).normalize(), side = V3(-d.z, 0, d.x), f = a.clone().addScaledVector(d, 0.6 * sz(api, who));
+    for (let r = 0; r < 4; r++) api.at(0.05 + r * 0.05, () => { for (let j = 0; j < N(api, 7); j++) { if ((j + r) % 2) continue; const p = f.clone().addScaledVector(side, (j / 6 - 0.5) * 0.95 * sz(api, who)).add(V3(0, 0.12 + r * 0.22 * sz(api, who), 0)); api.fx.spawn(p, V3(0, 0, 0), { color: r % 2 ? '#eaf6ff' : '#5fd0ff', life: 0.55 - r * 0.04, size: 0.08, grav: 0, spin: 1 }); } });
+    api.at(0.3, () => api.fx.glow(f.clone().setY(0.5), '#5fd0ff', 1.2, 0.35)); },
+  bladeform(api, who) { const tgt = api.other(who), s = who === 'p' ? 1 : -1, c = ['#ffffff', '#bfefff', '#5fd0ff'];
+    api.at(0.14, () => { const h = api.head(who); line(api, h, h.clone().add(V3(0.5 * s, -0.5, 0)), c, 8, { life: 0.2 }); api.fx.glow(h, '#5fd0ff', 0.9, 0.2); });
+    api.at(0.36, () => { const p = api.chest(tgt); line(api, p.clone().add(V3(-0.42 * s, 0.4, 0)), p.clone().add(V3(0.42 * s, -0.36, 0)), c, 16, { life: 0.3, j: 0.01 }); api.fx.slash(p, 'metal', s); });
+    api.at(0.44, () => { api.fx.burst(api.chest(tgt), ['#ffffff', '#5fd0ff'], 12, { speed: 2, life: 0.35, size: 0.045, grav: 1.6 }); groundRing(api, spot(api, tgt), 0.24, ['#5fd0ff', '#ffffff'], 10, 1.1, 0.35); }); },
+  overclock(api, who) { const tgt = api.other(who), c = ['#ffffff', '#5fd0ff', '#2f8cff'];
+    api.at(0.08, () => api.fx.column(spot(api, who), c, 14, { r: 0.5 * sz(api, who), rise: 1.6, life: 0.55 }));
+    gather(api, () => api.head(who), c, 12, 0.5, 0.1, 0.36);
+    for (let k2 = 0; k2 < 4; k2++) api.at(0.4 + k2 * 0.035, () => { let a = api.head(who); const b = api.chest(tgt); for (let i = 1; i <= 4; i++) { const q = a.clone().lerp(b, 0.25).add(V3(rnd(0.3), rnd(0.3), rnd(0.3))); if (i === 4) q.copy(b); line(api, a, q, c, 4, { life: 0.12, j: 0.02 }); a = q; } });
+    api.at(0.5, () => { api.fx.glow(api.chest(tgt), '#5fd0ff', 1.4, 0.25); groundRing(api, spot(api, tgt), 0.3, c, 14, 1.3, 0.4); }); },
+};
+const lineOf15 = (api, who) => ((window.A.Data.SPECIES[api.slot(who).spId] || {}).line);
 // wrap the roster's sequences: a prototype attacker gets its Phase 15 sequence, everyone else exactly what they had
 Object.keys(P15).forEach((mv) => { const key = MOVES[mv]; if (!key || !STYLE[key]) return; const orig = STYLE[key];
-  STYLE[key] = (api, who, info) => (on(api, who) ? P15[mv](api, who, info) : orig(api, who, info)); });
+  STYLE[key] = (api, who, info) => (!on(api, who) ? orig(api, who, info) : lineOf15(api, who) === 'meta' && META15[mv] ? META15[mv](api, who, info) : P15[mv](api, who, info)); });
 
 /* ================================================================= combat accents (hits)
    With the switch on, every hit in a battle gets a little more weight, without changing its timing:
@@ -452,6 +533,7 @@ export function hitAccent(api, who, el, eff, info) {
   if (window.A.Proto15.active(sp)) {
     if (line15 === 'atem') api.fx.burst(p, ['#ffd27a', '#ffffff', '#7fd0ff'], 10, { speed: 2.2, life: 0.28, size: 0.035, grav: 3.5 });
     else if (line15 === 'igniflare') api.fx.burst(p, ['#ff9a1a', '#ff4500', '#3a1a10'], 8, { speed: 1.2, life: 0.4, size: 0.045, grav: -0.6 });
+    else if (line15 === 'meta') api.fx.burst(p, ['#5fd0ff', '#eaf6ff', '#2f8cff'], 9, { speed: 1.6, life: 0.35, size: 0.04, grav: 0.8 });
     else if (line15 === 'lumifern') api.fx.burst(p, ['#9fe36a', '#7fcf5a', '#c8f59a'], 7, { speed: 1.1, life: 0.55, size: 0.055, grav: 1.6 });
   }
   return true;

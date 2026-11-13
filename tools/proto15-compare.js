@@ -2,7 +2,7 @@
 // records model metrics for both. Run: node tools/proto15-compare.js [outDir]
 const { chromium } = require('playwright'); const serve = require('../tests/server'); const fs = require('fs'), path = require('path');
 const OUT = process.argv[2] || path.join(__dirname, '..', 'docs', 'ui', 'screens15');
-const IDS = ['lumifern', 'solarbloom', 'aurelith', 'igniflare', 'pyronix', 'ignivor', 'atem1', 'atem2', 'atem'];
+const IDS = ['lumifern', 'solarbloom', 'aurelith', 'igniflare', 'pyronix', 'ignivor', 'atem1', 'atem2', 'atem', 'meta1', 'meta2', 'meta'];
 (async () => {
   fs.mkdirSync(path.join(OUT, 'models'), { recursive: true });
   const srv = await serve(); const browser = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });

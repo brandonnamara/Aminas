@@ -310,10 +310,101 @@
     return m;
   });
 
+  /* ================================================================= META → META II → META III (Metal, Ancient Tech, peace)
+     From the Phase 15 concept sheet: a slim grey armoured figure with blue light at the joints and a lit chest gem, a
+     smooth helmet face with two blue eyes, a ring of light behind the head, and long wired hair: glowing blue cables
+     with data cubes along them. Meta has a few short cables and a small ring; Meta II has shoulder plates, a waist and
+     cables to the knees; Meta III has hip plates, a full mane of cables spreading wide to the ground, a large ring and
+     two floating crystals. Block size stays close to the current models (the polish sheet keeps silhouettes).
+     Rig: torso on the waist, head, shoulder → forearm, thigh → shin, the ring, and the hair in four locks (two per
+     side), each with a tip, so the cables flow with a lag. */
+  V.register('meta15', function (stage) {
+    const m = new V.Model(), k = [1.3, 1.45, 1.6][stage - 1], S = (v) => v * k;
+    const GR = ['#e2e7f2', '#c4cde0', '#a3aec6', '#828ea8'], CY = '#5fd0ff', BL = '#2f8cff', WH = '#f2f8ff', FACE = '#cfd8ea', GD = '#e8b84a', TAB = '#e9ecf8';
+    const L = stage === 1 ? 9.5 : 10.5, T = stage === 1 ? 6.2 : 7, W = 1.7;
+    const smooth = (x, y, z) => (y % 7 === 0 ? GR[2] : GR[1]);
+    V.rigStart(m, 'biped');
+    // legs: slim, tapering to pointed feet; a glowing knee and a light line down the shin
+    K.sym((sd) => {
+      const s = sd > 0 ? 'L' : 'R', hip = [0, S(L), sd * S(W * 0.6)], knee = [S(0.25), S(L * 0.5), sd * S(W * 0.5)], ank = [S(0.1), S(1.0), sd * S(W * 0.42)];
+      V.joint(m, 'leg' + s, hip, null); V.joint(m, 'shin' + s, knee, 'leg' + s);
+      inP(m, 'leg' + s, () => m.capsule(hip, knee, S(1.05), S(0.78), smooth));
+      inP(m, 'shin' + s, () => { m.capsule(knee, ank, S(0.75), S(0.45), smooth); m.ellipsoid(knee[0] + S(0.55), knee[1], knee[2], S(0.5), S(0.5), S(0.5), glow(CY, 0.85));
+        m.capsule(ank, [S(0.9), 0, ank[2]], S(0.5), 0.5, GR[0]);   // the pointed foot
+        for (let y = R(ank[1] + S(1.2)); y < R(knee[1] - S(1)); y++) { const p = K.surface(m, [0, y, knee[2]], 0, 0, 20); if (p) m.set(p[0], y, R(knee[2]), CY, 0.7); } });
+    });
+    // hips wider than the waist; a lit waist ring
+    const waist = [S(0.1), S(L + T * 0.33), 0], sh = S(L + T - 0.3);
+    inP(m, 'core', () => { m.ellipsoid(0, S(L + 0.4), 0, S(W * 0.9), S(1.4), S(W * 1.2), smooth); m.capsule([0, S(L + 0.6), 0], waist, S(W * 0.55), S(W * 0.45), GR[2]);
+      for (let i = 0; i < 20; i++) { const a = (i / 20) * Math.PI * 2; m.set(waist[0] + Math.cos(a) * S(W * 0.5), waist[1], Math.sin(a) * S(W * 0.5), CY, 0.8); } }, true);
+    // tabards (II, III): front and back panels from the waist, pale with a blue edge and a gold clasp
+    if (stage > 1) inP(m, 'core', () => [1, -1].forEach((fb) => { const len = S(stage === 3 ? 6.5 : 5), w = S(stage === 3 ? 1.3 : 1.1);
+      for (let y = 0; y < len; y++) { const half = w * (1 - y / len * 0.35); for (let z = -half; z <= half; z += 0.5) m.set(fb * S(W * 0.75) + fb * y * 0.08, waist[1] - y, z, Math.abs(z) > half - 0.6 || y === R(len) - 1 ? BL : TAB, Math.abs(z) > half - 0.6 ? 0.5 : 0); }
+      m.set(fb * S(W * 0.8), waist[1], 0, GD); }), true);
+    // torso: slim, a gem framed in gold, a gold collar, light lines; shoulder plates on II and III
+    V.joint(m, 'torso', waist, null);
+    inP(m, 'torso', () => {
+      m.ellipsoid(S(0.2), waist[1] + S(T * 0.6), 0, S(W * 0.72), S(T * 0.42), S(W * 0.95), smooth);
+      const cc = K.surface(m, [0, waist[1] + S(T * 0.66), 0], 0, 0, 20);
+      if (cc) { [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]].forEach(([a, b]) => m.set(cc[0], cc[1] + a, b, GD)); [[0, 0], [1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([a, b]) => m.set(cc[0] + 1, cc[1] + a, b, a || b ? CY : WH, 1)); }
+      for (let i = 0; i < 18; i++) { const a = (i / 18) * Math.PI * 2; m.set(S(0.2) + Math.cos(a) * S(W * 0.6), S(L + T - 0.2), Math.sin(a) * S(W * 0.8), i % 3 ? GD : GR[0]); }
+      if (stage > 1) K.sym((sd) => { for (let i = 0; i < 2; i++) { const cy = sh + S(0.4) - i * S(0.7); m.ellipsoid(S(0.1), cy, sd * S(W * 1.25), S(stage === 3 ? 1.6 : 1.35) - i * 0.4, S(0.65), S(1.15) - i * 0.3, (x, y, z) => (y <= R(cy - S(0.5)) ? GD : i ? GR[1] : GR[0])); } });
+    }, true);
+    V.emit(m, 'chest', [S(0.3) + S(W), waist[1] + S(T * 0.6), 0], 'torso');
+    // arms: slender, glowing elbows, small pale hands (held a little out on Meta III)
+    K.sym((sd) => {
+      const s = sd > 0 ? 'L' : 'R', out = stage === 3 ? 1.9 : 1.55, s0 = [S(0.15), sh, sd * S(W * 1.3)], el = [S(0.45), sh - S(T * 0.55), sd * S(W * out)], hd = [S(1.0), sh - S(T * 1.0), sd * S(W * (out + 0.25))];
+      V.joint(m, 'arm' + s, s0, 'torso'); V.joint(m, 'fore' + s, el, 'arm' + s);
+      inP(m, 'arm' + s, () => m.capsule(s0, el, S(0.62), S(0.52), smooth));
+      inP(m, 'fore' + s, () => { m.capsule(el, hd, S(0.52), S(0.45), smooth); m.ellipsoid(el[0], el[1], el[2], S(0.48), S(0.48), S(0.48), glow(CY, 0.85)); m.ellipsoid(hd[0] + S(0.25), hd[1] - S(0.45), hd[2], S(0.55), S(0.75), S(0.42), WH); });
+      V.emit(m, 'hand' + s, [hd[0] + S(0.3), hd[1] - S(0.5), hd[2]], 'fore' + s);
+    });
+    // head: a small smooth helmet, a pale face with two blue eyes, a light crest
+    const hc = [S(0.5), S(L + T + 0.9 + 1.6), 0], hr = S(1.6);
+    V.joint(m, 'head', [S(0.3), S(L + T), 0], 'torso');
+    inP(m, 'head', () => {
+      m.capsule([S(0.3), S(L + T - 0.4), 0], [S(0.35), S(L + T + 1.0), 0], S(0.55), S(0.5), GR[2]);
+      m.ellipsoid(hc[0], hc[1], hc[2], hr * 1.02, hr * 1.12, hr * 0.98, (x, y, z) => (y > hc[1] + hr * 0.6 ? GR[0] : GR[1]));
+      m.ellipsoid(hc[0] + hr * 0.5, hc[1] - hr * 0.12, 0, hr * 0.58, hr * 0.72, hr * 0.74, FACE, 'paint');
+      const ex = R(hc[0] + hr * 1.02), ey = R(hc[1] + S(0.1));
+      K.sym((sd) => { const z = R(sd * hr * 0.42); m.set(ex, ey, z, CY, 1); m.set(ex, ey + 1, z, CY, 1); });
+      for (let x = R(hc[0] - hr * 0.6); x < R(hc[0] + hr * 0.6); x++) m.set(x, R(hc[1] + hr * 1.12), 0, CY, 0.7);
+    }, true);
+    V.emit(m, 'mouth', [hc[0] + hr + S(0.4), hc[1] - S(0.5), 0], 'head');
+    // the ring of light behind the head
+    const rc = [hc[0] - hr - S(0.8), hc[1] + S(0.8), 0], rr = S(stage === 1 ? 3.3 : stage === 2 ? 4.1 : 5.0);
+    V.joint(m, 'ring', rc, 'head');
+    inP(m, 'ring', () => { const n = R(rr * 7); for (let i = 0; i < n; i++) { const a = (i / n) * Math.PI * 2; if (i % 6 === 5) continue; m.set(rc[0], rc[1] + Math.sin(a) * rr, Math.cos(a) * rr, i % 6 === 0 ? WH : CY, i % 6 === 0 ? 0 : 0.9); }
+      if (stage === 3) for (let i = 0; i < 44; i++) { const a = (i / 44) * Math.PI * 2; if (i % 4 === 3) continue; m.set(rc[0] - 1, rc[1] + Math.sin(a) * (rr + 1.5), Math.cos(a) * (rr + 1.5), CY, 0.6); } });
+    // the wired hair: thick glowing ribbons in four locks (two per side, each with a tip part), sweeping down and out
+    // in an S and curling at the ends; more and longer with each stage; small data cubes along them
+    const per = [1, 2, 2][stage - 1], len = S([9, 14, 18][stage - 1]), reach = [0.4, 0.7, 1.15][stage - 1], thick = [0.6, 0.62, 0.66][stage - 1];   // separate tendrils, not a solid mass
+    K.sym((sd) => ['F', 'B'].forEach((fb, li) => {
+      const lk = 'hair' + (sd > 0 ? 'L' : 'R') + fb, tip = lk + 'T', root = [hc[0] - hr * (0.75 + li * 0.35), hc[1] + hr * 0.35, sd * hr * 0.72];   // from the back of the head, clear of the face
+      V.joint(m, lk, root, 'head'); V.joint(m, tip, add(root, [-0.2, -1, sd * 0.3 * reach], len * 0.45), lk);
+      for (let c = 0; c < per; c++) {
+        let p = add(root, [-li * 1.2, 0, sd * c * 1.6], 1); const steps = R(len / 1.0), ph = c * 2.3 + li * 3.1, wide = reach * (0.55 + c * 0.75 + li * 0.5);
+        for (let j = 0; j < steps; j++) {
+          const t = j / steps, part = t < 0.45 ? lk : tip;
+          // down and outward, swinging out in an S; the last fifth curls up and out
+          const curl = t > 0.8 ? (t - 0.8) / 0.2 : 0;
+          const dir = norm([-0.3 - li * 0.15 + t * 0.2 + Math.sin(ph + t * 6) * 0.12, -1 + curl * 1.4, sd * (wide * (0.25 + t) * 0.6 + Math.sin(ph + t * 5) * 0.35) + sd * curl * 1.2]);
+          const q = add(p, dir, 1.0), r0 = thick * (1 - t * 0.45) + 0.3;
+          inP(m, part, () => { m.capsule(p, q, r0, r0 * 0.95, (x, y, z) => { const e = Math.hypot(x - q[0], y - q[1], z - q[2]) > r0 * 0.6; return glow(e ? '#9fe8ff' : CY, e ? 0.6 : 0.9); }, 'under');
+            if (j % 5 === 4 && stage > 1) m.set(q[0], q[1], q[2] + sd * (r0 + 1), WH, 0.7); });
+          p = q;
+        }
+      }
+    }));
+    // Meta III: two crystals float beside it (they drift with the aura)
+    if (stage === 3) inP(m, 'aura', () => K.sym((sd) => { const c = [S(0.5), sh + S(2.2), sd * S(W * 5.2)]; for (let y = -3; y <= 3; y++) { const r = 1.9 - Math.abs(y) * 0.55; m.ellipsoid(c[0], c[1] + y, c[2], Math.max(0.5, r), 0.5, Math.max(0.5, r), glow(Math.abs(y) < 2 ? '#bfefff' : CY, 0.9)); } }));
+    return m;
+  });
+
   /* ================================================================= the developer switch
      Off by default. On: the three lines use these models in 3D (battle, viewer), with their Phase 15 clips, move
      effects, combat accents and sound layers. Nothing is saved with the game; the choice lives in this browser only. */
-  const LINES15 = { lumifern: 'lumifern15', igniflare: 'igniflare15', atem: 'atem15' };
+  const LINES15 = { lumifern: 'lumifern15', igniflare: 'igniflare15', atem: 'atem15', meta: 'meta15' };
   const KEY = 'aminas.proto15';
   let on = false;
   const devOK = !!(A.Data && A.Data.DEV_TOOLS);   // a developer build only

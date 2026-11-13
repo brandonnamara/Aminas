@@ -9,6 +9,7 @@ const FIGHTS = [
   { id: 'ignivor', foe: 'calyxar', presses: ['emberflick', 'inferno'], arena: 'heartwood' },
   { id: 'atem', foe: 'rockraki', presses: ['gearstrike', 'overclock'], arena: 'heartwood' },
   { id: 'lumifern', foe: 'umbrit', presses: ['glowpulse', 'sunsprout'], arena: 'heartwood' },
+  { id: 'meta', foe: 'rockraki', presses: ['gearstrike', 'overclock'], arena: 'heartwood' },
 ];
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 (async () => {

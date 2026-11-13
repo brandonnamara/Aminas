@@ -332,6 +332,13 @@
       victory: (X, t) => { [0, 0.62].forEach((d) => nz(X, t + d, 0.32, 0.06, 'bandpass', 240 / k, 1000 / k, 0.9)); },
       defeat: (X, t) => { kick(X, t + 0.9, 70, 30, 0.3, 0.1); nz(X, t + 0.9, 0.3, 0.05, 'lowpass', 600); },
     }),
+    meta: (k) => ({
+      move: (X, t) => { osc(X, t, 0.05, 'sine', 1400 * k, 1700 * k, 0.02); osc(X, t + 0.45, 0.05, 'sine', 1300 * k, 1600 * k, 0.02); },
+      attack: (X, t) => { [0, 0.03, 0.06].forEach((d, i) => nz(X, t + 0.26 + d, 0.08, 0.03, 'bandpass', 3800 + i * 600, 1800, 2)); osc(X, t + 0.32, 0.25, 'sine', 1760 * k, 1320 * k, 0.03, { echo: true }); },
+      special: (X, t) => { [880, 1320, 1760, 2640].forEach((f, i) => osc(X, t + i * 0.07, 0.35, 'sine', f * k, null, 0.025, { echo: true })); osc(X, t + 0.38, 0.4, 'triangle', 220 * k, 660 * k, 0.03, { lp: 2400 }); },
+      hurt: (X, t) => osc(X, t, 0.15, 'square', 900 * k, 500 * k, 0.02, { lp: 2400 }),
+      victory: (X, t) => [1320, 1760, 2093].forEach((f, i) => osc(X, t + 0.2 + i * 0.1, 0.25, 'sine', f * k, null, 0.025, { echo: true })),
+    }),
     lumifern: (k) => ({
       move: (X, t) => { nz(X, t, 0.05, 0.02, 'highpass', 4500); nz(X, t + 0.2, 0.05, 0.018, 'highpass', 4800); },
       attack: (X, t) => { nz(X, t + 0.3, 0.12, 0.03, 'bandpass', 3000, 1500, 1); },

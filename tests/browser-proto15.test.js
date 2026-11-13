@@ -130,7 +130,7 @@ const CLIPS = ['idle', 'blink', 'ready', 'attack', 'special', 'hit', 'hitBig', '
     const r = box ? box.getBoundingClientRect() : null, wide = document.documentElement.scrollWidth <= window.innerWidth + 1; const label = btn ? btn.textContent : '';
     btn.click(); await new Promise((r2) => setTimeout(r2, 300)); const after = A.Proto15.enabled(), key = localStorage.getItem('aminas.proto15'); const b2 = document.querySelector('[data-act="p15Toggle"]'); const label2 = b2 ? b2.textContent : ''; b2.click(); await new Promise((r2) => setTimeout(r2, 200));
     A.UI.closeAll(); return { rows, fits: r && r.right <= window.innerWidth && wide, label, after, key, label2, back: A.Proto15.enabled() }; });
-  ok(pan.rows === 9 && pan.fits && /On/.test(pan.label), 'the Monster showcase lists the nine prototype forms under a Phase 15 switch, within the 844×390 screen');
+  ok(pan.rows === 12 && pan.fits && /On/.test(pan.label), 'the Monster showcase lists the twelve prototype forms (Meta added for the Phase 15 test) under a Phase 15 switch, within the 844×390 screen');
   ok(pan.after === false && pan.key === '0' && /Off/.test(pan.label2) && pan.back === true, 'the switch turns off and on from the panel (remembered in this browser only)');
   await page.context().close();
   page = await open();
