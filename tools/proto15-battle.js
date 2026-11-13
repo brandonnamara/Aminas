@@ -14,7 +14,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 (async () => {
   fs.mkdirSync(OUT, { recursive: true }); fs.mkdirSync(TMP, { recursive: true });
   const srv = await serve(); const browser = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--autoplay-policy=no-user-gesture-required'] });
-  for (const F of FIGHTS) {
+  const only = process.argv.slice(2); for (const F of FIGHTS.filter((f) => !only.length || only.includes(f.id))) {
     const parts = [];
     for (const on of [false, true]) {
       const ctx = await browser.newContext({ viewport: { width: 844, height: 390 }, deviceScaleFactor: 1, hasTouch: true, isMobile: true, recordVideo: { dir: TMP, size: { width: 844, height: 390 } } });
