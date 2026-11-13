@@ -12,7 +12,7 @@
    island changes, plus a slow ambient tick (water, swaying leaves, drifting clouds and motes) that stops at rest,
    in the background and in Battery saver. */
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.170.0/+esm';
-import { VoxGrid, meshGrid, hash, pick } from './voxmesh.js';
+import { VoxGrid, meshGrid, mergeGeo, hash, pick } from './voxmesh.js';
 import { PAL, TV, DV, UNIT_PX, HEIGHT_PX, MAGIC, LIGHT } from './voxstyle.js';
 import * as VB from './voxbuild.js';
 import * as MS from './modelslots.js'; // Phase 14: imported building models (empty slots load nothing)
@@ -54,6 +54,41 @@ const fromIso = (wx, wy) => { const a = wx / 32, b = wy / 16; return new THREE.V
 /* ------------------------------------------------------------------ terrain */
 function vnoise(x, y, s) { const xi = Math.floor(x), yi = Math.floor(y), fx = x - xi, fy = y - yi, a = hash(xi, yi, s), b = hash(xi + 1, yi, s), c = hash(xi, yi + 1, s), d = hash(xi + 1, yi + 1, s), u = fx * fx * (3 - 2 * fx), v = fy * fy * (3 - 2 * fy); return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v; }
 
+// Phase 14 finalisation: detail blocks on the exposed cliff faces that face the camera (+X and +Z). Pure function of
+// the terrain grid, so it is the same every time. Returns { list, glow } of [x, y, z, sx, sy, sz, colour] in world units.
+function cliffSkin(t, TVs, DVs) {
+  const list = [], glow = [], g = t.g, k = TVs / DVs; // detail blocks per terrain voxel (4)
+  const solid = (X, Y, Z) => g.get(X, Y, Z) !== 0;
+  t.colAt.forEach((v, key) => {
+    const [X, Z] = key.split(',').map(Number), top = v.top, kind = v.c.kind; if (kind === 'water' || top <= v.bot) return;
+    [[1, 0], [0, 1]].forEach(([dx, dz]) => {
+      for (let Y = top - 1; Y >= Math.max(v.bot, top - 16); Y--) { // the upper cliff only: lower down the haze hides fine detail
+        if (!solid(X, Y, Z) || solid(X + dx, Y, Z + dz)) continue;           // only a face open to the air
+        const d = top - 1 - Y, fx = (X + dx) * TVs, fz = (Z + dz) * TVs, y0 = Y * TVs, hh = (a) => hash(X * 7 + a, Y * 13 + Z * 3, 140 + dx);
+        const col = (pal, a) => pick(pal, hh(a));
+        // place a block on the face: u along the face (0..k-1), w up the face (0..k-1), out = how far it stands proud
+        const put = (u, w, out, sx, sy, c, arr) => { sx = Math.max(1, Math.min(sx, k - u)); const along = u * DVs, up = y0 + w * DVs;
+          (arr || list).push(dx ? [fx, up, Z * TVs + along, out, sy, sx, c] : [X * TVs + along, up, fz, sx, sy, out, c]); };
+        if (d <= 1) { // under the grass lip: a moss drape the width of the face, ragged at the bottom, and now and then a root
+          if (hh(1) < 0.7) { put(0, k - 1, 1, k, 1, col(PAL.moss, 4)); const u = Math.floor(hh(2) * k); put(u, k - 3, 1, 1, 2, col(PAL.moss, 3)); }
+          if (hh(5) < 0.14) { const u = Math.floor(hh(6) * k), n = 3 + Math.floor(hh(7) * 4); put(u, k - 1 - n, 1, 1, n, PAL.woodDark[0]); put(u, k - 2 - n, 1, 1, 1, PAL.leaf[0]); }
+          continue; }
+        // strata: on every other voxel row, a ledge the width of the face standing one block proud, with a thin line
+        // of shadow beneath it, so the rock reads as layers; now and then the ledge is broken
+        // (in the rock's own colour: a lighter lip catching the sun, a darker line under it)
+        const lineRow = (Y + 200) % 2 === 0, own = new THREE.Color().setHex(g.get(X, Y, Z) - 1, THREE.SRGBColorSpace);
+        if (d >= 3 && lineRow && hh(8) < 0.75) { const u = hh(9) < 0.3 ? Math.floor(hh(10) * 2) : 0, n = k - u - (hh(11) < 0.25 ? 1 : 0); put(u, k - 1, 1, n, 1, own.clone().multiplyScalar(1.22)); put(u, k - 2, 0.3, n, 1, own.clone().multiplyScalar(0.62)); }
+        // a larger stone set into the face, now and then
+        if (d >= 3 && hh(14) < 0.15) { const w2 = 1 + Math.floor(hh(15) * 2); put(Math.floor(hh(16) * (k - 1)), Math.floor(hh(17) * (k - 2)), 1, w2, w2, own.clone().multiplyScalar(hh(18) < 0.5 ? 1.15 : 0.78)); }
+        // damp moss down the upper face
+        if (d < 8 && vnoise(X * 0.4 + Y * 0.2, Z * 0.4, 13) > 0.62 && hh(22) < 0.7) put(Math.floor(hh(23) * (k - 1)), Math.floor(hh(24) * k), 1, 2, 1, col(PAL.moss, 26));
+        // the World Resonance: a rare cold glint of crystal deep in the stone (a hint, never a feature)
+        if (d > 7 && hh(27) < 0.03) { const u = Math.floor(hh(28) * (k - 1)), w = Math.floor(hh(29) * (k - 2)); put(u, w, 1, 1, 2, MAGIC.spirit, glow); put(u + 1, w, 1, 1, 1, '#ffffff', glow); }
+      }
+    });
+  });
+  return { list: list.concat(glow), glow: [] }; // Phase 14: the glints are drawn in the same mesh (one draw call), bright enough to read as crystal
+}
 export function buildTerrain(cols, avoid) { // exported for Hide and Seek (src/3d/hideseek3d.js); unchanged
   const V = 1 / TV; // voxels per cell (2)
   let minX = 1e9, maxX = -1e9, minZ = 1e9, maxZ = -1e9, maxY = 0;
@@ -206,6 +241,14 @@ export function createIsland() {
     sh.fragmentShader = 'uniform vec3 uHaze; uniform vec3 uDepth; varying float vWy;\n' + sh.fragmentShader.replace('#include <tonemapping_fragment>', 'gl_FragColor.rgb = mix(gl_FragColor.rgb, uHaze, smoothstep(uDepth.x, uDepth.y, vWy) * uDepth.z);\n#include <tonemapping_fragment>');
   };
   const matMist = new THREE.MeshBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.38, depthWrite: false });
+  const matMistLow = new THREE.MeshBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.22, depthWrite: false }); // Phase 14: the thinning spray below each fall
+  // Phase 14 finalisation: the cliff skin's blocks (+X, +Y, +Z faces only: the fixed camera never sees the others),
+  // with the terrain's aerial haze (the same uniforms, worked out per instance)
+  const skinBox = new THREE.BoxGeometry(DV, DV, DV); skinBox.translate(DV / 2, DV / 2, DV / 2); { const ix = Array.from(skinBox.index.array); skinBox.setIndex(ix.slice(0, 6).concat(ix.slice(12, 18), ix.slice(24, 30))); skinBox.clearGroups(); }
+  const hazed = (m) => { m.onBeforeCompile = (sh) => { sh.uniforms.uHaze = { value: new THREE.Color(LIGHT.depthHaze) }; sh.uniforms.uDepth = { value: new THREE.Vector3(LIGHT.depthFrom, LIGHT.depthTo, LIGHT.depthMax) };
+    sh.vertexShader = 'varying float vWy;\n' + sh.vertexShader.replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\nvec4 wpH = vec4(transformed, 1.0);\n#ifdef USE_INSTANCING\nwpH = instanceMatrix * wpH;\n#endif\nvWy = (modelMatrix * wpH).y;');
+    sh.fragmentShader = 'uniform vec3 uHaze; uniform vec3 uDepth; varying float vWy;\n' + sh.fragmentShader.replace('#include <tonemapping_fragment>', 'gl_FragColor.rgb = mix(gl_FragColor.rgb, uHaze, smoothstep(uDepth.x, uDepth.y, vWy) * uDepth.z);\n#include <tonemapping_fragment>'); }; return m; };
+  const matSkin = hazed(new THREE.MeshLambertMaterial()), matSkinGlow = new THREE.MeshBasicMaterial(); let skinMesh = null;
   const uni = { uTime: { value: 0 } };
   // leaves sway a little (a vertex nudge proportional to height inside each tree instance)
   const matSway = new THREE.MeshLambertMaterial({ vertexColors: true });
@@ -223,6 +266,14 @@ export function createIsland() {
     const geo = meshGrid(t.g, { size: TV, shadeFaces: false }); disposables.push(geo);
     const m = new THREE.Mesh(facing(geo, BACK, 'terrain|' + key), matTerrain); m.receiveShadow = true; groups.terrain.add(m); disposables.push(m.geometry);
     const ms = new THREE.Mesh(geo, matTerrain); ms.castShadow = true; ms.layers.set(SHADOW_LAYER); ms.userData.shadowOnly = true; groups.terrain.add(ms);
+    // Phase 14 finalisation: the cliff skin. The terrain's blocks are half a cell, which reads as flat slabs once the
+    // camera is close. On the two cliff faces the camera sees, a skin of detail-sized blocks breaks them up: stones
+    // standing proud along the strata, darker pebbles set in the earth, moss clumps and roots under the grass lip,
+    // and, deep in the stone, a rare cold glint of crystal. Instanced like the meadow detail (only the three faces
+    // the camera sees), no shadows, and the same aerial haze as the rock it sits on.
+    { const sk = cliffSkin(t, TV, DV); if (sk.list.length) { const im = new THREE.InstancedMesh(skinBox, matSkin, sk.list.length), mm = new THREE.Matrix4(), cc = new THREE.Color();
+      sk.list.forEach(([x, y, z, sx, sy, sz, col], i) => { mm.makeScale(sx, sy, sz).setPosition(x, y, z); im.setMatrixAt(i, mm); im.setColorAt(i, cc.set(col)); }); im.instanceMatrix.needsUpdate = true; im.instanceColor.needsUpdate = true; im.receiveShadow = true; im.computeBoundingSphere(); im.userData.skin = sk.list.length; groups.terrain.add(im); skinMesh = im;
+      if (sk.glow.length) { const ig = new THREE.InstancedMesh(skinBox, matSkinGlow, sk.glow.length); sk.glow.forEach(([x, y, z, sx, sy, sz, col], i) => { mm.makeScale(sx, sy, sz).setPosition(x, y, z); ig.setMatrixAt(i, mm); ig.setColorAt(i, cc.set(col)); }); ig.instanceMatrix.needsUpdate = true; ig.instanceColor.needsUpdate = true; ig.computeBoundingSphere(); groups.terrain.add(ig); } } }
     // water: subdivided quads that ripple (vertex shader) with a sheen
     if (t.water.length) {
       const pos = [], idx = []; let n = 0;
@@ -233,6 +284,7 @@ export function createIsland() {
       disposables.push(wm); waterMesh = new THREE.Mesh(wg, wm); waterMesh.receiveShadow = true; groups.terrain.add(waterMesh);
     } else waterMesh = null;
     // waterfalls: a pixel-stepped ribbon of falling water with white streaks that scroll down and fade into the air
+    const veilQ = { pos: [], uv: [], len: [], idx: [] }; // Phase 14: the falls' front veils, one mesh for all of them
     (t.falls || []).forEach((f) => {
       const L = f.y0 - f.y1, pos = f.sx ? [f.x, f.y0, f.z, f.x, f.y0, f.z + f.w, f.x, f.y1, f.z + f.w, f.x, f.y1, f.z] : [f.x, f.y0, f.z, f.x + f.w, f.y0, f.z, f.x + f.w, f.y1, f.z, f.x, f.y1, f.z];
       const fg = new THREE.BufferGeometry(); fg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); fg.setAttribute('uv', new THREE.Float32BufferAttribute([0, 0, 1, 0, 1, L, 0, L], 2)); fg.setIndex([0, 1, 2, 0, 2, 3]); disposables.push(fg);
@@ -252,8 +304,23 @@ export function createIsland() {
       const back = new THREE.Mesh(fg, new THREE.MeshBasicMaterial({ color: '#3d8fc4', transparent: true, opacity: 0.35, depthWrite: false })); disposables.push(back.material); back.position.set(f.sx ? -0.04 : 0, 0, f.sz ? -0.04 : 0); back.renderOrder = 1; groups.terrain.add(back);
       // a little white churn where the water leaves the lip
       const cg = new VoxGrid(0, 0, 0, 6, 2, 6); for (let i = 0; i < 9; i++) cg.set(Math.floor(hash(i, f.x, 75) * 6), hash(i, 2, 76) < 0.5 ? 0 : 1, Math.floor(hash(i, f.z, 77) * 6), PAL.foam);
-      const foam = meshGrid(cg, { size: DV, origin: [f.sx ? f.x - 2 * DV : f.x + f.w / 2 - 3 * DV, f.y0 - DV, f.sz ? f.z - 2 * DV : f.z + f.w / 2 - 3 * DV] }); disposables.push(foam); groups.terrain.add(new THREE.Mesh(foam, matGlow));
+      const foam = meshGrid(cg, { size: DV, origin: [f.sx ? f.x - 2 * DV : f.x + f.w / 2 - 3 * DV, f.y0 - DV, f.sz ? f.z - 2 * DV : f.z + f.w / 2 - 3 * DV] }); disposables.push(foam); const foamMesh = new THREE.Mesh(foam, matGlow); groups.terrain.add(foamMesh);
+      // Phase 14 finalisation: a narrower veil just in front, falling faster and thinner, so the water has depth
+      // (two triangles, the same shader with its own speed and a lighter body)
+      const vw = f.w * 0.6, vo = (f.w - vw) / 2, out = 0.07, vpos = f.sx ? [f.x + out, f.y0 - 0.05, f.z + vo, f.x + out, f.y0 - 0.05, f.z + vo + vw, f.x + out, f.y1, f.z + vo + vw, f.x + out, f.y1, f.z + vo] : [f.x + vo, f.y0 - 0.05, f.z + out, f.x + vo + vw, f.y0 - 0.05, f.z + out, f.x + vo + vw, f.y1, f.z + out, f.x + vo, f.y1, f.z + out];
+      const vn = veilQ.pos.length / 3; veilQ.pos.push(...vpos); veilQ.uv.push(0, 0, 1, 0, 1, L, 0, L); veilQ.len.push(L, L, L, L); veilQ.idx.push(vn, vn + 1, vn + 2, vn, vn + 2, vn + 3);
+      // spray: white droplets thrown out where the water leaves the lip and where the sheet breaks up lower down
+      const sp = new VoxGrid(-6, -40, -6, 13, 44, 13); const dropAt = (yy, spread, n, seed) => { for (let i = 0; i < n; i++) { const a = hash(i, seed, 141), r = hash(seed, i, 142) * spread, px = Math.round(Math.cos(a * 6.283) * r), pz = Math.round(Math.abs(Math.sin(a * 6.283)) * r + 1), py = yy - Math.floor(hash(i, seed, 143) * 3); sp.set(f.sx ? pz : px, py, f.sx ? px : pz, hash(i, seed, 144) < 0.6 ? PAL.foam : '#bfe9ff'); } };
+      dropAt(0, 3, 14, 1); dropAt(-Math.round(L / DV * 0.35), 4, 12, 2); dropAt(-Math.round(L / DV * 0.55), 5, 10, 3);
+      const spg = meshGrid(sp, { size: DV, origin: [f.sx ? f.x : f.x + f.w / 2, f.y0 - DV, f.sz ? f.z : f.z + f.w / 2], ao: false }); disposables.push(spg); foamMesh.geometry = mergeGeo(foamMesh.geometry, spg); disposables.push(foamMesh.geometry); // one draw call with the churn
     });
+    if (veilQ.idx.length) { const vg = new THREE.BufferGeometry(); vg.setAttribute('position', new THREE.Float32BufferAttribute(veilQ.pos, 3)); vg.setAttribute('uv', new THREE.Float32BufferAttribute(veilQ.uv, 2)); vg.setAttribute('aLen', new THREE.Float32BufferAttribute(veilQ.len, 1)); vg.setIndex(veilQ.idx); disposables.push(vg);
+      const vm = new THREE.ShaderMaterial({ uniforms: { uTime: uni.uTime }, transparent: true, depthWrite: false, side: THREE.DoubleSide, vertexShader: 'attribute float aLen; varying vec2 vUv; varying float vLen; void main(){ vUv = uv; vLen = aLen; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+        fragmentShader: 'uniform float uTime; varying vec2 vUv; varying float vLen; float h(vec2 p){ return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }\n' +
+          'void main(){ vec2 q = vec2(floor(vUv.x * 5.0), floor(vUv.y * 8.0)); float lane = h(vec2(q.x, 9.0)); float s = fract(q.y / 7.0 - uTime * (1.5 + lane * 0.7) + lane);\n' +
+          ' float streak = step(0.62, s); float a = streak * 0.55 * (1.0 - smoothstep(vLen * 0.3, vLen * 0.85, vUv.y)) * (0.6 + 0.4 * h(vec2(q.x, floor(s * 7.0))));\n' +
+          ' if (a < 0.02) discard; gl_FragColor = vec4(mix(vec3(0.75, 0.93, 1.0), vec3(1.0), streak * 0.6), a); }' });
+      disposables.push(vm); const veil = new THREE.Mesh(vg, vm); veil.renderOrder = 3; groups.terrain.add(veil); }
     // fixed scenery that belongs to the island: the jetty with its skiff, the lighthouse rock
     (extras || []).forEach((e) => { const md = VB.extraModel(e.kind); if (!md) return; const g = new THREE.Group(); addModel(g, md); g.position.set(e.x, e.y || 0, e.z); if (e.ry) g.rotation.y = e.ry; g.userData.bob = e.bob ? { y0: g.position.y, ph: e.x } : null; groups.terrain.add(g); if (e.bob) clouds.push(g); });
     // mist and cloud banks drifting below and around the island
@@ -270,8 +337,12 @@ export function createIsland() {
     FAR.forEach((f, i) => { const geo3 = farIslet(i * 17 + 5, f.r, f); disposables.push(geo3); const mm2 = new THREE.Mesh(geo3, matSolid); const p = farBase.clone().addScaledVector(RIGHT, f.sx / UNIT_PX).addScaledVector(UP, -f.sy / UNIT_PX).addScaledVector(BACK, -40 - i * 3);
       mm2.position.copy(p); mm2.scale.setScalar(f.s); mm2.userData.far = f; mm2.userData.base = p.clone(); mm2.userData.ph = i * 1.3; farGroup.add(mm2); });
     // mist where each waterfall thins into the air
+    let lowMist = null;
     (t.falls || []).forEach((f, i) => { const cg = new VoxGrid(-6, 0, -6, 13, 5, 13); for (let k = 0; k < 6; k++) { const px = Math.round((hash(i, k, 78) - 0.5) * 6), pz = Math.round((hash(k, i, 79) - 0.5) * 6), rr = 2 + Math.floor(hash(i + k, 3, 80) * 2); for (let y = 0; y < 3; y++) for (let z = -rr; z <= rr; z++) for (let x = -rr; x <= rr; x++) if (x * x + z * z + y * y * 2 <= rr * rr) cg.set(px + x, y, pz + z, pick(PAL.cloud, hash(x, z, y + k))); }
-      const mg2 = meshGrid(cg, { size: TV * 0.3 }); disposables.push(mg2); const mist = new THREE.Mesh(mg2, matMist); mist.position.set(f.x + (f.sx ? 0.6 : f.w / 2), f.y1 + (f.y0 - f.y1) * 0.42, f.z + (f.sz ? 0.6 : f.w / 2)); mist.userData.bob = { y0: mist.position.y, ph: i * 2.1 }; groups.terrain.add(mist); clouds.push(mist); });
+      const mg2 = meshGrid(cg, { size: TV * 0.3 }); disposables.push(mg2); const mist = new THREE.Mesh(mg2, matMist); mist.position.set(f.x + (f.sx ? 0.6 : f.w / 2), f.y1 + (f.y0 - f.y1) * 0.42, f.z + (f.sz ? 0.6 : f.w / 2)); mist.userData.bob = { y0: mist.position.y, ph: i * 2.1 }; groups.terrain.add(mist); clouds.push(mist);
+      // Phase 14 finalisation: where the sheet thins out, two wider, fainter banks of spray mist drift apart
+      [[0.2, 1.5, -0.5], [0.08, 2.0, 0.7]].forEach(([at, sc, side]) => { const gq = mg2.clone(); gq.scale(sc, 0.8, sc); gq.translate(f.x + (f.sx ? 0.9 : f.w / 2 + side), f.y1 + (f.y0 - f.y1) * at, f.z + (f.sz ? 0.9 : f.w / 2 + side)); lowMist = lowMist ? mergeGeo(lowMist, gq) : gq; }); });
+    if (lowMist) { disposables.push(lowMist); const lm = new THREE.Mesh(lowMist, matMistLow); lm.userData.bob = { y0: 0, ph: 1.3 }; groups.terrain.add(lm); clouds.push(lm); }
     // living-pixel motes: pollen and sparkles rising slowly over the meadow
     const N = COARSE ? 28 : 44, mp = new Float32Array(N * 3), seed = new Float32Array(N);
     for (let i = 0; i < N; i++) { mp[i * 3] = b.minX + hash(i, 1, 81) * (b.maxX - b.minX); mp[i * 3 + 1] = hash(i, 2, 81) * 3; mp[i * 3 + 2] = b.minZ + hash(i, 3, 81) * (b.maxZ - b.minZ); seed[i] = hash(i, 4, 81) * 6.28; }
@@ -580,6 +651,7 @@ export function createIsland() {
     setTerrain, sync, setView, kick, setOverlay, occludedAt,
     redraw() { state.dirty = true; kick(); },
     // Phase 14: where each imported building model stands, against its building's footprint (tests and the report)
+    falls() { return terr ? terr.falls.map((f) => ({ sx: f.sx, sz: f.sz, x: f.x, z: f.z, y0: f.y0, y1: f.y1 })) : []; },
     spinModels(dt) { MS.tick(glbGroups, dt); },
     models() { return glbGroups.map((g) => { g.updateMatrixWorld(true); const b = new THREE.Box3().setFromObject(g), f = g.userData.foot, e = g.userData.spin[0]; return { type: g.userData.glb, minY: +b.min.y.toFixed(3), height: +(b.max.y - b.min.y).toFixed(3), w: +(b.max.x - b.min.x).toFixed(3), d: +(b.max.z - b.min.z).toFixed(3), cx: +((b.min.x + b.max.x) / 2).toFixed(3), cz: +((b.min.z + b.max.z) / 2).toFixed(3), fx: f.fx, fz: f.fz, fw: f.fw, fd: f.fd, spin: e ? e.rotation.x + e.rotation.y + e.rotation.z : 0 }; }); },
     has: (k, art, cat, st) => (k === 'b' ? VB.hasBuilding(art, cat) && st !== 'constructing' : k === 'l' ? VB.hasExtra(art) : VB.hasNature(art)),

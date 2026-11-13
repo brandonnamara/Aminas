@@ -23,10 +23,18 @@ export function inspect(scene, animations, bytes) {
   return { meshes, triangles: Math.round(tris), vertices: verts, materials: mats.size, textures: tl, maxTexture: maxTex, textureMemoryMB: +texMB.toFixed(1), size: [+size.x.toFixed(3), +size.y.toFixed(3), +size.z.toFixed(3)], min: [+box.min.x.toFixed(3), +box.min.y.toFixed(3), +box.min.z.toFixed(3)],
     pivotAtBase: Math.abs(box.min.y) < size.y * 0.05, pivotCentred: Math.abs((box.min.x + box.max.x) / 2) < size.x * 0.05 && Math.abs((box.min.z + box.max.z) / 2) < size.z * 0.05, transparentMaterials: alpha, skinned, animations: (animations || []).map((c) => c.name), nodes: (() => { const n = []; scene.traverse((o) => { if (o.name && o !== scene) n.push(o.name); }); return n.slice(0, 40); })(), bytes: bytes || 0, warnings: warn, ok: !nan && size.x > 0 && size.y > 0 };
 }
+// Phase 14 finalisation: the island's voxels carry a fixed face grade on top of the light (tops 1, sides 0.86 and 0.93,
+// undersides 0.6: voxmesh.js FACES). The imported models get the same grade, worked out from each surface's facing,
+// so a Tripo building and a voxel building beside it read with the same light and shade. It is normalised to the
+// sides facing the camera (÷ 0.93), so it adds contrast without darkening; the textures' own colours are unchanged.
+function faceGrade(m) { if (m.userData.graded) return; m.userData.graded = true;
+  m.onBeforeCompile = (sh) => { sh.vertexShader = 'varying vec3 vWN;\n' + sh.vertexShader.replace('#include <beginnormal_vertex>', '#include <beginnormal_vertex>\nvWN = normalize(mat3(modelMatrix) * objectNormal);');
+    sh.fragmentShader = 'varying vec3 vWN;\n' + sh.fragmentShader.replace('#include <map_fragment>', '#include <map_fragment>\n{ vec3 n = normalize(vWN), q = n * n; diffuseColor.rgb *= (q.x * 0.86 + q.z * 0.93 + q.y * (n.y > 0.0 ? 1.0 : 0.6)) / 0.93; }'); };
+  m.customProgramCacheKey = () => 'aminas-face-grade'; }
 function prepare(gltf, slot, bytes) {
   const src = gltf.scene, info = inspect(src, gltf.animations, bytes);
   src.traverse((o) => { if (!o.isMesh) return; o.castShadow = true; o.receiveShadow = true; o.frustumCulled = true;
-    (Array.isArray(o.material) ? o.material : [o.material]).forEach((m) => { if (slot.gain && slot.gain !== 1 && !m.userData.gained) { m.color.multiplyScalar(slot.gain); m.userData.gained = true; } if (m.transparent && !(m.alphaTest > 0)) { m.alphaTest = 0.5; m.transparent = false; m.depthWrite = true; } }); });
+    (Array.isArray(o.material) ? o.material : [o.material]).forEach((m) => { if (slot.gain && slot.gain !== 1 && !m.userData.gained) { m.color.multiplyScalar(slot.gain); m.userData.gained = true; } faceGrade(m); if (m.transparent && !(m.alphaTest > 0)) { m.alphaTest = 0.5; m.transparent = false; m.depthWrite = true; } }); });
   const turn = new THREE.Group(); turn.rotation.y = (slot.yaw || 0) * Math.PI / 180; turn.add(src); turn.updateMatrixWorld(true);
   const box = new THREE.Box3().setFromObject(turn), c = box.getCenter(new THREE.Vector3());
   src.position.x -= 0; turn.position.set(-c.x, -box.min.y, -c.z); // base on the ground, centred on the footprint

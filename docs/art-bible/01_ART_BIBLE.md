@@ -240,7 +240,8 @@ There is one standard: `LIGHT` in `voxstyle.js`. The island, the viewer and the 
 | **Grade** | neutral tone mapping at exposure 1.04: bright tops roll off instead of clipping, hues hold (Phase 4) |
 | **Shadows** | by quality tier: High soft variance shadows (2048 map, radius 3); Balanced PCF (1024, radius 2); Battery saver PCF (512, radius 1). Redrawn only when the island changes |
 | Ambient occlusion | baked per vertex in every mesh |
-| Haze | `#bfe0f6`: distant islands are baked part-way toward it. Aerial depth (Phase 4): the island's own rock fades towards `#a9d2f0` as it hangs lower, up to 50 % at 10 units down |
+| Haze | `#bfe0f6`: distant islands are baked part-way toward it. Aerial depth: the island's own rock fades towards `#a9d2f0` as it hangs lower, from 2 units below the rim to 42 % at 12 units down (Phase 14; was from the rim, 50 % at 10, which made the upper cliff read as see-through against the sky) |
+| Imported models | carry the same face grade as voxels (tops 1, sides 0.86 / 0.93, undersides 0.6), normalised to the camera-facing sides so it adds contrast without darkening (Phase 14) |
 
 **Glow discipline**
 
@@ -254,7 +255,8 @@ There is one standard: `LIGHT` in `voxstyle.js`. The island, the viewer and the 
 | Effect | How | Cost control |
 |---|---|---|
 | Water ripple and sparkle | shader on the water surface | ambient tick |
-| **Waterfalls** | pixel-stepped ribbon with scrolling streaks, darker back sheet, white churn at the lip, mist puffs where it fades | 2 per island |
+| **Waterfalls** | pixel-stepped ribbon with scrolling streaks, darker back sheet, a faster front veil (Phase 14), white churn and spray at the lip and partway down, mist puffs where it fades and a fainter spray bank below | 2 per island; veils and low mist share one draw call each |
+| **Cliff skin** (Phase 14) | detail-sized ledges in the rock's own colour with a shadow line beneath, larger set stones, moss drapes and roots under the lip, rare crystal glints, on the camera-facing upper cliff | one instanced draw call, three faces per block, no shadows |
 | Sea | painted backdrop, pixel glints in three staggered sets, horizon mist and low clouds | CSS steps; paused with the island |
 | Clouds | voxel banks below and around the island | drift on the ambient tick |
 | Distant islands | small hazed voxel islands with parallax | 6, no shadows |
