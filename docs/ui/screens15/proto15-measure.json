@@ -1,0 +1,444 @@
+{
+ "models": {
+  "lumifern": {
+   "cur": {
+    "tris": 942,
+    "drawCalls": 2,
+    "materials": 2,
+    "textures": 0,
+    "vertices": 1884,
+    "geometryKB": 116,
+    "bones": 7,
+    "clips": 12,
+    "tracks": 77,
+    "keys": 1719,
+    "idleTracks": 8,
+    "buildColdMs": 42,
+    "buildWarmMs": 7.9,
+    "animMsPerFrame": 0.009
+   },
+   "p15": {
+    "tris": 3092,
+    "drawCalls": 2,
+    "materials": 2,
+    "textures": 0,
+    "vertices": 6184,
+    "geometryKB": 380,
+    "bones": 12,
+    "clips": 12,
+    "tracks": 107,
+    "keys": 2409,
+    "idleTracks": 13,
+    "buildColdMs": 81,
+    "buildWarmMs": 33.7,
+    "animMsPerFrame": 0.0062
+   }
+  },
+  "solarbloom": {
+   "cur": {
+    "tris": 2112,
+    "drawCalls": 2,
+    "materials": 2,
+    "textures": 0,
+    "vertices": 4224,
+    "geometryKB": 260,
+    "bones": 10,
+    "clips": 12,
+    "tracks": 92,
+    "keys": 2064,
+    "idleTracks": 9,
+    "buildColdMs": 17,
+    "buildWarmMs": 12.5,
+    "animMsPerFrame": 0.002
+   },
+   "p15": {
+    "tris": 5294,
+    "drawCalls": 2,
+    "materials": 2,
+    "textures": 0,
+    "vertices": 10588,
+    "geometryKB": 651,
+    "bones": 13,
+    "clips": 12,
+    "tracks": 112,
+    "keys": 2715,
+    "idleTracks": 14,
+    "buildColdMs": 56,
+    "buildWarmMs": 36.2,
+    "animMsPerFrame": 0.0037
+   }
+  },
+  "aurelith": {
+   "cur": {
+    "tris": 4126,
+    "drawCalls": 2,
+    "materials": 2,
+    "textures": 0,
+    "vertices": 8252,
+    "geometryKB": 508,
+    "bones": 12,
+    "clips": 12,
+    "tracks": 108,
+    "keys": 2689,
+    "idleTracks": 11,
+    "buildColdMs": 35,
+    "buildWarmMs": 18.6,
+    "animMsPerFrame": 0.0025
+   },
+   "p15": {
+    "tris": 10730,
+    "drawCalls": 2,
+    "materials": 2,
+    "textures": 0,
+    "vertices": 21460,
+    "geometryKB": 1320,
+    "bones": 16,
+    "clips": 12,
+    "tracks": 120,
+    "keys": 3417,
+    "idleTracks": 17,
+    "buildColdMs": 116,
+    "buildWarmMs": 75,
+    "animMsPerFrame": 0.0039
+   }
+  },
+  "igniflare": {
+   "cur": {
+    "tris": 1806,
+    "drawCalls": 2,
+    "materials": 2,
+    "textures": 0,
+    "vertices": 3612,
+    "geometryKB": 222,
+    "bones": 13,
+    "clips": 12,
+    "tracks": 129,
+    "keys": 2698,
+    "idleTracks": 14,
+    "buildColdMs": 22,
+    "buildWarmMs": 8.9,
+    "animMsPerFrame": 0.0053
+   },
+   "p15": {
+    "tris": 4910,
+    "drawCalls": 2,
+    "materials": 2,
+    "textures": 0,
+    "vertices": 9820,
+    "geometryKB": 604,
+    "bones": 17,
+    "clips": 12,
+    "tracks": 152,
+    "keys": 3558,
+    "idleTracks": 18,
+    "buildColdMs": 46,
+    "buildWarmMs": 15.8,
+    "animMsPerFrame": 0.0038
+   }
+  },
+  "pyronix": {
+   "cur": {
+    "tris": 4330,
+    "drawCalls": 2,
+    "materials": 2,
+    "textures": 0,
+    "vertices": 8660,
+    "geometryKB": 533,
+    "bones": 13,
+    "clips": 12,
+    "tracks": 129,
+    "keys": 2866,
+    "idleTracks": 14,
+    "buildColdMs": 26,
+    "buildWarmMs": 15.6,
+    "animMsPerFrame": 0.0029
+   },
+   "p15": {
+    "tris": 9050,
+    "drawCalls": 2,
+    "materials": 2,
+    "textures": 0,
+    "vertices": 18100,
+    "geometryKB": 1114,
+    "bones": 18,
+    "clips": 12,
+    "tracks": 161,
+    "keys": 4498,
+    "idleTracks": 19,
+    "buildColdMs": 67,
+    "buildWarmMs": 40.9,
+    "animMsPerFrame": 0.0039
+   }
+  },
+  "ignivor": {
+   "cur": {
+    "tris": 6764,
+    "drawCalls": 2,
+    "materials": 2,
+    "textures": 0,
+    "vertices": 13528,
+    "geometryKB": 832,
+    "bones": 13,
+    "clips": 12,
+    "tracks": 129,
+    "keys": 3132,
+    "idleTracks": 14,
+    "buildColdMs": 51,
+    "buildWarmMs": 31.1,
+    "animMsPerFrame": 0.003
+   },
+   "p15": {
+    "tris": 14168,
+    "drawCalls": 2,
+    "materials": 2,
+    "textures": 0,
+    "vertices": 28336,
+    "geometryKB": 1743,
+    "bones": 18,
+    "clips": 12,
+    "tracks": 161,
+    "keys": 5372,
+    "idleTracks": 19,
+    "buildColdMs": 121,
+    "buildWarmMs": 87.5,
+    "animMsPerFrame": 0.0037
+   }
+  },
+  "atem1": {
+   "cur": {
+    "tris": 1874,
+    "drawCalls": 2,
+    "materials": 2,
+    "textures": 0,
+    "vertices": 3748,
+    "geometryKB": 231,
+    "bones": 12,
+    "clips": 12,
+    "tracks": 77,
+    "keys": 1371,
+    "idleTracks": 6,
+    "buildColdMs": 19,
+    "buildWarmMs": 6.3,
+    "animMsPerFrame": 0.0018
+   },
+   "p15": {
+    "tris": 2388,
+    "drawCalls": 2,
+    "materials": 2,
+    "textures": 0,
+    "vertices": 4776,
+    "geometryKB": 294,
+    "bones": 16,
+    "clips": 11,
+    "tracks": 89,
+    "keys": 1795,
+    "idleTracks": 10,
+    "buildColdMs": 28,
+    "buildWarmMs": 18.4,
+    "animMsPerFrame": 0.0044
+   }
+  },
+  "atem2": {
+   "cur": {
+    "tris": 2540,
+    "drawCalls": 2,
+    "materials": 2,
+    "textures": 0,
+    "vertices": 5080,
+    "geometryKB": 313,
+    "bones": 12,
+    "clips": 12,
+    "tracks": 77,
+    "keys": 1455,
+    "idleTracks": 6,
+    "buildColdMs": 23,
+    "buildWarmMs": 10.5,
+    "animMsPerFrame": 0.0018
+   },
+   "p15": {
+    "tris": 4166,
+    "drawCalls": 2,
+    "materials": 2,
+    "textures": 0,
+    "vertices": 8332,
+    "geometryKB": 513,
+    "bones": 16,
+    "clips": 11,
+    "tracks": 89,
+    "keys": 1827,
+    "idleTracks": 10,
+    "buildColdMs": 27,
+    "buildWarmMs": 19.8,
+    "animMsPerFrame": 0.002
+   }
+  },
+  "atem": {
+   "cur": {
+    "tris": 3686,
+    "drawCalls": 2,
+    "materials": 2,
+    "textures": 0,
+    "vertices": 7372,
+    "geometryKB": 454,
+    "bones": 12,
+    "clips": 12,
+    "tracks": 77,
+    "keys": 1581,
+    "idleTracks": 6,
+    "buildColdMs": 27,
+    "buildWarmMs": 16,
+    "animMsPerFrame": 0.0016
+   },
+   "p15": {
+    "tris": 5814,
+    "drawCalls": 2,
+    "materials": 2,
+    "textures": 0,
+    "vertices": 11628,
+    "geometryKB": 715,
+    "bones": 16,
+    "clips": 11,
+    "tracks": 89,
+    "keys": 1858,
+    "idleTracks": 10,
+    "buildColdMs": 42,
+    "buildWarmMs": 32.1,
+    "animMsPerFrame": 0.0017
+   }
+  }
+ },
+ "battles": {
+  "aurelith cur": {
+   "readyMs": 1874,
+   "saver": false,
+   "proto": false,
+   "draws": 32,
+   "tris": 31288,
+   "moves": {
+    "glowpulse": 39,
+    "solarflare": 93
+   }
+  },
+  "aurelith p15": {
+   "readyMs": 2048,
+   "saver": false,
+   "proto": true,
+   "draws": 34,
+   "tris": 44060,
+   "moves": {
+    "glowpulse": 63,
+    "solarflare": 110
+   }
+  },
+  "aurelith saver cur": {
+   "readyMs": 1627,
+   "saver": true,
+   "proto": false,
+   "draws": 28,
+   "tris": 30208,
+   "moves": {
+    "glowpulse": 20,
+    "solarflare": 53
+   }
+  },
+  "aurelith saver p15": {
+   "readyMs": 1734,
+   "saver": true,
+   "proto": true,
+   "draws": 30,
+   "tris": 42262,
+   "moves": {
+    "glowpulse": 38,
+    "solarflare": 56
+   }
+  },
+  "ignivor cur": {
+   "readyMs": 1796,
+   "saver": false,
+   "proto": false,
+   "draws": 31,
+   "tris": 39098,
+   "moves": {
+    "emberflick": 43,
+    "inferno": 82
+   }
+  },
+  "ignivor p15": {
+   "readyMs": 1985,
+   "saver": false,
+   "proto": true,
+   "draws": 32,
+   "tris": 54062,
+   "moves": {
+    "emberflick": 71,
+    "inferno": 107
+   }
+  },
+  "ignivor saver cur": {
+   "readyMs": 1758,
+   "saver": true,
+   "proto": false,
+   "draws": 27,
+   "tris": 37668,
+   "moves": {
+    "emberflick": 26,
+    "inferno": 41
+   }
+  },
+  "ignivor saver p15": {
+   "readyMs": 1852,
+   "saver": true,
+   "proto": true,
+   "draws": 28,
+   "tris": 52466,
+   "moves": {
+    "emberflick": 39,
+    "inferno": 52
+   }
+  },
+  "atem cur": {
+   "readyMs": 1687,
+   "saver": false,
+   "proto": false,
+   "draws": 31,
+   "tris": 30300,
+   "moves": {
+    "gearstrike": 46,
+    "overclock": 104
+   }
+  },
+  "atem p15": {
+   "readyMs": 1738,
+   "saver": false,
+   "proto": true,
+   "draws": 32,
+   "tris": 34262,
+   "moves": {
+    "gearstrike": 78,
+    "overclock": 148
+   }
+  },
+  "atem saver cur": {
+   "readyMs": 1489,
+   "saver": true,
+   "proto": false,
+   "draws": 27,
+   "tris": 28812,
+   "moves": {
+    "gearstrike": 23,
+    "overclock": 58
+   }
+  },
+  "atem saver p15": {
+   "readyMs": 1552,
+   "saver": true,
+   "proto": true,
+   "draws": 28,
+   "tris": 32436,
+   "moves": {
+    "gearstrike": 39,
+    "overclock": 74
+   }
+  }
+ }
+}

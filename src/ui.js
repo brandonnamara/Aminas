@@ -546,12 +546,17 @@
     const roster = lines.map((L) => { const ids = L.forms.filter((id) => id && trio.indexOf(id) < 0); if (!ids.length) return '';
       return '<h4 class="sc-line" data-ln="' + L.id + '" style="margin:.7rem 0 .2rem;font-size:.8rem">' + esc(D.SPECIES[L.forms.find(Boolean)].name) + ' line ' + chip(L.el) + '</h4>' + ids.map(row).join(''); }).join('');
     const jump = '<div class="row-actions" style="margin:.1rem 0 .4rem">' + lines.filter((L) => L.forms.some((id) => id && trio.indexOf(id) < 0)).map((L) => '<button class="fchip" data-act="scJump" data-ln="' + L.id + '">' + esc(D.SPECIES[L.forms.find(Boolean)].name) + '</button>').join('') + '</div>';
+    // Phase 15 prototypes: a switch (this browser only, never saved) that shows the three refined lines in 3D
+    const P15 = A.Proto15, p15 = !P15 ? '' : '<div class="p15-box" style="border:1px solid rgba(255,217,120,.45);border-radius:10px;padding:.4rem .5rem;margin:.2rem 0 .5rem"><div class="row-actions" style="align-items:center;margin:0"><b style="font-size:.8rem">Phase 15 prototypes</b><button class="btn small ' + (P15.enabled() ? 'gold' : '') + '" data-act="p15Toggle" aria-pressed="' + P15.enabled() + '">' + (P15.enabled() ? 'On: showing the prototypes' : 'Off: showing the current models') + '</button></div>' +
+      '<p class="muted" style="font-size:.72rem;margin:.2rem 0">Refined models, animations, move effects and sounds for Lumifern, Igniflare and Atem, for review. 3D views only (portraits and cards are unchanged). Only this browser; nothing is saved.</p>' +
+      (P15.enabled() ? P15.LINES.map((ln) => Object.values(D.SPECIES).filter((x) => x.line === ln).sort((a, b) => a.stage - b.stage).map((x) => row(x.id)).join('')).join('') : '') + '</div>';
     return UI.modal(UI.sheet('Monster showcase', '<p class="muted" style="font-size:.8rem;margin:.2rem 0 .4rem">View opens the details screen with the 3D model, its animations and sounds. Battle starts a practice battle in the Island Boss room. Nothing is saved and nothing is earned.</p>' +
-      '<h4 style="margin:.4rem 0 .2rem;font-size:.8rem">Phase 8 showcase</h4>' + trio.map(row).join('') + '<h4 style="margin:.8rem 0 .2rem;font-size:.8rem">Phase 8B roster (' + lines.reduce((n, L) => n + L.forms.filter((id) => id && trio.indexOf(id) < 0).length, 0) + ' forms)</h4>' + jump + roster,
+      p15 + '<h4 style="margin:.4rem 0 .2rem;font-size:.8rem">Phase 8 showcase</h4>' + trio.map(row).join('') + '<h4 style="margin:.8rem 0 .2rem;font-size:.8rem">Phase 8B roster (' + lines.reduce((n, L) => n + L.forms.filter((id) => id && trio.indexOf(id) < 0).length, 0) + ' forms)</h4>' + jump + roster,
       '<button class="btn gold" data-act="close">Close</button>', 'narrow'));
   };
   UI.act('scJump', (el) => { const h = el.closest('.overlay').querySelector('.sc-line[data-ln="' + el.dataset.ln + '"]'); if (h) h.scrollIntoView({ block: 'start', behavior: UI.calm && UI.calm() ? 'auto' : 'smooth' }); });
   UI.act('showcase', () => UI.showcasePanel());
+  UI.act('p15Toggle', (el) => { if (!A.Proto15) return; A.Proto15.set(!A.Proto15.enabled()); UI.close(el.closest('.overlay')); UI.showcasePanel(); });
   // Sound check (developer panel): plays test sounds and shows what the browser reports about audio
   const SC_LABEL = { context: 'Audio', session: 'iOS audio session', sfx: 'Sound effects setting', music: 'Music setting' };
   UI.soundCheck = function (ov) {

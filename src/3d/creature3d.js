@@ -1001,9 +1001,13 @@ export function skinnedShell(mesh, s, mat) {
 // Phase 8: species with bespoke animation register a clip builder here (src/3d/showcase.js): fn(root, profile, clips, model)
 // returns the clips to use. Every other species keeps its Phase 7 movement personality.
 export const CLIP_HOOKS = {};
-export function buildVoxel(spec) {
-  const Vx = window.A && window.A.Voxel, art = spec.art;
-  const m = Vx.model(art.vox, art.st || 1);
+// Phase 15: prototype models (developer switch A.Proto15) and their clip builders (src/3d/proto15.js)
+export const PROTO_HOOKS = {};
+export function buildVoxel(spec, o) {
+  const Vx = window.A && window.A.Voxel, art = spec.art, P15 = window.A && window.A.Proto15;
+  const proto = o && o.proto != null ? !!o.proto : !!(P15 && P15.active(spec.id));
+  const vox = proto && P15 && P15.voxFor(spec.id) ? P15.voxFor(spec.id) : art.vox;
+  const m = Vx.model(vox, art.st || 1);
   const root = pivot('amina'), rig = pivot('rig'); root.add(rig);
   const body = pivot('body'); rig.add(body);
   const holder = new THREE.Group(); holder.rotation.y = -Math.PI / 2; body.add(holder);
@@ -1058,8 +1062,8 @@ export function buildVoxel(spec) {
   }
   normalise(root, { big: spec.stage === 3 });
   const profile = motionProfile(spec, root);
-  root.userData = { id: spec.id, hover: false, glow: null, version: VERSION, voxel: true, profile, parts: m.pivots ? Object.keys(m.pivots) : null, voxScale: root.scale.x };
-  const base = makeClips(root, { profile }), hook = CLIP_HOOKS[spec.id];
+  root.userData = { id: spec.id, hover: false, glow: null, version: VERSION, voxel: true, profile, parts: m.pivots ? Object.keys(m.pivots) : null, voxScale: root.scale.x, proto15: vox !== art.vox };
+  const base = makeClips(root, { profile }), hook = (vox !== art.vox && PROTO_HOOKS[spec.id]) || CLIP_HOOKS[spec.id];
   const clips = hook ? hook(root, profile, base, m) : base;
   return { root, clips, info: summarise(root, clips) };
 }

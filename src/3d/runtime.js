@@ -9,6 +9,7 @@ import { buildArena, kit, motes, tracker, rnd } from './arenas.js';
 import { Fx, FocusMarks, ELFX } from './combatfx.js';
 import * as SC from './showcase.js';   // Phase 8: bespoke clips (registered on import), living details, move choreography
 import './roster.js';                  // Phase 8B: the rest of the roster (clips, living details, moves) registered on import
+import { hitAccent } from './proto15.js'; // Phase 15 prototypes (developer switch only): clips, moves, hit accents
 const THREE = C.THREE;
 const A = window.A, D = A.Data;
 
@@ -121,8 +122,11 @@ const calm = () => !!(A.UI && A.UI.calm && A.UI.calm());
 const templates = new Map(); // spId -> Promise<{ root, clips, refs }>
 const isVox = (id) => !!(A.Voxel && D.SPECIES[id] && D.SPECIES[id].art && A.Voxel.has(D.SPECIES[id].art.vox));
 const heroUrl = (id) => (!isVox(id) && C.HERO_IDS.indexOf(id) >= 0 ? 'assets/creatures/' + id + '.glb' : null);
+// Phase 15: a prototype model (developer switch, A.Proto15) is cached under its own key, so switching never mixes them
+const tkey = (spId) => (A.Proto15 && A.Proto15.active(spId) ? spId + '#p15' : spId);
 function template(spId) {
-  if (templates.has(spId)) return templates.get(spId);
+  const tk = tkey(spId);
+  if (templates.has(tk)) return templates.get(tk);
   const p = (async () => {
     const url = heroUrl(spId);
     if (url) {
@@ -131,7 +135,7 @@ function template(spId) {
     }
     const m = isVox(spId) ? C.buildVoxel(D.SPECIES[spId]) : C.buildAmina(D.SPECIES[spId]); return { root: m.root, clips: m.clips, refs: 0, source: isVox(spId) ? 'voxel' : 'procedural' };
   })();
-  templates.set(spId, p); trimTemplates(); return p;
+  templates.set(tk, p); trimTemplates(); return p;
 }
 // Keep at most 14 species in memory; free the least recently requested ones that nothing is using.
 function trimTemplates() {
@@ -389,6 +393,7 @@ export async function createBattle(container, o) {
       fx.impact(chest(who), el, eff === 'super' ? 'super' : info.big ? 'big' : eff === 'weak' ? 'weak' : 'normal');
       shake = big ? 0.35 : eff === 'weak' ? 0.08 : 0.18;
       if (eff === 'super') { fx.freeze(80); cam.punch = 1; } else if (info.big) cam.punch = 0.6;
+      hitAccent({ fx, at, slot: (w) => slots[w], chest, calm }, who, el, eff, info);
       return a.play(big ? 'hitBig' : 'hit');
     },
     heal(who) { boost(1000); const a = slots[who]; fx.column(a.group.position, ['#e8ffe8', '#9dffb0', '#5fe08a'], 12, { r: 0.5 * a.group.scale.x, rise: 1.0 }); fx.glow(chest(who), '#9dffb0', 1.3, 0.5); a.flash('#9dffb0'); note('heal:' + who); },

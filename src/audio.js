@@ -309,13 +309,47 @@
     lastCue[key] = now; live++; setTimeout(() => { live = Math.max(0, live - 1); }, 1200);
     if (!mBus) mBus = bus(ctx, master);
     try { fn({ c: ctx, out: mBus.out, echo: mBus.echo }, now + 0.01 + (o.delay || 0), Object.assign({ heads: VOICED[sp] }, o)); } catch (e) { /* audio is optional */ }
+    try { const L15 = layer15(sp, cue); if (L15) L15({ c: ctx, out: mBus.out, echo: mBus.echo }, now + 0.01 + (o.delay || 0)); } catch (e) { /* audio is optional */ }
     return true;
   };
+  /* Phase 15 prototypes (developer switch A.Proto15 only): a layer on top of the line's voice that sounds like its
+     body — Atem's servos, clanks and ringing blades; Igniflare's wingbeats, heavy steps and fire; Lumifern's leaves and
+     chimes. Deeper with each stage, through the same bus and limits; nothing plays with the switch off. */
+  const L15 = {
+    atem: (k) => ({
+      move: (X, t) => { osc(X, t, 0.09, 'square', 820 * k, 1250 * k, 0.025, { lp: 2600 }); kick(X, t + 0.1, 140 * k, 60, 0.12, 0.08); nz(X, t + 0.1, 0.05, 0.03, 'highpass', 3000); },
+      attack: (X, t) => { osc(X, t + 0.05, 0.12, 'square', 600 * k, 1500 * k, 0.03, { lp: 3000 }); nz(X, t + 0.28, 0.12, 0.05, 'bandpass', 5200, 2400, 2); [2637, 3520, 4186].forEach((f, i) => osc(X, t + 0.32 + i * 0.01, 0.55, 'triangle', f * k, f * k * 0.995, 0.025, { attack: 0.002 })); },
+      special: (X, t) => { osc(X, t, 0.36, 'sawtooth', 140 * k, 900 * k, 0.04, { lp: 2400 }); [1760, 2637, 3520].forEach((f, i) => osc(X, t + 0.4 + i * 0.012, 0.6, 'triangle', f * k, null, 0.025, { attack: 0.002 })); kick(X, t + 0.4, 120, 50, 0.2, 0.1); },
+      hurt: (X, t) => { kick(X, t, 300 * k, 120, 0.1, 0.06); [1180, 1630].forEach((f) => osc(X, t, 0.3, 'triangle', f * k, null, 0.02, { attack: 0.002 })); },
+      defeat: (X, t) => { osc(X, t, 0.9, 'sawtooth', 700 * k, 50, 0.04, { lp: 1600 }); kick(X, t + 0.75, 90, 40, 0.25, 0.1); },
+      victory: (X, t) => { [0, 0.12, 0.24].forEach((d, i) => osc(X, t + d, 0.06, 'square', (1400 + i * 300) * k, null, 0.025, { lp: 3500 })); },
+    }),
+    igniflare: (k) => ({
+      move: (X, t) => { kick(X, t, 90 * k, 38, 0.16, 0.05 + 0.04 / k); },
+      attack: (X, t) => { nz(X, t + 0.2, 0.08, 0.06, 'bandpass', 900, 500, 1.2); nz(X, t + 0.33, 0.03, 0.08, 'highpass', 2500); },
+      special: (X, t) => { [0, 0.5].forEach((d) => nz(X, t + d, 0.32, 0.06, 'bandpass', 260 / k, 1100 / k, 0.9)); nz(X, t + 0.38, 0.5, 0.07, 'lowpass', 1800, 300); osc(X, t + 0.38, 0.5, 'sawtooth', 110 * k, 70 * k, 0.03, { lp: 500 }); },
+      hurt: (X, t) => nz(X, t, 0.2, 0.05, 'bandpass', 400 / k, 900 / k, 0.9),
+      victory: (X, t) => { [0, 0.62].forEach((d) => nz(X, t + d, 0.32, 0.06, 'bandpass', 240 / k, 1000 / k, 0.9)); },
+      defeat: (X, t) => { kick(X, t + 0.9, 70, 30, 0.3, 0.1); nz(X, t + 0.9, 0.3, 0.05, 'lowpass', 600); },
+    }),
+    lumifern: (k) => ({
+      move: (X, t) => { nz(X, t, 0.05, 0.02, 'highpass', 4500); nz(X, t + 0.2, 0.05, 0.018, 'highpass', 4800); },
+      attack: (X, t) => { nz(X, t + 0.3, 0.12, 0.03, 'bandpass', 3000, 1500, 1); },
+      special: (X, t) => [1568, 1976, 2349, 3136].forEach((f, i) => osc(X, t + 0.1 + i * 0.07, 0.4, 'sine', f * k, null, 0.03, { echo: true })),
+      hurt: (X, t) => nz(X, t, 0.1, 0.025, 'highpass', 3500),
+      victory: (X, t) => [2093, 2637, 3136, 4186].forEach((f, i) => osc(X, t + 0.3 + i * 0.08, 0.3, 'sine', f * k, null, 0.025, { echo: true })),
+    }),
+  };
+  function layer15(sp, cue) {
+    const P = root.A && root.A.Proto15, D = root.A && root.A.Data; if (!P || !P.active(sp) || !D) return null;
+    const s = D.SPECIES[sp], mk = s && L15[s.line]; if (!mk) return null; return mk([1, 0.86, 0.74][(s.stage || 1) - 1])[cue] || null;
+  }
+  Au.layer15 = (sp, cue) => !!layer15(sp, cue);
   // Renders one cue offline to a WAV file (review page and tests); resolves with an ArrayBuffer
   Au.renderCue = async function (sp, cue, seconds) {
     const C = root.OfflineAudioContext || root.webkitOfflineAudioContext; if (!C) return null;
     const rate = 44100, c = new C(1, Math.ceil(rate * (seconds || 1.6)), rate), b = bus(c, c.destination);
-    voiceOf(sp)[cue]({ c, out: b.out, echo: b.echo }, 0.02, { heads: VOICED[sp] });
+    voiceOf(sp)[cue]({ c, out: b.out, echo: b.echo }, 0.02, { heads: VOICED[sp] }); const L = layer15(sp, cue); if (L) L({ c, out: b.out, echo: b.echo }, 0.02);
     const buf = await c.startRendering(), d = buf.getChannelData(0), n = d.length, ab = new ArrayBuffer(44 + n * 2), dv = new DataView(ab);
     const w = (o, s) => { for (let i = 0; i < s.length; i++) dv.setUint8(o + i, s.charCodeAt(i)); };
     w(0, 'RIFF'); dv.setUint32(4, 36 + n * 2, true); w(8, 'WAVE'); w(12, 'fmt '); dv.setUint32(16, 16, true); dv.setUint16(20, 1, true); dv.setUint16(22, 1, true); dv.setUint32(24, rate, true); dv.setUint32(28, rate * 2, true); dv.setUint16(32, 2, true); dv.setUint16(34, 16, true); w(36, 'data'); dv.setUint32(40, n * 2, true);

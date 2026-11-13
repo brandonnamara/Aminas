@@ -1,0 +1,353 @@
+{
+ "acinus_stylized_creature.glb": {
+  "tris": 19992,
+  "meshes": 120,
+  "materials": 15,
+  "textures": [],
+  "size": [
+   1.58,
+   3.265,
+   2.483
+  ],
+  "axisAligned": 0,
+  "loadMs": 31,
+  "nodes": [
+   "world",
+   "Body",
+   "Belly",
+   "Neck",
+   "Head",
+   "Muzzle",
+   "Nose",
+   "EyeSocket_-1",
+   "EyeWhite_-1",
+   "Iris_-1",
+   "Pupil_-1",
+   "Ear_-1"
+  ],
+  "anims": 0,
+  "bytes": 200660
+ },
+ "cannonis_3d_creature.glb": {
+  "tris": 10784,
+  "meshes": 46,
+  "materials": 7,
+  "textures": [],
+  "size": [
+   2.06,
+   3.386,
+   4.117
+  ],
+  "axisAligned": 0,
+  "loadMs": 8,
+  "nodes": [
+   "world",
+   "torso_core",
+   "belly_plastron",
+   "neck",
+   "head",
+   "snout",
+   "eye_socket",
+   "glowing_cyan_eye",
+   "brow_ridge",
+   "main_shell",
+   "shell_scute_0",
+   "shell_scute_1"
+  ],
+  "anims": 0,
+  "bytes": 154680
+ },
+ "dragon_2_3d_model.glb": {
+  "tris": 1979650,
+  "meshes": 1,
+  "materials": 1,
+  "textures": [
+   "map 4096x4096",
+   "normalMap 4096x4096",
+   "roughnessMap 4096x4096"
+  ],
+  "size": [
+   0.802,
+   0.57,
+   0.983
+  ],
+  "axisAligned": 0.08,
+  "loadMs": 599,
+  "nodes": [
+   "tripo_node_a5f70b7f-3f22-43d6-88e4-562753a34601"
+  ],
+  "anims": 0,
+  "bytes": 24149372
+ },
+ "ignivor_stylized_dragon.glb": {
+  "tris": 7760,
+  "meshes": 58,
+  "materials": 9,
+  "textures": [],
+  "size": [
+   3.663,
+   3.104,
+   4.19
+  ],
+  "axisAligned": 0,
+  "loadMs": 10,
+  "nodes": [
+   "world",
+   "Torso",
+   "Chest",
+   "Neck",
+   "Head",
+   "Muzzle",
+   "Lower_jaw",
+   "Eye_socket",
+   "Glowing_eye",
+   "Pupil",
+   "Brow",
+   "Nostril"
+  ],
+  "anims": 0,
+  "bytes": 151508
+ },
+ "jester_voxel_3d_model.glb": {
+  "tris": 1968906,
+  "meshes": 1,
+  "materials": 1,
+  "textures": [
+   "map 4096x4096",
+   "normalMap 4096x4096",
+   "roughnessMap 4096x4096"
+  ],
+  "size": [
+   0.401,
+   0.978,
+   0.771
+  ],
+  "axisAligned": 0.35,
+  "loadMs": 498,
+  "nodes": [
+   "tripo_node_db5dd5af-b807-482b-aa0a-5b7795e26e0b"
+  ],
+  "anims": 0,
+  "bytes": 18085244
+ },
+ "stylized_character_3d_model.glb": {
+  "tris": 978173,
+  "meshes": 1,
+  "materials": 1,
+  "textures": [
+   "map 4096x4096",
+   "normalMap 4096x4096",
+   "roughnessMap 4096x4096"
+  ],
+  "size": [
+   0.676,
+   1,
+   0.656
+  ],
+  "axisAligned": 0.46,
+  "loadMs": 445,
+  "nodes": [
+   "tripo_node_ac28dfc8-e538-4371-8957-5b822a2c3877"
+  ],
+  "anims": 0,
+  "bytes": 13204244
+ },
+ "voxel_creature_3d_model.glb": {
+  "tris": 967233,
+  "meshes": 1,
+  "materials": 1,
+  "textures": [
+   "map 4096x4096",
+   "normalMap 4096x4096",
+   "roughnessMap 4096x4096"
+  ],
+  "size": [
+   1,
+   0.718,
+   0.468
+  ],
+  "axisAligned": 0.52,
+  "loadMs": 476,
+  "nodes": [
+   "tripo_node_e7156f2c-0005-490d-9570-86ec6fa84f8f"
+  ],
+  "anims": 0,
+  "bytes": 14700916
+ },
+ "voxel_crystal_creature_3d_model.glb": {
+  "tris": 974995,
+  "meshes": 1,
+  "materials": 1,
+  "textures": [
+   "map 4096x4096",
+   "normalMap 4096x4096",
+   "roughnessMap 4096x4096"
+  ],
+  "size": [
+   0.838,
+   1,
+   0.926
+  ],
+  "axisAligned": 0.35,
+  "loadMs": 459,
+  "nodes": [
+   "tripo_node_3dc28390-9826-45c9-982d-33711de6eb80"
+  ],
+  "anims": 0,
+  "bytes": 11146532
+ },
+ "voxel_crystal_fairy_3d_model.glb": {
+  "tris": 972128,
+  "meshes": 1,
+  "materials": 1,
+  "textures": [
+   "map 4096x4096",
+   "normalMap 4096x4096",
+   "roughnessMap 4096x4096"
+  ],
+  "size": [
+   0.787,
+   0.93,
+   0.981
+  ],
+  "axisAligned": 0.48,
+  "loadMs": 452,
+  "nodes": [
+   "tripo_node_2906c94c-b50c-40fc-9aba-596e60fd7550"
+  ],
+  "anims": 0,
+  "bytes": 12267912
+ },
+ "voxel_dragon_0_3d_model.glb": {
+  "tris": 1889467,
+  "meshes": 1,
+  "materials": 1,
+  "textures": [
+   "map 4096x4096",
+   "normalMap 4096x4096",
+   "roughnessMap 4096x4096"
+  ],
+  "size": [
+   0.979,
+   0.656,
+   0.723
+  ],
+  "axisAligned": 0.3,
+  "loadMs": 499,
+  "nodes": [
+   "tripo_node_0672efef-9b85-45f6-9648-a595ada58a56"
+  ],
+  "anims": 0,
+  "bytes": 20624952
+ },
+ "voxel_dragon_1_3d_model.glb": {
+  "tris": 1867201,
+  "meshes": 1,
+  "materials": 1,
+  "textures": [
+   "map 4096x4096",
+   "normalMap 4096x4096",
+   "roughnessMap 4096x4096"
+  ],
+  "size": [
+   0.901,
+   0.517,
+   0.986
+  ],
+  "axisAligned": 0.32,
+  "loadMs": 551,
+  "nodes": [
+   "tripo_node_1c92ccc3-1c78-4bd8-9070-948ce29b3094"
+  ],
+  "anims": 0,
+  "bytes": 20456028
+ },
+ "voxel_dragon_3d_model.glb": {
+  "tris": 955729,
+  "meshes": 1,
+  "materials": 1,
+  "textures": [
+   "map 4096x4096",
+   "normalMap 4096x4096",
+   "roughnessMap 4096x4096"
+  ],
+  "size": [
+   1,
+   0.842,
+   0.75
+  ],
+  "axisAligned": 0.62,
+  "loadMs": 411,
+  "nodes": [
+   "tripo_node_a6075ac4-e429-4c3f-8087-a8a6e497d88b"
+  ],
+  "anims": 0,
+  "bytes": 13395204
+ },
+ "voxel_farm_house_3d_model.glb": {
+  "tris": 962168,
+  "meshes": 1,
+  "materials": 1,
+  "textures": [
+   "map 4096x4096",
+   "normalMap 4096x4096",
+   "roughnessMap 4096x4096"
+  ],
+  "size": [
+   0.999,
+   0.805,
+   0.995
+  ],
+  "axisAligned": 0.65,
+  "loadMs": 493,
+  "nodes": [
+   "tripo_node_0ee3997f-a7a7-489b-83e8-6d3de47151fe"
+  ],
+  "anims": 0,
+  "bytes": 15089300
+ },
+ "voxel_fortress_3d_model.glb": {
+  "tris": 940696,
+  "meshes": 1,
+  "materials": 1,
+  "textures": [
+   "map 4096x4096",
+   "normalMap 4096x4096",
+   "roughnessMap 4096x4096"
+  ],
+  "size": [
+   0.901,
+   0.923,
+   1
+  ],
+  "axisAligned": 0.64,
+  "loadMs": 412,
+  "nodes": [
+   "tripo_node_ea1781c2-1432-4fa8-97c7-c506fe0e72c7"
+  ],
+  "anims": 0,
+  "bytes": 12779620
+ },
+ "voxel_mage_3d_model.glb": {
+  "tris": 1844142,
+  "meshes": 1,
+  "materials": 1,
+  "textures": [
+   "map 4096x4096",
+   "normalMap 4096x4096",
+   "roughnessMap 4096x4096"
+  ],
+  "size": [
+   0.592,
+   0.982,
+   0.761
+  ],
+  "axisAligned": 0.46,
+  "loadMs": 504,
+  "nodes": [
+   "tripo_node_be5459d2-2868-421b-9b49-601425ebe3b2"
+  ],
+  "anims": 0,
+  "bytes": 18885584
+ }
+}
