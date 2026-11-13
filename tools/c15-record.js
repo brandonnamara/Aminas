@@ -21,7 +21,17 @@ const SC = {
   guard: { id: 'atem1', foe: 'rockraki', press: 'ironwall', secs: 2.2, rows: [OFF, ON] },
   status: { id: 'emberix', foe: 'acinus', press: 'flarebite', rng: 0.05, secs: 3.4, rows: [OFF, ON] },
   victory: { id: 'atem', foe: 'rockraki', press: 'overclock', hpMul: 0.05, secs: 5.0, rows: [OFF, ON] },
+  // Phase 15D
+  'lumi-solarflare': { id: 'aurelith', foe: 'rockraki', press: 'solarflare', secs: 2.8, rows: [OFF, ON] },
+  'igni-inferno': { id: 'ignivor', foe: 'calyxar', press: 'inferno', secs: 2.8, rows: [OFF, ON] },
+  'zeep-overclock': { id: 'zeep3', foe: 'rockraki', press: 'overclock', secs: 2.8, rows: [OFF, ON] },
+  'zeep-modes': { id: 'zeep3', foe: 'rockraki', press: 'overclock', secs: 2.8, rows: [ON, Object.assign({}, ON, { label: 'Battery Saver', saver: true }), Object.assign({}, ON, { label: 'Reduce Motion', calm: true })] },
+  'atem9-15d': { id: 'atem', foe: 'rockraki', press: 'overclock', secs: 3.0, rows: [ON] },
+  'aqua-serpent': { id: 'aquaflora3', foe: 'calyxar', press: 1, secs: 2.6, rows: [OFF, ON] },
+  'fox-head': { id: 'infernox', foe: 'calyxar', press: 0, secs: 2.4, rows: [OFF, ON] },
 };
+// Phase 15D: guard poses, played directly on the stage (the guard clip of each body type), one row per creature
+['aquaflora2', 'ignivor', 'emberix', 'zeep3', 'shellfin', 'kairyu', 'voltar3', 'sylvaneer'].forEach((id) => { SC['guard-' + id] = { id, foe: 'rockraki', direct: 'guard', secs: 1.2, rows: [OFF, ON] }; });
 (async () => {
   fs.mkdirSync(OUT, { recursive: true }); fs.mkdirSync(TMP, { recursive: true });
   const srv = await serve(); const browser = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
@@ -40,7 +50,8 @@ const SC = {
         for (let i = 0; i < 150 && !(A.UI.B.stage && A.UI.B.stage.is3d && !A.UI.B.busy); i++) await new Promise((r) => setTimeout(r, 100));
         await new Promise((r) => setTimeout(r, 1500)); return typeof S.press === 'number' ? A.Data.SPECIES[S.id].abil[S.press] : S.press; }, S);
       const now = await page.evaluate(() => Date.now()); await page.clock.pauseAt(now + 1500); await page.clock.runFor(200);
-      await page.evaluate((id) => { const b = document.querySelector('.abtn.ready[data-id="' + id + '"]'); if (b) b.click(); }, press);
+      if (S.direct) await page.evaluate((k) => A.UI.B.stage[k]('p'), S.direct);
+      else await page.evaluate((id) => { const b = document.querySelector('.abtn.ready[data-id="' + id + '"]'); if (b) b.click(); }, press);
       const n = Math.round(S.secs * FPS);
       for (let i = 0; i < n; i++) { await page.clock.runFor(1000 / FPS); await page.screenshot({ path: path.join(dir, String(i).padStart(4, '0') + '.png') }); }
       const vp = path.join(TMP, name + '-' + r + '.mp4');
