@@ -1,4 +1,68 @@
 {
+ "lumi": {
+  "cur": {
+   "voxels": 685,
+   "colours": 7,
+   "glow": 6,
+   "parts": [
+    "aura",
+    "mouth"
+   ],
+   "tris": 1162,
+   "meshes": 2,
+   "materials": 2,
+   "bones": 5,
+   "buildMs": 37,
+   "ok": true,
+   "errors": [],
+   "clips": [
+    "idle:5.35",
+    "blink:5.00",
+    "ready:0.75",
+    "attack:0.90",
+    "special:1.10",
+    "hit:0.55",
+    "hitBig:0.80",
+    "heal:0.90",
+    "guard:0.70",
+    "victory:1.60",
+    "defeat:1.20",
+    "move:0.80"
+   ],
+   "height": 1
+  },
+  "p15": {
+   "voxels": 4522,
+   "colours": 13,
+   "glow": 6,
+   "parts": [
+    "aura",
+    "mouth"
+   ],
+   "tris": 2966,
+   "meshes": 2,
+   "materials": 2,
+   "bones": 5,
+   "buildMs": 113,
+   "ok": true,
+   "errors": [],
+   "clips": [
+    "idle:5.35",
+    "blink:5.00",
+    "ready:0.75",
+    "attack:0.90",
+    "special:1.10",
+    "hit:0.55",
+    "hitBig:0.80",
+    "heal:0.90",
+    "guard:0.70",
+    "victory:1.60",
+    "defeat:1.20",
+    "move:0.80"
+   ],
+   "height": 1
+  }
+ },
  "lumi2": {
   "cur": {
    "voxels": 1471,
@@ -14,7 +78,7 @@
    "meshes": 2,
    "materials": 2,
    "bones": 7,
-   "buildMs": 172,
+   "buildMs": 188,
    "ok": true,
    "errors": [],
    "clips": [
@@ -47,7 +111,7 @@
    "meshes": 2,
    "materials": 2,
    "bones": 7,
-   "buildMs": 360,
+   "buildMs": 345,
    "ok": true,
    "errors": [],
    "clips": [
@@ -83,7 +147,7 @@
    "meshes": 2,
    "materials": 2,
    "bones": 8,
-   "buildMs": 80,
+   "buildMs": 53,
    "ok": true,
    "errors": [],
    "clips": [
@@ -117,7 +181,7 @@
    "meshes": 2,
    "materials": 2,
    "bones": 8,
-   "buildMs": 289,
+   "buildMs": 188,
    "ok": true,
    "errors": [],
    "clips": [
@@ -197,7 +261,7 @@
    "meshes": 2,
    "materials": 2,
    "bones": 13,
-   "buildMs": 200,
+   "buildMs": 87,
    "ok": true,
    "errors": [],
    "clips": [
@@ -239,7 +303,7 @@
    "meshes": 2,
    "materials": 2,
    "bones": 14,
-   "buildMs": 46,
+   "buildMs": 56,
    "ok": true,
    "errors": [],
    "clips": [
@@ -279,7 +343,7 @@
    "meshes": 2,
    "materials": 2,
    "bones": 14,
-   "buildMs": 133,
+   "buildMs": 128,
    "ok": true,
    "errors": [],
    "clips": [
@@ -321,7 +385,7 @@
    "meshes": 2,
    "materials": 2,
    "bones": 14,
-   "buildMs": 107,
+   "buildMs": 110,
    "ok": true,
    "errors": [],
    "clips": [
@@ -361,7 +425,7 @@
    "meshes": 2,
    "materials": 2,
    "bones": 14,
-   "buildMs": 201,
+   "buildMs": 155,
    "ok": true,
    "errors": [],
    "clips": [
