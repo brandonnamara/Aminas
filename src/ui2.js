@@ -189,6 +189,15 @@
   const synChips = (syn) => (syn || []).map((k) => '<span class="syn" title="' + esc(D.SYNERGIES[k].desc) + '">' + I('spark') + esc(D.SYNERGIES[k].name) + '</span>').join('');
   UI.synChips = synChips;
   // A dungeon battle (the default) or any other mode: ctx = {kind, b, d (arena), env, label, intro, finish(U), retreat}
+  // Phase 14 finalisation: the boss card. Who it is, where, and the one thing to know about how it fights (the same
+  // words as its trait in the battle), plus how far into the dungeon this is.
+  function bossCard(e0, isl, ctx) {
+    const sp = D.SPECIES[e0.sp] || {}, el = D.ELEMENTS[sp.el] || {}, where = ctx && ctx.d && D.DUNGEONS[ctx.d] ? D.DUNGEONS[ctx.d].name : '';
+    const spec = ctx && ctx.enc && ctx.enc.spec, mech = spec && spec.mech && D.BOSS_MECHS[spec.mech.type];
+    const trait = mech ? mech.name + ': ' + mech.desc : COND.guardian.desc; // the game's own words for it
+    return '<div class="b-bossin' + (isl ? ' isle' : '') + '" role="status" aria-live="polite" style="--ec:' + (el.color || '#ffd978') + '"><small>' + (isl ? 'The Island Boss' : 'Guardian' + (where ? ' of ' + esc(where) : '')) + '</small><b>' + esc(e0.name) + '</b>' +
+      '<span class="bb-el">' + (Art.elIcon ? Art.elIcon(sp.el) : '') + esc(el.name || '') + (ctx && ctx.enc && ctx.enc.battles ? ' · Battle ' + (ctx.enc.battle + 1) + ' of ' + ctx.enc.battles : '') + '</span><em>' + trait + '</em><i class="bb-tap">Tap to begin</i></div>';
+  }
   UI.startBattle = function (ctx) {
     const s = st();
     if (!ctx) {
@@ -217,14 +226,21 @@
       '<div class="b-tele" id="b-tele" hidden role="status" aria-live="polite"></div>' +
       '<div class="b-log" id="b-log" aria-live="polite"></div>' + fp('p') + '<div class="b-party" id="b-party"></div><div class="b-actions" id="b-actions"></div>' +
       '<div class="b-tip" id="b-tip" hidden role="tooltip"></div>' + (calmNow() ? '' : '<div class="b-wipe' + (isl ? ' isle' : boss ? ' boss' : '') + '" aria-hidden="true"><i></i><i></i><i></i></div>') +
-      (boss ? '<div class="b-bossin' + (isl ? ' isle' : '') + '" aria-hidden="true"><small>' + (isl ? 'The Island Boss' : 'Guardian') + '</small><b>' + esc(e0.name) + '</b></div>' : '') + '</div>';
+      (boss ? bossCard(e0, isl, ctx) : ctx.kind === 'dungeon' && !calmNow() ? '<div class="b-entry" aria-hidden="true"><small>' + esc(D.DUNGEONS[ctx.d].name) + '</small><b>Battle ' + (ctx.enc.battle + 1) + ' of ' + ctx.enc.battles + '</b></div>' : '') + '</div>';
     $('#spr-e').innerHTML = Art.portrait(e0.sp); $('#spr-p').innerHTML = Art.portrait(B.cur(b).sp);
     UI.cleanups.push(() => endStage(U));
     const wipe = $('.b-wipe'); if (wipe) setTimeout(() => wipe.remove(), 900);
-    const bin = $('.b-bossin'); if (bin) setTimeout(() => bin.remove(), calmNow() ? 1600 : 2000);
+    const ent = $('.b-entry'); if (ent) setTimeout(() => ent.remove(), 1100);
+    // Phase 14 finalisation: the boss introduction (card, camera and the boss's own move) ends by itself in about two
+    // seconds, or at the first tap; the battle itself starts exactly as before
+    const bin = $('.b-bossin'); let introOver = null;
+    if (bin) { const catcher = document.createElement('button'); catcher.className = 'b-skip'; catcher.setAttribute('aria-label', 'Skip the introduction'); $('#battle').appendChild(catcher);
+      introOver = () => { if (!bin.isConnected) return; bin.classList.add('out'); catcher.remove(); setTimeout(() => bin.remove(), 260); if (U.stage && U.stage.skipIntro) U.stage.skipIntro(); };
+      catcher.addEventListener('click', (ev) => { ev.preventDefault(); ev.stopPropagation(); introOver(); });
+      setTimeout(introOver, calmNow() ? 1600 : 2200); U.introOver = introOver; }
     bLog(ctx.intro || (e0.name !== D.SPECIES[e0.sp].name ? (/^The /.test(e0.name) ? '' : 'The ') + e0.name + (b.foes.length > 1 ? ' leads the other team!' : ' rises!') : 'A wild ' + e0.name + ' appears!'));
     bRender();
-    Promise.all([mountStage(U), sleep(700)]).then(() => { if (UI.B !== U || U.dead) return; U.busy = false; bRender(); if (isl) setTele({ t: 'intro' }); });
+    Promise.all([mountStage(U), sleep(700)]).then(() => { if (UI.B !== U || U.dead) return; U.busy = false; bRender(); if (isl) setTele({ t: 'intro' }); if (boss && bin && bin.isConnected && U.stage && U.stage.intro) U.stage.intro(); });
   };
   function bLog(t) { const l = $('#b-log'); if (l) { l.textContent = t; l.classList.toggle('empty', !t); } }
 

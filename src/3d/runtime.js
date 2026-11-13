@@ -294,6 +294,10 @@ export async function createBattle(container, o) {
   const camBase = new THREE.Vector3(-0.35, 1.7, 5.0), look = new THREE.Vector3(0.05, 0.62, -0.15);
   // Phase 7 camera: a gentle push towards whoever unleashes an ultimate, and a short punch-in on big hits
   const cam = { push: 0, pushTo: 0, toward: new THREE.Vector3(), punch: 0 }, camTmp = new THREE.Vector3(), lookTmp = new THREE.Vector3();
+  // Phase 14 finalisation: the boss introduction. The camera opens close on the boss, holds while it rears up (its own
+  // approved 'special' clip, or 'attack' where it has none), then eases back to the battle view. About 1.6 s; a tap
+  // ends it at once (skipIntro); skipped entirely for Reduce Motion and Battery saver.
+  const intro = { t: -1, len: 1.6, hold: 0.45, done: null }, introTgt = new THREE.Vector3(), introPos = new THREE.Vector3(), INTRO_OFF = new THREE.Vector3(0.9, 0.45, 2.8); // framed from the boss's own side, so the player's Amina is out of shot
   // Phase 7 timeline: effects scheduled against the battle's own clock (they line up with the animation, not with timers)
   const timeline = []; let clockT = 0; const at = (delay, fn) => timeline.push({ t: clockT + delay, fn });
   // Phase 7 focus: who is active, who is targeted (driven by the battle UI, see ui2.js syncArena)
@@ -323,6 +327,9 @@ export async function createBattle(container, o) {
       dome.material.opacity += ((barrier ? 0.28 : 0) - dome.material.opacity) * Math.min(1, dt * 6);
       cam.push += (cam.pushTo - cam.push) * Math.min(1, dt * 5); cam.punch = Math.max(0, cam.punch - dt * 3.5);
       camera.position.copy(camBase); lookTmp.copy(look);
+      if (intro.t >= 0) { intro.t += dt; const k0 = intro.t < intro.hold ? 1 : Math.max(0, 1 - (intro.t - intro.hold) / (intro.len - intro.hold)), k = k0 * k0 * (3 - 2 * k0);
+        introTgt.copy(chest('e')); introPos.copy(introTgt).add(INTRO_OFF); camera.position.lerp(introPos, 0.7 * k); lookTmp.lerp(introTgt, 0.8 * k);
+        if (intro.t >= intro.len) { intro.t = -1; const d = intro.done; intro.done = null; if (d) d(); } }
       if (cam.push > 0.002 && !still) { camTmp.copy(cam.toward).sub(camBase).multiplyScalar(0.16 * cam.push); camera.position.add(camTmp); lookTmp.lerp(cam.toward, 0.25 * cam.push); }
       if (shake > 0 && !still) { shake -= dt; camera.position.x += (Math.random() - 0.5) * shake * 0.25; camera.position.y += (Math.random() - 0.5) * shake * 0.2; }
       const fov = 36 - (still ? 0 : cam.punch * 2.2); if (Math.abs(camera.fov - fov) > 0.01) { camera.fov = fov; camera.updateProjectionMatrix(); }
@@ -342,6 +349,9 @@ export async function createBattle(container, o) {
     is3d: true,
     anchor: (who) => toScreen(head(who)),
     attack(who) { boost(); return slots[who].play('attack'); },
+    intro() { if (calm() || !slots.e) return Promise.resolve(false); boost(); intro.t = 0; at(0.18, () => { if (slots.e) slots.e.play('special'); }); if (slots.e) slots.e.setOutline('#ffd978', 0.7); at(intro.len, () => { if (slots.e && focus.target !== 'e') slots.e.setOutline(null, 0); }); return new Promise((res) => { intro.done = () => res(true); }); },
+    skipIntro() { if (intro.t < 0) return; intro.t = intro.len; },
+    introOn() { return intro.t >= 0; },
     // Phase 7: the battle UI says who is active and who is targeted; the arena shows it (outline, ring, reticle)
     focus(f) {
       f = f || {}; const key = (f.active || '-') + '|' + (f.target || '-') + '|' + (f.mode || '-');
