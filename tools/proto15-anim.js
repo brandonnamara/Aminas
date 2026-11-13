@@ -3,7 +3,7 @@
 // pose sheet. Run: node tools/proto15-anim.js video|poses [ids...]
 const { chromium } = require('playwright'); const serve = require('../tests/server'); const fs = require('fs'), path = require('path'), { execSync } = require('child_process');
 const MODE = process.argv[2] || 'poses', IDS = process.argv.slice(3).length ? process.argv.slice(3) : ['lumifern', 'solarbloom', 'aurelith', 'igniflare', 'pyronix', 'ignivor', 'atem1', 'atem2', 'atem'];
-const OUT = path.join(__dirname, '..', 'docs', 'ui', 'screens15'), TMP = process.env.P15_TMP || '/tmp/p15frames';
+const OUT = process.env.P15_OUT || path.join(__dirname, '..', 'docs', 'ui', 'screens15'), TMP = process.env.P15_TMP || '/tmp/p15frames';
 const SEQ = [['idle', 4.2], ['ready', 0.75], ['attack', 0.9], ['special', 1.1], ['hit', 0.55], ['hitBig', 0.8], ['guard', 0.7], ['victory', 1.6], ['defeat', 1.2], ['move', 1.6]];
 const POSES = [['idle', 0], ['attack', 0.18], ['attack', 0.34], ['special', 0.26], ['special', 0.42], ['hit', 0.08], ['guard', 0.4], ['victory', 0.45], ['defeat', 1.2], ['move', 0.2]];
 (async () => {

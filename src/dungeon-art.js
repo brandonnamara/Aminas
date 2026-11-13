@@ -53,7 +53,7 @@
       const covered = reveal >= 4 ? r() < 0.02 : reveal >= 3 ? r() < 0.08 : reveal === 2 ? t > 0.78 || r() < 0.22 : t > 0.44 || r() < 0.35;
       if (covered) moss += blk(Math.round(x + i * cw), Math.round(y + j * ch), Math.ceil(cw), r() < 0.5 ? '#4f8a3c' : '#5f9a46', Math.ceil(ch));
     }
-    const p = (sp, px) => '<image href="assets/portraits/' + sp + '.webp" x="' + px + '" y="' + (y + h * 0.12) + '" width="' + w * 0.36 + '" height="' + h * 0.8 + '" filter="url(#sepia)" opacity=".82" preserveAspectRatio="xMidYMax meet"/>';
+    const p = (sp, px) => '<image href="' + (A.Art && A.Art.portraitSrc ? A.Art.portraitSrc(sp) : 'assets/portraits/' + sp + '.webp') + '" x="' + px + '" y="' + (y + h * 0.12) + '" width="' + w * 0.36 + '" height="' + h * 0.8 + '" filter="url(#sepia)" opacity=".82" preserveAspectRatio="xMidYMax meet"/>';
     return blk(x - 24, y - 24, w + 48, '#8f8576', h + 48) + '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" fill="#d8c8a4"/>' +
       '<rect x="' + x + '" y="' + (y + h * 0.86) + '" width="' + w + '" height="' + h * 0.14 + '" fill="#b89f78"/>' + p('lumifern', x + w * 0.12) + p('umbrit', x + w * 0.5) +
       '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" fill="#6a4a2a" opacity=".12"/>' + moss;

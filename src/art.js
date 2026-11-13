@@ -205,7 +205,9 @@
   Art.portrait = function (id, opt) {
     const s = D.SPECIES[id]; if (!s) return '';
     if (!use3d() || (opt && opt.mood)) return Art.creature(id, opt);
-    return '<img class="portrait" src="assets/portraits/' + id + '.webp" alt="' + s.name + '" draggable="false" decoding="async" onerror="this.outerHTML=A.Art.creature(\'' + id + '\')">';
+    // Phase 15B: with the developer switch on, refined creatures show portraits baked from their refined models
+    const dir = A.Proto15 && A.Proto15.active(id) ? 'assets/portraits15/' : 'assets/portraits/';
+    return '<img class="portrait" src="' + dir + id + '.webp" alt="' + s.name + '" draggable="false" decoding="async" onerror="this.outerHTML=A.Art.creature(\'' + id + '\')">';
   };
 
   /* ---------- The Entity portrait ---------- */

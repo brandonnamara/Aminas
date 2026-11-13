@@ -15,6 +15,7 @@
      settle, never a drifting sway; a head scan in fixed steps; the ring behind its head turns in ticks; elbows and
      knees bend; slashes end in a held pose. */
 import { THREE, PROTO_HOOKS } from './creature3d.js';
+import { hitMaterial15 } from './roster15.js';   // Phase 15B: the refined roster's clips, move accents and hit material
 import { kit, blinks, STYLE, MOVES } from './showcase.js';
 
 const negX = (keys) => keys.map(([t, v]) => [t, [-v[0], v[1], v[2]]]);
@@ -535,6 +536,7 @@ export function hitAccent(api, who, el, eff, info) {
     else if (line15 === 'igniflare') api.fx.burst(p, ['#ff9a1a', '#ff4500', '#3a1a10'], 8, { speed: 1.2, life: 0.4, size: 0.045, grav: -0.6 });
     else if (line15 === 'meta') api.fx.burst(p, ['#5fd0ff', '#eaf6ff', '#2f8cff'], 9, { speed: 1.6, life: 0.35, size: 0.04, grav: 0.8 });
     else if (line15 === 'lumifern') api.fx.burst(p, ['#9fe36a', '#7fcf5a', '#c8f59a'], 7, { speed: 1.1, life: 0.55, size: 0.055, grav: 1.6 });
+    else hitMaterial15(api, who);
   }
   return true;
 }

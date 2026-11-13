@@ -347,9 +347,38 @@
       victory: (X, t) => [2093, 2637, 3136, 4186].forEach((f, i) => osc(X, t + 0.3 + i * 0.08, 0.3, 'sine', f * k, null, 0.025, { echo: true })),
     }),
   };
+  /* Phase 15B: the refined roster's layers, by body type (same bus, same limits; switch on only) */
+  const B15 = {
+    bat: (k) => ({ move: (X, t) => { nz(X, t, 0.07, 0.03, 'lowpass', 700); nz(X, t + 0.2, 0.07, 0.03, 'lowpass', 700); },
+      attack: (X, t) => { nz(X, t + 0.18, 0.08, 0.04, 'lowpass', 800); osc(X, t + 0.3, 0.07, 'sine', 3400 * k, 5200 * k, 0.018); },
+      special: (X, t) => { [0, 0.1].forEach((d, i) => osc(X, t + 0.3 + d, 0.08, 'sine', (3000 + i * 900) * k, (4800 + i * 900) * k, 0.016, { echo: true })); nz(X, t + 0.26, 0.12, 0.04, 'lowpass', 600); },
+      hurt: (X, t) => osc(X, t, 0.08, 'sine', 4200 * k, 2600 * k, 0.016), victory: (X, t) => [0, 0.16, 0.32].forEach((d) => nz(X, t + d, 0.07, 0.03, 'lowpass', 700)) }),
+    fox: (k) => ({ attack: (X, t) => osc(X, t + 0.26, 0.09, 'triangle', 900 * k, 1500 * k, 0.025, { lp: 3000 }),
+      special: (X, t) => { nz(X, t + 0.1, 0.3, 0.04, 'bandpass', 500, 2600, 1.2); osc(X, t + 0.38, 0.1, 'triangle', 1000 * k, 1600 * k, 0.022); },
+      hurt: (X, t) => osc(X, t, 0.12, 'triangle', 1500 * k, 800 * k, 0.022, { lp: 3000 }), victory: (X, t) => [0, 0.18].forEach((d) => osc(X, t + 0.2 + d, 0.08, 'triangle', 1100 * k, 1600 * k, 0.022)) }),
+    serpent: (k) => ({ move: (X, t) => nz(X, t, 0.3, 0.025, 'bandpass', 500, 1300, 0.8), attack: (X, t) => nz(X, t + 0.2, 0.18, 0.035, 'highpass', 4000),
+      special: (X, t) => { nz(X, t + 0.1, 0.5, 0.05, 'lowpass', 900, 300); nz(X, t + 0.38, 0.2, 0.03, 'highpass', 3500); }, hurt: (X, t) => nz(X, t, 0.12, 0.03, 'highpass', 3800) }),
+    monkey: (k) => ({ attack: (X, t) => osc(X, t + 0.22, 0.1, 'square', 420 * k, 620 * k, 0.02, { lp: 1400 }),
+      hurt: (X, t) => osc(X, t, 0.12, 'square', 900 * k, 1300 * k, 0.018, { lp: 2400 }), victory: (X, t) => [0, 0.09, 0.18, 0.27].forEach((d, i) => osc(X, t + 0.2 + d, 0.06, 'square', (700 + (i % 2) * 250) * k, null, 0.016, { lp: 2000 })) }),
+    mech: (k) => ({ move: (X, t) => osc(X, t, 0.08, 'square', 700 * k, 1000 * k, 0.015, { lp: 2400 }), attack: (X, t) => [0, 0.08].forEach((d) => osc(X, t + 0.2 + d, 0.05, 'square', 1800 * k, null, 0.015, { lp: 4000 })),
+      special: (X, t) => [0, 0.07, 0.14, 0.21].forEach((d, i) => osc(X, t + 0.12 + d, 0.05, 'square', (1200 + i * 300) * k, null, 0.015, { lp: 4000 })), hurt: (X, t) => osc(X, t, 0.14, 'sawtooth', 160 * k, 90 * k, 0.025, { lp: 900 }) }),
+    bird: (k) => ({ move: (X, t) => { nz(X, t, 0.06, 0.03, 'bandpass', 900, 600, 1); nz(X, t + 0.18, 0.06, 0.03, 'bandpass', 900, 600, 1); },
+      attack: (X, t) => { nz(X, t + 0.15, 0.08, 0.035, 'bandpass', 900, 600, 1); osc(X, t + 0.3, 0.12, 'sawtooth', 2200 * k, 1500 * k, 0.014, { lp: 3500 }); },
+      special: (X, t) => { [0, 0.14, 0.28].forEach((d) => nz(X, t + d, 0.08, 0.035, 'bandpass', 800, 600, 1)); osc(X, t + 0.38, 0.25, 'sawtooth', 1800 * k, 2600 * k, 0.014, { lp: 3500 }); },
+      victory: (X, t) => osc(X, t + 0.3, 0.3, 'sawtooth', 1900 * k, 2700 * k, 0.014, { lp: 3500 }) }),
+    heavy: (k) => ({ move: (X, t) => kick(X, t, 80 * k, 40, 0.18, 0.06), attack: (X, t) => kick(X, t + 0.3, 90 * k, 40, 0.2, 0.08),
+      special: (X, t) => { kick(X, t + 0.38, 70 * k, 32, 0.32, 0.1); nz(X, t + 0.38, 0.3, 0.04, 'lowpass', 500); }, hurt: (X, t) => kick(X, t, 110 * k, 50, 0.14, 0.06), defeat: (X, t) => kick(X, t + 0.85, 60, 28, 0.35, 0.1) }),
+    quad: (k) => ({ move: (X, t) => [0, 0.12, 0.24].forEach((d) => kick(X, t + d, 260 * k, 140, 0.05, 0.03)), attack: (X, t) => kick(X, t + 0.3, 200 * k, 90, 0.08, 0.05) }),
+    jester: (k) => ({ attack: (X, t) => [3136, 3729, 4186].forEach((f, i) => osc(X, t + 0.3 + i * 0.03, 0.25, 'triangle', f * k, null, 0.012, { attack: 0.002 })),
+      special: (X, t) => [2637, 3136, 3729, 4186, 4978].forEach((f, i) => osc(X, t + 0.1 + i * 0.06, 0.3, 'triangle', f * k, null, 0.012, { attack: 0.002, echo: true })),
+      victory: (X, t) => [0, 0.15, 0.3].forEach((d, i) => [3136, 3729].forEach((f) => osc(X, t + 0.2 + d, 0.2, 'triangle', (f + i * 200) * k, null, 0.011, { attack: 0.002 }))) }),
+    float: (k) => ({ attack: (X, t) => osc(X, t + 0.3, 0.3, 'sine', 2093 * k, null, 0.02, { echo: true }), special: (X, t) => [1568, 2093, 2637].forEach((f, i) => osc(X, t + 0.15 + i * 0.07, 0.35, 'sine', f * k, null, 0.02, { echo: true })) }),
+  };
+  const BODY15 = { umbrit: 'bat', emberix: 'fox', aquaflora: 'serpent', kairyu: 'monkey', pyrokai: 'monkey', zeep: 'mech', pyrospark: 'bird', zephyr: 'bird',
+    cannonis: 'heavy', acinus: 'heavy', gaiaroki: 'heavy', pyrocell: 'heavy', terraflora: 'heavy', sylvaneer: 'quad', voltar: 'jester', lumi: 'float' };
   function layer15(sp, cue) {
     const P = root.A && root.A.Proto15, D = root.A && root.A.Data; if (!P || !P.active(sp) || !D) return null;
-    const s = D.SPECIES[sp], mk = s && L15[s.line]; if (!mk) return null; return mk([1, 0.86, 0.74][(s.stage || 1) - 1])[cue] || null;
+    const s = D.SPECIES[sp], mk = s && (L15[s.line] || B15[BODY15[s.line]]); if (!mk) return null; return mk([1, 0.86, 0.74][(s.stage || 1) - 1])[cue] || null;
   }
   Au.layer15 = (sp, cue) => !!layer15(sp, cue);
   // Renders one cue offline to a WAV file (review page and tests); resolves with an ArrayBuffer

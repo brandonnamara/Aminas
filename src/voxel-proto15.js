@@ -429,6 +429,7 @@
   try { on = devOK && (/[?&]p15=1\b/.test(root.location ? root.location.search : '') || (root.localStorage && root.localStorage.getItem(KEY) === '1')); } catch (e) { on = false; }
   A.Proto15 = {
     LINES: Object.keys(LINES15),
+    PROTO: Object.keys(PROTO_LINES),   // the Phase 15A prototype lines (the rest of LINES is the Phase 15B refined roster)
     vox: LINES15,
     enabled: () => on,
     // set(true|false): remembered in this browser; the 3D views pick it up on the next model build (reload to be sure)

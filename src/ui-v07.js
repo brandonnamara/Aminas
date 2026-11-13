@@ -22,9 +22,11 @@
     const s = D.SPECIES[id]; if (!s) return '';
     return '<img class="portrait vox" src="' + Art.voxelUrl(id) + '" alt="' + esc(s.name) + '" draggable="false">';
   };
+  // Phase 15B: with the developer switch on, refined creatures use portraits baked from their refined models
+  Art.portraitSrc = (id) => (A.Proto15 && A.Proto15.active(id) ? 'assets/portraits15/' : 'assets/portraits/') + id + '.webp';
   Art.portrait = function (id) {
     const s = D.SPECIES[id]; if (!s) return '';
-    return '<img class="portrait vox" src="assets/portraits/' + id + '.webp" alt="' + esc(s.name) + '" draggable="false" decoding="async" onerror="this.onerror=null;this.src=A.Art.voxelUrl(\'' + id + '\')">';
+    return '<img class="portrait vox" src="' + Art.portraitSrc(id) + '" alt="' + esc(s.name) + '" draggable="false" decoding="async" onerror="this.onerror=null;this.src=A.Art.voxelUrl(\'' + id + '\')">';
   };
 
   /* ================================================================ The Entity */

@@ -1072,7 +1072,7 @@
   const critterUri = {};
   // v0.7: island creatures use the baked voxel portraits in every mode (live 3D only affects battles and viewers)
   Art.critter = function (id) {
-    return '<image href="assets/portraits/' + id + '.webp" x="-62" y="-107" width="124" height="124" preserveAspectRatio="xMidYMid meet"/>';
+    return '<image href="' + (A.Art && A.Art.portraitSrc ? A.Art.portraitSrc(id) : 'assets/portraits/' + id + '.webp') + '" x="-62" y="-107" width="124" height="124" preserveAspectRatio="xMidYMid meet"/>';
   };
 
   /* ================= sprite images ================= */

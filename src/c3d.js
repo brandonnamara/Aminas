@@ -27,6 +27,6 @@
     }
     return loading;
   };
-  C3D.portraitUrl = (id) => 'assets/portraits/' + id + '.webp';
+  C3D.portraitUrl = (id) => (window.A.Proto15 && window.A.Proto15.active(id) ? 'assets/portraits15/' : 'assets/portraits/') + id + '.webp';   // Phase 15B: refined portraits behind the switch
   C3D.stats = () => (mod ? mod.stats() : null);
 })(typeof window !== 'undefined' ? window : globalThis);

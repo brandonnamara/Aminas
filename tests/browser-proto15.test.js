@@ -111,8 +111,9 @@ const CLIPS = ['idle', 'blink', 'ready', 'attack', 'special', 'hit', 'hitBig', '
   ok(B3.proto && B3.log.includes('move:p:glowpulse') && B3.log.includes('move:p:solarflare'), 'Lumifern III (prototype): Glow Pulse and Solar Flare (' + B3.log.filter((x) => /^move/.test(x)).join(' ') + ')');
   ok([B1, B2, B3].every((b) => b.draws > 0 && b.draws <= 60), 'draw calls in these battles stay where they were (peak ' + Math.max(B1.draws, B2.draws, B3.draws) + ')');
   // a battle against a production foe: the foe keeps its own clips and moves (only prototype attackers change)
-  const B4 = await fight('rockraki', 'ignivor', ['pebbletoss']);
-  ok(!B4.proto && B4.log.includes('move:p:pebbletoss') && B4.played.every((x) => !/^rockraki:.*\+15/.test(x)), 'a production monster keeps its own moves and voice with the switch on (Igniflare III as the foe still uses the prototype)');
+  // (Phase 15B: the switch now also covers the refined roster, so the production example is Aimza, the one line it leaves as it is)
+  const B4 = await fight('aimza2', 'ignivor', ['echowave']);
+  ok(!B4.proto && B4.log.includes('move:p:echowave') && B4.played.every((x) => !/^aimza2:.*\+15/.test(x)), 'a production monster (Aimza II) keeps its own moves and voice with the switch on (Igniflare III as the foe still uses the prototype)');
   // Reduce Motion: no accents beyond the existing flash; effects at a quarter
   const B5n = await fight('atem', 'rockraki', ['gearstrike']), B5 = await fight('atem', 'rockraki', ['gearstrike'], { calm: true });
   ok(B5.cubes <= Math.ceil(B5n.cubes * 0.5), 'with Reduce Motion the effects shrink to the reduced budget, with no build-up or ground marks (' + B5.cubes + ' cubes at most, ' + B5n.cubes + ' without)');
