@@ -43,7 +43,7 @@
 .o16-cine .c-cap { position: absolute; left: 0; right: 0; text-align: center; margin: 0; font-size: 1.15rem; letter-spacing: .06em; color: #e8e2ff; text-shadow: 0 2px 12px rgba(0, 0, 0, .8); opacity: 0; transition: opacity 1s ease; pointer-events: none; padding: 0 1rem; }
 .o16-cine .c-cap.c0 { top: 18%; } .o16-cine .c-cap.c1 { top: 78%; }
 .o16-cine.p-c0 .c-cap.c0 { opacity: 1; } .o16-cine.p-c1 .c-cap.c1 { opacity: 1; }
-.o16-cine.p-c1 .c-cap.c0, .o16-cine.p-crack .c-cap { opacity: 0; }
+.o16-cine.p-c1 .c-cap.c0, .o16-cine.p-crack .c-cap.c0, .o16-cine.p-crack .c-cap.c1 { opacity: 0; }
 .o16-cine .c-shards { position: absolute; inset: 0; }
 .o16-cine .c-shard { position: absolute; left: 50%; top: 50%; width: 34vw; height: 24vw; max-height: 40vh; margin: -12vw 0 0 -17vw; opacity: 0; transform: translate(calc(var(--x) * 1.8), calc(var(--y) * 1.8)) rotate(var(--r)) scale(.85); clip-path: polygon(8% 0, 100% 6%, 92% 100%, 0 88%); filter: drop-shadow(0 0 12px rgba(180, 155, 255, .5)); }
 .o16-cine .c-shard.s1 { clip-path: polygon(0 10%, 88% 0, 100% 84%, 14% 100%); }

@@ -1,0 +1,37 @@
+# Console output of the first per-battle probe run (the browser-arena7 checks with the frame wait, run in place from
+# tests/), copied from the terminal; the probe lines and the failing check are exactly as printed. The same probe is
+# now tools/arena7-probe16.js.
+    probe 1 coldkiln started {"g":28,"t":1,"tex":6,"live":true}
+    probe 1 coldkiln before leave {"g":28,"t":1,"tex":6,"live":true}
+    probe 1 coldkiln left {"g":7,"t":1,"tex":3,"live":false}
+    probe 1 heartwood started {"g":32,"t":2,"tex":7,"live":true}
+    probe 1 heartwood before leave {"g":32,"t":2,"tex":7,"live":true}
+    probe 1 heartwood left {"g":10,"t":2,"tex":3,"live":false}
+    probe 1 windstair started {"g":33,"t":3,"tex":7,"live":true}
+    probe 1 windstair before leave {"g":33,"t":3,"tex":7,"live":true}
+    probe 1 windstair left {"g":13,"t":3,"tex":3,"live":false}
+    probe 1 reliquary before leave {"g":30,"t":4,"tex":7,"live":true}
+    probe 1 end {"g":14,"t":4,"tex":3,"live":false}
+    probe 2 coldkiln started {"g":38,"t":5,"tex":6,"live":true}
+    probe 2 coldkiln before leave {"g":38,"t":5,"tex":6,"live":true}
+    probe 2 coldkiln left {"g":17,"t":5,"tex":3,"live":false}
+    probe 2 heartwood started {"g":39,"t":5,"tex":7,"live":true}
+    probe 2 heartwood before leave {"g":39,"t":5,"tex":7,"live":true}
+    probe 2 heartwood left {"g":17,"t":5,"tex":3,"live":false}
+    probe 2 windstair started {"g":37,"t":5,"tex":7,"live":true}
+    probe 2 windstair before leave {"g":37,"t":5,"tex":7,"live":true}
+    probe 2 windstair left {"g":17,"t":5,"tex":3,"live":false}
+    probe 2 reliquary before leave {"g":33,"t":5,"tex":7,"live":true}
+    probe 2 end {"g":17,"t":5,"tex":3,"live":false}
+    probe 3 coldkiln started {"g":38,"t":5,"tex":6,"live":true}
+    probe 3 coldkiln before leave {"g":38,"t":5,"tex":6,"live":true}
+    probe 3 coldkiln left {"g":17,"t":5,"tex":3,"live":false}
+    probe 3 heartwood started {"g":39,"t":5,"tex":7,"live":true}
+    probe 3 heartwood before leave {"g":39,"t":5,"tex":7,"live":true}
+    probe 3 heartwood left {"g":17,"t":5,"tex":3,"live":false}
+    probe 3 windstair started {"g":37,"t":5,"tex":7,"live":true}
+    probe 3 windstair before leave {"g":37,"t":5,"tex":7,"live":true}
+    probe 3 windstair left {"g":17,"t":5,"tex":3,"live":false}
+    probe 3 reliquary before leave {"g":33,"t":5,"tex":7,"live":true}
+    probe 3 end {"g":17,"t":5,"tex":3,"live":false}
+FAIL  leaving battles frees their arenas, effects and highlights (GPU geometries after three boss battles: 14, after three more: 17, after three more: 17)

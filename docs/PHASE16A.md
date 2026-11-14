@@ -225,5 +225,112 @@ It plays once. The dungeon system itself is unchanged.
 
 ## 10. Mobile rendering costs (desktop software rendering, not iPhone)
 
-See `docs/ui/screens16a/o16-measure.json`. The measurements, the regression results, the limitations and the Phase
-16B recommendations are in the review page and in the sections added below once measured.
+From `docs/ui/screens16a/o16-measure.json` (desktop Chromium, SwiftShader software WebGL, 844×390). These figures say
+how heavy the new pieces are relative to each other; they are not iPhone performance.
+
+| Piece | Normal | Battery Saver | Reduce Motion |
+|---|---|---|---|
+| Cinematic length | 10.9 s | 10.9 s | 10.4 s |
+| Elements in the cinematic overlay (peak) | 712 | 180 | 712 |
+| CSS animations running at once (peak) | 27 | 12 | 0 |
+| Frame pacing during the cinematic (median / 95th percentile) | 16.7 / 16.8 ms | 16.7 / 16.8 ms | 16.7 / 16.7 ms |
+
+- Most of the overlay's elements are the four fragment backdrops: they are the dungeons' existing SVG scenes. Battery
+  Saver draws two.
+- Only `transform` and `opacity` are animated. The real island behind the cinematic is the existing island view, at
+  its existing cost.
+- **Starter screen:** 552 elements. One live 3D viewer at a time, and switching starters never leaves a second viewer
+  running (checked). The Lumifern viewer drew 5 calls and 986 triangles.
+- **Battle coach:** checks the battle four times a second while a prologue dungeon battle is open. Each check took
+  0.025 ms, about 0.08 % of one 30 fps frame. It stops when the battle closes.
+- **Dialogue panel:** the existing panel's cost plus a few elements (name plate, progress pips, the player's head).
+
+## 11. Tests
+
+**New suites:**
+
+- `tests/onboard16.test.js` (Node, 37 checks): classification, resume points, one-time starter grant compared with
+  the original code path, real starter facts, state-derived steps in and out of order, soft steps, returning players,
+  save compatibility and no reward or battle change (seeded event log).
+- `tests/browser-onboard16.test.js` (Chromium, 69 checks): the opening with the switch off (unchanged) and on;
+  avatar layout; the cinematic (pause while hidden, audio interruption, Skip); the dialogue (speed, keys, names);
+  the starter screen (real data, layout, confirmation, repeated taps); prologue steps; interrupted, established,
+  partly played and finished saves; the coach (one tip at a time, never covering a move, identical outcomes with the
+  switch on and off, 2D fallback); the dungeon introduction; the first victory note; the handoff; Reduce Motion;
+  Battery Saver; the Hatchery and Forge unchanged.
+
+### The memory-release check (browser-arena7): the approved timing fix did not work, so it is not applied
+
+As approved, I made the check wait for an actually rendered frame before leaving each battle, with the threshold and
+the clean-up measurement unchanged. It made things worse, not better, so I reverted the test to the Phase 15D
+version. The evidence is in `docs/ui/screens16a/`.
+
+**With the frame wait:**
+
+| Run | Result | GPU geometries per round |
+|---|---|---|
+| Phase 16A code, run 1 | failed | 14, 17, 17 |
+| Phase 16A code, run 2 | failed | 14, 17, 17 |
+| Phase 15D code (`b37dac1`) | failed | 14, 17, 17 |
+| Probe tool, in place in `tests/` | failed | 14, 17, 17 |
+| Probe tool, from `tools/` | passed | 23, 23, 23 |
+
+**Without it:**
+
+| Run | Result | GPU geometries per round |
+|---|---|---|
+| Phase 16A code, original test | passed | 17, 17, 17 |
+| Probe tool, from `tools/` | passed | 20, 20, 20 |
+
+**What the per-battle probe shows** (`tools/arena7-probe16.js`; the failing per-battle run is
+`arena7-probe16-wait-failing-run.log`, two passing runs are `arena7-probe16-wait.log` and `arena7-probe16-nowait.log`):
+
+- Every battle's arena, effects and highlights are freed when it is left. Geometry falls back to the cached-template
+  level every time, and textures return to 3.
+- The 14 → 17 step is a fifth creature template being cached at the start of round 2's first battle (templates 4 → 5,
+  3 geometries each). Nothing is retained from a battle.
+- How many templates a run caches varies (4 to 7 here). The check fails whenever one of them is first cached in round
+  2 instead of round 1. That depends on timing, and the frame wait shifts that timing.
+- So the cause is when the deliberate template cache fills, not a frame that has not been drawn. Waiting for a frame
+  cannot remove it.
+
+**A fix that would work** (needs your approval because it changes what the check compares; the threshold would stay):
+run one unmeasured warm-up round first, so the template cache is full before the first measurement.
+
+### Full regression
+
+See section 12, filled in after the complete run.
+
+## 12. Regression results
+
+(pending)
+
+## 13. Known limitations
+
+- **Behind a developer switch.** Players with the switch off (the default) see the Phase 15D opening. Turning it on
+  for everyone is a decision for you.
+- **Not tested on an iPhone.** Every measurement and recording is desktop Chromium with software WebGL at 844×390.
+  Touch targets, safe areas and frame pacing need a real device.
+- **Speed setting.** The dialogue Speed control is the existing three-step setting. There is no "instant" option; the
+  existing Reduce Motion setting shows lines at once.
+- **The handoff points to the road, while the task pill shows the existing chain's next task.** The existing chain's
+  next task is usually "Clear the Way", not the Forgotten Road. I did not reorder the quests.
+- **The first-battle coach** runs only in the prologue's dungeon battles. Practice, PvP, Survival and Hide and Seek are
+  untouched.
+- **Old saves stopped before choosing a starter** (made before Phase 16A) have no record and still start over from
+  New Game, as before.
+- **The memory-release check** remains intermittent (see section 11).
+- **The five simulated slow-device failures** in `browser-perf-fix` are carried forward. See the regression results.
+
+## 14. Recommendations for Phase 16B
+
+1. Play the opening on a real iPhone (Safari and Home Screen) and confirm cinematic smoothness, touch comfort,
+   audio after interruptions, and the dialogue panel with large text settings.
+2. Decide whether the Phase 16A opening becomes the default for new games, and whether the old intro cards are kept
+   anywhere (for example in the Journal).
+3. Approve or decline the arena7 warm-up round (section 11).
+4. Consider a short in-world marker for the Forgotten Road once the prologue hands over, and whether "Clear the Way"
+   should come after the road in the quest order (a progression change, so for your decision).
+5. Voice: a few one-time Entity lines for the Hatchery's first egg and the first evolution, in the same restrained
+   tone.
+6. Accessibility: a larger-text option for the dialogue panel, and an "instant text" speed.

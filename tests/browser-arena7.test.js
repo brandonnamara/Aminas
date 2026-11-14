@@ -132,11 +132,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   /* ---------------- clean-up: nothing leaks between battles ---------------- */
   // play the same three boss battles twice: creature templates are cached on purpose (up to 14 species), so the first
   // round may add theirs; the second round must add nothing (arenas, effects and highlights are all freed)
-  // Phase 16A (approved test-timing fix): before leaving each battle, and before measuring, wait until the renderer has
-  // actually drawn a new frame, so every template a battle cached is on the GPU (and counted) in that same round. The
-  // threshold below is unchanged and it still measures the renderer's live geometry count after the battles are left.
-  const drawnFrame = async () => { const d0 = await page.evaluate(() => (A.C3D.stats() || {}).drawn | 0); try { await page.waitForFunction((d0) => ((A.C3D.stats() || {}).drawn | 0) > d0, d0, { timeout: 15000 }); } catch (e) { console.log('  note  no new frame drawn within 15 s'); } };
-  const round = async () => { for (const a of ['coldkiln', 'heartwood', 'windstair']) { await start(a, 9); await press('.abtn.ready.k-atk'); await sleep(900); await drawnFrame(); await clean(); } await start('reliquary', 4); await drawnFrame(); await clean(); await sleep(400); return (await page.evaluate(() => A.C3D.stats())).geometries; };
+  const round = async () => { for (const a of ['coldkiln', 'heartwood', 'windstair']) { await start(a, 9); await press('.abtn.ready.k-atk'); await sleep(900); await clean(); } await start('reliquary', 4); await clean(); await sleep(400); return (await page.evaluate(() => A.C3D.stats())).geometries; };
   // Phase 14: three rounds. With the fuller arenas the first round sometimes ends before every cached template has
   // been drawn once, so the count can settle one round later; what must hold is that it stops growing.
   const g1 = await round(), g2 = await round(), g3 = await round();

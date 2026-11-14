@@ -1,0 +1,49 @@
+{
+  "note": "Desktop Chromium, SwiftShader software WebGL, 844x390, deviceScaleFactor 1. Not an iPhone measurement.",
+  "at": "2026-11-14T23:31:07.663Z",
+  "cinematic": {
+    "normal": {
+      "durationMs": 10928,
+      "frames": 582,
+      "frameMsMedian": 16.7,
+      "frameMsP95": 16.8,
+      "peakDomNodes": 712,
+      "peakRunningAnimations": 27,
+      "shards": 4,
+      "c3d": null
+    },
+    "saver": {
+      "durationMs": 10870,
+      "frames": 507,
+      "frameMsMedian": 16.7,
+      "frameMsP95": 16.8,
+      "peakDomNodes": 180,
+      "peakRunningAnimations": 12,
+      "shards": 2,
+      "c3d": null
+    },
+    "calm": {
+      "durationMs": 10412,
+      "frames": 472,
+      "frameMsMedian": 16.7,
+      "frameMsP95": 16.7,
+      "peakDomNodes": 712,
+      "peakRunningAnimations": 0,
+      "shards": 4,
+      "c3d": null
+    }
+  },
+  "starter": {
+    "domNodes": 552,
+    "liveViewer": true,
+    "liveViewersAfterSwitching": 1,
+    "drawCalls": 5,
+    "triangles": 986,
+    "geometries": 5
+  },
+  "coach": {
+    "pollEveryMs": 250,
+    "msPerCheck": 0.025,
+    "shareOfFrameAt30fps": "0.08% of one frame, four times a second"
+  }
+}

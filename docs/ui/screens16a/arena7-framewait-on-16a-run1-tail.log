@@ -1,0 +1,9 @@
+2
+  ok  Reduce motion keeps only a little of the effects (14 cubes), skips the battle-ready move, the camera moves and the freeze-frame
+  ok  on the 2D stage your Amina glows as active and the foe carries the target brackets
+  ok  the 2D stage sends an element-coloured streak across for attacks
+  ok  saves are unchanged: no new fields and nothing from the arena is written
+  ok  no script errors
+FAILED: 29 passed, 1 failed (browser-arena7)
+
+[exited with code 0]

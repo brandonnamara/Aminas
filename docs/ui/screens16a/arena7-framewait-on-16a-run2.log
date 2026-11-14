@@ -1,0 +1,31 @@
+  ok  all 63 Aminas build with a valid rig and the full clip set (idle, ready, attack, special, hit, heavy hit, heal, guard, victory, defeat, move)
+  ok  movement is not identical: 14 distinct temperament / fighting-style combinations across the roster
+  ok  every attack and special reaches the foe between 0.30 and 0.42 s, inside the existing battle beat (battle length unchanged)
+  ok  evolution lines move with more weight as they grow
+  ok  a dungeon battle opens on the 3D stage
+  ok  your move: your Amina is active (cyan ring, outline) and the foe carries the target reticle
+  ok  the active Amina plays its battle-ready move when its turn begins (ready)
+  ok  pressing an attack closes the reticle on the foe before the move is played
+  ok  releasing clears the preview
+  ok  when you are faster the arena highlights you, then the foe, in the rules’ order (p → e), then returns to your turn
+  ok  when the foe is faster the highlight follows it first (e → p)
+  ok  between turns no panel is marked as targeted
+  ok  after a turn the creatures are back in their idle and every effect has finished (effects alive: 0)
+  ok  the attack played its style clip and the impact landed on the foe
+  ok  every element sends voxel effects across the arena (fire:43+shot, resonance:52, water:49+shot, earth:36+shot)
+  ok  a super-effective hit gets the heavy reaction (hitBig), a freeze-frame and a shockwave
+  ok  a special move plays the ultimate: its own clip, a gathering column and the camera leaning in
+  ok  healing plays the heal animation with its rising light
+  ok  each of the 10 arenas has its own atmosphere (pollen, dust, spores, bubbles, embers, wisps, fireflies, gusts, glitter, leaves)
+  ok  a guardian battle keeps its boss presentation and adds boss lighting
+  ok  the Island Boss keeps its prismatic presentation (halo, title card) with the Heartwood atmosphere
+  ok  draw calls stay within budget in boss arenas (31, 34; budget 45)
+  ok  the arena link and effects work in other battle modes (practice on resonancescar: 2 moves, raid on hollowveil: 2 moves, survival on reliquary: 2 moves)
+FAIL  leaving battles frees their arenas, effects and highlights (GPU geometries after three boss battles: 14, after three more: 17, after three more: 17)
+  ok  Battery saver halves the arena particles (30 → 15) and the attack effects (60 → 26 cubes)
+  ok  Reduce motion keeps only a little of the effects (14 cubes), skips the battle-ready move, the camera moves and the freeze-frame
+  ok  on the 2D stage your Amina glows as active and the foe carries the target brackets
+  ok  the 2D stage sends an element-coloured streak across for attacks
+  ok  saves are unchanged: no new fields and nothing from the arena is written
+  ok  no script errors
+FAILED: 29 passed, 1 failed (browser-arena7)

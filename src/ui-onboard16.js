@@ -313,7 +313,9 @@
     if (on() && O.active(s) && O.tip(s, 'dungeons')) {
       O.mark(s, 'battle'); S.save(); const tr = $('#toast-root'); if (tr) tr.innerHTML = '';
       const rec = (D.DUNGEONS.forgottenroad && D.DUNGEONS.forgottenroad.recommended) || 4;
-      setTimeout(() => UI.script(W16.dungeons.map((l) => [l[0], l[1].replace('{rec}', rec)]), () => {}), calm() ? 0 : 250);
+      // the Battle-menu line is superseded by this conversation: drop it if it is still waiting or showing
+      UI.heldToasts = (UI.heldToasts || []).filter((x) => x.text !== W16.battleMenu); for (let i = UI.queue.length - 1; i >= 0; i--) if (UI.queue[i].text === W16.battleMenu) UI.queue.splice(i, 1);
+      setTimeout(() => { const tr2 = $('#toast-root'); if (tr2) tr2.innerHTML = ''; UI.script(W16.dungeons.map((l) => [l[0], l[1].replace('{rec}', rec)]), () => {}); }, calm() ? 0 : 250);
     }
     return r;
   };
