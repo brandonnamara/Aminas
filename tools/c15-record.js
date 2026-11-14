@@ -59,6 +59,7 @@ const SC = {
       parts.push(vp); await ctx.close(); console.log(name, row.label, press, n, 'frames');
     }
     const out = path.join(OUT, name + '.mp4');
+    if (parts.length === 1) fs.copyFileSync(parts[0], out); else
     execSync(`ffmpeg -y -loglevel error ${parts.map((p) => '-i ' + p).join(' ')} -filter_complex "${parts.map((_, i) => '[' + i + ':v]').join('')}vstack=inputs=${parts.length},scale=844:-2" -c:v libx264 -preset veryfast -crf 26 -pix_fmt yuv420p ${out}`);
     console.log('wrote', out);
   }

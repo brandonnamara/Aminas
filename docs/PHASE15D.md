@@ -59,3 +59,84 @@ The game runs as a web app in Safari. iOS Safari does not implement the Web Vibr
 there is no other supported web haptics API. The only ways to get haptics are workarounds, such as toggling a hidden
 switch-style checkbox, which the brief rules out. So haptics are not implemented. They would become possible with a
 native wrapper (for example a Capacitor or WKWebView shell using the native haptics API).
+
+## Performance (desktop software rendering, not iPhone)
+
+### Model costs
+
+From `docs/ui/screens15d/roster15d-measure.json`:
+
+- **Largest model:** 14,294 triangles at High (Cannonis III), inside the 20,000 budget.
+- **Phone level:** the largest roster forms (those with no finer grid) now skip the shading pass. Phone costs fell compared with 15B:
+
+| Form | Phone, 15B | Phone, 15D |
+|---|---|---|
+| Cannonis I | 13,918 | 12,430 (its production cost) |
+| Cannonis III | 11,000 | 9,842 |
+| Umbrit III | 8,524 | 7,918 |
+| Acinus III | 8,676 | 7,726 |
+| Zephyr III | 8,858 | 8,214 |
+
+- **New serpents:** Aquaflora II costs 9,866 triangles at High and 6,140 on phones; Aquaflora III costs 10,614 and 7,338.
+- **Meta, after the finer grid:**
+
+| Form | High | Phone |
+|---|---|---|
+| Meta I | 3,278 | 2,576 |
+| Meta II | 7,298 | 5,768 |
+| Meta III | 11,454 | 8,760 |
+
+**Still above the 8,000-triangle phone preference** (all within the 20,000 budget):
+
+- Cannonis I, at its production cost.
+- Cannonis III: 9,842.
+- Meta III: 8,760.
+- Zephyr III: 8,214.
+- The 15A prototypes, which have no separate phone level by design: Lumifern III at 12,042, Igniflare II at 9,050 and Igniflare III at 14,168.
+
+### Battle effects
+
+From `c15d-measure.json`. Values are peak draw calls / peak effect cubes.
+
+| Move | Off | On | Battery Saver | Reduce Motion |
+|---|---|---|---|---|
+| Atem III Overclock | 30 / 108 | 40 / 152 | 36 / 71 | 39 / 21 |
+| Other specials | 29–36 / up to 131 | 30–36 / up to 148 | lower | lower |
+
+Every move stays inside the 60 draw-call and 240-cube budgets.
+
+## Stability: the intermittent memory-release check (browser-arena7)
+
+**Finding:** this is a test timing issue in how the count is taken, not a resource leak.
+
+**Evidence:**
+
+- The failing pattern is always the same: GPU geometries 14, 17, 17. It happened in the 15C run and again in this phase's full run. The count stops growing after one step, and the step is exactly one creature template's geometries (3).
+- An instrumented copy of the check (`tools/arena7-probe.js`) ran six rounds instead of three. Its logs are `docs/ui/screens15d/arena7-probe-*.log`.
+  - Run normally, it held at 17 geometries and 5 templates for all six rounds.
+  - With three CPU-saturating processes running alongside, it held at 20 geometries and 6 templates for all six rounds.
+  - Geometry always followed the number of cached templates (3 per template). Textures stayed at 3.
+  - The same species appeared in every round, so the step is not a random foe.
+- The renderer only counts a geometry once it has been drawn. Creature templates are cached on purpose (up to 14). If a battle is left before its first frame draws a newly cached template, which is more likely under the full suite's load, that template's geometry is counted one round later.
+- Phase 15C/15D code creates nothing with the switch off, and that test runs with it off.
+
+**Remaining uncertainty:** I could not reproduce the exact 14 → 17 sequence on demand.
+
+**Not done:** I did not change the threshold and did not suppress the failure. Making the check wait for a drawn frame before leaving each battle would remove the race. That is a test change for you to approve.
+
+## Regression results
+
+The full suite was 42 suites and 1,347 checks: **1,341 passed, 6 failed** (`docs/ui/screens15d/full-suite-15d.log`). It includes the new `browser-final15d` suite (37 checks, all passed).
+
+**`browser-arena7`, 1 failure:** the memory-release count above (14, 17, 17).
+
+**`browser-perf-fix`, 5 failures:** the simulated-slow-device checks (resolution step-down, auto Battery Saver, and related).
+
+- These are intermittent and pre-existing.
+- An earlier full run on this same code, interrupted by a container restart, passed all 23 (`full-suite-15d-interrupted.log`).
+- Isolated reruns on this code passed 23/23 twice.
+- The unchanged Phase 15C code failed 4 of the same checks when rerun (`perf-fix-reruns.log`).
+- The test times simulated frames, so heavy load on the test machine affects it.
+- Phase 15D does not touch the performance governor.
+
+No thresholds were changed.

@@ -1,0 +1,162 @@
+baseline: 5 passed, 0 failed
+campaign: 60 passed, 0 failed
+migration v0.6: 22 passed, 0 failed
+modes: 41 passed, 0 failed
+forge: 53 passed, 0 failed
+dev8: 49 passed, 0 failed
+browser v0.6: 48 passed, 0 failed
+browser dev7: 30 passed, 0 failed
+ERROR page.click: Timeout 8000ms exceeded.
+Call log:
+[2m  - waiting for locator('.pill.res')[22m
+[2m    - locator resolved to <button class="pill res" data-act="wallet" aria-label="Wallet: currencies and essences">…</button>[22m
+[2m  - attempting click action[22m
+[2m    - waiting for element to be visible, enabled and stable[22m
+[2m    - element is visible, enabled and stable[22m
+[2m    - scrolling into view if needed[22m
+[2m    - done scrolling[22m
+
+browser-dev8.test.js: FAILED
+  ok  New Game opens the avatar creator before the story starts
+  ok  the first-time creator cannot be dismissed without confirming
+  ok  tapping outside does not skip it
+  ok  the chosen look and a cleaned-up name are saved
+  ok  confirming continues into the story
+  ok  a returning player loads straight into the island (no creator)
+  ok  the avatar survives a reload
+  ok  an existing save loads into the island without forcing the creator
+  ok  it migrated to schema 6 with progress intact
+  ok  the player’s avatar head sits in the top-left corner
+  ok  the HUD says Player Rank (no Caretaker Rank)
+  ok  gold, food and gems use the new pixel sprites
+  ok  a not-yet-customised avatar shows a gentle hint, not a forced screen
+  ok  tapping it opens the profile: Player Stats, Achievements, Customisation
+  ok  Player Stats shows rank and real statistics
+  ok  Achievements lists progress
+  ok  Customisation reopens the creator and saves the change
+  ok  the monster preview is smaller (212px wide, was 354px)
+  ok  no feed buttons until a monster is picked
+  ok  tapping it picks that monster and shows who will be fed, then Snack and Feast
+  ok  the card holds still while a monster is picked
+  ok  a Snack costs 3 food and feeds only the picked monster
+  ok  closing the pick hides the feed buttons again
+  ok  at the level cap the feed buttons are hidden
+  ok  upgrading from the preview spends 10 Light Essence once (double tap) and shows Lv 2
+  ok  the Creatures detail (Moves and Battle tabs) shows the same Lv 2
+  ok  and can upgrade there too (Lv 3, 25 more essence)
+  ok  moving a placed building has no Done button
+  ok  dropping it on a valid spot moves it for real, straight away
+  ok  an invalid drop is refused and it snaps back, with a reason
+  ok  the new position survives a reload
+  ok  Undo puts it back where this move started
+  ok  a Water Habitat offers Gold or Water Essence
+  ok  switching asks first, collects the 25 stored gold, then makes Water Essence
+  ok  the choice persists after a reload
+ERROR page.click: Timeout 8000ms exceeded.
+Call log:
+[2m  - waiting for locator('.pill.res')[22m
+[2m    - locator resolved to <button class="pill res" data-act="wallet" aria-label="Wallet: currencies and essences">…</button>[22m
+[2m  - attempting click action[22m
+[2m    - waiting for element to be visible, enabled and stable[22m
+[2m    - element is visible, enabled and stable[22m
+[2m    - scrolling into view if needed[22m
+[2m    - done scrolling[22m
+
+
+browser env1: 20 passed, 0 failed
+browser env1.2: 10 passed, 0 failed
+browser library: 11 passed, 0 failed
+PASSED: 19 passed, 0 failed (browser-env3)
+PASSED: 10 passed, 0 failed (browser-env4)
+PASSED: 12 passed, 0 failed (browser-ui5)
+PASSED: 45 passed, 0 failed (browser-ui6)
+browser-arena7.test.js: FAILED
+  ok  all 63 Aminas build with a valid rig and the full clip set (idle, ready, attack, special, hit, heavy hit, heal, guard, victory, defeat, move)
+  ok  movement is not identical: 14 distinct temperament / fighting-style combinations across the roster
+  ok  every attack and special reaches the foe between 0.30 and 0.42 s, inside the existing battle beat (battle length unchanged)
+  ok  evolution lines move with more weight as they grow
+  ok  a dungeon battle opens on the 3D stage
+  ok  your move: your Amina is active (cyan ring, outline) and the foe carries the target reticle
+  ok  the active Amina plays its battle-ready move when its turn begins (ready)
+  ok  pressing an attack closes the reticle on the foe before the move is played
+  ok  releasing clears the preview
+  ok  when you are faster the arena highlights you, then the foe, in the rules’ order (p → e), then returns to your turn
+  ok  when the foe is faster the highlight follows it first (e → p)
+  ok  between turns no panel is marked as targeted
+  ok  after a turn the creatures are back in their idle and every effect has finished (effects alive: 0)
+  ok  the attack played its style clip and the impact landed on the foe
+  ok  every element sends voxel effects across the arena (fire:43+shot, resonance:52, water:53+shot, earth:36+shot)
+  ok  a super-effective hit gets the heavy reaction (hitBig), a freeze-frame and a shockwave
+  ok  a special move plays the ultimate: its own clip, a gathering column and the camera leaning in
+  ok  healing plays the heal animation with its rising light
+  ok  each of the 10 arenas has its own atmosphere (pollen, dust, spores, bubbles, embers, wisps, fireflies, gusts, glitter, leaves)
+  ok  a guardian battle keeps its boss presentation and adds boss lighting
+  ok  the Island Boss keeps its prismatic presentation (halo, title card) with the Heartwood atmosphere
+  ok  draw calls stay within budget in boss arenas (31, 34; budget 45)
+  ok  the arena link and effects work in other battle modes (practice on resonancescar: 2 moves, raid on hollowveil: 2 moves, survival on reliquary: 2 moves)
+FAIL  leaving battles frees their arenas, effects and highlights (GPU geometries after three boss battles: 14, after three more: 17, after three more: 17)
+  ok  Battery saver halves the arena particles (30 → 15) and the attack effects (43 → 26 cubes)
+  ok  Reduce motion keeps only a little of the effects (14 cubes), skips the battle-ready move, the camera moves and the freeze-frame
+  ok  on the 2D stage your Amina glows as active and the foe carries the target brackets
+  ok  the 2D stage sends an element-coloured streak across for attacks
+  ok  saves are unchanged: no new fields and nothing from the arena is written
+  ok  no script errors
+FAILED: 29 passed, 1 failed (browser-arena7)
+
+PASSED: 31 passed, 0 failed (browser-bench-battle)
+browser-perf-fix.test.js: FAILED
+  ok  with no evidence the page is assumed to get 60 fps (exactly the earlier rule)
+  ok  a steady 60 fps page is read as 60 fps
+  ok  a steady 30 fps page is read as 30 fps
+  ok  a 30 fps page with the odd late frame is still read as 30 fps
+  ok  a 120 Hz screen changes nothing (budgets never go below a 60 fps frame)
+  ok  irregular, janky frames are not mistaken for a capped page
+  ok  the estimate follows the page back to 60 fps (e.g. Low Power Mode turned off)
+       60 fps page, light frames: {"prStart":2,"prEnd":2,"display":{"fps":60,"steady":true,"samples":40},"saverWouldStart":0,"firstWhy":null,"lowered":0,"judged":3,"slowPct":0,"fps":60,"saverNow":false}
+  ok  a healthy 60 fps 3D view stays at full resolution (2x) with no Battery saver (as before)
+       30 fps page, light frames: {"prStart":2,"prEnd":2,"display":{"fps":30,"steady":true,"samples":40},"saverWouldStart":0,"firstWhy":null,"lowered":0,"judged":3,"slowPct":0,"fps":30,"saverNow":false}
+  ok  a 3D view on a page capped at 30 fps reads the page as 30 fps
+  ok  and draws a steady ~30 fps (30)
+  ok  steady 30 fps frames are not counted as slow during moves (0% slow; the old rule counted ~88% on the iPhone)
+  ok  stable 30 fps does not lower the resolution (stays at 2x)
+  ok  stable 30 fps does not switch Battery saver on
+       60 fps page, struggling  : {"prStart":2,"prEnd":1.75,"display":{"fps":20,"steady":true,"samples":40},"saverWouldStart":0,"firstWhy":null,"lowered":1,"judged":7,"slowPct":17,"fps":18.9,"saverNow":false}
+FAIL  a device that is really struggling at 60 fps first steps its resolution down (2x → 1x, 1 steps)
+FAIL  and, still slow at 1x, switches Battery saver on
+FAIL  its heavy frames do not talk the estimate down to a lower frame rate
+FAIL  the reason is recorded (view, slow frames, the page frame rate it judged against)
+       30 fps page, struggling  : {"prStart":2,"prEnd":1,"display":{"fps":60,"steady":false,"samples":40},"saverWouldStart":2,"firstWhy":{"at":36550,"view":"viewer:lumifern","windowMs":1583,"frames":15,"slowFrames":15,"quickFrames":0,"pixelRatio":1,"cap":2,"targetFps":60,"displayFps":60,"boosting":true,"result":"battery-saver"},"lowered":4,"judged":6,"slowPct":100,"fps":9.2,"saverNow":false}
+  ok  on a 30 fps page, frames slower than 30 fps still lower the resolution and trigger Battery saver
+       30 fps, GPU always behind: {"prStart":2,"prEnd":2,"display":{"fps":30,"steady":true,"samples":40},"saverWouldStart":0,"firstWhy":null,"lowered":0,"judged":7,"slowPct":0,"fps":30,"saverNow":false}
+FAIL  frames that come at 30 fps because the GPU cannot keep up are still caught (no evidence of a capped page)
+  ok  island Auto quality: a steady 30 fps page stays on High; frames slower than that still step down to Balanced
+  ok  island Auto quality on a 60 fps page works exactly as before
+  ok  returning to the app starts a fresh estimate
+  ok  no script errors
+FAILED: 18 passed, 5 failed (browser-perf-fix)
+
+PASSED: 38 passed, 0 failed (browser-showcase8)
+PASSED: 38 passed, 0 failed (browser-p8fix)
+PASSED: 47 passed, 0 failed (browser-roster8b)
+raid12a: 31 passed, 0 failed
+PASSED: 18 passed, 0 failed (browser-raid12a)
+hideseek: 60 passed, 0 failed
+PASSED: 41 passed, 0 failed (browser-hideseek)
+hideseek12c: 30 passed, 0 failed
+PASSED: 58 passed, 0 failed (browser-hideseek12c)
+progression13a: 40 passed, 0 failed
+PASSED: 41 passed, 0 failed (browser-progress13a)
+hatchery13b: 41 passed, 0 failed
+PASSED: 35 passed, 0 failed (browser-hatchery13b)
+gear13c: 46 passed, 0 failed
+PASSED: 39 passed, 0 failed (browser-gear13c)
+economy13d: 14 passed, 0 failed
+PASSED: 5 passed, 0 failed (browser-rewards13d)
+PASSED: 31 passed, 0 failed (browser-models14)
+PASSED: 16 passed, 0 failed (browser-world14)
+40 passed, 0 failed
+browser-roster15b: 37 passed, 0 failed
+browser-combat15c: 33 passed, 0 failed
+browser-final15d: 37 passed, 0 failed
+PASSED: 12 passed, 0 failed (browser-intro14)
+EXIT 1

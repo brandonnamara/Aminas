@@ -1,0 +1,10 @@
+PASSED: 23 passed, 0 failed (browser-perf-fix)
+PASSED: 23 passed, 0 failed (browser-perf-fix)
+/tmp/claude-0/-home-claude/6b0ac393-8b28-56ee-826f-99fe0db5fe0f/scratchpad/wt15c/tests/browser-perf-fix.test.js
+15C: FAIL  a device that is really struggling at 60 fps first steps its resolution down (2x → 1x, 1 steps)
+15C: FAIL  and, still slow at 1x, switches Battery saver on
+15C: FAIL  its heavy frames do not talk the estimate down to a lower frame rate
+15C: FAIL  the reason is recorded (view, slow frames, the page frame rate it judged against)
+15C: FAILED: 19 passed, 4 failed (browser-perf-fix)
+
+[exited with code 0]
