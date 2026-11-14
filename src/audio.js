@@ -100,6 +100,13 @@
     hsRock: (t) => { noise(t, 0.06, 0.03); tone(70, t, 0.09, 'sine', 0.05, null, 50); },
     hsWood: (t) => tone(N(50), t, 0.06, 'triangle', 0.04, null, N(46)),
     hsTick: (t) => tone(N(81), t, 0.06, 'sine', 0.09),
+    // Phase 16A opening (only played while the Phase 16A switch is on)
+    o16res: (t) => { [55, 62, 67, 74].forEach((m, i) => tone(N(m), t + i * 0.22, 2.2 - i * 0.3, 'sine', 0.07, null, N(m + 0.4))); tone(N(86), t + 0.9, 1.4, 'sine', 0.025, null, N(91)); },
+    o16shard: (t) => { [91, 86, 94].forEach((m, i) => tone(N(m), t + i * 0.06, 0.6, 'sine', 0.045)); noise(t, 0.05, 0.03); },
+    o16land: (t) => { tone(N(48), t, 1.1, 'sine', 0.12, null, N(43)); [72, 79, 84].forEach((m, i) => tone(N(m), t + 0.15 + i * 0.11, 0.7, 'triangle', 0.06)); },
+    o16type: (t) => tone(N(96) * (0.98 + Math.random() * 0.04), t, 0.025, 'sine', 0.018),
+    o16pickL: (t) => [72, 76, 79, 84].forEach((m, i) => tone(N(m), t + i * 0.06, 0.32, 'sine', 0.1)),
+    o16pickD: (t) => [60, 63, 67, 70].forEach((m, i) => tone(N(m), t + i * 0.07, 0.36, 'triangle', 0.09)),
     hsGo: (t) => { tone(N(67), t, 0.16, 'triangle', 0.15); tone(N(74), t + 0.12, 0.28, 'triangle', 0.17); tone(N(79), t + 0.12, 0.28, 'sine', 0.08); },
   };
   Au.play = function (name) {
