@@ -1,0 +1,187 @@
+baseline: 5 passed, 0 failed
+campaign: 60 passed, 0 failed
+migration v0.6: 22 passed, 0 failed
+modes: 41 passed, 0 failed
+forge: 53 passed, 0 failed
+dev8: 49 passed, 0 failed
+browser v0.6: 48 passed, 0 failed
+browser dev7: 30 passed, 0 failed
+ERROR page.click: Timeout 8000ms exceeded.
+Call log:
+[2m  - waiting for locator('.pill.res')[22m
+[2m    - locator resolved to <button class="pill res" data-act="wallet" aria-label="Wallet: currencies and essences">…</button>[22m
+[2m  - attempting click action[22m
+[2m    - waiting for element to be visible, enabled and stable[22m
+[2m    - element is visible, enabled and stable[22m
+[2m    - scrolling into view if needed[22m
+[2m    - done scrolling[22m
+
+browser-dev8.test.js: FAILED
+  ok  New Game opens the avatar creator before the story starts
+  ok  the first-time creator cannot be dismissed without confirming
+  ok  tapping outside does not skip it
+  ok  the chosen look and a cleaned-up name are saved
+  ok  confirming continues into the story
+  ok  a returning player loads straight into the island (no creator)
+  ok  the avatar survives a reload
+  ok  an existing save loads into the island without forcing the creator
+  ok  it migrated to schema 6 with progress intact
+  ok  the player’s avatar head sits in the top-left corner
+  ok  the HUD says Player Rank (no Caretaker Rank)
+  ok  gold, food and gems use the new pixel sprites
+  ok  a not-yet-customised avatar shows a gentle hint, not a forced screen
+  ok  tapping it opens the profile: Player Stats, Achievements, Customisation
+  ok  Player Stats shows rank and real statistics
+  ok  Achievements lists progress
+  ok  Customisation reopens the creator and saves the change
+  ok  the monster preview is smaller (212px wide, was 354px)
+  ok  no feed buttons until a monster is picked
+  ok  tapping it picks that monster and shows who will be fed, then Snack and Feast
+  ok  the card holds still while a monster is picked
+  ok  a Snack costs 3 food and feeds only the picked monster
+  ok  closing the pick hides the feed buttons again
+  ok  at the level cap the feed buttons are hidden
+  ok  upgrading from the preview spends 10 Light Essence once (double tap) and shows Lv 2
+  ok  the Creatures detail (Moves and Battle tabs) shows the same Lv 2
+  ok  and can upgrade there too (Lv 3, 25 more essence)
+  ok  moving a placed building has no Done button
+  ok  dropping it on a valid spot moves it for real, straight away
+  ok  an invalid drop is refused and it snaps back, with a reason
+  ok  the new position survives a reload
+  ok  Undo puts it back where this move started
+  ok  a Water Habitat offers Gold or Water Essence
+  ok  switching asks first, collects the 25 stored gold, then makes Water Essence
+  ok  the choice persists after a reload
+ERROR page.click: Timeout 8000ms exceeded.
+Call log:
+[2m  - waiting for locator('.pill.res')[22m
+[2m    - locator resolved to <button class="pill res" data-act="wallet" aria-label="Wallet: currencies and essences">…</button>[22m
+[2m  - attempting click action[22m
+[2m    - waiting for element to be visible, enabled and stable[22m
+[2m    - element is visible, enabled and stable[22m
+[2m    - scrolling into view if needed[22m
+[2m    - done scrolling[22m
+
+
+browser env1: 20 passed, 0 failed
+browser env1.2: 10 passed, 0 failed
+browser library: 11 passed, 0 failed
+PASSED: 19 passed, 0 failed (browser-env3)
+PASSED: 10 passed, 0 failed (browser-env4)
+PASSED: 12 passed, 0 failed (browser-ui5)
+PASSED: 45 passed, 0 failed (browser-ui6)
+PASSED: 30 passed, 0 failed (browser-arena7)
+PASSED: 31 passed, 0 failed (browser-bench-battle)
+PASSED: 23 passed, 0 failed (browser-perf-fix)
+PASSED: 38 passed, 0 failed (browser-showcase8)
+PASSED: 38 passed, 0 failed (browser-p8fix)
+PASSED: 47 passed, 0 failed (browser-roster8b)
+raid12a: 31 passed, 0 failed
+PASSED: 18 passed, 0 failed (browser-raid12a)
+hideseek: 60 passed, 0 failed
+PASSED: 41 passed, 0 failed (browser-hideseek)
+hideseek12c: 30 passed, 0 failed
+PASSED: 58 passed, 0 failed (browser-hideseek12c)
+progression13a: 40 passed, 0 failed
+PASSED: 41 passed, 0 failed (browser-progress13a)
+hatchery13b: 41 passed, 0 failed
+PASSED: 35 passed, 0 failed (browser-hatchery13b)
+gear13c: 46 passed, 0 failed
+PASSED: 39 passed, 0 failed (browser-gear13c)
+economy13d: 14 passed, 0 failed
+PASSED: 5 passed, 0 failed (browser-rewards13d)
+PASSED: 31 passed, 0 failed (browser-models14)
+PASSED: 16 passed, 0 failed (browser-world14)
+40 passed, 0 failed
+browser-roster15b: 37 passed, 0 failed
+browser-combat15c: 33 passed, 0 failed
+browser-final15d: 37 passed, 0 failed
+PASSED: 12 passed, 0 failed (browser-intro14)
+onboard16: 37 passed, 0 failed
+node:internal/process/promises:394
+    triggerUncaughtException(err, true /* fromPromise */);
+    ^
+
+page.waitForSelector: Timeout 30000ms exceeded.
+Call log:
+[2m  - waiting for locator('.vcard') to be visible[22m
+
+    at /home/claude/aminas/tests/browser-onboard16.test.js:163:28 {
+  log: [ "  - waiting for locator('.vcard') to be visible" ],
+  name: 'TimeoutError'
+}
+
+Node.js v22.23.4
+browser-onboard16.test.js: FAILED
+  ok  the Phase 16A switch is off by default
+  ok  switch off: the avatar creator is the original one
+  ok  switch off: the original intro cards play (no cinematic)
+  ok  switch off: the original dialogue panel
+  ok  switch off: the original starter selection
+  ok  switch off: nothing is added to the save
+  ok  the title-screen chip turns the switch on and remembers it in this browser
+  ok  the avatar step shows "1 of 2" and says what can be changed later
+  ok  the whole avatar step fits an iPhone landscape screen (confirm button and note on screen)
+  ok  a new game records where it is (avatar)
+  ok  the avatar choice is saved
+  ok  the cinematic has four fragments of other places and a Skip button
+  ok  Skip is a comfortable touch target (44 pt or more)
+  ok  the cinematic pauses while the app is hidden (timeline frozen: 1302 ms → 1302 ms) and resumes on return
+  ok  the cinematic plays to its end through an audio interruption and hands over to the first conversation
+  ok  the save records that the Entity has been met
+  ok  the dialogue panel, Skip and Speed fit the screen
+  ok  Speed cycles the existing text-speed setting (normal → fast → slow → normal) and saves it
+  ok  a tap finishes the line, and Enter (or Space) moves on
+  ok  the conversation uses the player’s name for their own line and calls Aminas "Kind Souls"
+  ok  the hidden force is never named or explained in the new lines
+  ok  every opening line fits one panel (190 characters or fewer)
+  ok  both starters are shown with their own model portraits
+  ok  names, personalities and moves on the cards are the game’s own data
+  ok  the starter screen fits iPhone landscape
+  ok  nothing can be chosen before a starter is selected
+  ok  selecting shows clearly which starter is picked (the other turns away)
+  ok  the confirmation names the chosen starter
+  ok  Back cancels: nothing is granted
+  ok  one starter, exactly once, even with repeated taps (never both)
+  ok  the choice is saved at once
+  ok  the HUD shows the prologue step (3 of 12: look at your companion)
+  ok  Go opens the companion, and looking at it completes the step
+  ok  the next step is the existing first quest, with its own Go and reward
+  ok  the player is "partly through" the prologue
+  ok  a game interrupted during the cinematic offers Continue on the title screen
+  ok  Continue replays the (skippable) cinematic
+  ok  Skip goes straight to the starter choice and is remembered
+  ok  a game interrupted at the starter choice resumes there (after one line from the Entity)
+  ok  a game interrupted before the avatar was confirmed resumes at the avatar
+  ok  an existing save shows the normal Continue
+  ok  an existing player is never sent through the introduction, character creation or starter choice
+  ok  an existing save never gains an onboarding record
+  ok  a partly played first dungeon keeps its place; already-done steps count (next: the first quest)
+  ok  a player who already cleared the first dungeon has the prologue closed for them
+  ok  first battle, first turn: one short callout ("Your move. Tap an attack.")
+  ok  the callout never covers a move button
+  ok  the callout goes away as soon as the player acts
+  ok  later turns teach health and the turn indicator, one at a time (moves, health, turn)
+  ok  the same battle ends identically with the switch on and off (health [0,10,57], win on turn 4)
+  ok  2D battle fallback: the coach works the same way
+  ok  2D fallback: the first battle is played to a win
+  ok  after the four quests the prologue asks for the Battle menu
+  ok  opening the Battle menu completes that step
+  ok  the first visit to Dungeons explains the structure: ten and ten, the guardian, defeats resume at that battle
+  ok  it quotes the dungeon’s own recommended level
+  ok  the dungeon introduction plays only once
+node:internal/process/promises:394
+    triggerUncaughtException(err, true /* fromPromise */);
+    ^
+
+page.waitForSelector: Timeout 30000ms exceeded.
+Call log:
+[2m  - waiting for locator('.vcard') to be visible[22m
+
+    at /home/claude/aminas/tests/browser-onboard16.test.js:163:28 {
+  log: [ "  - waiting for locator('.vcard') to be visible" ],
+  name: 'TimeoutError'
+}
+
+Node.js v22.23.4
+

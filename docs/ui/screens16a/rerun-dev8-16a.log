@@ -1,0 +1,44 @@
+  ok  New Game opens the avatar creator before the story starts
+  ok  the first-time creator cannot be dismissed without confirming
+  ok  tapping outside does not skip it
+  ok  the chosen look and a cleaned-up name are saved
+  ok  confirming continues into the story
+  ok  a returning player loads straight into the island (no creator)
+  ok  the avatar survives a reload
+  ok  an existing save loads into the island without forcing the creator
+  ok  it migrated to schema 6 with progress intact
+  ok  the player’s avatar head sits in the top-left corner
+  ok  the HUD says Player Rank (no Caretaker Rank)
+  ok  gold, food and gems use the new pixel sprites
+  ok  a not-yet-customised avatar shows a gentle hint, not a forced screen
+  ok  tapping it opens the profile: Player Stats, Achievements, Customisation
+  ok  Player Stats shows rank and real statistics
+  ok  Achievements lists progress
+  ok  Customisation reopens the creator and saves the change
+  ok  the monster preview is smaller (212px wide, was 354px)
+  ok  no feed buttons until a monster is picked
+  ok  tapping it picks that monster and shows who will be fed, then Snack and Feast
+  ok  the card holds still while a monster is picked
+  ok  a Snack costs 3 food and feeds only the picked monster
+  ok  closing the pick hides the feed buttons again
+  ok  at the level cap the feed buttons are hidden
+  ok  upgrading from the preview spends 10 Light Essence once (double tap) and shows Lv 2
+  ok  the Creatures detail (Moves and Battle tabs) shows the same Lv 2
+  ok  and can upgrade there too (Lv 3, 25 more essence)
+  ok  moving a placed building has no Done button
+  ok  dropping it on a valid spot moves it for real, straight away
+  ok  an invalid drop is refused and it snaps back, with a reason
+  ok  the new position survives a reload
+  ok  Undo puts it back where this move started
+  ok  a Water Habitat offers Gold or Water Essence
+  ok  switching asks first, collects the 25 stored gold, then makes Water Essence
+  ok  the choice persists after a reload
+  ok  the wallet lists gold, food, gems and nine essences
+  ok  every dungeon has its own battle backdrop (10 different)
+  ok  every boss room looks different from that dungeon’s normal battles
+  ok  pixel bursts remove themselves (5 → 0 after a second)
+  ok  667×375: avatar, preview and buttons fit without overlapping
+  ok  932×430: avatar, preview and buttons fit without overlapping
+  ok  no console errors
+
+browser dev8: 42 passed, 0 failed

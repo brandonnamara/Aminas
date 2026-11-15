@@ -3,6 +3,9 @@
 Branch `p16a-onboarding`, made from the Phase 15D branch `p15d-final-polish` at `b37dac1` (verified: local and remote
 heads matched, the working tree was clean, `main` is at `0fc9e36` and is untouched). Nothing is merged.
 
+Review page: https://claude.ai/artifact/9s4mSTLw7Dufh6oGZdMiKJ · Development preview: Version 36 of
+https://claude.ai/artifact/ShbtpoFoauudCMFtMCfogK
+
 Everything new runs only while the **Phase 16A switch** is on. It is a separate developer switch from the Phase 15 one
 (which is still off by default and was not changed). Turn it on from the chip at the bottom left of the title screen,
 or with `?p16=1` or `#p16` in the address. It is remembered in that browser only, never in the save. With the switch
@@ -245,6 +248,23 @@ how heavy the new pieces are relative to each other; they are not iPhone perform
   0.025 ms, about 0.08 % of one 30 fps frame. It stops when the battle closes.
 - **Dialogue panel:** the existing panel's cost plus a few elements (name plate, progress pips, the player's head).
 
+## 10b. Recordings and screenshots
+
+All recordings are in `docs/ui/screens16a/rec/` and were made with `tools/o16-record.js`. A deterministic clock
+advances 1/30 s per frame, on desktop software rendering at 844×390, so they show timing, not iPhone performance.
+
+- `cinematic.mp4`: the opening and the first conversation, with Auto on.
+- `cinematic-calm.mp4`: Reduce Motion.
+- `cinematic-saver.mp4`: Battery Saver.
+- `starter.mp4`: both starters, the selection, the confirmation and the Entity's reaction.
+- `battle-coach.mp4`: the first battle with the coach.
+- `dungeon-intro.mp4`: the Battle menu and the dungeon structure introduction.
+
+Screenshots in `docs/ui/screens16a/`, made with `tools/o16-shots.js`:
+
+- before and after, with the switch off and on: `before-*.jpg`, `after-*.jpg`;
+- the guided walkthrough: `walk-01` … `walk-14`.
+
 ## 11. Tests
 
 **New suites:**
@@ -262,8 +282,8 @@ how heavy the new pieces are relative to each other; they are not iPhone perform
 ### The memory-release check (browser-arena7): the approved timing fix did not work, so it is not applied
 
 As approved, I made the check wait for an actually rendered frame before leaving each battle, with the threshold and
-the clean-up measurement unchanged. It made things worse, not better, so I reverted the test to the Phase 15D
-version. The evidence is in `docs/ui/screens16a/`.
+the clean-up measurement unchanged. With the wait, the check failed in 4 of 5 runs, so I reverted the test to the
+Phase 15D version. The evidence is in `docs/ui/screens16a/`.
 
 **With the frame wait:**
 
@@ -297,13 +317,41 @@ version. The evidence is in `docs/ui/screens16a/`.
 **A fix that would work** (needs your approval because it changes what the check compares; the threshold would stay):
 run one unmeasured warm-up round first, so the template cache is full before the first measurement.
 
-### Full regression
-
-See section 12, filled in after the complete run.
 
 ## 12. Regression results
 
-(pending)
+**The full run** (`docs/ui/screens16a/full-suite-16a.log`) had 45 suites, including the two new ones.
+
+- **43 suites ran to the end: 1,384 checks passed, none failed.** That includes:
+  - `browser-arena7`: 30 of 30 (with its Phase 15D test);
+  - `browser-perf-fix`: 23 of 23. The five simulated slow-device failures did not occur in this run. They are not
+    fixed: nothing was changed there, and they have been load-sensitive in every phase.
+- **2 suites stopped partway:**
+  - `browser-dev8`, after 35 passing checks: a tap on the wallet button timed out (8 s) under the full run's load.
+  - `browser-onboard16`, after 57 passing checks: a bug in the new test. Its battle loop did not handle a forced
+    switch when the starter fainted. Fixed in the test; the game was not changed.
+
+**Reruns, each suite on its own:**
+
+| Suite | Code | Result |
+|---|---|---|
+| `browser-dev8` | Phase 16A | 42 of 42 |
+| `browser-dev8` | unchanged Phase 15D code (`b37dac1`) | 41 of 42 |
+| `browser-onboard16` | Phase 16A, after the test fix | 69 of 69 |
+
+On the Phase 15D code a different `browser-dev8` check failed ("Customisation reopens the creator and saves the
+change"), so that suite was already timing-sensitive before Phase 16A. Its logs are `rerun-*.log`.
+
+**Not yet seen:** one uninterrupted full run where all 45 suites finish. The 43 completed suites plus the two reruns
+add up to 1,495 checks, all passing, but not in a single run.
+
+**Carried forward as known investigation items:**
+
+- **The memory-release check** (intermittent; the approved fix did not work; see section 11).
+- **The five simulated slow-device checks** in `browser-perf-fix`. They passed in this run but are not resolved.
+- **`browser-dev8`'s load-sensitive taps** (new to this list; seen on both 16A and 15D code).
+
+No thresholds were changed.
 
 ## 13. Known limitations
 
