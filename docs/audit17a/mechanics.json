@@ -1,0 +1,147 @@
+{
+ "bossGuard": {
+  "gatheringhall": {
+   "boss": "The Lamplighter",
+   "move": "lampsout",
+   "mechType": null,
+   "guardTeamAuto": 100,
+   "guardTeamNeverGuard": 100
+  },
+  "drownedsteps": {
+   "boss": "The Tidewarden",
+   "move": "undertow",
+   "mechType": null,
+   "guardTeamAuto": 100,
+   "guardTeamNeverGuard": 100
+  },
+  "coldkiln": {
+   "boss": "The Kiln Mother",
+   "move": "kilnflare",
+   "mechType": null,
+   "guardTeamAuto": 0,
+   "guardTeamNeverGuard": 0
+  },
+  "lanternorchard": {
+   "boss": "The Orchard Keeper",
+   "move": "lampglare",
+   "mechType": null,
+   "guardTeamAuto": 100,
+   "guardTeamNeverGuard": 100
+  },
+  "windstair": {
+   "boss": "The Weathervane",
+   "move": "galeforce",
+   "mechType": null,
+   "guardTeamAuto": 100,
+   "guardTeamNeverGuard": 100
+  },
+  "heartwood": {
+   "boss": "The Heartwood Stag",
+   "move": "prismfall",
+   "mechType": "prism",
+   "guardTeamAuto": 100,
+   "guardTeamNeverGuard": 100
+  },
+  "reliquary": {
+   "boss": "Rootbound Sentinel",
+   "move": "rootcrush",
+   "mechType": null,
+   "guardTeamAuto": 100,
+   "guardTeamNeverGuard": 100
+  },
+  "hollowveil": {
+   "boss": "Keeper of Unsaid Things",
+   "move": "unsaidverdict",
+   "mechType": null,
+   "guardTeamAuto": 100,
+   "guardTeamNeverGuard": 100
+  },
+  "resonancescar": {
+   "boss": "The Echo at the Centre",
+   "move": "resonantcollapse",
+   "mechType": null,
+   "guardTeamAuto": 100,
+   "guardTeamNeverGuard": 100
+  },
+  "forgottenroad": {
+   "boss": "The Waywarden",
+   "move": null,
+   "mechType": "barrier",
+   "guardTeamAuto": 100,
+   "guardTeamNeverGuard": 100
+  }
+ },
+ "status": {
+  "burn": {
+   "with": {
+    "winPct": 100,
+    "turns": 3
+   },
+   "without": {
+    "winPct": 100,
+    "turns": 3
+   }
+  },
+  "stun": {
+   "with": {
+    "winPct": 100,
+    "turns": 2
+   },
+   "without": {
+    "winPct": 100,
+    "turns": 2
+   }
+  },
+  "soak": {
+   "with": {
+    "winPct": 100,
+    "turns": 2
+   },
+   "without": {
+    "winPct": 100,
+    "turns": 2
+   }
+  },
+  "weaken": {
+   "with": {
+    "winPct": 100,
+    "turns": 3
+   },
+   "without": {
+    "winPct": 100,
+    "turns": 3
+   }
+  },
+  "guardMove": {
+   "with": {
+    "winPct": 98,
+    "turns": 4.43
+   },
+   "note": "Acinus at stage 1 has only Vine Whip + Leaf Guard"
+  },
+  "healMove": {
+   "with": {
+    "winPct": 59.7,
+    "turns": 4.56
+   },
+   "without": {
+    "winPct": 96,
+    "turns": 3.96
+   }
+  }
+ },
+ "synergy": {
+  "triangle": {
+   "with": 100,
+   "without": 100
+  },
+  "kindredFire": {
+   "with": 100,
+   "without": 100
+  },
+  "twilight": {
+   "with": 100,
+   "without": 100
+  }
+ }
+}

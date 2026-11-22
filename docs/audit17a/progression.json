@@ -1,0 +1,284 @@
+{
+ "xpCurve": [
+  {
+   "lv": 1,
+   "need": 25,
+   "cum": 25,
+   "snacks": 2,
+   "feastFood": 10
+  },
+  {
+   "lv": 2,
+   "need": 36,
+   "cum": 61,
+   "snacks": 2,
+   "feastFood": 10
+  },
+  {
+   "lv": 3,
+   "need": 50,
+   "cum": 111,
+   "snacks": 3,
+   "feastFood": 10
+  },
+  {
+   "lv": 4,
+   "need": 67,
+   "cum": 178,
+   "snacks": 4,
+   "feastFood": 10
+  },
+  {
+   "lv": 5,
+   "need": 86,
+   "cum": 264,
+   "snacks": 5,
+   "feastFood": 20
+  },
+  {
+   "lv": 6,
+   "need": 107,
+   "cum": 371,
+   "snacks": 6,
+   "feastFood": 20
+  },
+  {
+   "lv": 7,
+   "need": 130,
+   "cum": 501,
+   "snacks": 8,
+   "feastFood": 20
+  },
+  {
+   "lv": 8,
+   "need": 156,
+   "cum": 657,
+   "snacks": 9,
+   "feastFood": 30
+  },
+  {
+   "lv": 9,
+   "need": 185,
+   "cum": 842,
+   "snacks": 11,
+   "feastFood": 30
+  },
+  {
+   "lv": 10,
+   "need": 216,
+   "cum": 1058,
+   "snacks": 12,
+   "feastFood": 40
+  },
+  {
+   "lv": 11,
+   "need": 249,
+   "cum": 1307,
+   "snacks": 14,
+   "feastFood": 40
+  },
+  {
+   "lv": 12,
+   "need": 284,
+   "cum": 1591,
+   "snacks": 16,
+   "feastFood": 50
+  },
+  {
+   "lv": 13,
+   "need": 322,
+   "cum": 1913,
+   "snacks": 18,
+   "feastFood": 50
+  },
+  {
+   "lv": 14,
+   "need": 363,
+   "cum": 2276,
+   "snacks": 21,
+   "feastFood": 60
+  },
+  {
+   "lv": 15,
+   "need": 406,
+   "cum": 2682,
+   "snacks": 23,
+   "feastFood": 60
+  },
+  {
+   "lv": 16,
+   "need": 451,
+   "cum": 3133,
+   "snacks": 26,
+   "feastFood": 70
+  },
+  {
+   "lv": 17,
+   "need": 498,
+   "cum": 3631,
+   "snacks": 28,
+   "feastFood": 80
+  },
+  {
+   "lv": 18,
+   "need": 548,
+   "cum": 4179,
+   "snacks": 31,
+   "feastFood": 80
+  },
+  {
+   "lv": 19,
+   "need": 601,
+   "cum": 4780,
+   "snacks": 34,
+   "feastFood": 90
+  },
+  {
+   "lv": 20,
+   "need": 656,
+   "cum": 5436,
+   "snacks": 37,
+   "feastFood": 100
+  },
+  {
+   "lv": 21,
+   "need": 713,
+   "cum": 6149,
+   "snacks": 40,
+   "feastFood": 110
+  },
+  {
+   "lv": 22,
+   "need": 772,
+   "cum": 6921,
+   "snacks": 43,
+   "feastFood": 120
+  },
+  {
+   "lv": 23,
+   "need": 834,
+   "cum": 7755,
+   "snacks": 47,
+   "feastFood": 120
+  },
+  {
+   "lv": 24,
+   "need": 899,
+   "cum": 8654,
+   "snacks": 50,
+   "feastFood": 130
+  },
+  {
+   "lv": 25,
+   "need": 966,
+   "cum": 9620,
+   "snacks": 54,
+   "feastFood": 140
+  },
+  {
+   "lv": 26,
+   "need": 1035,
+   "cum": 10655,
+   "snacks": 58,
+   "feastFood": 150
+  },
+  {
+   "lv": 27,
+   "need": 1106,
+   "cum": 11761,
+   "snacks": 62,
+   "feastFood": 160
+  },
+  {
+   "lv": 28,
+   "need": 1180,
+   "cum": 12941,
+   "snacks": 66,
+   "feastFood": 170
+  },
+  {
+   "lv": 29,
+   "need": 1257,
+   "cum": 14198,
+   "snacks": 70,
+   "feastFood": 180
+  }
+ ],
+ "dungeonXp": [
+  {
+   "dungeon": "forgottenroad",
+   "rec": 4,
+   "xpPerMember": 414,
+   "bossOnlyXp": 66
+  },
+  {
+   "dungeon": "gatheringhall",
+   "rec": 5,
+   "xpPerMember": 495,
+   "bossOnlyXp": 93
+  },
+  {
+   "dungeon": "reliquary",
+   "rec": 6,
+   "xpPerMember": 486,
+   "bossOnlyXp": 84
+  },
+  {
+   "dungeon": "drownedsteps",
+   "rec": 8,
+   "xpPerMember": 684,
+   "bossOnlyXp": 120
+  },
+  {
+   "dungeon": "coldkiln",
+   "rec": 10,
+   "xpPerMember": 810,
+   "bossOnlyXp": 138
+  },
+  {
+   "dungeon": "hollowveil",
+   "rec": 12,
+   "xpPerMember": 897,
+   "bossOnlyXp": 147
+  },
+  {
+   "dungeon": "lanternorchard",
+   "rec": 14,
+   "xpPerMember": 1062,
+   "bossOnlyXp": 174
+  },
+  {
+   "dungeon": "windstair",
+   "rec": 16,
+   "xpPerMember": 1188,
+   "bossOnlyXp": 192
+  },
+  {
+   "dungeon": "resonancescar",
+   "rec": 18,
+   "xpPerMember": 1284,
+   "bossOnlyXp": 210
+  },
+  {
+   "dungeon": "heartwood",
+   "rec": 20,
+   "xpPerMember": 1428,
+   "bossOnlyXp": 246
+  }
+ ],
+ "statGrowth": {
+  "perLevel": 0.11,
+  "stageMult": [
+   1,
+   1.42,
+   1.85
+  ],
+  "gearMax": {
+   "atk": 0.17,
+   "def": 0.19,
+   "hp": 0.15,
+   "spd": 0.16
+  },
+  "moveMax": 1.38
+ }
+}

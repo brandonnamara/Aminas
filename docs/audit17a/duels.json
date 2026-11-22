@@ -1,0 +1,449 @@
+{
+ "lv5": {
+  "lumifern": {
+   "el": "light",
+   "role": "balanced",
+   "legendary": false,
+   "winPct": 55.9,
+   "turns": 4
+  },
+  "umbrit": {
+   "el": "dark",
+   "role": "swift",
+   "legendary": false,
+   "winPct": 15.1,
+   "turns": 3
+  },
+  "cannonis": {
+   "el": "water",
+   "role": "tank",
+   "legendary": false,
+   "winPct": 84.8,
+   "turns": 3.8
+  },
+  "kairyu": {
+   "el": "water",
+   "role": "swift",
+   "legendary": false,
+   "winPct": 73,
+   "turns": 2.9
+  },
+  "aquaflora": {
+   "el": "water",
+   "role": "mystic",
+   "legendary": false,
+   "winPct": 73.5,
+   "turns": 3.1
+  },
+  "gaiaroki": {
+   "el": "earth",
+   "role": "bruiser",
+   "legendary": false,
+   "winPct": 51.5,
+   "turns": 3.5
+  },
+  "pyrocell": {
+   "el": "earth",
+   "role": "tank",
+   "legendary": false,
+   "winPct": 51.9,
+   "turns": 4.4
+  },
+  "acinus": {
+   "el": "nature",
+   "role": "tank",
+   "legendary": false,
+   "winPct": 55.3,
+   "turns": 4.5
+  },
+  "sylvaneer": {
+   "el": "nature",
+   "role": "swift",
+   "legendary": false,
+   "winPct": 28.1,
+   "turns": 3
+  },
+  "terraflora": {
+   "el": "nature",
+   "role": "mystic",
+   "legendary": false,
+   "winPct": 37.4,
+   "turns": 3.4
+  },
+  "emberix": {
+   "el": "fire",
+   "role": "swift",
+   "legendary": false,
+   "winPct": 68,
+   "turns": 2.7
+  },
+  "pyrokai": {
+   "el": "fire",
+   "role": "bruiser",
+   "legendary": false,
+   "winPct": 79.6,
+   "turns": 2.9
+  },
+  "igniflare": {
+   "el": "fire",
+   "role": "bruiser",
+   "legendary": false,
+   "winPct": 79.6,
+   "turns": 2.9
+  },
+  "pyrospark": {
+   "el": "fire",
+   "role": "mystic",
+   "legendary": false,
+   "winPct": 71.3,
+   "turns": 2.8
+  },
+  "zephyr": {
+   "el": "wind",
+   "role": "swift",
+   "legendary": false,
+   "winPct": 23.5,
+   "turns": 2.8
+  },
+  "voltar": {
+   "el": "dark",
+   "role": "mystic",
+   "legendary": false,
+   "winPct": 21.3,
+   "turns": 3.5
+  },
+  "zeep": {
+   "el": "metal",
+   "role": "tank",
+   "legendary": false,
+   "winPct": 50.8,
+   "turns": 4.4
+  },
+  "aimza": {
+   "el": "resonance",
+   "role": "mystic",
+   "legendary": false,
+   "winPct": 49.6,
+   "turns": 4
+  },
+  "lumi": {
+   "el": "light",
+   "role": "mystic",
+   "legendary": false,
+   "winPct": 54.1,
+   "turns": 3.5
+  },
+  "meta": {
+   "el": "metal",
+   "role": "mystic",
+   "legendary": true,
+   "winPct": 59.3,
+   "turns": 3.6
+  },
+  "atem": {
+   "el": "metal",
+   "role": "bruiser",
+   "legendary": true,
+   "winPct": 64,
+   "turns": 3.5
+  }
+ },
+ "lv15": {
+  "lumifern": {
+   "el": "light",
+   "role": "balanced",
+   "legendary": false,
+   "winPct": 63.4,
+   "turns": 3.9
+  },
+  "umbrit": {
+   "el": "dark",
+   "role": "swift",
+   "legendary": false,
+   "winPct": 36.8,
+   "turns": 3.3
+  },
+  "cannonis": {
+   "el": "water",
+   "role": "tank",
+   "legendary": false,
+   "winPct": 85,
+   "turns": 4.4
+  },
+  "kairyu": {
+   "el": "water",
+   "role": "swift",
+   "legendary": false,
+   "winPct": 65.8,
+   "turns": 3.3
+  },
+  "aquaflora": {
+   "el": "water",
+   "role": "mystic",
+   "legendary": false,
+   "winPct": 78.5,
+   "turns": 3.5
+  },
+  "gaiaroki": {
+   "el": "earth",
+   "role": "bruiser",
+   "legendary": false,
+   "winPct": 47.5,
+   "turns": 3.9
+  },
+  "pyrocell": {
+   "el": "earth",
+   "role": "tank",
+   "legendary": false,
+   "winPct": 50.8,
+   "turns": 5
+  },
+  "acinus": {
+   "el": "nature",
+   "role": "tank",
+   "legendary": false,
+   "winPct": 65.5,
+   "turns": 4.7
+  },
+  "sylvaneer": {
+   "el": "nature",
+   "role": "swift",
+   "legendary": false,
+   "winPct": 38.9,
+   "turns": 3.2
+  },
+  "terraflora": {
+   "el": "nature",
+   "role": "mystic",
+   "legendary": false,
+   "winPct": 54.1,
+   "turns": 3.7
+  },
+  "emberix": {
+   "el": "fire",
+   "role": "swift",
+   "legendary": false,
+   "winPct": 51.3,
+   "turns": 3.1
+  },
+  "pyrokai": {
+   "el": "fire",
+   "role": "bruiser",
+   "legendary": false,
+   "winPct": 77,
+   "turns": 3.5
+  },
+  "igniflare": {
+   "el": "fire",
+   "role": "bruiser",
+   "legendary": false,
+   "winPct": 77,
+   "turns": 3.5
+  },
+  "pyrospark": {
+   "el": "fire",
+   "role": "mystic",
+   "legendary": false,
+   "winPct": 72.8,
+   "turns": 3.5
+  },
+  "zephyr": {
+   "el": "wind",
+   "role": "swift",
+   "legendary": false,
+   "winPct": 35.5,
+   "turns": 3.1
+  },
+  "voltar": {
+   "el": "dark",
+   "role": "mystic",
+   "legendary": false,
+   "winPct": 67.6,
+   "turns": 3.9
+  },
+  "zeep": {
+   "el": "metal",
+   "role": "tank",
+   "legendary": false,
+   "winPct": 56.4,
+   "turns": 4.6
+  },
+  "aimza": {
+   "el": "resonance",
+   "role": "mystic",
+   "legendary": false,
+   "winPct": 70.8,
+   "turns": 4
+  },
+  "lumi": {
+   "el": "light",
+   "role": "mystic",
+   "legendary": false,
+   "winPct": 65.6,
+   "turns": 3.7
+  },
+  "meta": {
+   "el": "metal",
+   "role": "mystic",
+   "legendary": true,
+   "winPct": 61.3,
+   "turns": 3.8
+  },
+  "atem": {
+   "el": "metal",
+   "role": "bruiser",
+   "legendary": true,
+   "winPct": 64.9,
+   "turns": 3.7
+  }
+ },
+ "lv28": {
+  "lumifern": {
+   "el": "light",
+   "role": "balanced",
+   "legendary": false,
+   "winPct": 53.1,
+   "turns": 5.2
+  },
+  "umbrit": {
+   "el": "dark",
+   "role": "swift",
+   "legendary": false,
+   "winPct": 28.1,
+   "turns": 4.4
+  },
+  "cannonis": {
+   "el": "water",
+   "role": "tank",
+   "legendary": false,
+   "winPct": 84.4,
+   "turns": 5.4
+  },
+  "kairyu": {
+   "el": "water",
+   "role": "swift",
+   "legendary": false,
+   "winPct": 64.5,
+   "turns": 4.2
+  },
+  "aquaflora": {
+   "el": "water",
+   "role": "mystic",
+   "legendary": false,
+   "winPct": 73.5,
+   "turns": 4.6
+  },
+  "gaiaroki": {
+   "el": "earth",
+   "role": "bruiser",
+   "legendary": false,
+   "winPct": 53.3,
+   "turns": 5.2
+  },
+  "pyrocell": {
+   "el": "earth",
+   "role": "tank",
+   "legendary": false,
+   "winPct": 49.3,
+   "turns": 7
+  },
+  "acinus": {
+   "el": "nature",
+   "role": "tank",
+   "legendary": false,
+   "winPct": 62.3,
+   "turns": 6.3
+  },
+  "sylvaneer": {
+   "el": "nature",
+   "role": "swift",
+   "legendary": false,
+   "winPct": 38.1,
+   "turns": 4.3
+  },
+  "terraflora": {
+   "el": "nature",
+   "role": "mystic",
+   "legendary": false,
+   "winPct": 48.9,
+   "turns": 4.8
+  },
+  "emberix": {
+   "el": "fire",
+   "role": "swift",
+   "legendary": false,
+   "winPct": 58.6,
+   "turns": 3.9
+  },
+  "pyrokai": {
+   "el": "fire",
+   "role": "bruiser",
+   "legendary": false,
+   "winPct": 80.4,
+   "turns": 4.1
+  },
+  "igniflare": {
+   "el": "fire",
+   "role": "bruiser",
+   "legendary": false,
+   "winPct": 80.4,
+   "turns": 4.1
+  },
+  "pyrospark": {
+   "el": "fire",
+   "role": "mystic",
+   "legendary": false,
+   "winPct": 67.4,
+   "turns": 4.2
+  },
+  "zephyr": {
+   "el": "wind",
+   "role": "swift",
+   "legendary": false,
+   "winPct": 39.3,
+   "turns": 4.1
+  },
+  "voltar": {
+   "el": "dark",
+   "role": "mystic",
+   "legendary": false,
+   "winPct": 49.3,
+   "turns": 5.1
+  },
+  "zeep": {
+   "el": "metal",
+   "role": "tank",
+   "legendary": false,
+   "winPct": 58.9,
+   "turns": 6.5
+  },
+  "aimza": {
+   "el": "resonance",
+   "role": "mystic",
+   "legendary": false,
+   "winPct": 48.8,
+   "turns": 4.8
+  },
+  "lumi": {
+   "el": "light",
+   "role": "mystic",
+   "legendary": false,
+   "winPct": 51,
+   "turns": 4.8
+  },
+  "meta": {
+   "el": "metal",
+   "role": "mystic",
+   "legendary": true,
+   "winPct": 63.3,
+   "turns": 5.1
+  },
+  "atem": {
+   "el": "metal",
+   "role": "bruiser",
+   "legendary": true,
+   "winPct": 67.8,
+   "turns": 5
+  }
+ }
+}

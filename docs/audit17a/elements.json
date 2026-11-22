@@ -1,0 +1,258 @@
+{
+ "matrix": {
+  "light": {
+   "light": 1,
+   "dark": 1.5,
+   "nature": 1,
+   "fire": 1,
+   "water": 1,
+   "earth": 1,
+   "wind": 1,
+   "resonance": 1,
+   "metal": 0.67
+  },
+  "dark": {
+   "light": 1.5,
+   "dark": 1,
+   "nature": 1,
+   "fire": 1,
+   "water": 1,
+   "earth": 1,
+   "wind": 1,
+   "resonance": 1,
+   "metal": 1
+  },
+  "nature": {
+   "light": 1,
+   "dark": 1,
+   "nature": 1,
+   "fire": 0.67,
+   "water": 1.5,
+   "earth": 1.5,
+   "wind": 0.67,
+   "resonance": 1,
+   "metal": 1
+  },
+  "fire": {
+   "light": 1,
+   "dark": 1,
+   "nature": 1.5,
+   "fire": 1,
+   "water": 0.67,
+   "earth": 1,
+   "wind": 1.5,
+   "resonance": 1,
+   "metal": 1.5
+  },
+  "water": {
+   "light": 1,
+   "dark": 1,
+   "nature": 0.67,
+   "fire": 1.5,
+   "water": 1,
+   "earth": 1.5,
+   "wind": 1,
+   "resonance": 1,
+   "metal": 1.5
+  },
+  "earth": {
+   "light": 1,
+   "dark": 1,
+   "nature": 0.67,
+   "fire": 1,
+   "water": 0.67,
+   "earth": 1,
+   "wind": 1.5,
+   "resonance": 1,
+   "metal": 0.67
+  },
+  "wind": {
+   "light": 1,
+   "dark": 1,
+   "nature": 1.5,
+   "fire": 0.67,
+   "water": 1,
+   "earth": 0.67,
+   "wind": 1,
+   "resonance": 1,
+   "metal": 1
+  },
+  "resonance": {
+   "light": 1,
+   "dark": 1,
+   "nature": 1,
+   "fire": 1,
+   "water": 1,
+   "earth": 1,
+   "wind": 1,
+   "resonance": 1,
+   "metal": 1
+  },
+  "metal": {
+   "light": 1.5,
+   "dark": 1,
+   "nature": 1,
+   "fire": 0.67,
+   "water": 0.67,
+   "earth": 1.5,
+   "wind": 1,
+   "resonance": 1,
+   "metal": 1
+  }
+ },
+ "summary": [
+  {
+   "el": "light",
+   "strongVs": [
+    "dark"
+   ],
+   "weakVs": [
+    "metal"
+   ],
+   "resists": [],
+   "weakTo": [
+    "dark",
+    "metal"
+   ],
+   "species": 2
+  },
+  {
+   "el": "dark",
+   "strongVs": [
+    "light"
+   ],
+   "weakVs": [],
+   "resists": [],
+   "weakTo": [
+    "light"
+   ],
+   "species": 2
+  },
+  {
+   "el": "nature",
+   "strongVs": [
+    "water",
+    "earth"
+   ],
+   "weakVs": [
+    "fire",
+    "wind"
+   ],
+   "resists": [
+    "water",
+    "earth"
+   ],
+   "weakTo": [
+    "fire",
+    "wind"
+   ],
+   "species": 3
+  },
+  {
+   "el": "fire",
+   "strongVs": [
+    "nature",
+    "wind",
+    "metal"
+   ],
+   "weakVs": [
+    "water"
+   ],
+   "resists": [
+    "nature",
+    "wind",
+    "metal"
+   ],
+   "weakTo": [
+    "water"
+   ],
+   "species": 4
+  },
+  {
+   "el": "water",
+   "strongVs": [
+    "fire",
+    "earth",
+    "metal"
+   ],
+   "weakVs": [
+    "nature"
+   ],
+   "resists": [
+    "fire",
+    "earth",
+    "metal"
+   ],
+   "weakTo": [
+    "nature"
+   ],
+   "species": 3
+  },
+  {
+   "el": "earth",
+   "strongVs": [
+    "wind"
+   ],
+   "weakVs": [
+    "nature",
+    "water",
+    "metal"
+   ],
+   "resists": [
+    "wind"
+   ],
+   "weakTo": [
+    "nature",
+    "water",
+    "metal"
+   ],
+   "species": 2
+  },
+  {
+   "el": "wind",
+   "strongVs": [
+    "nature"
+   ],
+   "weakVs": [
+    "fire",
+    "earth"
+   ],
+   "resists": [
+    "nature"
+   ],
+   "weakTo": [
+    "fire",
+    "earth"
+   ],
+   "species": 1
+  },
+  {
+   "el": "resonance",
+   "strongVs": [],
+   "weakVs": [],
+   "resists": [],
+   "weakTo": [],
+   "species": 1
+  },
+  {
+   "el": "metal",
+   "strongVs": [
+    "light",
+    "earth"
+   ],
+   "weakVs": [
+    "fire",
+    "water"
+   ],
+   "resists": [
+    "light",
+    "earth"
+   ],
+   "weakTo": [
+    "fire",
+    "water"
+   ],
+   "species": 3
+  }
+ ]
+}

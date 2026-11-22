@@ -1,0 +1,132 @@
+{
+ "idle": {
+  "early": {
+   "note": "After the Gathering Hall: Hollow 1, Tide Gate 1, 1 farm L1, 1 mine L1, no habitat.",
+   "perHour": {
+    "gold": 716,
+    "food": 713,
+    "gems": 0
+   }
+  },
+  "mid": {
+   "note": "Around the Hollow Veil: Hollow 3, Tide Gate 3, Moon Shrine 2, 2 farms L3, 2 mines L3, 2 habitats L2 with level-10 residents (half matching).",
+   "perHour": {
+    "gold": 7770,
+    "food": 2666,
+    "gems": 48.6
+   }
+  },
+  "late": {
+   "note": "After the Heartwood: every story building at max, 4 farms L5, 3 mines L5, 6 habitats L4 with three level-20 matching residents each.",
+   "perHour": {
+    "gold": 74292,
+    "food": 10848,
+    "gems": 187.2
+   }
+  }
+ },
+ "sinks": {
+  "buildingsToMax": 371490,
+  "hollow": 9740,
+  "tidegate": 11690,
+  "moonshrine": 9330,
+  "hatchery": 15110,
+  "reliquarygate": 9040,
+  "forge": 6300,
+  "farm": 56880,
+  "mine": 67200,
+  "hab_nature": 26600,
+  "hab_water": 26600,
+  "hab_earth": 26600,
+  "hab_fire": 26600,
+  "hab_light": 26600,
+  "hab_dark": 26600,
+  "hab_wind": 26600,
+  "habitatsAll7AtMax": 186200,
+  "gearTierIV": 2010,
+  "evolveOne": 220,
+  "evolveFoodOne": 55
+ },
+ "gemSinks": {
+  "forgeRecipes": 22,
+  "finishNowPerHour": 10
+ },
+ "gemSources": {
+  "questsTotal": 103,
+  "dungeonFirstClears": 162,
+  "survivalMilestones": 34
+ },
+ "raid": {
+  "gold": 60,
+  "food": 10
+ },
+ "practiceDaily": 5,
+ "ruins": {
+  "toll": {
+   "name": "The Old Toll House",
+   "island": "starter",
+   "blurb": "A stone hut by the Forgotten Road, with a window for taking payments.",
+   "unlock": {
+    "dungeon": "forgottenroad"
+   },
+   "unlockText": "Clear the Forgotten Road.",
+   "loot": {
+    "gold": [
+     30,
+     60
+    ],
+    "food": [
+     8,
+     16
+    ]
+   },
+   "gemChance": 0.1,
+   "artefact": "ruin_toll",
+   "cooldownMin": 30
+  },
+  "tower": {
+   "name": "The Signal Tower",
+   "island": "starter",
+   "blurb": "A tower on the cliffs with a ladder that stops halfway up.",
+   "unlock": {
+    "dungeon": "gatheringhall"
+   },
+   "unlockText": "Clear the Gathering Hall.",
+   "loot": {
+    "gold": [
+     50,
+     90
+    ],
+    "food": [
+     10,
+     20
+    ]
+   },
+   "gemChance": 0.15,
+   "artefact": "ruin_tower",
+   "cooldownMin": 45
+  },
+  "cellar": {
+   "name": "The Bakery Cellar",
+   "island": "starter",
+   "blurb": "Ovens far too big for any Amina, and a cellar door that sticks.",
+   "unlock": {
+    "dungeon": "reliquary"
+   },
+   "unlockText": "Clear the Overgrown Reliquary.",
+   "loot": {
+    "gold": [
+     70,
+     130
+    ],
+    "food": [
+     20,
+     35
+    ]
+   },
+   "gemChance": 0.2,
+   "artefact": "ruin_cellar",
+   "cooldownMin": 60
+  }
+ }
+}

@@ -1,0 +1,18 @@
+{
+ "note": "lv30 parties hit the 80-wave simulation cap: enemy level stops at 30, so the run never gets harder.",
+ "lv10": {
+  "avg": 5.3,
+  "max": 8,
+  "min": 4
+ },
+ "lv20": {
+  "avg": 16.2,
+  "max": 24,
+  "min": 9
+ },
+ "lv30": {
+  "avg": 80,
+  "max": 80,
+  "min": 80
+ }
+}

@@ -78,7 +78,16 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms)); const SHOTS = proce
   const sizes = {};
   for (const sz of ['normal', 'large', 'larger']) {
     await ev((sz) => { A.State.state.settings.textSize = sz; A.State.state.settings.textSpeed = 'instant'; A.UI.applyTextSize(); }, sz);
-    await ev((t) => A.UI.script([['n', t]], () => {}), long); await sleep(500);
+    await ev((t) => A.UI.script([['n', t]], () => {}), long);
+    // Phase 17A (approved condition-based wait; it replaces a fixed 500 ms): wait until the new panel shows the whole
+    // line, its entrance animation has finished, and the Aa/Auto/Skip row has stayed put for two frames. At most 8 s.
+    // The checks below still read the settled layout and still fail if the row ends up over the panel.
+    // (a synchronous check, polled every 50 ms: Playwright does not wait for a promise returned by the check)
+    await page.evaluate(() => { window.__rowB = null; window.__rowN = 0; });
+    await page.waitForFunction((n) => { const d = [...document.querySelectorAll('.dlg:not(.out)')].pop(); if (!d) return false;
+      const box = d.querySelector('.dlg-box'), tx = d.querySelector('.dlg-text'), row = d.querySelector('.dlg-ctl'); if (!box || !tx || !row || tx.textContent.length < n) return false;
+      if (box.getAnimations && box.getAnimations().some((a) => a.playState === 'running')) return false;
+      const rb = Math.round(row.getBoundingClientRect().bottom * 2) / 2; if (rb === window.__rowB) window.__rowN++; else { window.__rowB = rb; window.__rowN = 0; } return window.__rowN >= 2; }, long.length, { timeout: 8000, polling: 50 });
     sizes[sz] = await ev(() => { const d = [...document.querySelectorAll('.dlg:not(.out)')].pop(), box = d.querySelector('.dlg-box').getBoundingClientRect(), tx = d.querySelector('.dlg-text'), ctl = [...d.querySelectorAll('.dlg-ctl .btn')].map((b) => b.getBoundingClientRect());
       const hit = ctl.some((c) => !(c.right <= box.left || c.left >= box.right || c.bottom <= box.top || c.top >= box.bottom));
       return { font: parseFloat(getComputedStyle(tx).fontSize), full: tx.textContent.length, inView: box.top >= 0 && box.bottom <= innerHeight + 1, hit, aa: !!d.querySelector('.tsz16'), dlgs: document.querySelectorAll('.dlg').length }; });

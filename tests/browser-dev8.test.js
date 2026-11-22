@@ -21,7 +21,12 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   const islandReady = async () => { await until(() => !!document.querySelector('#world') && (!A.VoxIsland || !A.VoxIsland.stats || !A.VoxIsland.stats() || A.VoxIsland.stats().frames >= 1), null, 60000); await responsive(); };
   // ...and the page has got through the island's opening draws: three frames in a row less than 250 ms apart (a
   // software-rendered first draw can hold the page for seconds, and a tap sent meanwhile can outlast its own timeout)
-  async function responsive() { await page.waitForFunction(() => new Promise((res) => { let n = 0, p = performance.now(); const f = (t) => { if (t - p < 250) n++; else n = 0; p = t; if (n >= 3) res(true); else if (performance.now() - window.__r0 > 1500) res(false); else requestAnimationFrame(f); }; window.__r0 = performance.now(); requestAnimationFrame(f); }), null, { timeout: 60000, polling: 50 }); }
+  // (a synchronous check polled every 50 ms over frame times the page records itself: Playwright does not wait for a
+  // promise returned by the check, so the Phase 16C version of this helper returned at once)
+  async function responsive() {
+    await ev(() => { window.__fr = []; if (!window.__frOn) { window.__frOn = true; const f = (t) => { window.__fr.push(t); if (window.__fr.length > 8) window.__fr.shift(); requestAnimationFrame(f); }; requestAnimationFrame(f); } });
+    await page.waitForFunction(() => { const a = window.__fr; if (!a || a.length < 4) return false; for (let i = a.length - 3; i < a.length; i++) if (a[i] - a[i - 1] >= 250) return false; return performance.now() - a[a.length - 1] < 250; }, null, { timeout: 60000, polling: 50 });
+  }
   const calm = async () => { for (let i = 0; i < 12; i++) { const d = await page.$('.dlg-skip'); if (d) { await d.click(); await sleep(400); } else break; } await ev(() => { A.UI.queue.length = 0; A.UI.busy = false; A.UI.closeAll(); document.querySelectorAll('#toast-root .toast, .ach-toast').forEach((t) => t.remove()); }); };
 
   /* ---------- a brand-new player: the avatar creator comes first ---------- */

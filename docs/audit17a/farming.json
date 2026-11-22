@@ -1,0 +1,222 @@
+[
+ {
+  "dungeon": "forgottenroad",
+  "legacyEveryClear": false,
+  "full": {
+   "minutes": 2.4,
+   "gold": 256,
+   "food": 58,
+   "gems": 0,
+   "goldPerMin": 106,
+   "gemsPerHour": 0
+  },
+  "bossOnly": {
+   "minutes": 0.6,
+   "gold": 82,
+   "food": 22,
+   "gems": 0,
+   "goldPerMin": 149,
+   "gemsPerHour": 0,
+   "gearChance": 0.3,
+   "essence": 9
+  }
+ },
+ {
+  "dungeon": "gatheringhall",
+  "legacyEveryClear": false,
+  "full": {
+   "minutes": 2.8,
+   "gold": 302,
+   "food": 61,
+   "gems": 0,
+   "goldPerMin": 107,
+   "gemsPerHour": 0
+  },
+  "bossOnly": {
+   "minutes": 0.9,
+   "gold": 101,
+   "food": 25,
+   "gems": 0,
+   "goldPerMin": 109,
+   "gemsPerHour": 0,
+   "gearChance": 0.3,
+   "essence": 10
+  }
+ },
+ {
+  "dungeon": "reliquary",
+  "legacyEveryClear": true,
+  "full": {
+   "minutes": 2.8,
+   "gold": 399,
+   "food": 86,
+   "gems": 5,
+   "goldPerMin": 142,
+   "gemsPerHour": 106.9
+  },
+  "bossOnly": {
+   "minutes": 0.6,
+   "gold": 198,
+   "food": 50,
+   "gems": 5,
+   "goldPerMin": 317,
+   "gemsPerHour": 480,
+   "gearChance": 0.3,
+   "essence": 10
+  }
+ },
+ {
+  "dungeon": "drownedsteps",
+  "legacyEveryClear": false,
+  "full": {
+   "minutes": 2.4,
+   "gold": 422,
+   "food": 66,
+   "gems": 0,
+   "goldPerMin": 174,
+   "gemsPerHour": 0
+  },
+  "bossOnly": {
+   "minutes": 0.6,
+   "gold": 140,
+   "food": 30,
+   "gems": 0,
+   "goldPerMin": 255,
+   "gemsPerHour": 0,
+   "gearChance": 0.3,
+   "essence": 11
+  }
+ },
+ {
+  "dungeon": "coldkiln",
+  "legacyEveryClear": false,
+  "full": {
+   "minutes": 1.7,
+   "gold": 502,
+   "food": 71,
+   "gems": 0,
+   "goldPerMin": 302,
+   "gemsPerHour": 0
+  },
+  "bossOnly": {
+   "minutes": 0.8,
+   "gold": 166,
+   "food": 35,
+   "gems": 0,
+   "goldPerMin": 214,
+   "gemsPerHour": 0,
+   "gearChance": 0.3,
+   "essence": 12
+  }
+ },
+ {
+  "dungeon": "hollowveil",
+  "legacyEveryClear": true,
+  "full": {
+   "minutes": 1.9,
+   "gold": 864,
+   "food": 146,
+   "gems": 12,
+   "goldPerMin": 443,
+   "gemsPerHour": 369.2
+  },
+  "bossOnly": {
+   "minutes": 0.6,
+   "gold": 489,
+   "food": 110,
+   "gems": 12,
+   "goldPerMin": 782,
+   "gemsPerHour": 1152,
+   "gearChance": 0.3,
+   "essence": 12
+  }
+ },
+ {
+  "dungeon": "lanternorchard",
+  "legacyEveryClear": false,
+  "full": {
+   "minutes": 1.9,
+   "gold": 672,
+   "food": 81,
+   "gems": 0,
+   "goldPerMin": 355,
+   "gemsPerHour": 0
+  },
+  "bossOnly": {
+   "minutes": 0.8,
+   "gold": 228,
+   "food": 45,
+   "gems": 0,
+   "goldPerMin": 294,
+   "gemsPerHour": 0,
+   "gearChance": 0.3,
+   "essence": 13
+  }
+ },
+ {
+  "dungeon": "windstair",
+  "legacyEveryClear": false,
+  "full": {
+   "minutes": 1.8,
+   "gold": 762,
+   "food": 86,
+   "gems": 0,
+   "goldPerMin": 416,
+   "gemsPerHour": 0
+  },
+  "bossOnly": {
+   "minutes": 0.6,
+   "gold": 264,
+   "food": 50,
+   "gems": 0,
+   "goldPerMin": 422,
+   "gemsPerHour": 0,
+   "gearChance": 0.3,
+   "essence": 14
+  }
+ },
+ {
+  "dungeon": "resonancescar",
+  "legacyEveryClear": true,
+  "full": {
+   "minutes": 2.4,
+   "gold": 1527,
+   "food": 266,
+   "gems": 25,
+   "goldPerMin": 645,
+   "gemsPerHour": 633.2
+  },
+  "bossOnly": {
+   "minutes": 0.8,
+   "gold": 990,
+   "food": 230,
+   "gems": 25,
+   "goldPerMin": 1277,
+   "gemsPerHour": 1935.5,
+   "gearChance": 0.3,
+   "essence": 14
+  }
+ },
+ {
+  "dungeon": "heartwood",
+  "legacyEveryClear": false,
+  "full": {
+   "minutes": 2.3,
+   "gold": 993,
+   "food": 106,
+   "gems": 0,
+   "goldPerMin": 424,
+   "gemsPerHour": 0
+  },
+  "bossOnly": {
+   "minutes": 0.8,
+   "gold": 402,
+   "food": 70,
+   "gems": 0,
+   "goldPerMin": 519,
+   "gemsPerHour": 0,
+   "gearChance": 0.3,
+   "essence": 16
+  }
+ }
+]

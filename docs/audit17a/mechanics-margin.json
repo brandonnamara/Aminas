@@ -1,0 +1,636 @@
+{
+ "margin": {
+  "forgottenroad": {
+   "boss": "The Waywarden",
+   "recommended": 4,
+   "marginLevel": 2,
+   "auto": {
+    "winPct": 100,
+    "turns": 9.4
+   },
+   "basicOnly": {
+    "winPct": 94.5,
+    "turns": 11
+   },
+   "neverGuard": {
+    "winPct": 100,
+    "turns": 9.4
+   },
+   "smartSwitch": {
+    "winPct": 97.8,
+    "turns": 9.8
+   },
+   "plus1Level": {
+    "winPct": 100,
+    "turns": 8.8
+   },
+   "gearII": {
+    "winPct": 100,
+    "turns": 9.2
+   },
+   "moves3": {
+    "winPct": 100,
+    "turns": 8.7
+   }
+  },
+  "gatheringhall": {
+   "boss": "The Lamplighter",
+   "recommended": 5,
+   "marginLevel": 4,
+   "auto": {
+    "winPct": 99,
+    "turns": 10
+   },
+   "basicOnly": {
+    "winPct": 72.3,
+    "turns": 11
+   },
+   "neverGuard": {
+    "winPct": 99,
+    "turns": 10
+   },
+   "smartSwitch": {
+    "winPct": 99,
+    "turns": 10
+   },
+   "plus1Level": {
+    "winPct": 100,
+    "turns": 7.9
+   },
+   "gearII": {
+    "winPct": 100,
+    "turns": 9.1
+   },
+   "moves3": {
+    "winPct": 100,
+    "turns": 8.5
+   }
+  },
+  "reliquary": {
+   "boss": "Rootbound Sentinel",
+   "recommended": 6,
+   "marginLevel": 5,
+   "auto": {
+    "winPct": 64.8,
+    "turns": 9.5
+   },
+   "basicOnly": {
+    "winPct": 29.5,
+    "turns": 10.1
+   },
+   "neverGuard": {
+    "winPct": 64.8,
+    "turns": 9.5
+   },
+   "smartSwitch": {
+    "winPct": 93.5,
+    "turns": 9.2
+   },
+   "plus1Level": {
+    "winPct": 100,
+    "turns": 8.2
+   },
+   "gearII": {
+    "winPct": 99.5,
+    "turns": 8.5
+   },
+   "moves3": {
+    "winPct": 91.5,
+    "turns": 8.5
+   }
+  },
+  "drownedsteps": {
+   "boss": "The Tidewarden",
+   "recommended": 8,
+   "marginLevel": 6,
+   "auto": {
+    "winPct": 99.5,
+    "turns": 9
+   },
+   "basicOnly": {
+    "winPct": 0,
+    "turns": 10
+   },
+   "neverGuard": {
+    "winPct": 99.5,
+    "turns": 9
+   },
+   "smartSwitch": {
+    "winPct": 99.5,
+    "turns": 9
+   },
+   "plus1Level": {
+    "winPct": 100,
+    "turns": 8
+   },
+   "gearII": {
+    "winPct": 100,
+    "turns": 8.5
+   },
+   "moves3": {
+    "winPct": 100,
+    "turns": 8
+   }
+  },
+  "coldkiln": {
+   "boss": "The Kiln Mother",
+   "recommended": 10,
+   "marginLevel": 11,
+   "auto": {
+    "winPct": 64.8,
+    "turns": 14.1
+   },
+   "basicOnly": {
+    "winPct": 0,
+    "turns": 13.8
+   },
+   "neverGuard": {
+    "winPct": 64.8,
+    "turns": 14.1
+   },
+   "smartSwitch": {
+    "winPct": 27.3,
+    "turns": 13.9
+   },
+   "plus1Level": {
+    "winPct": 100,
+    "turns": 9.5
+   },
+   "gearII": {
+    "winPct": 91.8,
+    "turns": 13.5
+   },
+   "moves3": {
+    "winPct": 98.5,
+    "turns": 12.8
+   }
+  },
+  "hollowveil": {
+   "boss": "Keeper of Unsaid Things",
+   "recommended": 12,
+   "marginLevel": 11,
+   "auto": {
+    "winPct": 40.8,
+    "turns": 11.8
+   },
+   "basicOnly": {
+    "winPct": 2.3,
+    "turns": 12.2
+   },
+   "neverGuard": {
+    "winPct": 40.8,
+    "turns": 11.8
+   },
+   "smartSwitch": {
+    "winPct": 0.8,
+    "turns": 12.1
+   },
+   "plus1Level": {
+    "winPct": 100,
+    "turns": 9.5
+   },
+   "gearII": {
+    "winPct": 87.3,
+    "turns": 11.8
+   },
+   "moves3": {
+    "winPct": 100,
+    "turns": 11
+   }
+  },
+  "lanternorchard": {
+   "boss": "The Orchard Keeper",
+   "recommended": 14,
+   "marginLevel": 12,
+   "auto": {
+    "winPct": 94.8,
+    "turns": 9.1
+   },
+   "basicOnly": {
+    "winPct": 51.5,
+    "turns": 12.8
+   },
+   "neverGuard": {
+    "winPct": 94.8,
+    "turns": 9.1
+   },
+   "smartSwitch": {
+    "winPct": 94.8,
+    "turns": 9.1
+   },
+   "plus1Level": {
+    "winPct": 100,
+    "turns": 7.6
+   },
+   "gearII": {
+    "winPct": 100,
+    "turns": 7.8
+   },
+   "moves3": {
+    "winPct": 99.3,
+    "turns": 7.7
+   }
+  },
+  "windstair": {
+   "boss": "The Weathervane",
+   "recommended": 16,
+   "marginLevel": 12,
+   "auto": {
+    "winPct": 68.3,
+    "turns": 12
+   },
+   "basicOnly": {
+    "winPct": 0,
+    "turns": 13.4
+   },
+   "neverGuard": {
+    "winPct": 68.3,
+    "turns": 12
+   },
+   "smartSwitch": {
+    "winPct": 61.3,
+    "turns": 12.8
+   },
+   "plus1Level": {
+    "winPct": 100,
+    "turns": 10.2
+   },
+   "gearII": {
+    "winPct": 100,
+    "turns": 10.5
+   },
+   "moves3": {
+    "winPct": 97.3,
+    "turns": 11
+   }
+  },
+  "resonancescar": {
+   "boss": "The Echo at the Centre",
+   "recommended": 18,
+   "marginLevel": 14,
+   "auto": {
+    "winPct": 97.5,
+    "turns": 12.7
+   },
+   "basicOnly": {
+    "winPct": 0,
+    "turns": 13
+   },
+   "neverGuard": {
+    "winPct": 97.5,
+    "turns": 12.7
+   },
+   "smartSwitch": {
+    "winPct": 97.5,
+    "turns": 12.7
+   },
+   "plus1Level": {
+    "winPct": 100,
+    "turns": 9
+   },
+   "gearII": {
+    "winPct": 100,
+    "turns": 9.1
+   },
+   "moves3": {
+    "winPct": 100,
+    "turns": 11
+   }
+  },
+  "heartwood": {
+   "boss": "The Heartwood Stag",
+   "recommended": 20,
+   "marginLevel": 18,
+   "auto": {
+    "winPct": 95.5,
+    "turns": 10.9
+   },
+   "basicOnly": {
+    "winPct": 45.8,
+    "turns": 13.3
+   },
+   "neverGuard": {
+    "winPct": 95.5,
+    "turns": 10.9
+   },
+   "smartSwitch": {
+    "winPct": 93.5,
+    "turns": 11.7
+   },
+   "plus1Level": {
+    "winPct": 100,
+    "turns": 9
+   },
+   "gearII": {
+    "winPct": 100,
+    "turns": 9.1
+   },
+   "moves3": {
+    "winPct": 100,
+    "turns": 8.9
+   }
+  }
+ },
+ "healTest": {
+  "drownedsteps": {
+   "marginLevel": 4,
+   "auto": {
+    "winPct": 74,
+    "turns": 10.5
+   },
+   "neverHeal": {
+    "winPct": 74,
+    "turns": 10.5
+   },
+   "neverGuard": {
+    "winPct": 71.8,
+    "turns": 9.6
+   }
+  },
+  "coldkiln": {
+   "marginLevel": 12,
+   "auto": {
+    "winPct": 100,
+    "turns": 9.1
+   },
+   "neverHeal": {
+    "winPct": 100,
+    "turns": 9.1
+   },
+   "neverGuard": {
+    "winPct": 100,
+    "turns": 9.1
+   }
+  },
+  "lanternorchard": {
+   "marginLevel": 12,
+   "auto": {
+    "winPct": 90.8,
+    "turns": 13
+   },
+   "neverHeal": {
+    "winPct": 90.8,
+    "turns": 13
+   },
+   "neverGuard": {
+    "winPct": 90.8,
+    "turns": 13
+   }
+  },
+  "heartwood": {
+   "marginLevel": 17,
+   "auto": {
+    "winPct": 47.3,
+    "turns": 12.7
+   },
+   "neverHeal": {
+    "winPct": 47.3,
+    "turns": 12.7
+   },
+   "neverGuard": {
+    "winPct": 47.3,
+    "turns": 12.7
+   }
+  }
+ },
+ "statusMargin": {
+  "gatheringhall": {
+   "statusTeam": {
+    "lv": 4,
+    "all": 100,
+    "noBurn": 100,
+    "noStun": 100,
+    "noSoak": 100,
+    "noneAtAll": 100
+   },
+   "weakenTeam": {
+    "lv": 5,
+    "all": 100,
+    "usesWeakenMoves": 100,
+    "noWeaken": 100
+   }
+  },
+  "drownedsteps": {
+   "statusTeam": {
+    "lv": 7,
+    "all": 38.5,
+    "noBurn": 0,
+    "noStun": 35.8,
+    "noSoak": 39,
+    "noneAtAll": 0.3
+   },
+   "weakenTeam": {
+    "lv": 8,
+    "all": 97.5,
+    "usesWeakenMoves": 100,
+    "noWeaken": 97.5
+   }
+  },
+  "lanternorchard": {
+   "statusTeam": {
+    "lv": 12,
+    "all": 77.5,
+    "noBurn": 61,
+    "noStun": 75.5,
+    "noSoak": 77.8,
+    "noneAtAll": 57.8
+   },
+   "weakenTeam": {
+    "lv": 12,
+    "all": 92.3,
+    "usesWeakenMoves": 92.3,
+    "noWeaken": 92.3
+   }
+  },
+  "heartwood": {
+   "statusTeam": {
+    "lv": 16,
+    "all": 44.5,
+    "noBurn": 5,
+    "noStun": 44.5,
+    "noSoak": 44.3,
+    "noneAtAll": 5
+   },
+   "weakenTeam": {
+    "lv": 16,
+    "all": 27.5,
+    "usesWeakenMoves": 27.5,
+    "noWeaken": 27.5
+   }
+  }
+ },
+ "synergyMargin": {
+  "triangle": {
+   "lv": 12,
+   "with": 95,
+   "without": 85.8
+  },
+  "kindredFire": {
+   "lv": 12,
+   "with": 96.5,
+   "without": 91.3
+  },
+  "twilight": {
+   "lv": 12,
+   "with": 94.8,
+   "without": 68.5
+  },
+  "triangleKiln": {
+   "lv": 11,
+   "with": 68.3,
+   "without": 48.5
+  }
+ },
+ "counter": {
+  "forgottenroad": {
+   "bossEl": "earth",
+   "level": 2,
+   "byElement": {
+    "light": 85,
+    "dark": 52.5,
+    "nature": 100,
+    "fire": 86.5,
+    "water": 100,
+    "earth": 75,
+    "wind": 0,
+    "resonance": 70.5,
+    "metal": 100
+   }
+  },
+  "gatheringhall": {
+   "bossEl": "dark",
+   "level": 4,
+   "byElement": {
+    "light": 0.5,
+    "dark": 88,
+    "nature": 1.5,
+    "fire": 100,
+    "water": 99.5,
+    "earth": 100,
+    "wind": 32.5,
+    "resonance": 23,
+    "metal": 100
+   }
+  },
+  "reliquary": {
+   "bossEl": "earth",
+   "level": 5,
+   "byElement": {
+    "light": 0,
+    "dark": 5,
+    "nature": 93,
+    "fire": 72.5,
+    "water": 100,
+    "earth": 30,
+    "wind": 0,
+    "resonance": 0.5,
+    "metal": 100
+   }
+  },
+  "drownedsteps": {
+   "bossEl": "water",
+   "level": 6,
+   "byElement": {
+    "light": 34.5,
+    "dark": 10.5,
+    "nature": 100,
+    "fire": 5,
+    "water": 89.5,
+    "earth": 3.5,
+    "wind": 0,
+    "resonance": 14.5,
+    "metal": 0
+   }
+  },
+  "coldkiln": {
+   "bossEl": "earth",
+   "level": 11,
+   "byElement": {
+    "light": 0,
+    "dark": 0,
+    "nature": 2,
+    "fire": 47.5,
+    "water": 100,
+    "earth": 6,
+    "wind": 0,
+    "resonance": 0,
+    "metal": 0
+   }
+  },
+  "hollowveil": {
+   "bossEl": "metal",
+   "level": 11,
+   "byElement": {
+    "light": 0,
+    "dark": 0,
+    "nature": 0,
+    "fire": 100,
+    "water": 100,
+    "earth": 0.5,
+    "wind": 0,
+    "resonance": 0,
+    "metal": 1.5
+   }
+  },
+  "lanternorchard": {
+   "bossEl": "light",
+   "level": 12,
+   "byElement": {
+    "light": 56,
+    "dark": 95.5,
+    "nature": 63.5,
+    "fire": 100,
+    "water": 67.5,
+    "earth": 94.5,
+    "wind": 99.5,
+    "resonance": 43,
+    "metal": 100
+   }
+  },
+  "windstair": {
+   "bossEl": "fire",
+   "level": 12,
+   "byElement": {
+    "light": 7,
+    "dark": 0,
+    "nature": 0,
+    "fire": 94.5,
+    "water": 100,
+    "earth": 98.5,
+    "wind": 0,
+    "resonance": 5,
+    "metal": 0
+   }
+  },
+  "resonancescar": {
+   "bossEl": "resonance",
+   "level": 14,
+   "byElement": {
+    "light": 96,
+    "dark": 0,
+    "nature": 17.5,
+    "fire": 100,
+    "water": 19.5,
+    "earth": 100,
+    "wind": 0,
+    "resonance": 20.5,
+    "metal": 100
+   }
+  },
+  "heartwood": {
+   "bossEl": "nature",
+   "level": 18,
+   "byElement": {
+    "light": 100,
+    "dark": 100,
+    "nature": 100,
+    "fire": 100,
+    "water": 4.5,
+    "earth": 20.5,
+    "wind": 72.5,
+    "resonance": 94,
+    "metal": 100
+   }
+  }
+ }
+}

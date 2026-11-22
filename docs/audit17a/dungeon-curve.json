@@ -1,0 +1,1162 @@
+[
+ {
+  "dungeon": "forgottenroad",
+  "rec": 4,
+  "battles": [
+   {
+    "i": 0,
+    "lv": 2,
+    "sp": "gaiaroki",
+    "boss": false,
+    "hp": 53,
+    "atk": 14,
+    "power": 0.83,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 1,
+    "lv": 2,
+    "sp": "terraflora",
+    "boss": false,
+    "hp": 51,
+    "atk": 13,
+    "power": 0.74,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 2,
+    "lv": 3,
+    "sp": "gaiaroki",
+    "boss": false,
+    "hp": 58,
+    "atk": 15,
+    "power": 0.97,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 3,
+    "lv": 3,
+    "sp": "acinus",
+    "boss": false,
+    "hp": 63,
+    "atk": 12,
+    "power": 0.84,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 4,
+    "lv": 3,
+    "sp": "gaiaroki",
+    "boss": false,
+    "hp": 58,
+    "atk": 15,
+    "power": 0.97,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 5,
+    "lv": 3,
+    "sp": "acinus",
+    "boss": false,
+    "hp": 63,
+    "atk": 12,
+    "power": 0.84,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 6,
+    "lv": 4,
+    "sp": "sylvaneer",
+    "boss": false,
+    "hp": 55,
+    "atk": 15,
+    "power": 0.92,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 7,
+    "lv": 4,
+    "sp": "gaiaroki",
+    "boss": false,
+    "hp": 63,
+    "atk": 17,
+    "power": 1.19,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 8,
+    "lv": 4,
+    "sp": "sylvaneer",
+    "boss": false,
+    "hp": 55,
+    "atk": 15,
+    "power": 0.92,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 9,
+    "lv": 4,
+    "sp": "gaiaroki",
+    "boss": true,
+    "hp": 82,
+    "atk": 17,
+    "power": 1.55,
+    "move": null,
+    "mech": "barrier"
+   }
+  ]
+ },
+ {
+  "dungeon": "gatheringhall",
+  "rec": 5,
+  "battles": [
+   {
+    "i": 0,
+    "lv": 3,
+    "sp": "acinus",
+    "boss": false,
+    "hp": 63,
+    "atk": 12,
+    "power": 0.73,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 1,
+    "lv": 3,
+    "sp": "gaiaroki",
+    "boss": false,
+    "hp": 58,
+    "atk": 15,
+    "power": 0.84,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 2,
+    "lv": 4,
+    "sp": "voltar",
+    "boss": false,
+    "hp": 61,
+    "atk": 15,
+    "power": 0.88,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 3,
+    "lv": 4,
+    "sp": "voltar",
+    "boss": false,
+    "hp": 61,
+    "atk": 15,
+    "power": 0.88,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 4,
+    "lv": 4,
+    "sp": "voltar",
+    "boss": false,
+    "hp": 61,
+    "atk": 15,
+    "power": 0.88,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 5,
+    "lv": 4,
+    "sp": "voltar",
+    "boss": false,
+    "hp": 61,
+    "atk": 15,
+    "power": 0.88,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 6,
+    "lv": 5,
+    "sp": "terraflora",
+    "boss": false,
+    "hp": 66,
+    "atk": 17,
+    "power": 1.08,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 7,
+    "lv": 5,
+    "sp": "acinus",
+    "boss": false,
+    "hp": 74,
+    "atk": 14,
+    "power": 1,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 8,
+    "lv": 5,
+    "sp": "terraflora",
+    "boss": false,
+    "hp": 66,
+    "atk": 17,
+    "power": 1.08,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 9,
+    "lv": 7,
+    "sp": "voltar",
+    "boss": true,
+    "hp": 118,
+    "atk": 19,
+    "power": 2.16,
+    "move": "lampsout",
+    "mech": null
+   }
+  ]
+ },
+ {
+  "dungeon": "reliquary",
+  "rec": 6,
+  "battles": [
+   {
+    "i": 0,
+    "lv": 3,
+    "sp": "acinus",
+    "boss": false,
+    "hp": 63,
+    "atk": 12,
+    "power": 0.63,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 1,
+    "lv": 3,
+    "sp": "gaiaroki",
+    "boss": false,
+    "hp": 58,
+    "atk": 15,
+    "power": 0.72,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 2,
+    "lv": 4,
+    "sp": "acinus",
+    "boss": false,
+    "hp": 69,
+    "atk": 13,
+    "power": 0.75,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 3,
+    "lv": 4,
+    "sp": "terraflora",
+    "boss": false,
+    "hp": 61,
+    "atk": 15,
+    "power": 0.76,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 4,
+    "lv": 4,
+    "sp": "acinus",
+    "boss": false,
+    "hp": 69,
+    "atk": 13,
+    "power": 0.75,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 5,
+    "lv": 4,
+    "sp": "terraflora",
+    "boss": false,
+    "hp": 61,
+    "atk": 15,
+    "power": 0.76,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 6,
+    "lv": 5,
+    "sp": "sylvaneer",
+    "boss": false,
+    "hp": 60,
+    "atk": 17,
+    "power": 0.85,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 7,
+    "lv": 5,
+    "sp": "acinus",
+    "boss": false,
+    "hp": 74,
+    "atk": 14,
+    "power": 0.86,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 8,
+    "lv": 5,
+    "sp": "sylvaneer",
+    "boss": false,
+    "hp": 60,
+    "atk": 17,
+    "power": 0.85,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 9,
+    "lv": 6,
+    "sp": "terraki",
+    "boss": true,
+    "hp": 116,
+    "atk": 27,
+    "power": 2.61,
+    "move": "rootcrush",
+    "mech": null
+   }
+  ]
+ },
+ {
+  "dungeon": "drownedsteps",
+  "rec": 8,
+  "battles": [
+   {
+    "i": 0,
+    "lv": 6,
+    "sp": "cannonis",
+    "boss": false,
+    "hp": 80,
+    "atk": 15,
+    "power": 0.77,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 1,
+    "lv": 6,
+    "sp": "sylvaneer",
+    "boss": false,
+    "hp": 65,
+    "atk": 18,
+    "power": 0.75,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 2,
+    "lv": 7,
+    "sp": "gaiaroki",
+    "boss": false,
+    "hp": 79,
+    "atk": 21,
+    "power": 1.06,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 3,
+    "lv": 7,
+    "sp": "kairyu",
+    "boss": false,
+    "hp": 69,
+    "atk": 19,
+    "power": 0.84,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 4,
+    "lv": 7,
+    "sp": "gaiaroki",
+    "boss": false,
+    "hp": 79,
+    "atk": 21,
+    "power": 1.06,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 5,
+    "lv": 7,
+    "sp": "kairyu",
+    "boss": false,
+    "hp": 69,
+    "atk": 19,
+    "power": 0.84,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 6,
+    "lv": 8,
+    "sp": "cannonis",
+    "boss": false,
+    "hp": 92,
+    "atk": 17,
+    "power": 1,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 7,
+    "lv": 8,
+    "sp": "cannonis",
+    "boss": false,
+    "hp": 92,
+    "atk": 17,
+    "power": 1,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 8,
+    "lv": 8,
+    "sp": "cannonis",
+    "boss": false,
+    "hp": 92,
+    "atk": 17,
+    "power": 1,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 9,
+    "lv": 10,
+    "sp": "kairyu",
+    "boss": true,
+    "hp": 125,
+    "atk": 23,
+    "power": 1.84,
+    "move": "undertow",
+    "mech": null
+   }
+  ]
+ },
+ {
+  "dungeon": "coldkiln",
+  "rec": 10,
+  "battles": [
+   {
+    "i": 0,
+    "lv": 8,
+    "sp": "pyrokai",
+    "boss": false,
+    "hp": 84,
+    "atk": 23,
+    "power": 0.99,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 1,
+    "lv": 8,
+    "sp": "emberix",
+    "boss": false,
+    "hp": 74,
+    "atk": 21,
+    "power": 0.79,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 2,
+    "lv": 9,
+    "sp": "igniflare",
+    "boss": false,
+    "hp": 90,
+    "atk": 24,
+    "power": 1.1,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 3,
+    "lv": 9,
+    "sp": "pyrocell",
+    "boss": false,
+    "hp": 97,
+    "atk": 18,
+    "power": 0.89,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 4,
+    "lv": 9,
+    "sp": "igniflare",
+    "boss": false,
+    "hp": 90,
+    "atk": 24,
+    "power": 1.1,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 5,
+    "lv": 9,
+    "sp": "pyrocell",
+    "boss": false,
+    "hp": 97,
+    "atk": 18,
+    "power": 0.89,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 6,
+    "lv": 10,
+    "sp": "pyrokai",
+    "boss": false,
+    "hp": 95,
+    "atk": 25,
+    "power": 1.21,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 7,
+    "lv": 10,
+    "sp": "pyrokai",
+    "boss": false,
+    "hp": 95,
+    "atk": 25,
+    "power": 1.21,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 8,
+    "lv": 10,
+    "sp": "pyrokai",
+    "boss": false,
+    "hp": 95,
+    "atk": 25,
+    "power": 1.21,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 9,
+    "lv": 12,
+    "sp": "pyroforge",
+    "boss": true,
+    "hp": 253,
+    "atk": 30,
+    "power": 3.88,
+    "move": "kilnflare",
+    "mech": null
+   }
+  ]
+ },
+ {
+  "dungeon": "hollowveil",
+  "rec": 12,
+  "battles": [
+   {
+    "i": 0,
+    "lv": 9,
+    "sp": "voltar",
+    "boss": false,
+    "hp": 86,
+    "atk": 22,
+    "power": 0.39,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 1,
+    "lv": 9,
+    "sp": "voltar2",
+    "boss": false,
+    "hp": 122,
+    "atk": 31,
+    "power": 0.77,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 2,
+    "lv": 10,
+    "sp": "zeep",
+    "boss": false,
+    "hp": 103,
+    "atk": 19,
+    "power": 0.4,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 3,
+    "lv": 10,
+    "sp": "zeep",
+    "boss": false,
+    "hp": 103,
+    "atk": 19,
+    "power": 0.4,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 4,
+    "lv": 11,
+    "sp": "zeep",
+    "boss": false,
+    "hp": 109,
+    "atk": 21,
+    "power": 0.47,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 5,
+    "lv": 11,
+    "sp": "zeep",
+    "boss": false,
+    "hp": 109,
+    "atk": 21,
+    "power": 0.47,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 6,
+    "lv": 11,
+    "sp": "duskmantle",
+    "boss": false,
+    "hp": 126,
+    "atk": 35,
+    "power": 0.9,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 7,
+    "lv": 12,
+    "sp": "voltar",
+    "boss": false,
+    "hp": 101,
+    "atk": 26,
+    "power": 0.54,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 8,
+    "lv": 12,
+    "sp": "duskmantle",
+    "boss": false,
+    "hp": 132,
+    "atk": 37,
+    "power": 1,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 9,
+    "lv": 13,
+    "sp": "zeep2",
+    "boss": true,
+    "hp": 205,
+    "atk": 32,
+    "power": 1.34,
+    "move": "unsaidverdict",
+    "mech": null
+   }
+  ]
+ },
+ {
+  "dungeon": "lanternorchard",
+  "rec": 14,
+  "battles": [
+   {
+    "i": 0,
+    "lv": 12,
+    "sp": "lumi",
+    "boss": false,
+    "hp": 101,
+    "atk": 26,
+    "power": 0.43,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 1,
+    "lv": 12,
+    "sp": "lumifern",
+    "boss": false,
+    "hp": 101,
+    "atk": 24,
+    "power": 0.4,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 2,
+    "lv": 13,
+    "sp": "lumi",
+    "boss": false,
+    "hp": 106,
+    "atk": 27,
+    "power": 0.47,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 3,
+    "lv": 13,
+    "sp": "igniflare",
+    "boss": false,
+    "hp": 111,
+    "atk": 30,
+    "power": 0.55,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 4,
+    "lv": 13,
+    "sp": "lumi",
+    "boss": false,
+    "hp": 106,
+    "atk": 27,
+    "power": 0.47,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 5,
+    "lv": 13,
+    "sp": "igniflare",
+    "boss": false,
+    "hp": 111,
+    "atk": 30,
+    "power": 0.55,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 6,
+    "lv": 14,
+    "sp": "aquaflora",
+    "boss": false,
+    "hp": 111,
+    "atk": 29,
+    "power": 0.53,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 7,
+    "lv": 14,
+    "sp": "lumi",
+    "boss": false,
+    "hp": 111,
+    "atk": 29,
+    "power": 0.53,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 8,
+    "lv": 14,
+    "sp": "aquaflora",
+    "boss": false,
+    "hp": 111,
+    "atk": 29,
+    "power": 0.53,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 9,
+    "lv": 16,
+    "sp": "lumi2",
+    "boss": true,
+    "hp": 275,
+    "atk": 45,
+    "power": 2.03,
+    "move": "lampglare",
+    "mech": null
+   }
+  ]
+ },
+ {
+  "dungeon": "windstair",
+  "rec": 16,
+  "battles": [
+   {
+    "i": 0,
+    "lv": 14,
+    "sp": "zephyr",
+    "boss": false,
+    "hp": 102,
+    "atk": 29,
+    "power": 0.41,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 1,
+    "lv": 14,
+    "sp": "igniflare",
+    "boss": false,
+    "hp": 116,
+    "atk": 31,
+    "power": 0.5,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 2,
+    "lv": 15,
+    "sp": "pyrohawk",
+    "boss": false,
+    "hp": 165,
+    "atk": 43,
+    "power": 0.98,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 3,
+    "lv": 15,
+    "sp": "pyrospark",
+    "boss": false,
+    "hp": 116,
+    "atk": 30,
+    "power": 0.48,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 4,
+    "lv": 15,
+    "sp": "pyrohawk",
+    "boss": false,
+    "hp": 165,
+    "atk": 43,
+    "power": 0.98,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 5,
+    "lv": 15,
+    "sp": "pyrospark",
+    "boss": false,
+    "hp": 116,
+    "atk": 30,
+    "power": 0.48,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 6,
+    "lv": 16,
+    "sp": "aeolus",
+    "boss": false,
+    "hp": 159,
+    "atk": 45,
+    "power": 0.99,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 7,
+    "lv": 16,
+    "sp": "zephyr",
+    "boss": false,
+    "hp": 111,
+    "atk": 31,
+    "power": 0.47,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 8,
+    "lv": 16,
+    "sp": "aeolus",
+    "boss": false,
+    "hp": 159,
+    "atk": 45,
+    "power": 0.99,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 9,
+    "lv": 18,
+    "sp": "pyrohawk",
+    "boss": true,
+    "hp": 307,
+    "atk": 48,
+    "power": 2.03,
+    "move": "galeforce",
+    "mech": null
+   }
+  ]
+ },
+ {
+  "dungeon": "resonancescar",
+  "rec": 18,
+  "battles": [
+   {
+    "i": 0,
+    "lv": 15,
+    "sp": "aimza",
+    "boss": false,
+    "hp": 116,
+    "atk": 30,
+    "power": 0.41,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 1,
+    "lv": 15,
+    "sp": "zeep2",
+    "boss": false,
+    "hp": 187,
+    "atk": 35,
+    "power": 0.77,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 2,
+    "lv": 16,
+    "sp": "aimza2",
+    "boss": false,
+    "hp": 172,
+    "atk": 45,
+    "power": 0.91,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 3,
+    "lv": 16,
+    "sp": "voltar2",
+    "boss": false,
+    "hp": 172,
+    "atk": 45,
+    "power": 0.91,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 4,
+    "lv": 17,
+    "sp": "aimza2",
+    "boss": false,
+    "hp": 179,
+    "atk": 46,
+    "power": 0.97,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 5,
+    "lv": 17,
+    "sp": "voltar2",
+    "boss": false,
+    "hp": 179,
+    "atk": 46,
+    "power": 0.97,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 6,
+    "lv": 17,
+    "sp": "aimza",
+    "boss": false,
+    "hp": 126,
+    "atk": 33,
+    "power": 0.49,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 7,
+    "lv": 18,
+    "sp": "aimza",
+    "boss": false,
+    "hp": 132,
+    "atk": 34,
+    "power": 0.53,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 8,
+    "lv": 18,
+    "sp": "aimza",
+    "boss": false,
+    "hp": 132,
+    "atk": 34,
+    "power": 0.53,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 9,
+    "lv": 20,
+    "sp": "aimza2",
+    "boss": true,
+    "hp": 250,
+    "atk": 52,
+    "power": 1.53,
+    "move": "resonantcollapse",
+    "mech": null
+   }
+  ]
+ },
+ {
+  "dungeon": "heartwood",
+  "rec": 20,
+  "battles": [
+   {
+    "i": 0,
+    "lv": 17,
+    "sp": "sylvaneer2",
+    "boss": false,
+    "hp": 165,
+    "atk": 46,
+    "power": 0.77,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 1,
+    "lv": 17,
+    "sp": "solarbloom",
+    "boss": false,
+    "hp": 179,
+    "atk": 44,
+    "power": 0.8,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 2,
+    "lv": 18,
+    "sp": "aimza2",
+    "boss": false,
+    "hp": 186,
+    "atk": 48,
+    "power": 0.91,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 3,
+    "lv": 18,
+    "sp": "sylvaneer2",
+    "boss": false,
+    "hp": 172,
+    "atk": 48,
+    "power": 0.84,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 4,
+    "lv": 19,
+    "sp": "duskmantle",
+    "boss": false,
+    "hp": 178,
+    "atk": 50,
+    "power": 0.91,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 5,
+    "lv": 19,
+    "sp": "reefback",
+    "boss": false,
+    "hp": 220,
+    "atk": 41,
+    "power": 0.92,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 6,
+    "lv": 19,
+    "sp": "terraki",
+    "boss": false,
+    "hp": 202,
+    "atk": 53,
+    "power": 1.09,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 7,
+    "lv": 20,
+    "sp": "duskmantle",
+    "boss": false,
+    "hp": 185,
+    "atk": 52,
+    "power": 0.98,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 8,
+    "lv": 20,
+    "sp": "sylvaneer2",
+    "boss": false,
+    "hp": 185,
+    "atk": 52,
+    "power": 0.98,
+    "move": null,
+    "mech": null
+   },
+   {
+    "i": 9,
+    "lv": 24,
+    "sp": "sylvaneer2",
+    "boss": true,
+    "hp": 464,
+    "atk": 60,
+    "power": 2.84,
+    "move": "prismfall",
+    "mech": "prism"
+   }
+  ]
+ }
+]

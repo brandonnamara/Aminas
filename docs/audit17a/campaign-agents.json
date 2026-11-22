@@ -1,0 +1,1375 @@
+[
+ {
+  "team": "triangle",
+  "mode": "full",
+  "log": [
+   {
+    "id": "forgottenroad",
+    "rec": 4,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 1,
+    "clearedAfterBattles": 10,
+    "minutes": 3,
+    "levels": [
+     10,
+     9,
+     9
+    ],
+    "gold": 541,
+    "food": 6,
+    "gems": 6,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "gatheringhall",
+    "rec": 5,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 2,
+    "clearedAfterBattles": 20,
+    "minutes": 5,
+    "levels": [
+     13,
+     13,
+     12
+    ],
+    "gold": 1063,
+    "food": 8,
+    "gems": 12,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "reliquary",
+    "rec": 6,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 4,
+    "clearedAfterBattles": 30,
+    "minutes": 6,
+    "levels": [
+     15,
+     15,
+     14
+    ],
+    "gold": 1542,
+    "food": 6,
+    "gems": 19,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "drownedsteps",
+    "rec": 8,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 5,
+    "clearedAfterBattles": 40,
+    "minutes": 8,
+    "levels": [
+     17,
+     17,
+     17
+    ],
+    "gold": 2324,
+    "food": 0,
+    "gems": 28,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "coldkiln",
+    "rec": 10,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 5,
+    "clearedAfterBattles": 50,
+    "minutes": 9,
+    "levels": [
+     20,
+     19,
+     19
+    ],
+    "gold": 3306,
+    "food": 6,
+    "gems": 39,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "hollowveil",
+    "rec": 12,
+    "rankNeed": 6,
+    "rankFromDungeonsAlone": 6,
+    "clearedAfterBattles": 60,
+    "minutes": 11,
+    "levels": [
+     22,
+     22,
+     21
+    ],
+    "gold": 4390,
+    "food": 7,
+    "gems": 55,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "lanternorchard",
+    "rec": 14,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 7,
+    "clearedAfterBattles": 70,
+    "minutes": 13,
+    "levels": [
+     24,
+     24,
+     23
+    ],
+    "gold": 5762,
+    "food": 6,
+    "gems": 69,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "windstair",
+    "rec": 16,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 7,
+    "clearedAfterBattles": 80,
+    "minutes": 15,
+    "levels": [
+     26,
+     26,
+     25
+    ],
+    "gold": 7374,
+    "food": 9,
+    "gems": 86,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "resonancescar",
+    "rec": 18,
+    "rankNeed": 9,
+    "rankFromDungeonsAlone": 8,
+    "clearedAfterBattles": 90,
+    "minutes": 17,
+    "levels": [
+     28,
+     28,
+     27
+    ],
+    "gold": 9341,
+    "food": 5,
+    "gems": 117,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "heartwood",
+    "rec": 20,
+    "rankNeed": 10,
+    "rankFromDungeonsAlone": 9,
+    "clearedAfterBattles": 100,
+    "minutes": 21,
+    "levels": [
+     30,
+     30,
+     29
+    ],
+    "gold": 12694,
+    "food": 6,
+    "gems": 162,
+    "losses": 0,
+    "replays": 0
+   }
+  ],
+  "essence": {
+   "light": 37,
+   "dark": 53,
+   "nature": 67,
+   "fire": 63,
+   "water": 42,
+   "earth": 60,
+   "wind": 16,
+   "resonance": 45,
+   "metal": 28
+  },
+  "items": 10,
+  "rank": 11
+ },
+ {
+  "team": "triangle",
+  "mode": "noFeed",
+  "log": [
+   {
+    "id": "forgottenroad",
+    "rec": 4,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 1,
+    "clearedAfterBattles": 10,
+    "minutes": 3,
+    "levels": [
+     6,
+     7,
+     7
+    ],
+    "gold": 541,
+    "food": 146,
+    "gems": 6,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "gatheringhall",
+    "rec": 5,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 2,
+    "clearedAfterBattles": 20,
+    "minutes": 6,
+    "levels": [
+     10,
+     10,
+     10
+    ],
+    "gold": 1063,
+    "food": 268,
+    "gems": 12,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "reliquary",
+    "rec": 6,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 4,
+    "clearedAfterBattles": 30,
+    "minutes": 8,
+    "levels": [
+     12,
+     12,
+     12
+    ],
+    "gold": 1362,
+    "food": 331,
+    "gems": 19,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "drownedsteps",
+    "rec": 8,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 5,
+    "clearedAfterBattles": 40,
+    "minutes": 9,
+    "levels": [
+     14,
+     14,
+     14
+    ],
+    "gold": 2144,
+    "food": 485,
+    "gems": 28,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "coldkiln",
+    "rec": 10,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 6,
+    "clearedAfterBattles": 50,
+    "minutes": 10,
+    "levels": [
+     16,
+     16,
+     16
+    ],
+    "gold": 3126,
+    "food": 671,
+    "gems": 39,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "hollowveil",
+    "rec": 12,
+    "rankNeed": 6,
+    "rankFromDungeonsAlone": 6,
+    "clearedAfterBattles": 60,
+    "minutes": 12,
+    "levels": [
+     18,
+     18,
+     18
+    ],
+    "gold": 4210,
+    "food": 872,
+    "gems": 55,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "lanternorchard",
+    "rec": 14,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 7,
+    "clearedAfterBattles": 70,
+    "minutes": 14,
+    "levels": [
+     20,
+     20,
+     20
+    ],
+    "gold": 5582,
+    "food": 1121,
+    "gems": 69,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "windstair",
+    "rec": 16,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 8,
+    "clearedAfterBattles": 80,
+    "minutes": 15,
+    "levels": [
+     21,
+     21,
+     21
+    ],
+    "gold": 7194,
+    "food": 1414,
+    "gems": 86,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "resonancescar",
+    "rec": 18,
+    "rankNeed": 9,
+    "rankFromDungeonsAlone": 8,
+    "clearedAfterBattles": 90,
+    "minutes": 17,
+    "levels": [
+     23,
+     23,
+     23
+    ],
+    "gold": 8681,
+    "food": 1670,
+    "gems": 117,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "heartwood",
+    "rec": 20,
+    "rankNeed": 10,
+    "rankFromDungeonsAlone": 10,
+    "clearedAfterBattles": 100,
+    "minutes": 20,
+    "levels": [
+     25,
+     25,
+     25
+    ],
+    "gold": 12034,
+    "food": 2281,
+    "gems": 162,
+    "losses": 0,
+    "replays": 0
+   }
+  ],
+  "essence": {
+   "light": 37,
+   "dark": 53,
+   "nature": 67,
+   "fire": 63,
+   "water": 42,
+   "earth": 60,
+   "wind": 16,
+   "resonance": 45,
+   "metal": 28
+  },
+  "items": 10,
+  "rank": 10
+ },
+ {
+  "team": "starter",
+  "mode": "full",
+  "log": [
+   {
+    "id": "forgottenroad",
+    "rec": 4,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 1,
+    "clearedAfterBattles": 10,
+    "minutes": 3,
+    "levels": [
+     10,
+     9,
+     9
+    ],
+    "gold": 541,
+    "food": 6,
+    "gems": 6,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "gatheringhall",
+    "rec": 5,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 2,
+    "clearedAfterBattles": 20,
+    "minutes": 5,
+    "levels": [
+     13,
+     13,
+     12
+    ],
+    "gold": 1063,
+    "food": 8,
+    "gems": 12,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "reliquary",
+    "rec": 6,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 4,
+    "clearedAfterBattles": 30,
+    "minutes": 6,
+    "levels": [
+     15,
+     15,
+     15
+    ],
+    "gold": 1542,
+    "food": 6,
+    "gems": 19,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "drownedsteps",
+    "rec": 8,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 5,
+    "clearedAfterBattles": 40,
+    "minutes": 8,
+    "levels": [
+     18,
+     17,
+     17
+    ],
+    "gold": 2324,
+    "food": 0,
+    "gems": 28,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "coldkiln",
+    "rec": 10,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 5,
+    "clearedAfterBattles": 50,
+    "minutes": 10,
+    "levels": [
+     20,
+     19,
+     19
+    ],
+    "gold": 3306,
+    "food": 6,
+    "gems": 39,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "hollowveil",
+    "rec": 12,
+    "rankNeed": 6,
+    "rankFromDungeonsAlone": 6,
+    "clearedAfterBattles": 60,
+    "minutes": 13,
+    "levels": [
+     22,
+     22,
+     21
+    ],
+    "gold": 4390,
+    "food": 7,
+    "gems": 55,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "lanternorchard",
+    "rec": 14,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 7,
+    "clearedAfterBattles": 70,
+    "minutes": 15,
+    "levels": [
+     24,
+     24,
+     23
+    ],
+    "gold": 5762,
+    "food": 6,
+    "gems": 69,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "windstair",
+    "rec": 16,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 7,
+    "clearedAfterBattles": 80,
+    "minutes": 18,
+    "levels": [
+     26,
+     26,
+     25
+    ],
+    "gold": 7374,
+    "food": 9,
+    "gems": 86,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "resonancescar",
+    "rec": 18,
+    "rankNeed": 9,
+    "rankFromDungeonsAlone": 8,
+    "clearedAfterBattles": 90,
+    "minutes": 21,
+    "levels": [
+     28,
+     28,
+     27
+    ],
+    "gold": 9341,
+    "food": 5,
+    "gems": 117,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "heartwood",
+    "rec": 20,
+    "rankNeed": 10,
+    "rankFromDungeonsAlone": 9,
+    "clearedAfterBattles": 101,
+    "minutes": 26,
+    "levels": [
+     30,
+     30,
+     29
+    ],
+    "gold": 12694,
+    "food": 1,
+    "gems": 162,
+    "losses": 1,
+    "replays": 0
+   }
+  ],
+  "essence": {
+   "light": 37,
+   "dark": 53,
+   "nature": 67,
+   "fire": 63,
+   "water": 42,
+   "earth": 60,
+   "wind": 16,
+   "resonance": 45,
+   "metal": 28
+  },
+  "items": 10,
+  "rank": 11
+ },
+ {
+  "team": "starter",
+  "mode": "noFeed",
+  "log": [
+   {
+    "id": "forgottenroad",
+    "rec": 4,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 1,
+    "clearedAfterBattles": 10,
+    "minutes": 3,
+    "levels": [
+     7,
+     7,
+     7
+    ],
+    "gold": 541,
+    "food": 146,
+    "gems": 6,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "gatheringhall",
+    "rec": 5,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 2,
+    "clearedAfterBattles": 20,
+    "minutes": 5,
+    "levels": [
+     10,
+     10,
+     10
+    ],
+    "gold": 1063,
+    "food": 268,
+    "gems": 12,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "reliquary",
+    "rec": 6,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 4,
+    "clearedAfterBattles": 30,
+    "minutes": 7,
+    "levels": [
+     12,
+     12,
+     12
+    ],
+    "gold": 1362,
+    "food": 331,
+    "gems": 19,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "drownedsteps",
+    "rec": 8,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 5,
+    "clearedAfterBattles": 40,
+    "minutes": 8,
+    "levels": [
+     14,
+     14,
+     14
+    ],
+    "gold": 2144,
+    "food": 485,
+    "gems": 28,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "coldkiln",
+    "rec": 10,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 6,
+    "clearedAfterBattles": 50,
+    "minutes": 10,
+    "levels": [
+     16,
+     16,
+     16
+    ],
+    "gold": 3126,
+    "food": 671,
+    "gems": 39,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "hollowveil",
+    "rec": 12,
+    "rankNeed": 6,
+    "rankFromDungeonsAlone": 6,
+    "clearedAfterBattles": 60,
+    "minutes": 12,
+    "levels": [
+     18,
+     18,
+     18
+    ],
+    "gold": 4210,
+    "food": 872,
+    "gems": 55,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "lanternorchard",
+    "rec": 14,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 7,
+    "clearedAfterBattles": 70,
+    "minutes": 13,
+    "levels": [
+     20,
+     20,
+     20
+    ],
+    "gold": 5582,
+    "food": 1121,
+    "gems": 69,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "windstair",
+    "rec": 16,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 8,
+    "clearedAfterBattles": 80,
+    "minutes": 15,
+    "levels": [
+     21,
+     21,
+     21
+    ],
+    "gold": 7194,
+    "food": 1414,
+    "gems": 86,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "resonancescar",
+    "rec": 18,
+    "rankNeed": 9,
+    "rankFromDungeonsAlone": 8,
+    "clearedAfterBattles": 90,
+    "minutes": 16,
+    "levels": [
+     23,
+     23,
+     23
+    ],
+    "gold": 8681,
+    "food": 1670,
+    "gems": 117,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "heartwood",
+    "rec": 20,
+    "rankNeed": 10,
+    "rankFromDungeonsAlone": 10,
+    "clearedAfterBattles": 100,
+    "minutes": 18,
+    "levels": [
+     25,
+     25,
+     25
+    ],
+    "gold": 12034,
+    "food": 2281,
+    "gems": 162,
+    "losses": 0,
+    "replays": 0
+   }
+  ],
+  "essence": {
+   "light": 37,
+   "dark": 53,
+   "nature": 67,
+   "fire": 63,
+   "water": 42,
+   "earth": 60,
+   "wind": 16,
+   "resonance": 45,
+   "metal": 28
+  },
+  "items": 10,
+  "rank": 10
+ },
+ {
+  "team": "kindredFire",
+  "mode": "full",
+  "log": [
+   {
+    "id": "forgottenroad",
+    "rec": 4,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 1,
+    "clearedAfterBattles": 10,
+    "minutes": 2,
+    "levels": [
+     10,
+     9,
+     9
+    ],
+    "gold": 541,
+    "food": 6,
+    "gems": 6,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "gatheringhall",
+    "rec": 5,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 2,
+    "clearedAfterBattles": 20,
+    "minutes": 3,
+    "levels": [
+     13,
+     13,
+     12
+    ],
+    "gold": 1063,
+    "food": 8,
+    "gems": 12,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "reliquary",
+    "rec": 6,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 4,
+    "clearedAfterBattles": 30,
+    "minutes": 4,
+    "levels": [
+     15,
+     15,
+     15
+    ],
+    "gold": 1542,
+    "food": 6,
+    "gems": 19,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "drownedsteps",
+    "rec": 8,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 5,
+    "clearedAfterBattles": 40,
+    "minutes": 5,
+    "levels": [
+     18,
+     17,
+     17
+    ],
+    "gold": 2324,
+    "food": 0,
+    "gems": 28,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "coldkiln",
+    "rec": 10,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 5,
+    "clearedAfterBattles": 50,
+    "minutes": 6,
+    "levels": [
+     20,
+     19,
+     19
+    ],
+    "gold": 3306,
+    "food": 6,
+    "gems": 39,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "hollowveil",
+    "rec": 12,
+    "rankNeed": 6,
+    "rankFromDungeonsAlone": 6,
+    "clearedAfterBattles": 60,
+    "minutes": 8,
+    "levels": [
+     22,
+     22,
+     21
+    ],
+    "gold": 4390,
+    "food": 7,
+    "gems": 55,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "lanternorchard",
+    "rec": 14,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 7,
+    "clearedAfterBattles": 70,
+    "minutes": 9,
+    "levels": [
+     24,
+     24,
+     23
+    ],
+    "gold": 5762,
+    "food": 6,
+    "gems": 69,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "windstair",
+    "rec": 16,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 7,
+    "clearedAfterBattles": 80,
+    "minutes": 11,
+    "levels": [
+     26,
+     26,
+     25
+    ],
+    "gold": 7374,
+    "food": 9,
+    "gems": 86,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "resonancescar",
+    "rec": 18,
+    "rankNeed": 9,
+    "rankFromDungeonsAlone": 8,
+    "clearedAfterBattles": 90,
+    "minutes": 13,
+    "levels": [
+     28,
+     28,
+     27
+    ],
+    "gold": 9341,
+    "food": 5,
+    "gems": 117,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "heartwood",
+    "rec": 20,
+    "rankNeed": 10,
+    "rankFromDungeonsAlone": 9,
+    "clearedAfterBattles": 100,
+    "minutes": 15,
+    "levels": [
+     30,
+     30,
+     30
+    ],
+    "gold": 12694,
+    "food": 6,
+    "gems": 162,
+    "losses": 0,
+    "replays": 0
+   }
+  ],
+  "essence": {
+   "light": 37,
+   "dark": 53,
+   "nature": 67,
+   "fire": 63,
+   "water": 42,
+   "earth": 60,
+   "wind": 16,
+   "resonance": 45,
+   "metal": 28
+  },
+  "items": 10,
+  "rank": 11
+ },
+ {
+  "team": "kindredFire",
+  "mode": "noFeed",
+  "log": [
+   {
+    "id": "forgottenroad",
+    "rec": 4,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 1,
+    "clearedAfterBattles": 10,
+    "minutes": 2,
+    "levels": [
+     7,
+     7,
+     7
+    ],
+    "gold": 541,
+    "food": 146,
+    "gems": 6,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "gatheringhall",
+    "rec": 5,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 2,
+    "clearedAfterBattles": 20,
+    "minutes": 3,
+    "levels": [
+     10,
+     10,
+     10
+    ],
+    "gold": 1063,
+    "food": 268,
+    "gems": 12,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "reliquary",
+    "rec": 6,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 4,
+    "clearedAfterBattles": 30,
+    "minutes": 4,
+    "levels": [
+     12,
+     12,
+     12
+    ],
+    "gold": 1362,
+    "food": 331,
+    "gems": 19,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "drownedsteps",
+    "rec": 8,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 5,
+    "clearedAfterBattles": 40,
+    "minutes": 5,
+    "levels": [
+     14,
+     14,
+     14
+    ],
+    "gold": 2144,
+    "food": 485,
+    "gems": 28,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "coldkiln",
+    "rec": 10,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 6,
+    "clearedAfterBattles": 50,
+    "minutes": 7,
+    "levels": [
+     16,
+     16,
+     16
+    ],
+    "gold": 3126,
+    "food": 671,
+    "gems": 39,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "hollowveil",
+    "rec": 12,
+    "rankNeed": 6,
+    "rankFromDungeonsAlone": 6,
+    "clearedAfterBattles": 60,
+    "minutes": 8,
+    "levels": [
+     18,
+     18,
+     18
+    ],
+    "gold": 4210,
+    "food": 872,
+    "gems": 55,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "lanternorchard",
+    "rec": 14,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 7,
+    "clearedAfterBattles": 70,
+    "minutes": 9,
+    "levels": [
+     20,
+     20,
+     20
+    ],
+    "gold": 5582,
+    "food": 1121,
+    "gems": 69,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "windstair",
+    "rec": 16,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 8,
+    "clearedAfterBattles": 80,
+    "minutes": 10,
+    "levels": [
+     21,
+     21,
+     21
+    ],
+    "gold": 7194,
+    "food": 1414,
+    "gems": 86,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "resonancescar",
+    "rec": 18,
+    "rankNeed": 9,
+    "rankFromDungeonsAlone": 8,
+    "clearedAfterBattles": 90,
+    "minutes": 12,
+    "levels": [
+     23,
+     23,
+     23
+    ],
+    "gold": 8681,
+    "food": 1670,
+    "gems": 117,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "heartwood",
+    "rec": 20,
+    "rankNeed": 10,
+    "rankFromDungeonsAlone": 10,
+    "clearedAfterBattles": 100,
+    "minutes": 13,
+    "levels": [
+     25,
+     25,
+     25
+    ],
+    "gold": 12034,
+    "food": 2281,
+    "gems": 162,
+    "losses": 0,
+    "replays": 0
+   }
+  ],
+  "essence": {
+   "light": 37,
+   "dark": 53,
+   "nature": 67,
+   "fire": 63,
+   "water": 42,
+   "earth": 60,
+   "wind": 16,
+   "resonance": 45,
+   "metal": 28
+  },
+  "items": 10,
+  "rank": 10
+ },
+ {
+  "team": "solo",
+  "mode": "noFeed",
+  "log": [
+   {
+    "id": "forgottenroad",
+    "rec": 4,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 1,
+    "clearedAfterBattles": 10,
+    "minutes": 3,
+    "levels": [
+     7
+    ],
+    "gold": 541,
+    "food": 146,
+    "gems": 6,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "gatheringhall",
+    "rec": 5,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 2,
+    "clearedAfterBattles": 20,
+    "minutes": 5,
+    "levels": [
+     10
+    ],
+    "gold": 1063,
+    "food": 268,
+    "gems": 12,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "reliquary",
+    "rec": 6,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 3,
+    "clearedAfterBattles": 30,
+    "minutes": 7,
+    "levels": [
+     12
+    ],
+    "gold": 1482,
+    "food": 361,
+    "gems": 19,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "drownedsteps",
+    "rec": 8,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 4,
+    "clearedAfterBattles": 40,
+    "minutes": 8,
+    "levels": [
+     14
+    ],
+    "gold": 2264,
+    "food": 515,
+    "gems": 28,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "coldkiln",
+    "rec": 10,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 5,
+    "clearedAfterBattles": 50,
+    "minutes": 10,
+    "levels": [
+     16
+    ],
+    "gold": 3246,
+    "food": 701,
+    "gems": 39,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "hollowveil",
+    "rec": 12,
+    "rankNeed": 6,
+    "rankFromDungeonsAlone": 6,
+    "clearedAfterBattles": 60,
+    "minutes": 12,
+    "levels": [
+     18
+    ],
+    "gold": 4330,
+    "food": 902,
+    "gems": 55,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "lanternorchard",
+    "rec": 14,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 7,
+    "clearedAfterBattles": 70,
+    "minutes": 13,
+    "levels": [
+     20
+    ],
+    "gold": 5702,
+    "food": 1151,
+    "gems": 69,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "windstair",
+    "rec": 16,
+    "rankNeed": null,
+    "rankFromDungeonsAlone": 7,
+    "clearedAfterBattles": 80,
+    "minutes": 15,
+    "levels": [
+     21
+    ],
+    "gold": 7314,
+    "food": 1444,
+    "gems": 86,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "resonancescar",
+    "rec": 18,
+    "rankNeed": 9,
+    "rankFromDungeonsAlone": 8,
+    "clearedAfterBattles": 90,
+    "minutes": 16,
+    "levels": [
+     23
+    ],
+    "gold": 9121,
+    "food": 1780,
+    "gems": 117,
+    "losses": 0,
+    "replays": 0
+   },
+   {
+    "id": "heartwood",
+    "rec": 20,
+    "rankNeed": 10,
+    "rankFromDungeonsAlone": 9,
+    "clearedAfterBattles": 100,
+    "minutes": 18,
+    "levels": [
+     25
+    ],
+    "gold": 12474,
+    "food": 2391,
+    "gems": 162,
+    "losses": 0,
+    "replays": 0
+   }
+  ],
+  "essence": {
+   "light": 37,
+   "dark": 53,
+   "nature": 67,
+   "fire": 63,
+   "water": 42,
+   "earth": 60,
+   "wind": 16,
+   "resonance": 45,
+   "metal": 28
+  },
+  "items": 10,
+  "rank": 11
+ }
+]
