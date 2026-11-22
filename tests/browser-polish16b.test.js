@@ -26,6 +26,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms)); const SHOTS = proce
   const parsed = await ev((t) => { const p = A.SaveFile.parse(t); return { ok: p.ok, name: p.summary && p.summary.name, gold: p.summary && p.summary.gold, same: p.ok && JSON.stringify(p.st.aminas) === JSON.stringify(A.State.hydrate(JSON.parse(JSON.stringify(A.State.state))).st.aminas) && JSON.stringify(p.st.res) === JSON.stringify(A.State.state.res) }; }, text);
   ok(parsed.ok && parsed.name === 'Rowan' && parsed.gold === 1234 && parsed.same, 'the downloaded file is a complete, valid save of this game');
   await sleep(400); await shot('save-02-exported');
+  ok(await ev(() => /Save file/.test((document.querySelector('.sf16 h2') || {}).textContent || '') && !!document.querySelector('#sf-copy') && /asked to save/.test(document.querySelector('.sf16').textContent)), 'after exporting, a sheet says which file was saved and offers Copy save text (a page cannot confirm the browser kept it)');
 
   /* ---------------- 2. import: malformed and incompatible files are refused safely ---------------- */
   const pick = async (name, content) => { const f = path.join(tmp, name); fs.writeFileSync(f, content); await ev(() => { A.UI.closeAll(); A.UI.sfPick = A.UI.sfPick; }); await ev(() => A.UI.sfPick()); await page.setInputFiles('#sf-file', f); await sleep(500); };
@@ -78,14 +79,14 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms)); const SHOTS = proce
   for (const sz of ['normal', 'large', 'larger']) {
     await ev((sz) => { A.State.state.settings.textSize = sz; A.State.state.settings.textSpeed = 'instant'; A.UI.applyTextSize(); }, sz);
     await ev((t) => A.UI.script([['n', t]], () => {}), long); await sleep(500);
-    sizes[sz] = await ev(() => { const box = document.querySelector('.dlg .dlg-box').getBoundingClientRect(), tx = document.querySelector('.dlg .dlg-text'), ctl = [...document.querySelectorAll('.dlg .dlg-ctl .btn')].map((b) => b.getBoundingClientRect());
+    sizes[sz] = await ev(() => { const d = [...document.querySelectorAll('.dlg:not(.out)')].pop(), box = d.querySelector('.dlg-box').getBoundingClientRect(), tx = d.querySelector('.dlg-text'), ctl = [...d.querySelectorAll('.dlg-ctl .btn')].map((b) => b.getBoundingClientRect());
       const hit = ctl.some((c) => !(c.right <= box.left || c.left >= box.right || c.bottom <= box.top || c.top >= box.bottom));
-      return { font: parseFloat(getComputedStyle(tx).fontSize), full: tx.textContent.length, inView: box.top >= 0 && box.bottom <= innerHeight + 1, hit, aa: !!document.querySelector('.dlg .tsz16') }; });
+      return { font: parseFloat(getComputedStyle(tx).fontSize), full: tx.textContent.length, inView: box.top >= 0 && box.bottom <= innerHeight + 1, hit, aa: !!d.querySelector('.tsz16'), dlgs: document.querySelectorAll('.dlg').length }; });
     await shot('dialogue-' + sz); await tidy();
   }
   ok(sizes.normal.font < sizes.large.font && sizes.large.font < sizes.larger.font, 'Dialogue text size: standard ' + sizes.normal.font + ' px, large ' + sizes.large.font + ' px, larger ' + sizes.larger.font + ' px');
   ok(['normal', 'large', 'larger'].every((k) => !sizes[k].hit && sizes[k].inView), 'at every size the panel stays on screen and never covers Aa, Auto or Skip');
-  ok(['normal', 'large', 'larger'].every((k) => sizes[k].full === long.length), 'Instant shows the whole line at once');
+  ok(['normal', 'large', 'larger'].every((k) => sizes[k].full === long.length), 'Instant shows the whole line at once (' + ['normal', 'large', 'larger'].map((k) => sizes[k].full + '/' + long.length).join(', ') + ')');
   ok(sizes.normal.aa, 'every dialogue panel has an Aa button');
   await ev(() => { A.State.state.settings.textSize = 'normal'; A.State.state.settings.textSpeed = 'normal'; A.UI.applyTextSize(); A.UI.script([['n', 'Text size?']], () => {}); }); await sleep(400);
   await ev(() => document.querySelector('.dlg .tsz16').click());

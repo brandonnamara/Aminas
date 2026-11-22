@@ -273,31 +273,31 @@
     "act": "colSet"
    },
    {
-    "w": 60,
+    "w": 62,
     "h": 27,
     "t": "Light 1/6",
     "act": "colSet"
    },
    {
-    "w": 58,
+    "w": 61,
     "h": 27,
     "t": "Dark 1/6",
     "act": "colSet"
    },
    {
-    "w": 69,
+    "w": 71,
     "h": 27,
     "t": "Nature 1/9",
     "act": "colSet"
    },
    {
-    "w": 57,
+    "w": 60,
     "h": 27,
     "t": "Fire 1/12",
     "act": "colSet"
    },
    {
-    "w": 67,
+    "w": 70,
     "h": 27,
     "t": "Water 0/9",
     "act": "colSet"
@@ -345,7 +345,7 @@
     "act": "colSet"
    }
   ],
-  "tinyText": 50,
+  "tinyText": 41,
   "tinyList": [
    {
     "px": 9.5,
@@ -378,49 +378,49 @@
     "c": "span. < nbtn"
    },
    {
-    "px": 8.8,
-    "t": "1/6",
-    "c": "small. < fchip"
+    "px": 8.2,
+    "t": "#01",
+    "c": "span.dexno < card"
    },
    {
-    "px": 8.8,
-    "t": "1/6",
-    "c": "small. < fchip"
+    "px": 9.6,
+    "t": "Lv 12",
+    "c": "div.lvl < card"
    },
    {
-    "px": 8.8,
-    "t": "1/9",
-    "c": "small. < fchip"
+    "px": 8.2,
+    "t": "#02",
+    "c": "span.dexno < card"
    },
    {
-    "px": 8.8,
-    "t": "1/12",
-    "c": "small. < fchip"
+    "px": 9.6,
+    "t": "Undiscovered",
+    "c": "div.lvl < card"
    },
    {
-    "px": 8.8,
-    "t": "0/9",
-    "c": "small. < fchip"
+    "px": 8.2,
+    "t": "#03",
+    "c": "span.dexno < card"
    },
    {
-    "px": 8.8,
-    "t": "0/6",
-    "c": "small. < fchip"
+    "px": 9.6,
+    "t": "Undiscovered",
+    "c": "div.lvl < card"
    },
    {
-    "px": 8.8,
-    "t": "0/3",
-    "c": "small. < fchip"
+    "px": 8.2,
+    "t": "#04",
+    "c": "span.dexno < card"
    },
    {
-    "px": 8.8,
-    "t": "0/3",
-    "c": "small. < fchip"
+    "px": 9.6,
+    "t": "Lv 6",
+    "c": "div.lvl < card"
    },
    {
-    "px": 8.8,
-    "t": "0/9",
-    "c": "small. < fchip"
+    "px": 8.2,
+    "t": "#05",
+    "c": "span.dexno < card"
    }
   ],
   "clipped": [],
@@ -664,7 +664,7 @@
     "act": "hStart"
    }
   ],
-  "tinyText": 19,
+  "tinyText": 31,
   "tinyList": [
    {
     "px": 9.5,
@@ -702,44 +702,44 @@
     "c": "span.lv < "
    },
    {
-    "px": 9.6,
-    "t": "Next, Lv 2: +1 slot (2 in all)",
-    "c": "small. < hx-up-n"
+    "px": 9,
+    "t": "Idle",
+    "c": "span.hx-state.s-idle < "
    },
    {
     "px": 9.6,
-    "t": "+1 slot",
-    "c": "b.good < "
+    "t": "Breeding slots · 0 of 1 in use",
+    "c": "div.hx-cap < hx-left-col"
    },
    {
     "px": 9.6,
-    "t": "85%",
-    "c": "b.good < "
-   },
-   {
-    "px": 9.6,
-    "t": "500 · 2m",
-    "c": "small. < hx-up-n"
+    "t": "· 0 of 1 in use",
+    "c": "span.muted < hx-cap"
    },
    {
     "px": 9.3,
-    "t": "Egg",
-    "c": "small.muted < hx-out"
+    "t": "Empty: the next egg goes here",
+    "c": "small. < hx-sb"
    },
    {
-    "px": 9.8,
-    "t": "The egg is decided by the two ",
-    "c": "small.hx-note.muted < hx-breed"
+    "px": 9.3,
+    "t": "Opens at Hatchery Lv 2",
+    "c": "small. < hx-sb"
    },
    {
-    "px": 9.8,
-    "t": "Two different Aminas",
-    "c": "span. < wait"
+    "px": 9.3,
+    "t": "Opens at Hatchery Lv 3",
+    "c": "small. < hx-sb"
    },
    {
-    "px": 9.8,
-    "t": "Both level 5 or higher",
-    "c": "span. < wait"
+    "px": 9.3,
+    "t": "Opens at Hatchery Lv 4",
+    "c": "small. < hx-sb"
+   },
+   {
+    "px": 9.3,
+    "t": "Opens at Hatchery Lv 5",
+    "c": "small. < hx-sb"
    }
   ],
   "clipped": [],
@@ -1082,7 +1082,7 @@
     "act": "selNext"
    }
   ],
-  "tinyText": 19,
+  "tinyText": 9,
   "tinyList": [
    {
     "px": 9.5,
@@ -1115,49 +1115,19 @@
     "c": "span. < nbtn"
    },
    {
-    "px": 7.6,
-    "t": "BOSS",
-    "c": "small. < bn"
+    "px": 8.5,
+    "t": "The Waywarden: Stone Barrier (",
+    "c": "div.dn-move < dd-b"
    },
    {
-    "px": 9.6,
-    "t": "Overgrown Stones 258",
-    "c": "span.sec. < secs"
+    "px": 8.5,
+    "t": "Stone Barrier",
+    "c": "b. < dn-move"
    },
    {
-    "px": 9.6,
-    "t": "25",
-    "c": "span. < "
-   },
-   {
-    "px": 9.6,
-    "t": "Broken Signposts 3510",
-    "c": "span.sec. < secs"
-   },
-   {
-    "px": 9.6,
-    "t": "35",
-    "c": "span. < "
-   },
-   {
-    "px": 9.6,
-    "t": "10",
-    "c": "span. < "
-   },
-   {
-    "px": 9.6,
-    "t": "The Mural 4512",
-    "c": "span.sec. < secs"
-   },
-   {
-    "px": 9.6,
-    "t": "45",
-    "c": "span. < "
-   },
-   {
-    "px": 9.6,
-    "t": "12",
-    "c": "span. < "
+    "px": 10.4,
+    "t": "Ten battles per dungeon, the t",
+    "c": "span.muted < sh-foot"
    }
   ],
   "clipped": [],
@@ -1305,7 +1275,7 @@
     "act": "selNext"
    }
   ],
-  "tinyText": 15,
+  "tinyText": 6,
   "tinyList": [
    {
     "px": 9.5,
@@ -1336,51 +1306,6 @@
     "px": 9.5,
     "t": "Hatchery",
     "c": "span. < nbtn"
-   },
-   {
-    "px": 8.5,
-    "t": "Light",
-    "c": "small. < ess-c"
-   },
-   {
-    "px": 8.5,
-    "t": "Dark",
-    "c": "small. < ess-c"
-   },
-   {
-    "px": 8.5,
-    "t": "Nature",
-    "c": "small. < ess-c"
-   },
-   {
-    "px": 8.5,
-    "t": "Fire",
-    "c": "small. < ess-c"
-   },
-   {
-    "px": 8.5,
-    "t": "Water",
-    "c": "small. < ess-c"
-   },
-   {
-    "px": 8.5,
-    "t": "Earth",
-    "c": "small. < ess-c"
-   },
-   {
-    "px": 8.5,
-    "t": "Wind",
-    "c": "small. < ess-c"
-   },
-   {
-    "px": 8.5,
-    "t": "Resonance",
-    "c": "small. < ess-c"
-   },
-   {
-    "px": 8.5,
-    "t": "Metal",
-    "c": "small. < ess-c"
    }
   ],
   "clipped": [],
@@ -1497,17 +1422,17 @@
     "c": "span.bt-f.first < b-turn"
    },
    {
-    "px": 9.5,
+    "px": 7.6,
     "t": "Lumifern",
     "c": "span.pm-n < pm"
    },
    {
-    "px": 9.5,
+    "px": 7.6,
     "t": "Acinus",
     "c": "span.pm-n < pm"
    },
    {
-    "px": 9.5,
+    "px": 7.6,
     "t": "Emberix",
     "c": "span.pm-n < pm"
    },

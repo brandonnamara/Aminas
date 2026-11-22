@@ -114,7 +114,12 @@
     UI.sfLast = { name: r.name, bytes: r.bytes, how };
     if (how === 'failed') { UI.toast('The file could not be saved here. Use Backup code instead and keep the code somewhere safe.', 'w'); return { ok: false, reason: 'blocked' }; }
     Au.play('ok'); if (btn) UI.gainFloat(btn, 'Exported', '#8cffa0');
-    UI.toast('Save exported as ' + r.name + ' (' + Math.ceil(r.bytes / 1024) + ' KB). Keep it somewhere safe.', 'n');
+    // a page cannot tell whether the browser actually kept the file (some embedded views block downloads silently),
+    // so it says what it asked for and offers the same save as text to copy
+    const ov = UI.modal(UI.sheet('Save file', '<p style="margin:.2rem 0">' + (how === 'share' ? 'Your save was handed to the share sheet as ' : 'Your browser was asked to save ') + '<b>' + esc(r.name) + '</b> (' + Math.ceil(r.bytes / 1024) + ' KB). Keep it somewhere safe, for example in Files or iCloud Drive.</p>' +
+      '<p class="muted small-t">No file appeared? Copy the save as text instead and keep it in Notes. Import accepts a file, and Backup code › Restore accepts the pasted text.</p>',
+      '<button class="btn ghost" id="sf-copy">Copy save text</button><button class="btn gold" data-act="close">Done</button>', 'narrow sf16'));
+    $('#sf-copy', ov).onclick = (e) => { const el = e.currentTarget; try { navigator.clipboard.writeText(r.text).then(() => UI.gainFloat(el, 'Copied', '#8cffa0'), () => UI.toast('Copying was blocked here. Use Backup code instead.', 'w')); } catch (er) { UI.toast('Copying was blocked here. Use Backup code instead.', 'w'); } };
     return { ok: true, name: r.name, how };
   };
   UI.sfPick = function () {

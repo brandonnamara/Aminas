@@ -1,0 +1,2 @@
+  ok  the camera frames the sequence and the target, then returns to the battle view (peak 0.932, end 0.03)
+  ok  the camera frames the sequence and the target, then returns to the battle view (peak 0.868, end 0.029)

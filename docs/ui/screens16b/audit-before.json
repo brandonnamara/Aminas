@@ -55,64 +55,79 @@
   "tinyText": 15,
   "tinyList": [
    {
-    "px": 9.555,
-    "t": "PLAYER RANK 1"
+    "px": 9.6,
+    "t": "PLAYER RANK 1",
+    "c": "small. < pill"
    },
    {
-    "px": 9.828,
-    "t": "Current task"
+    "px": 9.8,
+    "t": "Current task",
+    "c": "b. < pill"
    },
    {
-    "px": 10.101,
-    "t": "Remove 3 obstacles on Sunlit S"
+    "px": 10.1,
+    "t": "Remove 3 obstacles on Sunlit S",
+    "c": "span.mo < pill"
    },
    {
-    "px": 9.828,
-    "t": "Go"
+    "px": 9.8,
+    "t": "Go",
+    "c": "span.go < pill"
    },
    {
-    "px": 8.19,
-    "t": "Nature"
+    "px": 8.2,
+    "t": "Nature",
+    "c": "span.chip.nature < nm"
    },
    {
-    "px": 8.736,
-    "t": "Lv 9"
+    "px": 8.7,
+    "t": "Lv 9",
+    "c": "span. < xpl"
    },
    {
-    "px": 8.736,
-    "t": "0 / 185 xp"
+    "px": 8.7,
+    "t": "0 / 185 xp",
+    "c": "span. < xpl"
    },
    {
-    "px": 9.828,
-    "t": "2 / 4"
+    "px": 9.8,
+    "t": "2 / 4",
+    "c": "span.seldots < selnav"
    },
    {
-    "px": 8.463,
-    "t": "Build"
+    "px": 8.5,
+    "t": "Build",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Creatures"
+    "px": 8.5,
+    "t": "Creatures",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Tasks"
+    "px": 8.5,
+    "t": "Tasks",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.736,
-    "t": "Battle"
+    "px": 8.7,
+    "t": "Battle",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Explore"
+    "px": 8.5,
+    "t": "Explore",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Hatchery"
+    "px": 8.5,
+    "t": "Hatchery",
+    "c": "span. < nbtn"
    },
    {
-    "px": 9.009,
-    "t": "Achievement"
+    "px": 9,
+    "t": "Achievement",
+    "c": "small. < "
    }
   ],
   "clipped": [],
@@ -240,60 +255,74 @@
   "tinyText": 14,
   "tinyList": [
    {
-    "px": 9.555,
-    "t": "PLAYER RANK 1"
+    "px": 9.6,
+    "t": "PLAYER RANK 1",
+    "c": "small. < pill"
    },
    {
-    "px": 9.828,
-    "t": "Current task"
+    "px": 9.8,
+    "t": "Current task",
+    "c": "b. < pill"
    },
    {
-    "px": 10.101,
-    "t": "Remove 3 obstacles on Sunlit S"
+    "px": 10.1,
+    "t": "Remove 3 obstacles on Sunlit S",
+    "c": "span.mo < pill"
    },
    {
-    "px": 9.828,
-    "t": "Go"
+    "px": 9.8,
+    "t": "Go",
+    "c": "span.go < pill"
    },
    {
-    "px": 8.19,
-    "t": "Dark"
+    "px": 8.2,
+    "t": "Nature",
+    "c": "span.chip.nature < nm"
    },
    {
-    "px": 8.736,
-    "t": "Lv 6"
+    "px": 8.7,
+    "t": "Lv 9",
+    "c": "span. < xpl"
    },
    {
-    "px": 8.736,
-    "t": "0 / 107 xp"
+    "px": 8.7,
+    "t": "0 / 185 xp",
+    "c": "span. < xpl"
    },
    {
-    "px": 9.828,
-    "t": "4 / 4"
+    "px": 9.8,
+    "t": "2 / 4",
+    "c": "span.seldots < selnav"
    },
    {
-    "px": 8.463,
-    "t": "Build"
+    "px": 8.5,
+    "t": "Build",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Creatures"
+    "px": 8.5,
+    "t": "Creatures",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Tasks"
+    "px": 8.5,
+    "t": "Tasks",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.736,
-    "t": "Battle"
+    "px": 8.7,
+    "t": "Battle",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Explore"
+    "px": 8.5,
+    "t": "Explore",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Hatchery"
+    "px": 8.5,
+    "t": "Hatchery",
+    "c": "span. < nbtn"
    }
   ],
   "clipped": [],
@@ -474,67 +503,82 @@
     "act": "close"
    }
   ],
-  "tinyText": 78,
+  "tinyText": 75,
   "tinyList": [
    {
-    "px": 9.555,
-    "t": "PLAYER RANK 1"
+    "px": 9.6,
+    "t": "PLAYER RANK 1",
+    "c": "small. < pill"
    },
    {
-    "px": 9.828,
-    "t": "Current task"
+    "px": 9.8,
+    "t": "Current task",
+    "c": "b. < pill"
    },
    {
-    "px": 10.101,
-    "t": "Remove 3 obstacles on Sunlit S"
+    "px": 10.1,
+    "t": "Remove 3 obstacles on Sunlit S",
+    "c": "span.mo < pill"
    },
    {
-    "px": 9.828,
-    "t": "Go"
+    "px": 9.8,
+    "t": "Go",
+    "c": "span.go < pill"
    },
    {
-    "px": 8.19,
-    "t": "Dark"
+    "px": 8.2,
+    "t": "Nature",
+    "c": "span.chip.nature < nm"
    },
    {
-    "px": 8.736,
-    "t": "Lv 6"
+    "px": 8.7,
+    "t": "Lv 9",
+    "c": "span. < xpl"
    },
    {
-    "px": 8.736,
-    "t": "0 / 107 xp"
+    "px": 8.7,
+    "t": "0 / 185 xp",
+    "c": "span. < xpl"
    },
    {
-    "px": 9.828,
-    "t": "4 / 4"
+    "px": 9.8,
+    "t": "2 / 4",
+    "c": "span.seldots < selnav"
    },
    {
-    "px": 8.463,
-    "t": "Build"
+    "px": 8.5,
+    "t": "Build",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Creatures"
+    "px": 8.5,
+    "t": "Creatures",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Tasks"
+    "px": 8.5,
+    "t": "Tasks",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.736,
-    "t": "Battle"
+    "px": 8.7,
+    "t": "Battle",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Explore"
+    "px": 8.5,
+    "t": "Explore",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Hatchery"
+    "px": 8.5,
+    "t": "Hatchery",
+    "c": "span. < nbtn"
    },
    {
-    "px": 10.101,
-    "t": "All"
+    "px": 10.1,
+    "t": "All",
+    "c": "button.fchip.on < fchips"
    }
   ],
   "clipped": [],
@@ -703,67 +747,82 @@
     "act": "close"
    }
   ],
-  "tinyText": 37,
+  "tinyText": 25,
   "tinyList": [
    {
-    "px": 9.555,
-    "t": "PLAYER RANK 1"
+    "px": 9.6,
+    "t": "PLAYER RANK 1",
+    "c": "small. < pill"
    },
    {
-    "px": 9.828,
-    "t": "Current task"
+    "px": 9.8,
+    "t": "Current task",
+    "c": "b. < pill"
    },
    {
-    "px": 10.101,
-    "t": "Remove 3 obstacles on Sunlit S"
+    "px": 10.1,
+    "t": "Remove 3 obstacles on Sunlit S",
+    "c": "span.mo < pill"
    },
    {
-    "px": 9.828,
-    "t": "Go"
+    "px": 9.8,
+    "t": "Go",
+    "c": "span.go < pill"
    },
    {
-    "px": 8.19,
-    "t": "Dark"
+    "px": 8.2,
+    "t": "Nature",
+    "c": "span.chip.nature < nm"
    },
    {
-    "px": 8.736,
-    "t": "Lv 6"
+    "px": 8.7,
+    "t": "Lv 9",
+    "c": "span. < xpl"
    },
    {
-    "px": 8.736,
-    "t": "0 / 107 xp"
+    "px": 8.7,
+    "t": "0 / 185 xp",
+    "c": "span. < xpl"
    },
    {
-    "px": 9.828,
-    "t": "4 / 4"
+    "px": 9.8,
+    "t": "2 / 4",
+    "c": "span.seldots < selnav"
    },
    {
-    "px": 8.463,
-    "t": "Build"
+    "px": 8.5,
+    "t": "Build",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Creatures"
+    "px": 8.5,
+    "t": "Creatures",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Tasks"
+    "px": 8.5,
+    "t": "Tasks",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.736,
-    "t": "Battle"
+    "px": 8.7,
+    "t": "Battle",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Explore"
+    "px": 8.5,
+    "t": "Explore",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Hatchery"
+    "px": 8.5,
+    "t": "Hatchery",
+    "c": "span. < nbtn"
    },
    {
-    "px": 10.101,
-    "t": "Hop"
+    "px": 10.1,
+    "t": "Hop",
+    "c": "button.fchip < clipbar"
    }
   ],
   "clipped": [],
@@ -858,67 +917,82 @@
     "act": "close"
    }
   ],
-  "tinyText": 46,
+  "tinyText": 39,
   "tinyList": [
    {
-    "px": 9.555,
-    "t": "PLAYER RANK 1"
+    "px": 9.6,
+    "t": "PLAYER RANK 1",
+    "c": "small. < pill"
    },
    {
-    "px": 9.828,
-    "t": "Current task"
+    "px": 9.8,
+    "t": "Current task",
+    "c": "b. < pill"
    },
    {
-    "px": 10.101,
-    "t": "Remove 3 obstacles on Sunlit S"
+    "px": 10.1,
+    "t": "Remove 3 obstacles on Sunlit S",
+    "c": "span.mo < pill"
    },
    {
-    "px": 9.828,
-    "t": "Go"
+    "px": 9.8,
+    "t": "Go",
+    "c": "span.go < pill"
    },
    {
-    "px": 8.19,
-    "t": "Dark"
+    "px": 8.2,
+    "t": "Nature",
+    "c": "span.chip.nature < nm"
    },
    {
-    "px": 8.736,
-    "t": "Lv 6"
+    "px": 8.7,
+    "t": "Lv 9",
+    "c": "span. < xpl"
    },
    {
-    "px": 8.736,
-    "t": "0 / 107 xp"
+    "px": 8.7,
+    "t": "0 / 185 xp",
+    "c": "span. < xpl"
    },
    {
-    "px": 9.828,
-    "t": "4 / 4"
+    "px": 9.8,
+    "t": "2 / 4",
+    "c": "span.seldots < selnav"
    },
    {
-    "px": 8.463,
-    "t": "Build"
+    "px": 8.5,
+    "t": "Build",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Creatures"
+    "px": 8.5,
+    "t": "Creatures",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Tasks"
+    "px": 8.5,
+    "t": "Tasks",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.736,
-    "t": "Battle"
+    "px": 8.7,
+    "t": "Battle",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Explore"
+    "px": 8.5,
+    "t": "Explore",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Hatchery"
+    "px": 8.5,
+    "t": "Hatchery",
+    "c": "span. < nbtn"
    },
    {
-    "px": 10.2375,
-    "t": "Lv 1"
+    "px": 10.2,
+    "t": "Lv 1",
+    "c": "span.lv < "
    }
   ],
   "clipped": [],
@@ -1031,67 +1105,82 @@
     "act": "close"
    }
   ],
-  "tinyText": 33,
+  "tinyText": 23,
   "tinyList": [
    {
-    "px": 9.555,
-    "t": "PLAYER RANK 1"
+    "px": 9.6,
+    "t": "PLAYER RANK 1",
+    "c": "small. < pill"
    },
    {
-    "px": 9.828,
-    "t": "Current task"
+    "px": 9.8,
+    "t": "Current task",
+    "c": "b. < pill"
    },
    {
-    "px": 10.101,
-    "t": "Remove 3 obstacles on Sunlit S"
+    "px": 10.1,
+    "t": "Remove 3 obstacles on Sunlit S",
+    "c": "span.mo < pill"
    },
    {
-    "px": 9.828,
-    "t": "Go"
+    "px": 9.8,
+    "t": "Go",
+    "c": "span.go < pill"
    },
    {
-    "px": 8.19,
-    "t": "Dark"
+    "px": 8.2,
+    "t": "Nature",
+    "c": "span.chip.nature < nm"
    },
    {
-    "px": 8.736,
-    "t": "Lv 6"
+    "px": 8.7,
+    "t": "Lv 9",
+    "c": "span. < xpl"
    },
    {
-    "px": 8.736,
-    "t": "0 / 107 xp"
+    "px": 8.7,
+    "t": "0 / 185 xp",
+    "c": "span. < xpl"
    },
    {
-    "px": 9.828,
-    "t": "4 / 4"
+    "px": 9.8,
+    "t": "2 / 4",
+    "c": "span.seldots < selnav"
    },
    {
-    "px": 8.463,
-    "t": "Build"
+    "px": 8.5,
+    "t": "Build",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Creatures"
+    "px": 8.5,
+    "t": "Creatures",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Tasks"
+    "px": 8.5,
+    "t": "Tasks",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.736,
-    "t": "Battle"
+    "px": 8.7,
+    "t": "Battle",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Explore"
+    "px": 8.5,
+    "t": "Explore",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Hatchery"
+    "px": 8.5,
+    "t": "Hatchery",
+    "c": "span. < nbtn"
    },
    {
-    "px": 10.2375,
-    "t": "Lv 1"
+    "px": 10.2,
+    "t": "Lv 1",
+    "c": "span.lv < "
    }
   ],
   "clipped": [],
@@ -1165,64 +1254,79 @@
   "tinyText": 15,
   "tinyList": [
    {
-    "px": 9.555,
-    "t": "PLAYER RANK 1"
+    "px": 9.6,
+    "t": "PLAYER RANK 1",
+    "c": "small. < pill"
    },
    {
-    "px": 9.828,
-    "t": "Current task"
+    "px": 9.8,
+    "t": "Current task",
+    "c": "b. < pill"
    },
    {
-    "px": 10.101,
-    "t": "Remove 3 obstacles on Sunlit S"
+    "px": 10.1,
+    "t": "Remove 3 obstacles on Sunlit S",
+    "c": "span.mo < pill"
    },
    {
-    "px": 9.828,
-    "t": "Go"
+    "px": 9.8,
+    "t": "Go",
+    "c": "span.go < pill"
    },
    {
-    "px": 8.19,
-    "t": "Dark"
+    "px": 8.2,
+    "t": "Nature",
+    "c": "span.chip.nature < nm"
    },
    {
-    "px": 8.736,
-    "t": "Lv 6"
+    "px": 8.7,
+    "t": "Lv 9",
+    "c": "span. < xpl"
    },
    {
-    "px": 8.736,
-    "t": "0 / 107 xp"
+    "px": 8.7,
+    "t": "0 / 185 xp",
+    "c": "span. < xpl"
    },
    {
-    "px": 9.828,
-    "t": "4 / 4"
+    "px": 9.8,
+    "t": "2 / 4",
+    "c": "span.seldots < selnav"
    },
    {
-    "px": 8.463,
-    "t": "Build"
+    "px": 8.5,
+    "t": "Build",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Creatures"
+    "px": 8.5,
+    "t": "Creatures",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Tasks"
+    "px": 8.5,
+    "t": "Tasks",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.736,
-    "t": "Battle"
+    "px": 8.7,
+    "t": "Battle",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Explore"
+    "px": 8.5,
+    "t": "Explore",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Hatchery"
+    "px": 8.5,
+    "t": "Hatchery",
+    "c": "span. < nbtn"
    },
    {
-    "px": 9.828,
-    "t": "To equip something, open an Am"
+    "px": 9.8,
+    "t": "To equip something, open an Am",
+    "c": "p.muted.small-t < sh-body"
    }
   ],
   "clipped": [],
@@ -1293,67 +1397,82 @@
     "act": "close"
    }
   ],
-  "tinyText": 18,
+  "tinyText": 16,
   "tinyList": [
    {
-    "px": 9.555,
-    "t": "PLAYER RANK 1"
+    "px": 9.6,
+    "t": "PLAYER RANK 1",
+    "c": "small. < pill"
    },
    {
-    "px": 9.828,
-    "t": "Current task"
+    "px": 9.8,
+    "t": "Current task",
+    "c": "b. < pill"
    },
    {
-    "px": 10.101,
-    "t": "Remove 3 obstacles on Sunlit S"
+    "px": 10.1,
+    "t": "Remove 3 obstacles on Sunlit S",
+    "c": "span.mo < pill"
    },
    {
-    "px": 9.828,
-    "t": "Go"
+    "px": 9.8,
+    "t": "Go",
+    "c": "span.go < pill"
    },
    {
-    "px": 8.19,
-    "t": "Dark"
+    "px": 8.2,
+    "t": "Nature",
+    "c": "span.chip.nature < nm"
    },
    {
-    "px": 8.736,
-    "t": "Lv 6"
+    "px": 8.7,
+    "t": "Lv 9",
+    "c": "span. < xpl"
    },
    {
-    "px": 8.736,
-    "t": "0 / 107 xp"
+    "px": 8.7,
+    "t": "0 / 185 xp",
+    "c": "span. < xpl"
    },
    {
-    "px": 9.828,
-    "t": "4 / 4"
+    "px": 9.8,
+    "t": "2 / 4",
+    "c": "span.seldots < selnav"
    },
    {
-    "px": 8.463,
-    "t": "Build"
+    "px": 8.5,
+    "t": "Build",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Creatures"
+    "px": 8.5,
+    "t": "Creatures",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Tasks"
+    "px": 8.5,
+    "t": "Tasks",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.736,
-    "t": "Battle"
+    "px": 8.7,
+    "t": "Battle",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Explore"
+    "px": 8.5,
+    "t": "Explore",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Hatchery"
+    "px": 8.5,
+    "t": "Hatchery",
+    "c": "span. < nbtn"
    },
    {
-    "px": 10.92,
-    "t": "Dungeons, the Island Map, Expl"
+    "px": 9.8,
+    "t": "0 / 10 dungeons cleared",
+    "c": "span.hc-meta < hubcard"
    }
   ],
   "clipped": [],
@@ -1478,67 +1597,82 @@
     "act": "close"
    }
   ],
-  "tinyText": 42,
+  "tinyText": 39,
   "tinyList": [
    {
-    "px": 9.555,
-    "t": "PLAYER RANK 1"
+    "px": 9.6,
+    "t": "PLAYER RANK 1",
+    "c": "small. < pill"
    },
    {
-    "px": 9.828,
-    "t": "Current task"
+    "px": 9.8,
+    "t": "Current task",
+    "c": "b. < pill"
    },
    {
-    "px": 10.101,
-    "t": "Remove 3 obstacles on Sunlit S"
+    "px": 10.1,
+    "t": "Remove 3 obstacles on Sunlit S",
+    "c": "span.mo < pill"
    },
    {
-    "px": 9.828,
-    "t": "Go"
+    "px": 9.8,
+    "t": "Go",
+    "c": "span.go < pill"
    },
    {
-    "px": 8.19,
-    "t": "Dark"
+    "px": 8.2,
+    "t": "Nature",
+    "c": "span.chip.nature < nm"
    },
    {
-    "px": 8.736,
-    "t": "Lv 6"
+    "px": 8.7,
+    "t": "Lv 9",
+    "c": "span. < xpl"
    },
    {
-    "px": 8.736,
-    "t": "0 / 107 xp"
+    "px": 8.7,
+    "t": "0 / 185 xp",
+    "c": "span. < xpl"
    },
    {
-    "px": 9.828,
-    "t": "4 / 4"
+    "px": 9.8,
+    "t": "2 / 4",
+    "c": "span.seldots < selnav"
    },
    {
-    "px": 8.463,
-    "t": "Build"
+    "px": 8.5,
+    "t": "Build",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Creatures"
+    "px": 8.5,
+    "t": "Creatures",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Tasks"
+    "px": 8.5,
+    "t": "Tasks",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.736,
-    "t": "Battle"
+    "px": 8.7,
+    "t": "Battle",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Explore"
+    "px": 8.5,
+    "t": "Explore",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Hatchery"
+    "px": 8.5,
+    "t": "Hatchery",
+    "c": "span. < nbtn"
    },
    {
-    "px": 10.647,
-    "t": "Sunlit Sanctuary"
+    "px": 9.8,
+    "t": "0 / 10 dungeons · 0 / 100 batt",
+    "c": "span.muted < dg-isle"
    }
   ],
   "clipped": [],
@@ -1614,64 +1748,79 @@
   "tinyText": 15,
   "tinyList": [
    {
-    "px": 9.555,
-    "t": "PLAYER RANK 1"
+    "px": 9.6,
+    "t": "PLAYER RANK 1",
+    "c": "small. < pill"
    },
    {
-    "px": 9.828,
-    "t": "Current task"
+    "px": 9.8,
+    "t": "Current task",
+    "c": "b. < pill"
    },
    {
-    "px": 10.101,
-    "t": "Remove 3 obstacles on Sunlit S"
+    "px": 10.1,
+    "t": "Remove 3 obstacles on Sunlit S",
+    "c": "span.mo < pill"
    },
    {
-    "px": 9.828,
-    "t": "Go"
+    "px": 9.8,
+    "t": "Go",
+    "c": "span.go < pill"
    },
    {
-    "px": 8.19,
-    "t": "Dark"
+    "px": 8.2,
+    "t": "Nature",
+    "c": "span.chip.nature < nm"
    },
    {
-    "px": 8.736,
-    "t": "Lv 6"
+    "px": 8.7,
+    "t": "Lv 9",
+    "c": "span. < xpl"
    },
    {
-    "px": 8.736,
-    "t": "0 / 107 xp"
+    "px": 8.7,
+    "t": "0 / 185 xp",
+    "c": "span. < xpl"
    },
    {
-    "px": 9.828,
-    "t": "4 / 4"
+    "px": 9.8,
+    "t": "2 / 4",
+    "c": "span.seldots < selnav"
    },
    {
-    "px": 8.463,
-    "t": "Build"
+    "px": 8.5,
+    "t": "Build",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Creatures"
+    "px": 8.5,
+    "t": "Creatures",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Tasks"
+    "px": 8.5,
+    "t": "Tasks",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.736,
-    "t": "Battle"
+    "px": 8.7,
+    "t": "Battle",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Explore"
+    "px": 8.5,
+    "t": "Explore",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Hatchery"
+    "px": 8.5,
+    "t": "Hatchery",
+    "c": "span. < nbtn"
    },
    {
-    "px": 9.828,
-    "t": "0 of 9 found."
+    "px": 9.8,
+    "t": "0 of 9 found.",
+    "c": "p.muted.small-t < "
    }
   ],
   "clipped": [],
@@ -1760,67 +1909,82 @@
     "act": "close"
    }
   ],
-  "tinyText": 42,
+  "tinyText": 38,
   "tinyList": [
    {
-    "px": 9.555,
-    "t": "PLAYER RANK 1"
+    "px": 9.6,
+    "t": "PLAYER RANK 1",
+    "c": "small. < pill"
    },
    {
-    "px": 9.828,
-    "t": "Current task"
+    "px": 9.8,
+    "t": "Current task",
+    "c": "b. < pill"
    },
    {
-    "px": 10.101,
-    "t": "Remove 3 obstacles on Sunlit S"
+    "px": 10.1,
+    "t": "Remove 3 obstacles on Sunlit S",
+    "c": "span.mo < pill"
    },
    {
-    "px": 9.828,
-    "t": "Go"
+    "px": 9.8,
+    "t": "Go",
+    "c": "span.go < pill"
    },
    {
-    "px": 8.19,
-    "t": "Dark"
+    "px": 8.2,
+    "t": "Nature",
+    "c": "span.chip.nature < nm"
    },
    {
-    "px": 8.736,
-    "t": "Lv 6"
+    "px": 8.7,
+    "t": "Lv 9",
+    "c": "span. < xpl"
    },
    {
-    "px": 8.736,
-    "t": "0 / 107 xp"
+    "px": 8.7,
+    "t": "0 / 185 xp",
+    "c": "span. < xpl"
    },
    {
-    "px": 9.828,
-    "t": "4 / 4"
+    "px": 9.8,
+    "t": "2 / 4",
+    "c": "span.seldots < selnav"
    },
    {
-    "px": 8.463,
-    "t": "Build"
+    "px": 8.5,
+    "t": "Build",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Creatures"
+    "px": 8.5,
+    "t": "Creatures",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Tasks"
+    "px": 8.5,
+    "t": "Tasks",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.736,
-    "t": "Battle"
+    "px": 8.7,
+    "t": "Battle",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Explore"
+    "px": 8.5,
+    "t": "Explore",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Hatchery"
+    "px": 8.5,
+    "t": "Hatchery",
+    "c": "span. < nbtn"
    },
    {
-    "px": 10.92,
-    "t": "Player Stats"
+    "px": 9.3,
+    "t": "Player Rank",
+    "c": "small. < pst"
    }
   ],
   "clipped": [],
@@ -1894,64 +2058,79 @@
   "tinyText": 15,
   "tinyList": [
    {
-    "px": 9.555,
-    "t": "PLAYER RANK 1"
+    "px": 9.6,
+    "t": "PLAYER RANK 1",
+    "c": "small. < pill"
    },
    {
-    "px": 9.828,
-    "t": "Current task"
+    "px": 9.8,
+    "t": "Current task",
+    "c": "b. < pill"
    },
    {
-    "px": 10.101,
-    "t": "Remove 3 obstacles on Sunlit S"
+    "px": 10.1,
+    "t": "Remove 3 obstacles on Sunlit S",
+    "c": "span.mo < pill"
    },
    {
-    "px": 9.828,
-    "t": "Go"
+    "px": 9.8,
+    "t": "Go",
+    "c": "span.go < pill"
    },
    {
-    "px": 8.19,
-    "t": "Dark"
+    "px": 8.2,
+    "t": "Nature",
+    "c": "span.chip.nature < nm"
    },
    {
-    "px": 8.736,
-    "t": "Lv 6"
+    "px": 8.7,
+    "t": "Lv 9",
+    "c": "span. < xpl"
    },
    {
-    "px": 8.736,
-    "t": "0 / 107 xp"
+    "px": 8.7,
+    "t": "0 / 185 xp",
+    "c": "span. < xpl"
    },
    {
-    "px": 9.828,
-    "t": "4 / 4"
+    "px": 9.8,
+    "t": "2 / 4",
+    "c": "span.seldots < selnav"
    },
    {
-    "px": 8.463,
-    "t": "Build"
+    "px": 8.5,
+    "t": "Build",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Creatures"
+    "px": 8.5,
+    "t": "Creatures",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Tasks"
+    "px": 8.5,
+    "t": "Tasks",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.736,
-    "t": "Battle"
+    "px": 8.7,
+    "t": "Battle",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Explore"
+    "px": 8.5,
+    "t": "Explore",
+    "c": "span. < nbtn"
    },
    {
-    "px": 8.463,
-    "t": "Hatchery"
+    "px": 8.5,
+    "t": "Hatchery",
+    "c": "span. < nbtn"
    },
    {
-    "px": 9.828,
-    "t": "The Entity"
+    "px": 9.8,
+    "t": "The Entity",
+    "c": "div.dlg-name < "
    }
   ],
   "clipped": [],
@@ -1968,67 +2147,77 @@
     "act": "bRetreat"
    }
   ],
-  "tinyText": 19,
+  "tinyText": 14,
   "tinyList": [
    {
-    "px": 10.92,
-    "t": "Gaiaroki"
+    "px": 8.7,
+    "t": "Lv 2",
+    "c": "span.fp-lv < fp-head"
    },
    {
-    "px": 8.736,
-    "t": "Lv 2"
+    "px": 9,
+    "t": "53 / 53",
+    "c": "span.hpn < fp-foot"
    },
    {
-    "px": 9.009,
-    "t": "53 / 53"
+    "px": 8.5,
+    "t": "Turn 1",
+    "c": "span.bt-n < b-turn"
    },
    {
-    "px": 10.647,
-    "t": "53"
+    "px": 10.1,
+    "t": "Your move",
+    "c": "span.bt-w < b-turn"
    },
    {
-    "px": 10.647,
-    "t": "Forgotten Road · 1/10"
+    "px": 8.2,
+    "t": "You act first",
+    "c": "span.bt-f.first < b-turn"
    },
    {
-    "px": 8.463,
-    "t": "Turn 1"
+    "px": 8.7,
+    "t": "Lv 12",
+    "c": "span.fp-lv < fp-head"
    },
    {
-    "px": 10.101,
-    "t": "Your move"
+    "px": 9,
+    "t": "101 / 101",
+    "c": "span.hpn < fp-foot"
    },
    {
-    "px": 8.19,
-    "t": "You act first"
+    "px": 7.6,
+    "t": "Lumifern",
+    "c": "span.pm-n < pm"
    },
    {
-    "px": 10.92,
-    "t": "Lumifern"
+    "px": 7.6,
+    "t": "Acinus",
+    "c": "span.pm-n < pm"
    },
    {
-    "px": 8.736,
-    "t": "Lv 12"
+    "px": 7.6,
+    "t": "Emberix",
+    "c": "span.pm-n < pm"
    },
    {
-    "px": 9.009,
-    "t": "101 / 101"
+    "px": 9,
+    "t": "Pow 40",
+    "c": "span.ab-pow < "
    },
    {
-    "px": 10.647,
-    "t": "101"
+    "px": 9,
+    "t": "Pow 45",
+    "c": "span.ab-pow < "
    },
    {
-    "px": 7.644,
-    "t": "Lumifern"
+    "px": 9,
+    "t": "Special · every 3",
+    "c": "span.ab-sp < "
    },
    {
-    "px": 7.644,
-    "t": "Acinus"
-   },
-   {
-    "px": 7.644,
-    "t": "Emberix"
+    "px": 9,
+    "t": "Uses your turn",
+    "c": "small. < ab-main"
    }
   ],
   "clipped": [],

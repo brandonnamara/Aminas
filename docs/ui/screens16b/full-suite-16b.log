@@ -1,0 +1,157 @@
+baseline: 5 passed, 0 failed
+campaign: 60 passed, 0 failed
+migration v0.6: 22 passed, 0 failed
+modes: 41 passed, 0 failed
+forge: 53 passed, 0 failed
+dev8: 49 passed, 0 failed
+browser v0.6: 48 passed, 0 failed
+browser dev7: 30 passed, 0 failed
+browser dev8: 42 passed, 0 failed
+browser env1: 20 passed, 0 failed
+browser env1.2: 10 passed, 0 failed
+browser library: 11 passed, 0 failed
+PASSED: 19 passed, 0 failed (browser-env3)
+PASSED: 10 passed, 0 failed (browser-env4)
+PASSED: 12 passed, 0 failed (browser-ui5)
+PASSED: 45 passed, 0 failed (browser-ui6)
+PASSED: 30 passed, 0 failed (browser-arena7)
+PASSED: 31 passed, 0 failed (browser-bench-battle)
+PASSED: 23 passed, 0 failed (browser-perf-fix)
+PASSED: 38 passed, 0 failed (browser-showcase8)
+PASSED: 38 passed, 0 failed (browser-p8fix)
+PASSED: 47 passed, 0 failed (browser-roster8b)
+raid12a: 31 passed, 0 failed
+PASSED: 18 passed, 0 failed (browser-raid12a)
+hideseek: 60 passed, 0 failed
+PASSED: 41 passed, 0 failed (browser-hideseek)
+hideseek12c: 30 passed, 0 failed
+PASSED: 58 passed, 0 failed (browser-hideseek12c)
+progression13a: 40 passed, 0 failed
+PASSED: 41 passed, 0 failed (browser-progress13a)
+hatchery13b: 41 passed, 0 failed
+browser-hatchery13b.test.js: FAILED
+  ok  the Hatchery opens with its level, its state (Idle) and how many slots are in use
+  ok  all five slots are listed: two open (the first chosen for the next egg), three locked with the level that opens each
+  ok  the upgrade card shows the capacity now, the next level’s benefit (+1 slot, 3 in all), its cost (1,500 gold) and what is short (“Hatchery Lv 2 of 52 breeding slots · incubation 85%Next, Lv 3: +1 slot (3 in all), incubation 85% → 70% 1,500 · 10m Need 600 more gold.Upgrade”)
+  ok  before choosing parents the panel lists the five requirements, the cost and the incubation time, and Breed is off
+FAIL  the whole screen fits a phone in landscape without scrolling [284,272]
+  ok  pressing Breed with no parents does nothing and spends nothing; the list shows what is still needed
+  ok  the picker lists every Amina, eligible ones first; the Lv 3 Gaiaroki is marked “Needs Lv 5” and cannot be chosen
+  ok  for the second parent each partner shows what the pair would lay (a mystery egg until discovered); the chosen one and a locked pairing cannot be picked
+  ok  with a valid pair every requirement is ticked, the egg is shown (a mystery egg) and Breed is on
+  ok  Breed asks first: the pair, the egg, the cost, what will be left, the slot and the time; nothing is spent yet
+  ok  Cancel spends nothing
+  ok  confirming (even tapped three times) breeds once: exactly 40 gold and 25 food, one egg, both parents kept
+  ok  the screen stays open: the egg is in Slot 1 with its time left, a message confirms it, and the next free slot is chosen
+  ok  the progress bar moves with the clock (1% → 19%)
+  ok  a second pair fills the second slot; the Hatchery reads “Fully occupied” and Breed is off until a slot is free
+  ok  on the island a marker over the Hatchery shows it is full (“2 / 2 full”)
+  ok  both eggs survive closing and reopening the game, unchanged
+  ok  when the eggs are ready the island marker turns to “Hatch ×2” by itself and the Hatchery button shows 2
+  ok  tapping the marker opens the Hatchery, which reads “Ready to hatch” with a Hatch button on both eggs
+  ok  Hatch (tapped twice) hatches one egg once: one new Amina, one ceremony, the egg on screen first
+  ok  the egg opens to show the new Amina by name and title (Igniflare, The Kindled Hatchling)
+  ok  with its element, role, stage and level, and its four stats (HP48, ATK13, DEF10, SPD8)
+  ok  it says the Amina is new to the collection (7 of 63) and which recipe was recorded, and fits the screen
+  ok  closing it returns to the Hatchery: Slot 1 is free again and the other egg still waits
+  ok  an egg from a known pairing is named (Igniflare egg)
+  ok  a second Igniflare is announced as “It hatched!” with how many you now have, not as a new discovery
+  ok  Details opens the new Amina’s page
+  ok  the recipe book lists the two discovered pairings and counts the 29 still hidden, without revealing them
+  ok  when gold is short the cost line says how much (28 gold short) and Breed is off
+  ok  pressing it anyway opens nothing and spends nothing
+  ok  with no room for another Amina the egg waits in its slot, and the screen says so
+  ok  Upgrade opens the Hatchery’s building panel with the same figures (slots 2 → 3, 1,500 gold)
+  ok  after the upgrade there is exactly one more slot (3), and the card shows the next step
+  ok  with Reduce Motion the ready egg does not rock and hatching shows the Amina at once, with the same information
+  ok  no script errors
+FAILED: 34 passed, 1 failed (browser-hatchery13b)
+
+gear13c: 46 passed, 0 failed
+PASSED: 39 passed, 0 failed (browser-gear13c)
+economy13d: 14 passed, 0 failed
+PASSED: 5 passed, 0 failed (browser-rewards13d)
+PASSED: 31 passed, 0 failed (browser-models14)
+PASSED: 16 passed, 0 failed (browser-world14)
+40 passed, 0 failed
+browser-roster15b: 37 passed, 0 failed
+browser-combat15c.test.js: FAILED
+  ok  switch off (default): Atem III uses Overclock with its Phase 8B presentation; no swords, no 15C camera or sounds
+  ok  Atem III plays its nine-sword stance (special9) for Overclock, its existing special
+  ok  exactly nine individual swords are drawn (peak 9)
+  ok  all nine blades strike (nine distinct impacts) and the sequence clears itself afterwards
+  ok  the last blade lands with the rule engine's hit (on this software renderer the sequence ran 0.5 s behind real time and was brought forward to the hit)
+  ok  Overclock's damage, attack-down and cooldown are exactly the same with the presentation on and off (foe HP 18428 vs 18428)
+  ok  turns continue: the foe takes its turn after the swords, and the battle carries on
+  ok  the layered nine-sword sound sequence plays (activation, assembly, launches, impacts, retraction)
+FAIL  the camera frames the sequence and the target, then returns to the battle view (peak 0.932, end 0.056)
+  ok  Atem I and Atem II keep their own weapon presentations (no swords)
+  ok  leaving the battle mid-sequence releases the swords at once (no lingering meshes or updates)
+  ok  the next battle plays the sequence cleanly again
+  ok  eclipsar: its special eclipsefang plays with its signature flourish (peak 118 effect cubes)
+  ok  aquaflora3: its special abyssalwave plays with its signature flourish (peak 175 effect cubes)
+  ok  infernox: its special inferno plays with its signature flourish (peak 126 effect cubes)
+  ok  pyrophoenix: its special inferno plays with its signature flourish (peak 149 effect cubes)
+  ok  oceanfang: its special abyssalwave plays with its signature flourish (peak 141 effect cubes)
+  ok  voltar3: its special eclipsefang plays with its signature flourish (peak 113 effect cubes)
+  ok  aimza3: its special tripleecho plays with its signature flourish (peak 159 effect cubes)
+  ok  shellfin: its special abyssalwave plays with its signature flourish (peak 140 effect cubes)
+  ok  meta: its special overclock plays with its signature flourish (peak 186 effect cubes)
+  ok  shielding: Iron Wall raises the lattice shield with its own sound
+  ok  status application (emberflick by emberix): the status ring and sound play with the existing status event
+  ok  Battery Saver: all nine swords and impacts, with fewer particles (peak 71 cubes vs 142)
+  ok  Reduce Motion: the swords stay readable (nine, no orbit), no camera movement, minimal particles (peak 21)
+  ok  2D battle fallback: Overclock resolves identically (foe HP 18428), no 3D sequence, no stalls
+  ok  dungeon arena (Reliquary): the sequence plays in another arena
+  ok  boss encounter: the boss introduction, then the nine swords against a boss, then the boss's turn
+  ok  victory: Overclock finishes the foe, the battle ends and the victory celebration plays
+  ok  defeat: the fainting presentation plays and the battle ends
+  ok  audio: sequences are skipped (never queued) while the context is interrupted, and play again after it resumes
+  ok  nothing about the presentation reaches the save
+  ok  no page errors ()
+
+browser-combat15c: 32 passed, 1 failed
+
+browser-final15d: 37 passed, 0 failed
+PASSED: 12 passed, 0 failed (browser-intro14)
+onboard16: 37 passed, 0 failed
+69 passed, 0 failed (browser-onboard16)
+savefile16b: 47 passed, 0 failed
+browser-polish16b.test.js: FAILED
+  ok  Settings › Your save has Export save file and Import save file (no Undo before any import)
+  ok  Export downloads a file named for the player and time (aminas-save-Rowan-20261122-0520.json)
+  ok  the downloaded file is a complete, valid save of this game
+  ok  after exporting, a sheet says which file was saved and offers Copy save text (a page cannot confirm the browser kept it)
+  ok  a cut-short file is refused with a plain reason
+  ok  and nothing changed
+  ok  an edited file fails its checksum and is refused
+  ok  a save from a newer game version is refused
+  ok  an unrelated file is refused
+  ok  after four refused files the game and the stored save are untouched
+  ok  a valid file shows what it contains beside the current game, and asks first
+  ok  Cancel changes nothing
+  ok  Replace loads the file as the current game (and saves it), once
+  ok  Settings now offers Undo last import
+  ok  Undo shows which game it will put back
+  ok  Undo restores the earlier game exactly
+  ok  after a reload the restored game is still there, and the other one is still recoverable
+  ok  a bad backup code gives a plain reason
+  ok  a good backup code now opens the same confirmation instead of replacing the game at once
+  ok  Dialogue text size: standard 15.015 px, large 17.745 px, larger 20.748 px
+  ok  at every size the panel stays on screen and never covers Aa, Auto or Skip
+FAIL  Instant shows the whole line at once
+  ok  every dialogue panel has an Aa button
+  ok  Aa changes the size at once and saves it
+  ok  Settings has Dialogue text size and an Instant text speed
+  ok  story scenes: none available to replay here (checked in the dialogue tests above)
+  ok  a tap 5 px above a 27 px filter chip selects it (hit assist)
+  ok  a tap on the dimmed backdrop still closes the panel, as before
+  ok  closing fades a copy for 150 ms with no ids or actions, then removes it
+  ok  Reduce Motion: no fade
+  ok  a refused action shakes the pressed button (no craft button to test)
+  ok  the task pill tracks the Forgotten Road once you are partway through it ("CURRENT TASK The Forgotten Road Clear the Forgotten Road · Battle 4 of")
+  ok  its Go opens the Forgotten Road
+  ok  no script errors
+
+FAILED: 33 passed, 1 failed (browser-polish16b)
+

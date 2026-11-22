@@ -1,0 +1,35 @@
+  ok  switch off (default): Atem III uses Overclock with its Phase 8B presentation; no swords, no 15C camera or sounds
+  ok  Atem III plays its nine-sword stance (special9) for Overclock, its existing special
+  ok  exactly nine individual swords are drawn (peak 9)
+  ok  all nine blades strike (nine distinct impacts) and the sequence clears itself afterwards
+  ok  the last blade lands with the rule engine's hit (on this software renderer the sequence ran 0.65 s behind real time and was brought forward to the hit)
+  ok  Overclock's damage, attack-down and cooldown are exactly the same with the presentation on and off (foe HP 18428 vs 18428)
+  ok  turns continue: the foe takes its turn after the swords, and the battle carries on
+  ok  the layered nine-sword sound sequence plays (activation, assembly, launches, impacts, retraction)
+  ok  the camera frames the sequence and the target, then returns to the battle view (peak 0.915, end 0.048)
+  ok  Atem I and Atem II keep their own weapon presentations (no swords)
+  ok  leaving the battle mid-sequence releases the swords at once (no lingering meshes or updates)
+  ok  the next battle plays the sequence cleanly again
+  ok  eclipsar: its special eclipsefang plays with its signature flourish (peak 124 effect cubes)
+  ok  aquaflora3: its special abyssalwave plays with its signature flourish (peak 132 effect cubes)
+  ok  infernox: its special inferno plays with its signature flourish (peak 127 effect cubes)
+  ok  pyrophoenix: its special inferno plays with its signature flourish (peak 148 effect cubes)
+  ok  oceanfang: its special abyssalwave plays with its signature flourish (peak 132 effect cubes)
+  ok  voltar3: its special eclipsefang plays with its signature flourish (peak 133 effect cubes)
+  ok  aimza3: its special tripleecho plays with its signature flourish (peak 158 effect cubes)
+  ok  shellfin: its special abyssalwave plays with its signature flourish (peak 133 effect cubes)
+  ok  meta: its special overclock plays with its signature flourish (peak 176 effect cubes)
+  ok  shielding: Iron Wall raises the lattice shield with its own sound
+  ok  status application (emberflick by emberix): the status ring and sound play with the existing status event
+  ok  Battery Saver: all nine swords and impacts, with fewer particles (peak 75 cubes vs 163)
+  ok  Reduce Motion: the swords stay readable (nine, no orbit), no camera movement, minimal particles (peak 21)
+  ok  2D battle fallback: Overclock resolves identically (foe HP 18428), no 3D sequence, no stalls
+  ok  dungeon arena (Reliquary): the sequence plays in another arena
+  ok  boss encounter: the boss introduction, then the nine swords against a boss, then the boss's turn
+  ok  victory: Overclock finishes the foe, the battle ends and the victory celebration plays
+  ok  defeat: the fainting presentation plays and the battle ends
+  ok  audio: sequences are skipped (never queued) while the context is interrupted, and play again after it resumes
+  ok  nothing about the presentation reaches the save
+  ok  no page errors ()
+
+browser-combat15c: 33 passed, 0 failed

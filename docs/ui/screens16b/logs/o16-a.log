@@ -1,0 +1,71 @@
+  ok  the Phase 16A switch is off by default
+  ok  switch off: the avatar creator is the original one
+  ok  switch off: the original intro cards play (no cinematic)
+  ok  switch off: the original dialogue panel
+  ok  switch off: the original starter selection
+  ok  switch off: nothing is added to the save
+  ok  the title-screen chip turns the switch on and remembers it in this browser
+  ok  the avatar step shows "1 of 2" and says what can be changed later
+  ok  the whole avatar step fits an iPhone landscape screen (confirm button and note on screen)
+  ok  a new game records where it is (avatar)
+  ok  the avatar choice is saved
+  ok  the cinematic has four fragments of other places and a Skip button
+  ok  Skip is a comfortable touch target (44 pt or more)
+  ok  the cinematic pauses while the app is hidden (timeline frozen: 1762 ms → 1762 ms) and resumes on return
+  ok  the cinematic plays to its end through an audio interruption and hands over to the first conversation
+  ok  the save records that the Entity has been met
+  ok  the dialogue panel, Skip and Speed fit the screen
+  ok  Speed cycles the text-speed setting (normal → fast → instant (Phase 16B) → slow → normal) and saves it
+  ok  a tap finishes the line, and Enter (or Space) moves on
+  ok  the conversation uses the player’s name for their own line and calls Aminas "Kind Souls"
+  ok  the hidden force is never named or explained in the new lines
+  ok  every opening line fits one panel (190 characters or fewer)
+  ok  both starters are shown with their own model portraits
+  ok  names, personalities and moves on the cards are the game’s own data
+  ok  the starter screen fits iPhone landscape
+  ok  nothing can be chosen before a starter is selected
+  ok  selecting shows clearly which starter is picked (the other turns away)
+  ok  the confirmation names the chosen starter
+  ok  Back cancels: nothing is granted
+  ok  one starter, exactly once, even with repeated taps (never both)
+  ok  the choice is saved at once
+  ok  the HUD shows the prologue step (3 of 12: look at your companion)
+  ok  Go opens the companion, and looking at it completes the step
+  ok  the next step is the existing first quest, with its own Go and reward
+  ok  the player is "partly through" the prologue
+  ok  a game interrupted during the cinematic offers Continue on the title screen
+  ok  Continue replays the (skippable) cinematic
+  ok  Skip goes straight to the starter choice and is remembered
+  ok  a game interrupted at the starter choice resumes there (after one line from the Entity)
+  ok  a game interrupted before the avatar was confirmed resumes at the avatar
+  ok  an existing save shows the normal Continue
+  ok  an existing player is never sent through the introduction, character creation or starter choice
+  ok  an existing save never gains an onboarding record
+  ok  a partly played first dungeon keeps its place; already-done steps count (next: the first quest)
+  ok  a player who already cleared the first dungeon has the prologue closed for them
+  ok  first battle, first turn: one short callout ("Your move. Tap an attack.")
+  ok  the callout never covers a move button
+  ok  the callout goes away as soon as the player acts
+  ok  later turns teach health and the turn indicator, one at a time (moves, health, turn)
+  ok  the same battle ends identically with the switch on and off (health [0,10,57], win on turn 4)
+  ok  2D battle fallback: the coach works the same way
+  ok  2D fallback: the first battle is played to a win
+  ok  after the four quests the prologue asks for the Battle menu
+  ok  opening the Battle menu completes that step
+  ok  the first visit to Dungeons explains the structure: ten and ten, the guardian, defeats resume at that battle
+  ok  it quotes the dungeon’s own recommended level
+  ok  the dungeon introduction plays only once
+  ok  the first victory card says the win is saved (visible without scrolling)
+  ok  after the first win the step is "Return to the sanctuary"
+  ok  back home, the Entity hands over (with one slip about the player)
+  ok  the prologue completes and the HUD returns to the ordinary task list
+  ok  dungeon progress is the game’s own: battle 2 is next, nothing extra cleared
+  ok  Reduce Motion: cross-fades only (no drifting fragments, no camera push)
+  ok  Reduce Motion: each line of dialogue appears at once
+  ok  Battery Saver: two fragments instead of four, no blur, no camera push
+  ok  the cinematic stays light: 180 elements under Battery Saver
+  ok  Skip works under Battery Saver too
+  ok  opening the Hatchery and Forge only adds a one-time line from the Entity; nothing else in the save changes
+  ok  no script errors
+
+69 passed, 0 failed (browser-onboard16)

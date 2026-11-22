@@ -31,8 +31,8 @@ button:focus-visible, [data-act]:focus-visible { outline: 2px solid var(--pz-cya
 /* ---------- readability: the smallest labels grow slightly. Body text and secondary notes reach 10.5 px at iPhone
    landscape; tightly packed labels (bottom-bar names, battle party names, move numbers) reach 9.5 px so they still fit
    their unchanged buttons. ---------- */
-.nm .chip, .xpl span, .seldots, .fchip, .hx-state, .hx-cap, .hx-up-h span, .small-t, .tier, .fi-d, .hc-meta, .dg-isle .muted, .dd-num, .tagp, .pst em, .pst small, .fp-lv, .hpn, .bt-w, .seg button, .pg-lv, .pg-xpt, .btn small, .hx-sb small, .dl-t small,
-.pill.rank small, .mission-pill > b, .mission-pill .go, .mission-pill .mo, .pill small, .fchip small, .hx-up-n small, .hx-out small, .hx-note, .wait span, .bn small, .secs .sec, .ess-c small { font-size: 10.5px !important; }
+/* the Hatchery panel is laid out to fit one landscape screen exactly (a tested requirement), so its notes keep their size */
+:is(.nm .chip, .xpl span, .seldots, .fchip, .hx-state, .small-t, .tier, .fi-d, .hc-meta, .dg-isle .muted, .dd-num, .tagp, .pst em, .pst small, .fp-lv, .hpn, .bt-w, .seg button, .pg-lv, .pg-xpt, .btn small, .dl-t small, .pill.rank small, .mission-pill > b, .mission-pill .go, .mission-pill .mo, .pill small, .fchip small, .bn small, .secs .sec, .ess-c small):not(.hatch13 *) { font-size: 10.5px !important; }
 .nbtn span, .ab-pow, .ab-sp, .ab-main small, .bt-n, .bt-f { font-size: 9.5px !important; }
 /* HUD round buttons (Ask, Settings, companion arrows): a larger invisible touch area, same look */
 #hud .round::after { content: ''; position: absolute; inset: -4px; border-radius: 50%; }

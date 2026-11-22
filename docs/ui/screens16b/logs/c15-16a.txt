@@ -1,0 +1,3 @@
+FAIL  the camera frames the sequence and the target, then returns to the battle view (peak 0.915, end 0.077)
+FAIL  the camera frames the sequence and the target, then returns to the battle view (peak 0.932, end 0.055)
+FAIL  the camera frames the sequence and the target, then returns to the battle view (peak 0.932, end 0.076)
