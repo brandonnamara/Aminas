@@ -162,7 +162,7 @@ Findings:
    - Fed regularly: slack 2–6, 0 losses.
    - Challenger: slack 4–9.
    - With ×1.3/×1.15: rarely fed has 2 losses and 1 replay; fed teams still have no losses.
-5. **The Moonwell (Dungeon 8) is the spike** in every variant (threshold jumps by 5). Tune it down (Tidal Hymn power,
+5. **The Moonwell (Dungeon 8) is the spike** in every variant (its threshold jumps by 4–5 levels). Tune it down (Tidal Hymn power,
    or rec 32) in 18D.
 6. Well-prepared teams (challenger) stay comfortable in every variant. Making the island hard for them would make it
    punishing for rarely-fed players. The 17D challenges remain the stretch goal for them.
@@ -326,7 +326,7 @@ The labelled map is on the review page.
 
 ## 11. The intermittent Forge-close failure
 
-See section 11 of the review page and `docs/audit18a/forge-close.md` for the investigation and verdict.
+The full investigation is in `docs/audit18a/forge-close.md`; a summary is on the review page.
 
 **Verdict:** not a functional defect as far as can be shown. `UI.close` removes the Forge synchronously and nothing reopens it; the check depends on `.overlay:last-child` still being the Forge at click time, and asynchronous notices in the modal layer can change that (UI transition state, made more likely by load: test environment). It was not reproduced in 22 instrumented runs on the 18A code (14 alone, 8 under parallel load), after 5 failures in about 33 runs across 17C–17D. The test now prints the modal layer when it fails (diagnostics only; same click, wait and assertion). Full write-up: `docs/audit18a/forge-close.md`. A second intermittent check in the same suite ("hidden: every island animation is paused", 3 of 22) is reported, not changed.
 
