@@ -22,6 +22,7 @@ const A = window.A;
 const COARSE = !!(window.matchMedia && matchMedia('(pointer: coarse)').matches);
 const AMBIENT_FPS = 12;
 let R = null; // shared renderer (kept between visits to the island)
+let ctxLost = false, live = null; const ctxEvents = { lost: 0, restored: 0 }; // Phase 16C: context loss
 // Phase 3: graphics quality tier (A.Perf.tier in src/perf.js): pixel-ratio cap, shadow map, LOD rules
 const FALLBACK_TIER = { id: COARSE ? 'balanced' : 'high', prCap: COARSE ? 1.5 : 2, shadowMap: COARSE ? 1024 : 2048, shadows: true, natureLod: false, buildingLod: false };
 const tier = () => (A && A.Perf && A.Perf.tier ? A.Perf.tier() : FALLBACK_TIER);
@@ -220,6 +221,12 @@ export function createIsland() {
     R.setClearColor(0x000000, 0); R.outputColorSpace = THREE.SRGBColorSpace; R.toneMapping = THREE.NeutralToneMapping; R.toneMappingExposure = LIGHT.exposure || 1; // Phase 4 grade
     R.shadowMap.enabled = true; R.shadowMap.type = THREE.PCFShadowMap; R.shadowMap.autoUpdate = false;
     R.domElement.className = 'vox3d';
+    // Phase 16C: graphics context loss (iOS Safari drops WebGL contexts under memory pressure or after a long time in
+    // the background). three.js keeps the context restorable; the island only redraws when something changes, so
+    // without this it stayed blank after the context came back. Now it pauses while lost and redraws everything
+    // (scene and shadow map) as soon as it is restored.
+    R.domElement.addEventListener('webglcontextlost', () => { ctxLost = true; ctxEvents.lost++; if (live && live.lost) live.lost(); });
+    R.domElement.addEventListener('webglcontextrestored', () => { ctxLost = false; ctxEvents.restored++; if (live && live.restored) live.restored(); });
   }
   const scene = new THREE.Scene(), camera = new THREE.OrthographicCamera(-1, 1, 1, -1, -200, 200);
   camera.up.copy(UP);
@@ -506,7 +513,7 @@ export function createIsland() {
   const occCanvas = document.createElement('canvas'); occCanvas.className = 'vox-occ'; const occCtx = occCanvas.getContext('2d');
   const proxyScene = new THREE.Scene(), proxyMat = new THREE.MeshBasicMaterial({ colorWrite: false, side: THREE.DoubleSide, stencilWrite: true, stencilRef: 1, stencilFunc: THREE.AlwaysStencilFunc, stencilZPass: THREE.ReplaceStencilOp });
   const proxyGeo = new THREE.BufferGeometry(), proxyMesh = new THREE.Mesh(proxyGeo, proxyMat); proxyMesh.frustumCulled = false; proxyScene.add(proxyMesh);
-  const occ = { fn: null, data: null, sig: null, dirty: false, timer: 0, cost: 0, shown: false, cam: null, last: 0, stale: false };
+  const occ = { fn: null, data: null, sig: null, dirty: false, timer: 0, cost: 0, frameCost: 0, passes: 0, shown: false, cam: null, last: 0, stale: false };
   const YV = new THREE.Vector3(0, 1, 0);
   function setOverlay(fn) { occ.fn = fn; occ.sig = null; pollOcc(); }
   function pollOcc() {
@@ -597,7 +604,7 @@ export function createIsland() {
   // browser and screen; it tells Perf what frame rate the page can get (see Perf.noteFrame)
   let cbPrev = 0, cbIdle = false;
   function loop(now) {
-    raf = 0; if (!R.domElement.isConnected) return;
+    raf = 0; if (!R.domElement.isConnected || ctxLost) return;
     if (cbPrev && cbIdle && now - cbPrev < 120 && A && A.Perf && A.Perf.noteFrame) A.Perf.noteFrame(now - cbPrev);
     cbPrev = now;
     const animate = !slow && !saver() && !resting() && !calm();
@@ -644,8 +651,12 @@ export function createIsland() {
     // would leave the rest of the canvas empty
     if (full || region) { R.setScissorTest(false); R.autoClear = true; R.setClearColor(0x000000, 0); R.render(scene, camera); }
     R.setScissorTest(false); R.autoClear = true;
-    state.dirty = false; frames++; drawMs += performance.now() - s0;
+    state.dirty = false; frames++; const ms = performance.now() - s0; drawMs += ms;
+    // Phase 16C: counted for the profile (a whole occlusion frame: proxies, stencil pass, read-back and full redraw)
+    if (region) { occ.passes++; occ.frameCost = occ.frameCost ? occ.frameCost * 0.6 + ms * 0.4 : ms; }
   }
+  // Phase 16C: the controller the context-loss handlers talk to (the island on screen)
+  live = { lost() { if (raf) cancelAnimationFrame(raf); raf = 0; }, restored() { state.dirty = true; state.shadowDirty = true; state.moved = true; occ.dirty = true; occ.sig = null; if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; } kick(); } };
   return {
     canvas: R.domElement, occCanvas,
     setTerrain, sync, setView, kick, setOverlay, occludedAt,
@@ -659,7 +670,7 @@ export function createIsland() {
     breakdown() { const t = (o) => (o.geometry && o.geometry.index ? o.geometry.index.count / 3 : 0) * (o.isInstancedMesh ? o.count : 1); const out = { terrain: 0, buildings: 0, nature: 0, detail: 0, far: 0, fx: 0 };
       groups.terrain.traverse((o) => { if (o.isMesh && !o.userData.shadowOnly) out.terrain += t(o); }); farGroup.traverse((o) => { if (o.isMesh) out.far += t(o); });
       groups.things.children.forEach((o) => { if (o.userData.shadowOnly) return; if (o.userData.glb) { o.traverse((m) => { if (m.isMesh) out.buildings += t(m); }); return; } if (!o.isMesh || !o.visible) return; if (o === detail) out.detail += t(o); else if (o.material === matSway || o.userData.nature) out.nature += t(o); else out.buildings += t(o); }); Object.keys(out).forEach((k) => (out[k] = Math.round(out[k]))); return out; },
-    stats() { const i = R.info; return { frames, avgDrawMs: frames ? +(drawMs / frames).toFixed(2) : 0, calls: i.render.calls, triangles: i.render.triangles, geometries: i.memory.geometries, textures: i.memory.textures, shadow: sun.castShadow, shadowMap: sun.shadow.mapSize.x, shadowType: R.shadowMap.type === THREE.VSMShadowMap ? 'vsm' : 'pcf', detail: detail ? detail.count : 0, grade: { toneMapping: R.toneMapping === THREE.NeutralToneMapping ? 'neutral' : 'none', exposure: R.toneMappingExposure }, tinted: groups.things.children.filter((o) => o.isInstancedMesh && o.instanceColor).length, tier: tier().id, canvas: [R.domElement.width, R.domElement.height], pixelRatio: R.getPixelRatio(), slow, lod: lodOn === 0 ? 'off' : lodOn === 1 ? 'nature' : 'all', terrainMs: cost.terrainMs, syncMs: cost.syncMs, occ: { shown: occ.shown, proxies: occ.data ? occ.data.up.length + occ.data.flat.length : 0, ms: +occ.cost.toFixed(1) } }; },
+    stats() { const i = R.info; return { ctx: { lost: ctxLost, events: Object.assign({}, ctxEvents) }, occPace: { passes: occ.passes, frameMs: +occ.frameCost.toFixed(1), passMs: +occ.cost.toFixed(1) }, programs: i.programs ? i.programs.length : null, frames, avgDrawMs: frames ? +(drawMs / frames).toFixed(2) : 0, calls: i.render.calls, triangles: i.render.triangles, geometries: i.memory.geometries, textures: i.memory.textures, shadow: sun.castShadow, shadowMap: sun.shadow.mapSize.x, shadowType: R.shadowMap.type === THREE.VSMShadowMap ? 'vsm' : 'pcf', detail: detail ? detail.count : 0, grade: { toneMapping: R.toneMapping === THREE.NeutralToneMapping ? 'neutral' : 'none', exposure: R.toneMappingExposure }, tinted: groups.things.children.filter((o) => o.isInstancedMesh && o.instanceColor).length, tier: tier().id, canvas: [R.domElement.width, R.domElement.height], pixelRatio: R.getPixelRatio(), slow, lod: lodOn === 0 ? 'off' : lodOn === 1 ? 'nature' : 'all', terrainMs: cost.terrainMs, syncMs: cost.syncMs, occ: { shown: occ.shown, proxies: occ.data ? occ.data.up.length + occ.data.flat.length : 0, ms: +occ.cost.toFixed(1) } }; },
     dispose() { if (raf) cancelAnimationFrame(raf); raf = 0; clearGroup(groups.terrain); groups.things.children.slice().forEach((c) => { groups.things.remove(c); if (c.isInstancedMesh) c.dispose(); }); state = { things: new Map(), sig: '' }; },
   };
 }

@@ -36,7 +36,10 @@ let pass = 0, fail = 0; const ok = (c, m) => { if (c) { pass++; console.log('  o
     }
     if (!out.left) for (let i = 0; i < 120 && A.UI.B && A.UI.B.busy; i++) { sample(); await new Promise((r) => setTimeout(r, 50)); }
     out.ms = Math.round(performance.now() - t0);
-    if (!out.left) await new Promise((r) => setTimeout(r, 1500));   // let the camera settle back
+    // Phase 16C (approved condition-based wait): the same 1.5 s as before, then, if the camera has not yet eased back to
+    // the battle view (focus under 0.05, the value the check below requires), keep waiting for it, at most 4.5 s more.
+    // On a slow machine the ease-out simply finishes later; the time it took is reported in the check.
+    if (!out.left) { const s1 = performance.now(); await new Promise((r) => setTimeout(r, 1500)); for (let i = 0; i < 90 && is3d() && (A.UI.B.stage.debug().c15 || {}).camFocus >= 0.05; i++) await new Promise((r) => setTimeout(r, 50)); out.settleMs = Math.round(performance.now() - s1 + 0); }
     if (A.UI.B && is3d()) { const d = A.UI.B.stage.debug(); out.log = d.log.slice(); out.c15 = d.c15; }
     out.enemyHp = b.enemy.hp; out.enemyMax = b.enemy.hpMax; out.weak = JSON.stringify(b.enemy.weak || 0); out.cd = JSON.stringify(f.cd || {}); out.turn = b.turn; out.over = !!(A.UI.B && A.UI.B.over); out.result = b.result || null;
     out.seq = seq; A.Audio.seq15 = s0; out.c15last = (await import('/src/3d/combat15c.js')).last9; out.c15last = out.c15last ? { done: out.c15last.done, hits: out.c15last.hit.filter(Boolean).length, maxVisible: out.c15last.maxVisible } : null;
@@ -62,7 +65,7 @@ let pass = 0, fail = 0; const ok = (c, m) => { if (c) { pass++; console.log('  o
   ok(S.enemyHp === offHp && S.weak === offW && S.cd === offCd, 'Overclock\'s damage, attack-down and cooldown are exactly the same with the presentation on and off (foe HP ' + S.enemyHp + ' vs ' + offHp + ')');
   ok(S.log.some((x) => /^use:e:/.test(x)) && !S.over, 'turns continue: the foe takes its turn after the swords, and the battle carries on');
   ok(S.seq.indexOf('atem9') >= 0, 'the layered nine-sword sound sequence plays (activation, assembly, launches, impacts, retraction)');
-  ok(Math.max(0, ...S.samples.map((s) => (s && s.camFocus) || 0)) > 0.3 && S.c15.camFocus < 0.05, 'the camera frames the sequence and the target, then returns to the battle view (peak ' + Math.max(0, ...S.samples.map((s) => (s && s.camFocus) || 0)) + ', end ' + S.c15.camFocus + ')');
+  ok(Math.max(0, ...S.samples.map((s) => (s && s.camFocus) || 0)) > 0.3 && S.c15.camFocus < 0.05, 'the camera frames the sequence and the target, then returns to the battle view (peak ' + Math.max(0, ...S.samples.map((s) => (s && s.camFocus) || 0)) + ', end ' + S.c15.camFocus + ', settled after ' + S.settleMs + ' ms)');
   const S2 = await fight(page, 'atem2', 'rockraki', ['bladeform']), S1 = await fight(page, 'atem1', 'rockraki', ['gearstrike']);
   ok(!S2.log.includes('use:p:special9') && !S1.log.includes('use:p:special9') && !S2.samples.some((s) => s && s.swords && s.swords.start > 0 && s.swords.visible), 'Atem I and Atem II keep their own weapon presentations (no swords)');
   // interruption: leave the battle while the swords are out

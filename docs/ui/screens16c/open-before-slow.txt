@@ -1,0 +1,3 @@
+slow {"windowMs":25751,"busyPct":39.7,"longTasks":9,"maxTask":2981,"passes":null,"occFrameMs":null,"frames":8,"resting":false,"slow":true,"inputMedian":17,"inputP90":788,"inputMax":2517}
+slow {"windowMs":25408,"busyPct":38,"longTasks":8,"maxTask":3167,"passes":null,"occFrameMs":null,"frames":7,"resting":false,"slow":true,"inputMedian":17,"inputP90":570,"inputMax":2711}
+slow {"windowMs":25699,"busyPct":42.5,"longTasks":10,"maxTask":3397,"passes":null,"occFrameMs":null,"frames":8,"resting":false,"slow":true,"inputMedian":19,"inputP90":799,"inputMax":2926}

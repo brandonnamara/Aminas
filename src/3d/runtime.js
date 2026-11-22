@@ -25,11 +25,13 @@ function getRenderer() {
   renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.NeutralToneMapping; renderer.toneMappingExposure = 1;
   renderer.setPixelRatio(pr);
   renderer.domElement.className = 'c3d-canvas';
-  renderer.domElement.addEventListener('webglcontextlost', (e) => { e.preventDefault(); contextLost = true; stop(); if (A.UI && A.UI.toast) A.UI.toast('3D view paused (the graphics context was lost). Reopen the screen to restore it.', 't'); });
-  renderer.domElement.addEventListener('webglcontextrestored', () => { contextLost = false; });
+  // Phase 16C: the loop used to stay stopped after the context came back, so a battle stayed frozen until the screen
+  // was reopened. three.js restores its own state; the loop now starts again by itself.
+  renderer.domElement.addEventListener('webglcontextlost', (e) => { e.preventDefault(); contextLost = true; ctxEvents.lost++; stop(); if (A.UI && A.UI.toast) A.UI.toast('3D view paused while the graphics reset. It comes back on its own.', 't'); });
+  renderer.domElement.addEventListener('webglcontextrestored', () => { contextLost = false; ctxEvents.restored++; lastDraw = 0; start(); });
   return renderer;
 }
-let contextLost = false;
+let contextLost = false; const ctxEvents = { lost: 0, restored: 0 };
 // Adaptive resolution: if frames are slow for a while, render fewer pixels (down to 1x); speed back up when there is room.
 // Dev 7: phones (coarse pointer) render at most 1.5x: voxel art stays sharp and it is ~44% fewer pixels than 2x
 const COARSE = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
@@ -544,6 +546,6 @@ export function resolutionLog(since) { return adaptLog.filter((e) => !since || e
 export function resetResolution() { if (!renderer) return; pr = prCap(); renderer.setPixelRatio(pr); resize(); slow = quick = sampled = 0; since = 0; }
 export function stats() {
   const i = renderer ? renderer.info : null;
-  return { c3dFps: +fps.toFixed(1), drawn, starts, loopRunning: !!raf, targetFps: Perf() ? Perf().targetFps() : 60, pixelRatio: pr, drawCalls: i ? i.render.calls : 0, triangles: i ? i.render.triangles : 0, geometries: i ? i.memory.geometries : 0, textures: i ? i.memory.textures : 0, templates: templates.size, live: !!active };
+  return { ctx: { lost: contextLost, events: Object.assign({}, ctxEvents) }, programs: renderer && renderer.info.programs ? renderer.info.programs.length : null, c3dFps: +fps.toFixed(1), drawn, starts, loopRunning: !!raf, targetFps: Perf() ? Perf().targetFps() : 60, pixelRatio: pr, drawCalls: i ? i.render.calls : 0, triangles: i ? i.render.triangles : 0, geometries: i ? i.memory.geometries : 0, textures: i ? i.memory.textures : 0, templates: templates.size, live: !!active };
 }
 export const VERSION = C.VERSION;

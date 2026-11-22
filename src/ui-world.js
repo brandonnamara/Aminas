@@ -244,7 +244,14 @@
       else if (d && d.moved && d.mode === 'pan' && !wasPinch && d.hist && d.hist.length > 1) { const a = d.hist[0], b = d.hist[d.hist.length - 1], dt = b.t - a.t; if (dt > 0 && performance.now() - b.t < 90) fling((b.x - a.x) / dt, (b.y - a.y) / dt); }
     }
   }
-  function onCancel(e) { ptrs.delete(e.pointerId); if (!ptrs.size) { drag = null; pinch = null; UI.dragging = false; } }
+  function onCancel(e) { ptrs.delete(e.pointerId); if (!ptrs.size) { drag = null; pinch = null; UI.dragging = false; const w = $('#world'); if (w) w.classList.remove('dragging'); } }
+  // Phase 16C: iOS can take a touch away without telling the page (the app goes to the background mid-drag, a
+  // notification or system gesture). A finger left in the pointer map made the next one-finger drag act as a pinch.
+  // Leaving the page, or the window losing focus, now clears every touch in progress.
+  function resetPointers() { if (!ptrs.size && !drag && !pinch) return; ptrs.clear(); drag = null; pinch = null; UI.dragging = false; const w = $('#world'); if (w) w.classList.remove('dragging'); UI.ptrResets = (UI.ptrResets || 0) + 1; }
+  UI.resetPointers = resetPointers; UI.pointerState = () => ({ pointers: ptrs.size, drag: !!drag, pinch: !!pinch });
+  document.addEventListener('visibilitychange', () => { if (document.hidden) resetPointers(); });
+  root.addEventListener('pagehide', resetPointers); root.addEventListener('blur', resetPointers);
 
   function tap(target, px, py) {
     if (UI.screen !== 'island' || UI.busy || UI.modalOpen()) return;

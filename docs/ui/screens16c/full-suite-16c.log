@@ -1,0 +1,86 @@
+baseline: 5 passed, 0 failed
+campaign: 60 passed, 0 failed
+migration v0.6: 22 passed, 0 failed
+modes: 41 passed, 0 failed
+forge: 53 passed, 0 failed
+dev8: 49 passed, 0 failed
+browser v0.6: 48 passed, 0 failed
+browser dev7: 30 passed, 0 failed
+browser dev8: 42 passed, 0 failed
+browser env1: 20 passed, 0 failed
+browser env1.2: 10 passed, 0 failed
+browser library: 11 passed, 0 failed
+PASSED: 19 passed, 0 failed (browser-env3)
+PASSED: 10 passed, 0 failed (browser-env4)
+PASSED: 12 passed, 0 failed (browser-ui5)
+PASSED: 45 passed, 0 failed (browser-ui6)
+PASSED: 30 passed, 0 failed (browser-arena7)
+PASSED: 31 passed, 0 failed (browser-bench-battle)
+PASSED: 23 passed, 0 failed (browser-perf-fix)
+PASSED: 38 passed, 0 failed (browser-showcase8)
+PASSED: 38 passed, 0 failed (browser-p8fix)
+PASSED: 47 passed, 0 failed (browser-roster8b)
+raid12a: 31 passed, 0 failed
+PASSED: 18 passed, 0 failed (browser-raid12a)
+hideseek: 60 passed, 0 failed
+PASSED: 41 passed, 0 failed (browser-hideseek)
+hideseek12c: 30 passed, 0 failed
+PASSED: 58 passed, 0 failed (browser-hideseek12c)
+progression13a: 40 passed, 0 failed
+PASSED: 41 passed, 0 failed (browser-progress13a)
+hatchery13b: 41 passed, 0 failed
+PASSED: 35 passed, 0 failed (browser-hatchery13b)
+gear13c: 46 passed, 0 failed
+PASSED: 39 passed, 0 failed (browser-gear13c)
+economy13d: 14 passed, 0 failed
+PASSED: 5 passed, 0 failed (browser-rewards13d)
+PASSED: 31 passed, 0 failed (browser-models14)
+PASSED: 16 passed, 0 failed (browser-world14)
+40 passed, 0 failed
+browser-roster15b: 37 passed, 0 failed
+browser-combat15c: 33 passed, 0 failed
+browser-final15d: 37 passed, 0 failed
+PASSED: 12 passed, 0 failed (browser-intro14)
+onboard16: 37 passed, 0 failed
+69 passed, 0 failed (browser-onboard16)
+savefile16b: 47 passed, 0 failed
+browser-polish16b.test.js: FAILED
+  ok  Settings › Your save has Export save file and Import save file (no Undo before any import)
+  ok  Export downloads a file named for the player and time (aminas-save-Rowan-20261122-0827.json)
+  ok  the downloaded file is a complete, valid save of this game
+  ok  after exporting, a sheet says which file was saved and offers Copy save text (a page cannot confirm the browser kept it)
+  ok  a cut-short file is refused with a plain reason
+  ok  and nothing changed
+  ok  an edited file fails its checksum and is refused
+  ok  a save from a newer game version is refused
+  ok  an unrelated file is refused
+  ok  after four refused files the game and the stored save are untouched
+  ok  a valid file shows what it contains beside the current game, and asks first
+  ok  Cancel changes nothing
+  ok  Replace loads the file as the current game (and saves it), once
+  ok  Settings now offers Undo last import
+  ok  Undo shows which game it will put back
+  ok  Undo restores the earlier game exactly
+  ok  after a reload the restored game is still there, and the other one is still recoverable
+  ok  a bad backup code gives a plain reason
+  ok  a good backup code now opens the same confirmation instead of replacing the game at once
+  ok  Dialogue text size: standard 15.015 px, large 17.745 px, larger 20.748 px
+FAIL  at every size the panel stays on screen and never covers Aa, Auto or Skip
+  ok  Instant shows the whole line at once (228/228, 228/228, 228/228)
+  ok  every dialogue panel has an Aa button
+  ok  Aa changes the size at once and saves it
+  ok  Settings has Dialogue text size and an Instant text speed
+  ok  story scenes: none available to replay here (checked in the dialogue tests above)
+  ok  a tap 5 px above a 27 px filter chip selects it (hit assist)
+  ok  a tap on the dimmed backdrop still closes the panel, as before
+  ok  closing fades a copy for 150 ms with no ids or actions, then removes it
+  ok  Reduce Motion: no fade
+  ok  a refused action shakes the pressed button (no craft button to test)
+  ok  the task pill tracks the Forgotten Road once you are partway through it ("CURRENT TASK The Forgotten Road Clear the Forgotten Road · Battle 4 of")
+  ok  its Go opens the Forgotten Road
+  ok  no script errors
+
+FAILED: 33 passed, 1 failed (browser-polish16b)
+
+20 passed, 0 failed (browser-stability16c)
+exit 1

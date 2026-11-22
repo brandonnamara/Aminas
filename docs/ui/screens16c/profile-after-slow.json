@@ -1,0 +1,347 @@
+{
+ "label": "after",
+ "cond": "slow",
+ "note": "Desktop Chromium + SwiftShader software WebGL, 844x390 at DPR 2, CPU throttled x4 (simulated slow device). Not an iPhone.",
+ "titleMs": 470,
+ "scenes": {
+  "island": {
+   "firstMs": 10465,
+   "longTasks": {
+    "count": 10,
+    "totalMs": 12222,
+    "maxMs": 4416
+   },
+   "pace": {
+    "frames": 48,
+    "fps": 12,
+    "median": 16.7,
+    "p95": 33.4,
+    "worst": 3099.9,
+    "over50": 1
+   },
+   "stats": {
+    "c3d": null,
+    "isl": {
+     "calls": 76,
+     "triangles": 143953,
+     "geometries": 80,
+     "textures": 4,
+     "avgDrawMs": 832.22,
+     "shadowMap": 2048
+    },
+    "dom": 2631,
+    "saver": false
+   }
+  },
+  "collection": {
+   "firstMs": 571,
+   "longTasks": {
+    "count": 2,
+    "totalMs": 1103,
+    "maxMs": 1011
+   },
+   "pace": {
+    "frames": 242,
+    "fps": 60.5,
+    "median": 16.7,
+    "p95": 16.7,
+    "worst": 16.8,
+    "over50": 0
+   },
+   "stats": {
+    "c3d": null,
+    "isl": {
+     "calls": 76,
+     "triangles": 143953,
+     "geometries": 80,
+     "textures": 4,
+     "avgDrawMs": 788.7,
+     "shadowMap": 2048
+    },
+    "dom": 3595,
+    "saver": false
+   }
+  },
+  "building": {
+   "firstMs": 277,
+   "longTasks": {
+    "count": 3,
+    "totalMs": 242,
+    "maxMs": 120
+   },
+   "pace": {
+    "frames": 239,
+    "fps": 59.8,
+    "median": 16.7,
+    "p95": 16.7,
+    "worst": 66.6,
+    "over50": 1
+   },
+   "stats": {
+    "c3d": null,
+    "isl": {
+     "calls": 76,
+     "triangles": 143953,
+     "geometries": 80,
+     "textures": 4,
+     "avgDrawMs": 788.7,
+     "shadowMap": 2048
+    },
+    "dom": 3299,
+    "saver": false
+   }
+  },
+  "detail": {
+   "firstMs": 1904,
+   "longTasks": {
+    "count": 7,
+    "totalMs": 3786,
+    "maxMs": 1481
+   },
+   "pace": {
+    "frames": 83,
+    "fps": 20.8,
+    "median": 50,
+    "p95": 66.7,
+    "worst": 100,
+    "over50": 21
+   },
+   "stats": {
+    "c3d": {
+     "drawCalls": 4,
+     "triangles": 12472,
+     "geometries": 4,
+     "textures": 2,
+     "pixelRatio": 1,
+     "c3dFps": 23.2
+    },
+    "isl": {
+     "calls": 76,
+     "triangles": 143953,
+     "geometries": 80,
+     "textures": 4,
+     "avgDrawMs": 784.42,
+     "shadowMap": 2048
+    },
+    "dom": 4510,
+    "saver": false
+   }
+  },
+  "dungeons": {
+   "firstMs": 1670,
+   "longTasks": {
+    "count": 3,
+    "totalMs": 1583,
+    "maxMs": 1252
+   },
+   "pace": {
+    "frames": 118,
+    "fps": 29.5,
+    "median": 33.3,
+    "p95": 50,
+    "worst": 166.6,
+    "over50": 2
+   },
+   "stats": {
+    "c3d": {
+     "drawCalls": 4,
+     "triangles": 12472,
+     "geometries": 2,
+     "textures": 1,
+     "pixelRatio": 1,
+     "c3dFps": 23.2
+    },
+    "isl": {
+     "calls": 76,
+     "triangles": 143953,
+     "geometries": 80,
+     "textures": 4,
+     "avgDrawMs": 773.37,
+     "shadowMap": 2048
+    },
+    "dom": 5121,
+    "saver": false
+   }
+  },
+  "combat": {
+   "firstMs": 1546,
+   "longTasks": {
+    "count": 17,
+    "totalMs": 3820,
+    "maxMs": 903
+   },
+   "pace": {
+    "frames": 31,
+    "fps": 7.8,
+    "median": 133.3,
+    "p95": 183.3,
+    "worst": 250,
+    "over50": 30
+   },
+   "stats": {
+    "c3d": {
+     "drawCalls": 20,
+     "triangles": 14134,
+     "geometries": 19,
+     "textures": 5,
+     "pixelRatio": 1,
+     "c3dFps": 7.7
+    },
+    "isl": {
+     "calls": 76,
+     "triangles": 143953,
+     "geometries": 80,
+     "textures": 4,
+     "avgDrawMs": 773.37,
+     "shadowMap": 2048
+    },
+    "dom": 868,
+    "saver": false
+   }
+  },
+  "combatBig": {
+   "firstMs": 1629,
+   "longTasks": {
+    "count": 20,
+    "totalMs": 3661,
+    "maxMs": 874
+   },
+   "pace": {
+    "frames": 27,
+    "fps": 6.8,
+    "median": 150.1,
+    "p95": 183.4,
+    "worst": 199.9,
+    "over50": 26
+   },
+   "stats": {
+    "c3d": {
+     "drawCalls": 22,
+     "triangles": 35776,
+     "geometries": 23,
+     "textures": 5,
+     "pixelRatio": 1,
+     "c3dFps": 6.6
+    },
+    "isl": {
+     "calls": 76,
+     "triangles": 143953,
+     "geometries": 80,
+     "textures": 4,
+     "avgDrawMs": 773.37,
+     "shadowMap": 2048
+    },
+    "dom": 409,
+    "saver": false
+   }
+  }
+ },
+ "memory": [
+  {
+   "cycle": 0,
+   "heapMB": 14.88,
+   "nodes": 7366,
+   "listeners": 69,
+   "docs": 14,
+   "c3dGeo": 9,
+   "c3dTex": 2,
+   "templates": 4,
+   "c3dLoop": false,
+   "islGeo": 80,
+   "islTex": 4,
+   "canvases": 2,
+   "overlays": 0
+  },
+  {
+   "cycle": 1,
+   "heapMB": 15.08,
+   "nodes": 7358,
+   "listeners": 68,
+   "docs": 14,
+   "c3dGeo": 9,
+   "c3dTex": 2,
+   "templates": 4,
+   "c3dLoop": false,
+   "islGeo": 80,
+   "islTex": 4,
+   "canvases": 2,
+   "overlays": 0
+  },
+  {
+   "cycle": 2,
+   "heapMB": 15.26,
+   "nodes": 7358,
+   "listeners": 68,
+   "docs": 14,
+   "c3dGeo": 9,
+   "c3dTex": 2,
+   "templates": 4,
+   "c3dLoop": false,
+   "islGeo": 80,
+   "islTex": 4,
+   "canvases": 2,
+   "overlays": 0
+  },
+  {
+   "cycle": 3,
+   "heapMB": 15.37,
+   "nodes": 7358,
+   "listeners": 68,
+   "docs": 14,
+   "c3dGeo": 9,
+   "c3dTex": 2,
+   "templates": 4,
+   "c3dLoop": false,
+   "islGeo": 80,
+   "islTex": 4,
+   "canvases": 2,
+   "overlays": 0
+  },
+  {
+   "cycle": 4,
+   "heapMB": 15.47,
+   "nodes": 7358,
+   "listeners": 68,
+   "docs": 14,
+   "c3dGeo": 9,
+   "c3dTex": 2,
+   "templates": 4,
+   "c3dLoop": false,
+   "islGeo": 80,
+   "islTex": 4,
+   "canvases": 2,
+   "overlays": 0
+  },
+  {
+   "cycle": 5,
+   "heapMB": 15.53,
+   "nodes": 7358,
+   "listeners": 68,
+   "docs": 14,
+   "c3dGeo": 9,
+   "c3dTex": 2,
+   "templates": 4,
+   "c3dLoop": false,
+   "islGeo": 80,
+   "islTex": 4,
+   "canvases": 2,
+   "overlays": 0
+  },
+  {
+   "cycle": 6,
+   "heapMB": 15.55,
+   "nodes": 7366,
+   "listeners": 69,
+   "docs": 14,
+   "c3dGeo": 9,
+   "c3dTex": 2,
+   "templates": 4,
+   "c3dLoop": false,
+   "islGeo": 80,
+   "islTex": 4,
+   "canvases": 2,
+   "overlays": 0
+  }
+ ],
+ "errors": []
+}

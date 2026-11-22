@@ -14,6 +14,14 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   page.on('pageerror', (e) => errors.push('pageerror: ' + e.message)); page.on('console', (m) => { if (m.type() === 'error' && !/404|Failed to load resource|sw\.js|ServiceWorker/i.test(m.text())) errors.push('console: ' + m.text()); });
   const shot = (n) => page.screenshot({ path: path.join(SHOTS, n + '.png') });
   const ev = (fn, arg) => page.evaluate(fn, arg);
+  // Phase 16C (approved): condition-based waits. Each waits for something observable on the page, with an explicit
+  // maximum; the assertions after them are unchanged.
+  const until = (fn, arg, ms) => page.waitForFunction(fn, arg, { timeout: ms || 20000, polling: 50 });
+  // the island has drawn its first frames and the page has painted twice since (its first draw is the longest task)
+  const islandReady = async () => { await until(() => !!document.querySelector('#world') && (!A.VoxIsland || !A.VoxIsland.stats || !A.VoxIsland.stats() || A.VoxIsland.stats().frames >= 1), null, 60000); await responsive(); };
+  // ...and the page has got through the island's opening draws: three frames in a row less than 250 ms apart (a
+  // software-rendered first draw can hold the page for seconds, and a tap sent meanwhile can outlast its own timeout)
+  async function responsive() { await page.waitForFunction(() => new Promise((res) => { let n = 0, p = performance.now(); const f = (t) => { if (t - p < 250) n++; else n = 0; p = t; if (n >= 3) res(true); else if (performance.now() - window.__r0 > 1500) res(false); else requestAnimationFrame(f); }; window.__r0 = performance.now(); requestAnimationFrame(f); }), null, { timeout: 60000, polling: 50 }); }
   const calm = async () => { for (let i = 0; i < 12; i++) { const d = await page.$('.dlg-skip'); if (d) { await d.click(); await sleep(400); } else break; } await ev(() => { A.UI.queue.length = 0; A.UI.busy = false; A.UI.closeAll(); document.querySelectorAll('#toast-root .toast, .ach-toast').forEach((t) => t.remove()); }); };
 
   /* ---------- a brand-new player: the avatar creator comes first ---------- */
@@ -26,14 +34,14 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   ok(!!(await page.$('.avc.first')), 'tapping outside does not skip it');
   await page.click('[data-act=avStep][data-k=hair][data-d="1"]'); await page.click('[data-act=avStep][data-k=hairCol][data-d="1"]'); await page.click('[data-act=avStep][data-k=acc][data-d="1"]');
   await page.fill('#avc-name', 'Tester<script>'); await shot('01-creator');
-  await page.click('#avc-ok'); await page.click('#avc-ok').catch(() => {}); await sleep(600);
+  await page.click('#avc-ok'); await page.click('#avc-ok').catch(() => {}); await until(() => A.State.state.avatar.made && !!document.querySelector('.intro'));
   const av = await ev(() => A.State.state.avatar);
   ok(av.made && av.look.hair === 1 && av.look.hairCol === 2 && av.look.acc === 1 && av.name === 'Testerscript', 'the chosen look and a cleaned-up name are saved');
   ok(!!(await page.$('.intro')), 'confirming continues into the story');
   // skip the intro and the starter choice
-  await page.click('[data-act=introSkip]'); await sleep(900); await calm(); await sleep(300);
+  await page.click('[data-act=introSkip]'); await until(() => !document.querySelector('.intro')); await calm();
   await ev(() => { const s = A.State.state; if (!s.starter) { s.starter = 'lumifern'; s.phase = 'play'; A.Rules.addAmina(s, 'lumifern', 1); A.State.save(); } });
-  await page.reload(); await page.waitForSelector('.logo'); await page.click('[data-act=continue]'); await sleep(1000); await calm();
+  await page.reload(); await page.waitForSelector('.logo'); await page.click('[data-act=continue]'); await islandReady(); await calm();
   ok(!(await page.$('.avc')) && !!(await page.$('#world')), 'a returning player loads straight into the island (no creator)');
   ok(await ev(() => A.State.state.avatar.look.hair === 1), 'the avatar survives a reload');
 
@@ -46,7 +54,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     A.State.save = () => true; // stop the page's unload handler from writing the current game over the injected save
     localStorage.setItem(A.Data.SAVE_KEY, JSON.stringify(s)); localStorage.removeItem(A.Data.SAVE_KEY + '-backup');
   });
-  await page.reload(); await page.waitForSelector('.logo'); await page.click('[data-act=continue]'); await sleep(1100); await calm();
+  await page.reload(); await page.waitForSelector('.logo'); await page.click('[data-act=continue]'); await islandReady(); await calm();
   ok(!(await page.$('.avc')) && !!(await page.$('#world')), 'an existing save loads into the island without forcing the creator');
   ok(await ev(() => A.State.state.schema === 6 && A.State.state.res.gold === 6000 && A.State.state.aminas.length === 3), 'it migrated to schema 6 with progress intact');
   await page.mouse.move(820, 200); await shot('02-island');
@@ -65,7 +73,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   ok(await ev(() => document.querySelectorAll('.profile .ach').length >= 15 && !!document.querySelector('.profile .ach .bar')), 'Achievements lists progress');
   await shot('03-profile-ach');
   await page.click('[data-act=pfTab][data-tab=cust]'); await page.click('[data-act=avOpen]'); await page.waitForSelector('.avc:not(.first)');
-  await page.click('[data-act=avStep][data-k=outfit][data-d="1"]'); await page.click('#avc-ok'); await sleep(600);
+  await page.click('[data-act=avStep][data-k=outfit][data-d="1"]'); await page.click('#avc-ok'); await until(() => A.State.state.avatar.made && !document.querySelector('.avc') && !document.querySelector('.avatar-btn .badge.dot')).catch(() => {});
   ok(await ev(() => A.State.state.avatar.made && A.State.state.avatar.look.outfit === 1 && !document.querySelector('.avatar-btn .badge.dot')), 'Customisation reopens the creator and saves the change');
   await calm();
 
@@ -119,7 +127,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   const p2 = await ev((id) => { const b = A.State.state.buildings[id], g = A.UI.bm.ghost; return { x: b.x, y: b.y, gx: g.x, gy: g.y, msg: document.querySelector('#bbar-root').innerText }; }, lid);
   ok(p2.x === p1.x && p2.y === p1.y && p2.gx === p1.x && /stays where it was/.test(p2.msg), 'an invalid drop is refused and it snaps back, with a reason');
   await shot('06-placement');
-  await page.reload(); await page.waitForSelector('.logo'); await page.click('[data-act=continue]'); await sleep(900); await calm();
+  await page.reload(); await page.waitForSelector('.logo'); await page.click('[data-act=continue]'); await islandReady(); await calm();
   ok(await ev((a) => { const b = A.State.state.buildings[a[0]]; return b.x === a[1] && b.y === a[2]; }, [lid, p1.x, p1.y]), 'the new position survives a reload');
   await ev((id) => { A.UI.enterBuild(); A.UI.selectForMove(id); }, lid); await sleep(200);
   await ev((t) => { A.UI.ghostTo(t[0] + 0, t[1]); }, [p1.x, p1.y]);
@@ -138,7 +146,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   const hp = await ev((a) => ({ k: A.World.prodKind(A.State.state.buildings[a]), gold: A.State.state.res.gold }), hid);
   ok(hp.k === 'ess_water' && hp.gold === g0 + 25, 'switching asks first, collects the 25 stored gold, then makes Water Essence');
   await shot('07-habitat');
-  await page.reload(); await page.waitForSelector('.logo'); await page.click('[data-act=continue]'); await sleep(800); await calm();
+  await page.reload(); await page.waitForSelector('.logo'); await page.click('[data-act=continue]'); await islandReady(); await calm();
   ok(await ev((a) => A.World.prodKind(A.State.state.buildings[a]) === 'ess_water', hid), 'the choice persists after a reload');
 
   /* ---------- wallet ---------- */
