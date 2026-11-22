@@ -93,8 +93,8 @@
       unlock: { struct: 'reliquarygate' }, unlockText: 'Restore the Reliquary Gate.', env: 'vault',
       battles: nine(['acinus', 'terraflora', 'gaiaroki', 'sylvaneer', 'acinus'], 3, 5).concat([{ sp: 'terraki', lv: 6, boss: true, title: 'Rootbound Sentinel', hpMult: 1.1, move: 'rootcrush' }]),
       sections: sec({ name: 'Mossy Threshold', first: { gold: 20, food: 6 } }, { name: 'The Whispering Stacks', first: { gold: 30, food: 8 } }, { name: 'The Root Halls', first: { gold: 30, food: 8 } }, { name: 'Heart of the Reliquary', first: { gems: 2 } }),
-      clearReward: { gold: 150, food: 40, gems: 5 },
-      rewardText: '150 gold, 40 food, 5 gems on each clear. Gaiaroki II on your first clear, Sylvaneer II on your second.',
+      first: { gold: 150, food: 40, gems: 5 }, repeat: { gold: 50, food: 15 }, // Phase 17B: was 150/40/5 gems on every clear
+      rewardText: 'First clear: 150 gold, 40 food, 5 gems and Gaiaroki II. Second clear: Sylvaneer II. Replays: 50 gold, 15 food.',
     },
     /* ===== Dungeons 4-5 ===== */
     drownedsteps: {
@@ -110,7 +110,7 @@
       name: 'The Cold Kiln', island: 'starter', el: 'fire', playable: true, recommended: 10,
       theme: 'A kiln big enough to walk into, gone cold for an age. Something inside has started warming it again.',
       unlock: { flag: 'r1' }, unlockText: 'Investigate the humming stones on the east shore.', env: 'kiln',
-      battles: nine(['pyrokai', 'pyrocell', 'emberix', 'pyrokai', 'igniflare'], 8, 10).concat([{ sp: 'pyroforge', lv: 12, boss: true, title: 'The Kiln Mother', hpMult: 1.55, scale: 1.5, move: 'kilnflare' }]),
+      battles: nine(['pyrokai', 'pyrocell', 'emberix', 'pyrokai', 'igniflare'], 8, 10).concat([{ sp: 'pyroforge', lv: 11, boss: true, title: 'The Kiln Mother', hpMult: 1.55, scale: 1.5, move: 'kilnflare' }]), // Phase 17B: level 12 -> 11 (the spike)
       sections: sec({ name: 'The Ash Yard', first: { gold: 70, food: 18 } }, { name: 'The Firing Room', first: { gold: 80, food: 20 } }, { name: 'The Chimney', first: { gold: 90, food: 22 } }, { name: 'The Kiln Heart', first: { gems: 5 } }),
       first: { gold: 340, food: 80, gems: 6 }, repeat: { gold: 100, food: 25 },
       rewardText: 'First clear: 340 gold, 80 food, 6 gems. Replays: 100 gold, 25 food.',
@@ -123,8 +123,8 @@
       species: ['voltar', 'zeep', 'voltar2'],
       battles: nine(['voltar', 'zeep', 'voltar2', 'duskmantle', 'zeep'], 9, 12).concat([{ sp: 'zeep2', lv: 13, boss: true, title: 'Keeper of Unsaid Things', hpMult: 1.2, move: 'unsaidverdict' }]),
       sections: sec({ name: 'The Unwritten Hall', first: { gold: 60, food: 15 } }, { name: 'Margins of Memory', first: { gold: 80, food: 20 } }, { name: 'The Folded Corridor', first: { gold: 80, food: 20 } }, { name: 'The Hollow Warden', first: { gems: 4 } }),
-      clearReward: { gold: 420, food: 100, gems: 12 },
-      rewardText: '420 gold, 100 food, 12 gems on each clear, plus Meta on your first clear.',
+      first: { gold: 420, food: 100, gems: 12 }, repeat: { gold: 140, food: 35 }, // Phase 17B: was 420/100/12 gems on every clear
+      rewardText: 'First clear: 420 gold, 100 food, 12 gems and Meta. Replays: 140 gold, 35 food.',
     },
     /* ===== Dungeons 7-8 ===== */
     lanternorchard: {
@@ -153,8 +153,8 @@
       species: ['aimza', 'voltar2', 'zeep2', 'aimza2'],
       battles: nine(['aimza', 'voltar2', 'zeep2', 'aimza', 'aimza2'], 15, 18).concat([{ sp: 'aimza2', lv: 20, boss: true, title: 'The Echo at the Centre', hpMult: 1.25, move: 'resonantcollapse' }]),
       sections: sec({ name: 'Where the Sky Is Floor', first: { gold: 120, food: 30 } }, { name: 'The Long Moment', first: { gold: 160, food: 40 } }, { name: 'The Sideways Hour', first: { gold: 160, food: 40 } }, { name: 'The Quiet Centre', first: { gems: 6 } }),
-      clearReward: { gold: 900, food: 220, gems: 25 },
-      rewardText: '900 gold, 220 food, 25 gems on each clear, plus Atem on your first clear.',
+      first: { gold: 900, food: 220, gems: 25 }, repeat: { gold: 250, food: 55 }, // Phase 17B: was 900/220/25 gems on every clear
+      rewardText: 'First clear: 900 gold, 220 food, 25 gems and Atem. Replays: 250 gold, 55 food.',
     },
     /* ===== Dungeon 10: the Island Boss ===== */
     heartwood: {
@@ -179,6 +179,27 @@
     obsidian: { dungeons: [], islandBoss: null, next: 'celestial', hint: 'Dark stone, and a warmth that does not come from any sun.' },
     celestial: { dungeons: [], islandBoss: null, next: null, hint: 'High up. Higher than an island has any right to be.' },
   };
+  /* ---------- Phase 17B: the run-up to each boss ----------
+     elites: the third section's foes (battles 7-9) appear in the form their level calls for (second form from level 12,
+             third from 22), as the player's own Aminas do, instead of first forms against an evolved party.
+     herald: battle 9 rehearses the boss. It carries the boss's charged move (the same telegraph, a guard blocks it),
+             or for a barrier boss a single barrier at half health. Species, levels, clues and settings are unchanged. */
+  D.DUNGEON17 = { elites: true, herald: true };
+  Object.keys(D.DUNGEONS).forEach((id) => {
+    const d = D.DUNGEONS[id], boss = d.battles[9], form = (spId, lv) => {
+      const s = D.SPECIES[spId], L = s && D.LINES[s.line]; if (!L) return spId;
+      const want = lv >= 22 ? 3 : lv >= 12 ? 2 : 1; return want > s.stage ? L.ids[want - 1] : spId;
+    };
+    d.battles.forEach((b, i) => {
+      b.base17 = { sp: b.sp }; // what the battle was before Phase 17B (kept for the simulator and the notes)
+      if (D.DUNGEON17.elites && i >= 6 && i <= 8) b.sp = form(b.sp, b.lv);
+      if (D.DUNGEON17.herald && i === 8 && boss) {
+        if (boss.move) b.move = boss.move;
+        else if (boss.mech && boss.mech.type === 'barrier') b.mech = { type: 'barrier', at: [0.5], amt: boss.mech.amt };
+        b.herald = true;
+      }
+    });
+  });
   D.DUNGEON_ORDER = [];
   D.ISLAND_ORDER.forEach((iid) => {
     const c = D.CAMPAIGN[iid]; if (!c) return;

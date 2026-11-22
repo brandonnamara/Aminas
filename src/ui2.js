@@ -47,7 +47,7 @@
     if (k === 'locked') actions = '<div class="lockmsg">' + I('lock') + ' ' + esc(R.dungeonLockText(s, id)) + '</div><button class="btn ghost" data-act="dWhy" data-id="' + id + '">' + I('arrow') + ' Show me</button>';
     else if (run) actions = '<button class="btn gold" data-act="resumeRun" data-id="' + id + '" data-hl="enter:' + id + '">' + I('swords') + ' Continue · battle ' + (run.battle + 1) + '</button><button class="btn small ghost" data-act="dropRun">Leave the dungeon</button>';
     else if (s.run) actions = '<div class="lockmsg">You are partway through ' + esc(D.DUNGEONS[s.run.d].name) + '. Continue or leave it first.</div><button class="btn" data-act="dSel" data-id="' + s.run.d + '">Go to it</button>';
-    else if (k === 'completed') actions = '<button class="btn gold" data-act="enterDungeon" data-id="' + id + '" data-from="0" data-hl="enter:' + id + '">' + I('swords') + ' Replay from battle 1</button><button class="btn small" data-act="enterDungeon" data-id="' + id + '" data-from="9">Fight the boss again</button>';
+    else if (k === 'completed') actions = '<button class="btn gold" data-act="enterDungeon" data-id="' + id + '" data-from="0" data-hl="enter:' + id + '">' + I('swords') + ' Replay from battle 1</button><button class="btn small" data-act="enterDungeon" data-id="' + id + '" data-from="9">Fight the boss again · battle reward only</button>';
     else actions = '<button class="btn gold" data-act="enterDungeon" data-id="' + id + '" data-hl="enter:' + id + '">' + I('swords') + ' ' + (at > 0 ? 'Continue · battle ' + (at + 1) : 'Enter · battle 1') + '</button>';
     return '<div class="dd ' + k + ' d-' + id + '"><div class="dd-art">' + (Art.hasEnv(d.battles[Math.max(0, Math.min(9, at))].env || d.env) ? Art.envBg(d.battles[Math.max(0, Math.min(9, at))].env || d.env) : Art.battleBg('', id)) + '<span class="dd-num">' + (boss.islandBoss ? 'ISLAND BOSS · ' : '') + 'DUNGEON ' + d.index + '</span></div>' +
       '<div class="dd-b"><h3>' + esc(d.name) + ' ' + chip(d.el) + ' ' + stateTag(k) + '</h3><div class="dd-a">' + actions + '</div><p>' + esc(d.theme) + '</p><p class="muted small-t"><b>Recommended level</b> ' + d.recommended + ' · <b>Rewards</b> ' + esc(d.rewardText) + '</p>' +
@@ -85,9 +85,13 @@
       } else info = o.note || '';
       const need = o.exact ? o.size : 1;
       const syn = R.synergies(sel.map((u) => D.SPECIES[R.inst(s, u).sp].el));
+      // Phase 17B: the guardian, its weaknesses once you have met it, and what your party has to answer it
+      const bb = d && R.bossBrief ? R.bossBrief(s, o.dungeon, sel) : null;
+      const bossHtml = bb ? '<div class="pp-syn pp-boss"><div>' + I('warn') + ' <b>' + esc(bb.title || 'The guardian') + '</b> ' + (bb.known ? bb.els.map(chip).join(' ') + ' <span class="muted">Weak to</span> ' + (bb.weakTo.length ? bb.weakTo.map(chip).join(' ') : '<span class="muted">nothing</span>') + (bb.resists.length ? ' <span class="muted">· resists</span> ' + bb.resists.map(chip).join(' ') : '') : '<span class="muted">Not met yet: its element shows here once you have faced it.</span>') + '</div>' +
+        (bb.advice.length ? '<div class="pp-adv">' + bb.advice.map((x) => '<span class="' + (x.k === 'good' ? 'good' : x.k === 'bad' ? 'bad' : 'muted') + '">' + esc(x.t) + '</span>').join(' ') + '</div>' : '') + '</div>' : '';
       const synHtml = o.size <= 3 ? '<div class="pp-syn">' + (syn.length ? syn.map((k) => '<div>' + UI.synChips([k]) + ' <span class="muted">' + esc(D.SYNERGIES[k].desc) + '</span></div>').join('') : '<span class="muted">No team synergy yet. Pair two of one element (Kindred), bring Light with Dark (Twilight Pact), or Fire, Water and Nature together (Elemental Triangle).</span>') + '</div>' : '';
       ov.innerHTML = UI.sheet(esc(o.title),
-        '<div class="party-row' + (o.size > 3 ? ' many' : '') + '">' + slots + '<div class="muted" style="font-size:.8rem;align-self:center">Pick ' + (o.exact ? 'exactly ' : 'up to ') + o.size + '. ' + (o.size <= 3 ? 'The first one fights first. ' : 'They fight in this order. ') + info + '</div></div>' + synHtml + '<div class="grid">' +
+        '<div class="party-row' + (o.size > 3 ? ' many' : '') + '">' + slots + '<div class="muted" style="font-size:.8rem;align-self:center">Pick ' + (o.exact ? 'exactly ' : 'up to ') + o.size + '. ' + (o.size <= 3 ? 'The first one fights first. ' : 'They fight in this order. ') + info + '</div></div>' + bossHtml + synHtml + '<div class="grid">' +
         list.map((a) => { const sp = D.SPECIES[a.sp], on = sel.indexOf(a.uid); return '<div class="card ' + (on >= 0 ? 'sel' : '') + '" data-pp="' + a.uid + '">' + artBox(a.sp) + (on >= 0 ? '<span class="cnt">#' + (on + 1) + '</span>' : '') + '<div class="nm">' + esc(sp.name) + '</div><div>' + chip(sp.el) + '</div><div class="lvl">Lv ' + a.lv + '</div></div>'; }).join('') + '</div>',
         '<button class="btn ghost" data-act="close">Back</button><button class="btn gold ' + (sel.length >= need ? '' : 'off') + '" id="pp-go">' + esc(o.go) + '</button>', 'wide');
       ov.querySelectorAll('[data-pp]').forEach((c) => (c.onclick = () => { Au.play('tap'); const u = +c.dataset.pp, i = sel.indexOf(u); if (i >= 0) sel.splice(i, 1); else if (sel.length < o.size) sel.push(u); draw(); }));
@@ -342,8 +346,10 @@
       const cf = B.cur(b), mvl = (cf && cf.mvl) || {};
       const pSts = Object.keys(d.pSt || {}).some((k) => d.pSt[k] > 0);
       // only rebuilt when something on the buttons changed, so the activation flash is never cut short
-      putHtml('b-actions', B.legal(b).map((a) => abilityBtn(a, off, d, en, mvl)).join('') +
-        '<button class="abtn swap ' + (off || B.alive(b) < 2 ? 'off' : '') + '" data-act="bSwapOpen" style="grid-column:span 2"><span class="ab-main"><b>' + I('swap') + ' Switch Amina</b><small>Uses your turn' + (pSts ? ' · clears status effects' : '') + '</small></span></button>');
+      // Phase 17B: with a kept third move, Switch shares the second row with it (same two-column grid)
+      const legal = B.legal(b);
+      putHtml('b-actions', legal.map((a) => abilityBtn(a, off, d, en, mvl)).join('') +
+        '<button class="abtn swap ' + (off || B.alive(b) < 2 ? 'off' : '') + '" data-act="bSwapOpen"' + (legal.length % 2 ? '' : ' style="grid-column:span 2"') + '><span class="ab-main"><b>' + I('swap') + ' Switch Amina</b><small>Uses your turn' + (pSts ? ' · clears status effects' : '') + '</small></span></button>');
     }
   }
   UI.bRender = bRender;
@@ -475,6 +481,10 @@
           bLog(e.k === 'regen' ? nameOf(e.who) + ' regenerates.' : e.k === 'twilight' ? 'The Twilight Pact mends ' + nameOf(e.who) + '.' : 'Recovered ' + e.amt + ' health.');
           bRender(); await sleep(e.k ? 440 : 560); break;
         case 'guard': if (e.who === 'p') d.pGuard = true; else d.eGuard = true; bLog(nameOf(e.who) + ' braces for impact.'); bRender(); await sleep(450); break;
+        // Phase 17B: a guard that took a hit readies a counter; healing clears what wore the Amina down
+        case 'hold': floatAt('e', 'Sputters!', 'status'); bLog(e.name + ' is soaked: ' + e.abName + ' sputters and waits a turn.'); await sleep(620); break;
+        case 'counter': floatAt(e.who, 'Counter ready', 'status'); bLog(nameOf(e.who) + ' held firm and is ready to strike back!'); bRender(); await sleep(420); break;
+        case 'cleanse': if (e.who === 'p') d.pWeak = e.weak; else d.eWeak = e.weak; floatAt(e.who, 'Cleansed', 'heal'); bLog(nameOf(e.who) + ' shakes off what was wearing it down.'); bRender(); await sleep(380); break;
         case 'weak': if (e.who === 'p') d.pWeak = (d.pWeak || 0) + 1; else d.eWeak = (d.eWeak || 0) + 1; floatAt(e.who, 'ATK down', 'status'); bLog(nameOf(e.who) + '’s attack fell!'); bRender(); await sleep(450); break;
         case 'status': {
           stSet(e.who)[e.k] = e.n; stg.status(e.who, D.STATUS[e.k].color);

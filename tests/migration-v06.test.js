@@ -32,7 +32,9 @@ const s2 = S.hydrate(v05Save()).st; s2.run = null;
 const gems0 = s2.res.gems; R.startRun(s2, 'reliquary', [1, 2, 3], { from: 9 });
 let b = R.createBattle(s2, seeded(1)); b.enemy.hp = 0; b.over = true; b.result = 'win'; const out = R.resolveBattle(s2, b);
 ok(out.cleared && !out.first && !out.sectionFirst && s2.dungeon.reliquary.clears === 4, 'a replay after migration is a normal replay');
-ok(s2.res.gems === gems0 + Math.round(D.DUNGEONS.reliquary.clearReward.gems * W.dungeonRewardMult(s2)), 'only the every-clear reward is paid');
+// Phase 17B (approved change): the Reliquary no longer pays gems on every clear, and a replay that starts at the boss
+// pays the boss battle only. Before 17B this checked that the every-clear gem reward was paid here.
+ok(s2.res.gems === gems0 && out.partial && !out.reward.gold && !out.items.length, 'a boss-only replay pays the boss battle only: no clear reward, no gems, no gear roll');
 ok(!s2.owned.briarstag || s2.dungeon.reliquary.clears !== 4, 'species rewards follow the clear count as before');
 // finishing the migrated run
 const s3 = S.hydrate(v05Save()).st; let guard = 0;

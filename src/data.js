@@ -36,7 +36,7 @@
     sunsprout:   { name: 'Sun Sprout',     el: 'light',  type: 'drain',  power: 45, cd: 2, desc: 'Damages the foe and heals you for half the damage.' },
     radiantburst:{ name: 'Radiant Burst',  el: 'light',  type: 'dmg',    power: 70, cd: 2, desc: 'A blooming flash of sunlight.' },
     shadenip:    { name: 'Shade Nip',      el: 'dark',   type: 'dmg',    power: 40, cd: 0, desc: 'A quick bite from the shadows.' },
-    gloomveil:   { name: 'Gloom Veil',     el: 'dark',   type: 'weaken', power: 35, cd: 2, desc: 'Damages the foe and lowers its attack.' },
+    gloomveil:   { name: 'Gloom Veil',     el: 'dark',   type: 'weaken', power: 40, cd: 2, desc: 'Damages the foe and lowers its attack.' },
     duskrend:    { name: 'Dusk Rend',      el: 'dark',   type: 'dmg',    power: 70, cd: 2, desc: 'Claws of folded twilight.' },
     vinewhip:    { name: 'Vine Whip',      el: 'nature', type: 'dmg',    power: 40, cd: 0, desc: 'A lashing vine.' },
     leafguard:   { name: 'Leaf Guard',     el: 'nature', type: 'guard',  power: 0,  cd: 2, desc: 'Halves the next hit you take.' },
@@ -97,6 +97,18 @@
     silence: { name: 'Silenced', short: 'Hush',  color: '#c9b8ff', desc: 'Only basic abilities can be chosen.' },
   };
   D.STATUS_RULES = { burn: 0.06, regen: 0.05, soak: 0.7, twilight: 0.03 };
+  // Phase 17B: combat refinements. Each switch can be turned off on its own (the simulator compares them one by one);
+  // with every switch false the battle rules are exactly those of Phase 17A.
+  D.COMBAT17 = {
+    retain: true,        // an evolved Amina of yours keeps its first form's special as a third move
+    counter: 0.3,        // after a guard takes a hit, your next attack deals this much more (0 = off)
+    cleanse: true,       // a healing move also clears burn, soak, silence and one stack of lowered attack
+    healBrace: 0.25,     // ...and the healed Amina takes this much less from the next hit (0 = off)
+    soakSlows: true,     // a charging guardian that is soaked sputters and unleashes one turn later (once per charge)
+    swift: 0.15,         // one of your swift Aminas acting before its foe deals this much more (0 = off)
+    tailwind: true,      // Wind moves are never resisted (Wind's weakness on defence stays)
+    smartAuto: true,     // the auto-battle uses guard, heal, soak and attack-lowering moves when they help
+  };
   // Team synergies, decided by the elements of the party you bring.
   D.SYNERGIES = {
     kindred:  { name: 'Kindred', desc: 'Two or more Aminas share an element: they deal 10% more damage.', atk: 1.1 },

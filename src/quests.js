@@ -92,8 +92,20 @@
     if (st.missions[q.id] === 'claimed') return 'claimed';
     if (q.season && !(A.Events && A.Events.isActive(q.season, q.year))) return 'locked'; // the season is over
     if (!q.after.every((a) => st.missions[a] === 'claimed')) return 'locked';
+    if (!Q.reachable(st, q)) return 'locked'; // Phase 17B: never point a player at an island that cannot be opened yet
     return Q.progress(st, q).complete ? 'ready' : 'active';
   };
+  // An island can be reached when it is already open, or when the island before it has an Island Boss to defeat.
+  // The Verdant Wilds has no dungeons yet, so Obsidian Reach and the Celestial Crown cannot be opened in a new save;
+  // quests that ask for them wait (hidden, their data and any progress untouched) until they can be done.
+  Q.islandReachable = function (st, iid) {
+    if (A.World && A.World.islandUnlocked && A.World.islandUnlocked(st, iid)) return true;
+    const isl = D.ISLANDS && D.ISLANDS[iid], from = D.CAMPAIGN && D.CAMPAIGN[iid] && D.CAMPAIGN[iid].unlockedBy;
+    if (!isl) return false; if (!from) return isl.tier === 0;
+    const c = D.CAMPAIGN[from], boss = c && c.islandBoss && D.DUNGEONS[c.islandBoss];
+    return !!(boss && boss.playable) && Q.islandReachable(st, from);
+  };
+  Q.reachable = (st, q) => q.objectives.every((ob) => (ob.type !== 'unlock_island' && ob.type !== 'visit_island') || Q.islandReachable(st, ob.island));
   Q.nextObjective = function (st, q) {
     const p = Q.progress(st, q);
     return (p.objs.find((o) => !o.done && !o.ob.optional) || p.objs.find((o) => !o.done) || p.objs[0]).ob;

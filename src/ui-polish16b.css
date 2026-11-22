@@ -59,3 +59,6 @@ body.calm .ov-ghost16 { display: none; }
 .o16-fight small, .o16-stepn, .o16-moves em, .mission-pill .o16-pro, .o16-chip small { font-size: 10.5px !important; }
 .o16-coach { font-size: max(.82rem, 13px); }
 .o16-mini { width: 2.2rem; height: 2.7rem; }
+
+/* Phase 17B: the guardian brief in the party picker */
+.pp-boss .pp-adv { display: flex; flex-wrap: wrap; gap: .1rem .7rem; }

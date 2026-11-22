@@ -332,7 +332,19 @@
   };
   // A party fighter for an owned Amina, with its equipment applied exactly once.
   R.partyFighter = function (st, inst, opts) {
-    return B.fighter(inst.sp, inst.lv, Object.assign({ uid: inst.uid, gear: R.gearBonus(st, inst), mvl: R.moveLevels ? R.moveLevels(inst) : null }, opts || {}));
+    const f = B.fighter(inst.sp, inst.lv, Object.assign({ uid: inst.uid, gear: R.gearBonus(st, inst), mvl: R.moveLevels ? R.moveLevels(inst) : null }, opts || {}));
+    // Phase 17B: an evolved Amina keeps its first form's special (guard, heal, attack-lowering or status move) as a
+    // third move in battle, at move level 1. Its two upgradable slots are unchanged.
+    const keep = D.COMBAT17 && D.COMBAT17.retain ? R.retainedMove(inst.sp) : null;
+    if (keep && f.abil.indexOf(keep) < 0) { f.abil.push(keep); f.cd[keep] = 0; f.retained = keep; }
+    if (f.role === 'swift') f.swiftEdge = true; // Phase 17B: your swift Aminas strike harder when they act first
+    return f;
+  };
+  // The first form's special, for a second or third form (null for a first form, or when it is already one of its moves).
+  R.retainedMove = function (spId) {
+    const s = sp(spId), L = s && D.LINES && D.LINES[s.line]; if (!s || s.stage < 2 || !L) return null;
+    const base = sp(L.ids[0]), id = base && base.abil[1];
+    return id && s.abil.indexOf(id) < 0 ? id : null;
   };
   R.statsWithGear = function (st, inst) {
     const b = R.statsAt(inst.sp, inst.lv), g = R.gearBonus(st, inst);
@@ -356,7 +368,8 @@
     const hpMax = Math.round(st.hp * (opts.hpMult || 1));
     const f = { sp: spId, uid: opts.uid || null, name: opts.name || s.name, lv, el: s.el, hpMax,
       hp: opts.hp != null ? Math.max(0, Math.min(hpMax, Math.round(opts.hp))) : hpMax,
-      atk: st.atk, def: st.def, spd: st.spd, abil: s.abil.slice(), cd: {}, weak: 0, guard: false, st: {}, boost: 1, gear: !!opts.gear, mvl: opts.mvl || {} };
+      atk: st.atk, def: st.def, spd: st.spd, abil: s.abil.slice(), cd: {}, weak: 0, guard: false, st: {}, boost: 1, gear: !!opts.gear, mvl: opts.mvl || {},
+      role: (D.LINES && s.line && D.LINES[s.line] && D.LINES[s.line].role) || null };
     f.abil.forEach((a) => (f.cd[a] = 0));
     return f;
   };
@@ -385,18 +398,24 @@
   };
   B.cur = (b) => b.party[b.pi];
   B.damage = function (att, def, ab, rng) {
-    const eff = ab.neutral ? 1 : R.elMult(ab.el, def.el);
+    const C = D.COMBAT17 || {};
+    let eff = ab.neutral ? 1 : R.elMult(ab.el, def.el);
+    if (C.tailwind && ab.el === 'wind' && eff < 1) eff = 1;                 // Phase 17B: Wind is never resisted
     const stab = ab.el === att.el ? 1.2 : 1;
-    const A_ = att.atk * (att.boost || 1) * (1 - 0.2 * Math.min(3, att.weak));
+    // Phase 17B: a counter after a guard that took a hit, and a swift Amina's edge when it acts first
+    const edge = (att.counter && C.counter ? 1 + C.counter : 1) * (att.swiftEdge && att.first && C.swift ? 1 + C.swift : 1);
+    const A_ = att.atk * (att.boost || 1) * edge * (1 - 0.2 * Math.min(3, att.weak));
     const base = ((2 * att.lv / 5 + 2) * ab.power * A_ / Math.max(1, def.def)) / DIV + 2;
     const rand = 0.92 + rng() * 0.16;
     // a guard lets through half a hit (less with an upgraded guard move); a guardian move is three-quarters blocked
-    let dmg = Math.max(1, Math.round(base * stab * eff * rand * (def.guard ? (ab.boss ? 0.25 : (typeof def.guard === 'number' ? def.guard : 0.5)) : 1)));
+    let dmg = Math.max(1, Math.round(base * stab * eff * rand * (def.guard ? (ab.boss ? 0.25 : (typeof def.guard === 'number' ? def.guard : 0.5)) : 1) * (def.brace ? 1 - def.brace : 1)));
     return { dmg, eff };
   };
   B.ready = (f, id) => f.cd[id] === 0;
   // Silence blocks every ability with a cooldown (the "special" ones); basic abilities stay usable.
-  B.silenced = (f, id) => !!(f.st && f.st.silence > 0 && D.ABILITIES[id].cd > 0);
+  // Phase 17B fix: a fighter's first move is its basic move and is never silenced. Resonance's basic move (Echo Wave)
+  // has a 1-turn cooldown, so before this a silenced Aimza had no move at all; alone, the battle could not go on.
+  B.silenced = (f, id) => !!(f.st && f.st.silence > 0 && D.ABILITIES[id].cd > 0 && f.abil[0] !== id);
   B.usable = (f, id) => B.ready(f, id) && !B.silenced(f, id);
   B.speed = (f) => f.spd * (f.st && f.st.soak > 0 ? D.STATUS_RULES.soak : 1);
 
@@ -427,6 +446,13 @@
       if (ab.type === 'heal') {
         const amt = Math.min(att.hpMax - att.hp, Math.round(att.hpMax * (MV ? MV.heal[mlv] : 0.25)));
         att.hp += amt; ev.push({ t: 'heal', who, amt, hp: att.hp });
+        // Phase 17B: healing also clears what wears an Amina down: burn, soak, silence and one stack of lowered attack
+        if (D.COMBAT17 && D.COMBAT17.cleanse) {
+          const gone = ['burn', 'soak', 'silence'].filter((k) => att.st[k] > 0); gone.forEach((k) => { delete att.st[k]; ev.push({ t: 'statusEnd', who, k }); });
+          if (att.weak > 0) { att.weak--; gone.push('weak'); }
+          if (gone.length) ev.push({ t: 'cleanse', who, ks: gone, weak: att.weak });
+        }
+        if (D.COMBAT17 && D.COMBAT17.healBrace) att.brace = D.COMBAT17.healBrace; // and steadies it against the next hit
         if (ab.fx) applyFx(b, att, ab.fx, who, ev);
         return;
       }
@@ -440,8 +466,12 @@
         ev.push({ t: 'shieldHit', who: foe, absorbed, shield: def.shield, max: def.shieldMax, broke, special });
       }
       def.hp = Math.max(0, def.hp - dmg);
-      const hadGuard = def.guard; def.guard = false;
+      const hadGuard = def.guard; def.guard = false; def.brace = 0;
+      if (att.counter) att.counter = false;                                   // a counter is spent by the next attack
+      // Phase 17B: a guard that takes a hit readies a counter (one attack, once per guard; guard moves recharge)
+      const readied = !!(hadGuard && D.COMBAT17 && D.COMBAT17.counter && def.hp > 0 && r.dmg > 0); if (readied) def.counter = true;
       ev.push({ t: 'hit', who: foe, dmg, eff: R.effLabel(r.eff), hp: def.hp, guarded: hadGuard, el: ab.el, big: !!ab.boss, blocked: dmg === 0 });
+      if (readied) ev.push({ t: 'counter', who: foe });
       thresholds(def, foe, ev);
       if (ab.type === 'drain') {
         const amt = Math.min(att.hpMax - att.hp, Math.ceil(r.dmg / 2));
@@ -482,6 +512,8 @@
   B.enemyChoice = function (b) {
     const e = b.enemy, p = B.cur(b), opts = e.abil.filter((a) => B.usable(e, a));
     // guardians telegraph: one turn charging, then the move lands on the next
+    // Phase 17B: a charging guardian that is soaked sputters and holds its charge one more turn (once per charge)
+    if (e.move && e.charging && D.COMBAT17 && D.COMBAT17.soakSlows && e.st.soak > 0 && !e.held) { e.held = true; return 'hold'; }
     if (e.move && e.charging) return e.move;
     if (e.barrierDue) return 'barrier';
     if (e.move && e.chargeIn <= 0) return 'charge';
@@ -507,7 +539,18 @@
     if (b.pending) { const i = b.party.findIndex((p) => p.hp > 0); return { t: 'sw', to: i }; }
     const p = B.cur(b), e = b.enemy, legal = B.legal(b).filter((x) => x.ready);
     if (e.charging) { const g = legal.find((x) => D.ABILITIES[x.id].type === 'guard'); if (g) return { t: 'ab', id: g.id }; }
-    if (p.hp < p.hpMax * 0.3) { const h = legal.find((x) => D.ABILITIES[x.id].type === 'heal'); if (h) return { t: 'ab', id: h.id }; }
+    const smart = D.COMBAT17 && D.COMBAT17.smartAuto, of = (k) => legal.find((x) => D.ABILITIES[x.id].type === k);
+    if (smart) {
+      // Phase 17B: support moves when they pay off. Heal below 45% health while the foe still has fight in it (it also
+      // clears burn and soak); lower a lasting foe's attack; soak a guardian whose charge is near; guard a big hit.
+      const h = of('heal'), foeLasts = e.hp > e.hpMax * 0.3;
+      if (h && foeLasts && (p.hp < p.hpMax * 0.45 || (p.st.burn > 0 && p.hp < p.hpMax * 0.7))) return { t: 'ab', id: h.id };
+      const w = of('weaken'); if (w && e.weak < 2 && e.hp > e.hpMax * 0.45 && (e.boss || e.move || e.hpMax > p.hpMax)) return { t: 'ab', id: w.id };
+      const soakMv = legal.filter((x) => { const f = D.ABILITIES[x.id].fx; return f && f.k === 'soak'; }).sort((x, y) => D.ABILITIES[y.id].fx.p - D.ABILITIES[x.id].fx.p)[0]; // the surest soak
+      if (soakMv && e.move && !e.charging && e.chargeIn <= 0 && !(e.st.soak > 0)) return { t: 'ab', id: soakMv.id }; // it charges this turn: soaked, it will sputter
+      const g = of('guard'), foeSpecial = e.abil.some((id) => D.ABILITIES[id].cd > 0 && B.usable(e, id));
+      if (g && foeSpecial && p.hp < p.hpMax * 0.5 && e.hp > e.hpMax * 0.3) return { t: 'ab', id: g.id };
+    } else if (p.hp < p.hpMax * 0.3) { const h = of('heal'); if (h) return { t: 'ab', id: h.id }; }
     const score = (id) => { const ab = D.ABILITIES[id]; if (!ab.power) return -1; return ab.power * (ab.neutral ? 1 : R.elMult(ab.el, e.el)) * (ab.el === p.el ? 1.2 : 1) * (e.shield > 0 && ab.cd > 0 ? 2 : 1); };
     const best = legal.slice().sort((a, c) => score(c.id) - score(a.id))[0];
     return { t: 'ab', id: (best || legal[0] || { id: p.abil[0] }).id };
@@ -552,13 +595,15 @@
     if (action.t === 'ab') {
       if (B.speed(p) >= B.speed(e)) order.push(['p', action.id], ['e', eId]); else order.push(['e', eId], ['p', action.id]);
     } else order.push(['e', eId]);
+    p.first = order[0][0] === 'p'; e.first = order[0][0] === 'e';              // who acts first this turn (swift edge)
     for (const [who, id] of order) {
       if (b.over || b.pending) break;
       const fighter = who === 'p' ? B.cur(b) : b.enemy;
       if (fighter.hp <= 0) continue;
       if (fighter.st.stun > 0) { fighter.st.stun = 0; delete fighter.st.stun; ev.push({ t: 'stunned', who, name: fighter.name, stagger: !!fighter.boss }); continue; }
       if (id === 'barrier') { fighter.barrierDue = false; fighter.shield = fighter.shieldMax = Math.max(1, Math.round(fighter.hpMax * (fighter.mech.amt || 0.2))); ev.push({ t: 'barrier', who, name: fighter.name, shield: fighter.shield }); continue; }
-      if (id === 'charge') { fighter.charging = true; const mv = D.ABILITIES[fighter.move]; ev.push({ t: 'charge', who, name: fighter.name, move: fighter.move, abName: mv.name, el: mv.el, tell: mv.tell }); continue; }
+      if (id === 'hold') { const mv = D.ABILITIES[fighter.move]; ev.push({ t: 'hold', who, name: fighter.name, move: fighter.move, abName: mv.name }); continue; }
+      if (id === 'charge') { fighter.charging = true; fighter.held = false; const mv = D.ABILITIES[fighter.move]; ev.push({ t: 'charge', who, name: fighter.name, move: fighter.move, abName: mv.name, el: mv.el, tell: mv.tell }); continue; }
       if (who === 'e' && fighter.move && id === fighter.move && !fighter.charging) continue; // charge was broken
       doAbility(b, who, ev)(id);
       if (checkEnd(b, ev)) break;
@@ -739,7 +784,11 @@
       out.cleared = true;
       rec.clears++; rec.next = 0;
       out.first = rec.clears === 1;
-      const base = d.clearReward || (out.first ? d.first : d.repeat) || {};
+      // Phase 17B: a replay that skipped battles (such as "Fight the boss again", which starts at battle 10) pays the
+      // battles it fought, but not the dungeon's clear reward or its gear roll. A first clear always pays in full, even
+      // when it was finished from battle 10 after a defeat. Older saves without a start count as full runs.
+      const partial = wasCleared && (run.start | 0) > 0; out.partial = partial;
+      const base = (partial ? null : out.first ? d.first || d.clearReward : d.repeat || d.clearReward) || {};
       const mult = A.World.dungeonRewardMult(st), reward = {};
       Object.keys(base).forEach((k) => (reward[k] = Math.round(base[k] * mult)));
       A.Economy.gain(st, reward);
@@ -748,7 +797,7 @@
       st.flags['cleared_' + run.d] = true;
       // equipment: the dungeon's own item on the first clear, then a chance at a common/rare one on later clears
       out.items = [];
-      const gearId = out.first ? D.DUNGEON_GEAR[run.d] : (R.rng() < D.GEAR_REPEAT_CHANCE ? D.GEAR_REPEAT_POOL[Math.floor(R.rng() * D.GEAR_REPEAT_POOL.length)] : null);
+      const gearId = out.first ? D.DUNGEON_GEAR[run.d] : partial ? null : (R.rng() < D.GEAR_REPEAT_CHANCE ? D.GEAR_REPEAT_POOL[Math.floor(R.rng() * D.GEAR_REPEAT_POOL.length)] : null);
       if (gearId) { const it = R.grantItem(st, gearId, 'dungeon:' + run.d); if (it) out.items.push(it.id); }
       if (run.d === 'reliquary') {
         if (rec.clears === 1 && !st.owned.terraki) { R.addAmina(st, 'terraki', 6); out.newSp.push('terraki'); }
@@ -779,6 +828,27 @@
     return out;
   };
   R.abandonRun = function (st) { st.run = null; };
+  // Phase 17B: what the party picker tells you about a dungeon's guardian. Its element and weaknesses only once you
+  // have met it (it is in your codex); its title, charged move and mechanic are already on the dungeon card.
+  // Advice is about the party you picked: a counter element, a way to block the charge, specials for a barrier.
+  R.bossBrief = function (st, id, uids) {
+    const d = D.DUNGEONS[id]; if (!d) return null;
+    const boss = d.battles[d.battles.length - 1], known = !!(st.seen && st.seen[boss.sp]) || R.dungeonCleared(st, id);
+    const els = boss.mech && boss.mech.type === 'prism' ? boss.mech.els.slice() : [D.SPECIES[boss.sp].el];
+    const all = Object.keys(D.ELEMENTS), weakTo = all.filter((e) => els.some((x) => R.elMult(e, x) > 1.01)), resists = all.filter((e) => els.every((x) => R.elMult(e, x) < 0.99));
+    const party = (uids || []).map((u) => R.inst(st, u)).filter(Boolean).map((a) => { const f = R.partyFighter(st, a); return { el: f.el, abil: f.abil }; });
+    const has = (pred) => party.some((p) => p.abil.some((id2) => pred(D.ABILITIES[id2])));
+    const mv = boss.move && D.ABILITIES[boss.move], advice = [];
+    if (known && party.length) {
+      const good = party.filter((p) => weakTo.indexOf(p.el) >= 0).length, bad = party.filter((p) => resists.indexOf(p.el) >= 0).length;
+      advice.push(good ? { k: 'good', t: good + ' of your party ' + (good === 1 ? 'hits' : 'hit') + ' its weakness.' } : { k: 'bad', t: 'Nobody in your party hits its weakness.' });
+      if (bad) advice.push({ k: 'bad', t: bad + ' of your party ' + (bad === 1 ? 'is' : 'are') + ' resisted by it.' });
+    }
+    if (mv && party.length) advice.push(has((x) => x.type === 'guard') ? { k: 'good', t: 'You can guard when it charges ' + mv.name + '.' } : has((x) => x.fx && x.fx.k === 'soak') ? { k: 'good', t: 'Soak it to hold back ' + mv.name + '.' } : { k: 'bad', t: 'No guard or soak move to answer ' + mv.name + '.' });
+    if (boss.mech && boss.mech.type === 'barrier') advice.push({ k: 'tip', t: 'Special moves crack its barrier twice as fast.' });
+    if (boss.mech && boss.mech.type === 'prism') advice.push({ k: 'tip', t: 'Its element shifts: bring more than one element.' });
+    return { known, title: boss.title || null, els: known ? els : null, weakTo: known ? weakTo : null, resists: known ? resists : null, move: mv ? mv.name : null, mech: boss.mech ? boss.mech.type : null, advice };
+  };
   // Story scenes: 'seen' or 'skipped'. Marking one also clears it from the pending slot (a scene that was due when
   // the game closed plays the next time the island opens).
   R.sceneDone = function (st, id, how) {

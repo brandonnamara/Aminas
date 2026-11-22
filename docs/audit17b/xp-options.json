@@ -1,0 +1,1651 @@
+{
+ "newRec": [
+  6,
+  8,
+  10,
+  12,
+  14,
+  17,
+  19,
+  21,
+  24,
+  27
+ ],
+ "results": [
+  {
+   "opt": "base",
+   "feed": "none",
+   "end": 25,
+   "battles": 100,
+   "minutes": 20,
+   "losses": 0,
+   "grinds": 0,
+   "fed": 0,
+   "reach12": {
+    "battles": 30,
+    "minutes": 8
+   },
+   "reach22": {
+    "battles": 82,
+    "minutes": 17
+   },
+   "log": [
+    {
+     "id": "forgottenroad",
+     "rec": 4,
+     "arrive": 3,
+     "ready": -1,
+     "leave": 6.7,
+     "battles": 10,
+     "minutes": 4,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "gatheringhall",
+     "rec": 5,
+     "arrive": 6.7,
+     "ready": 1.7,
+     "leave": 9.7,
+     "battles": 20,
+     "minutes": 6,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "reliquary",
+     "rec": 6,
+     "arrive": 9.7,
+     "ready": 3.7,
+     "leave": 12,
+     "battles": 30,
+     "minutes": 8,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "drownedsteps",
+     "rec": 8,
+     "arrive": 12,
+     "ready": 4,
+     "leave": 14,
+     "battles": 40,
+     "minutes": 9,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "coldkiln",
+     "rec": 10,
+     "arrive": 14,
+     "ready": 4,
+     "leave": 16,
+     "battles": 50,
+     "minutes": 10,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "hollowveil",
+     "rec": 12,
+     "arrive": 16,
+     "ready": 4,
+     "leave": 18,
+     "battles": 60,
+     "minutes": 12,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "lanternorchard",
+     "rec": 14,
+     "arrive": 18,
+     "ready": 4,
+     "leave": 19.7,
+     "battles": 70,
+     "minutes": 14,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "windstair",
+     "rec": 16,
+     "arrive": 19.7,
+     "ready": 3.7,
+     "leave": 21,
+     "battles": 80,
+     "minutes": 16,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "resonancescar",
+     "rec": 18,
+     "arrive": 21,
+     "ready": 3,
+     "leave": 23,
+     "battles": 90,
+     "minutes": 18,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "heartwood",
+     "rec": 20,
+     "arrive": 23,
+     "ready": 3,
+     "leave": 25,
+     "battles": 100,
+     "minutes": 20,
+     "losses": 0,
+     "grinds": 0
+    }
+   ],
+   "endAvg": 25,
+   "lossesAvg": 0,
+   "grindsAvg": 0,
+   "minutesAvg": 19
+  },
+  {
+   "opt": "base",
+   "feed": "half",
+   "end": 29,
+   "battles": 100,
+   "minutes": 15,
+   "losses": 0,
+   "grinds": 0,
+   "fed": 1820,
+   "reach12": {
+    "battles": 22,
+    "minutes": 5
+   },
+   "reach22": {
+    "battles": 69,
+    "minutes": 11
+   },
+   "log": [
+    {
+     "id": "forgottenroad",
+     "rec": 4,
+     "arrive": 3,
+     "ready": -1,
+     "leave": 8.3,
+     "battles": 10,
+     "minutes": 4,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "gatheringhall",
+     "rec": 5,
+     "arrive": 8.3,
+     "ready": 3.3,
+     "leave": 11.7,
+     "battles": 20,
+     "minutes": 5,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "reliquary",
+     "rec": 6,
+     "arrive": 11.7,
+     "ready": 5.7,
+     "leave": 14,
+     "battles": 30,
+     "minutes": 6,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "drownedsteps",
+     "rec": 8,
+     "arrive": 14,
+     "ready": 6,
+     "leave": 16.3,
+     "battles": 40,
+     "minutes": 7,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "coldkiln",
+     "rec": 10,
+     "arrive": 16.3,
+     "ready": 6.3,
+     "leave": 18.7,
+     "battles": 50,
+     "minutes": 8,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "hollowveil",
+     "rec": 12,
+     "arrive": 18.7,
+     "ready": 6.7,
+     "leave": 20.7,
+     "battles": 60,
+     "minutes": 10,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "lanternorchard",
+     "rec": 14,
+     "arrive": 20.7,
+     "ready": 6.7,
+     "leave": 22.7,
+     "battles": 70,
+     "minutes": 11,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "windstair",
+     "rec": 16,
+     "arrive": 22.7,
+     "ready": 6.7,
+     "leave": 24.7,
+     "battles": 80,
+     "minutes": 12,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "resonancescar",
+     "rec": 18,
+     "arrive": 24.7,
+     "ready": 6.7,
+     "leave": 26.7,
+     "battles": 90,
+     "minutes": 14,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "heartwood",
+     "rec": 20,
+     "arrive": 26.7,
+     "ready": 6.7,
+     "leave": 29,
+     "battles": 100,
+     "minutes": 15,
+     "losses": 0,
+     "grinds": 0
+    }
+   ],
+   "endAvg": 29,
+   "lossesAvg": 0,
+   "grindsAvg": 0,
+   "minutesAvg": 15
+  },
+  {
+   "opt": "base",
+   "feed": "all",
+   "end": 29.7,
+   "battles": 100,
+   "minutes": 15,
+   "losses": 0,
+   "grinds": 0,
+   "fed": 2280,
+   "reach12": {
+    "battles": 21,
+    "minutes": 5
+   },
+   "reach22": {
+    "battles": 68,
+    "minutes": 10
+   },
+   "log": [
+    {
+     "id": "forgottenroad",
+     "rec": 4,
+     "arrive": 3,
+     "ready": -1,
+     "leave": 9.3,
+     "battles": 10,
+     "minutes": 4,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "gatheringhall",
+     "rec": 5,
+     "arrive": 9.3,
+     "ready": 4.3,
+     "leave": 12.7,
+     "battles": 20,
+     "minutes": 5,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "reliquary",
+     "rec": 6,
+     "arrive": 12.7,
+     "ready": 6.7,
+     "leave": 14.7,
+     "battles": 30,
+     "minutes": 6,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "drownedsteps",
+     "rec": 8,
+     "arrive": 14.7,
+     "ready": 6.7,
+     "leave": 17,
+     "battles": 40,
+     "minutes": 7,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "coldkiln",
+     "rec": 10,
+     "arrive": 17,
+     "ready": 7,
+     "leave": 19.3,
+     "battles": 50,
+     "minutes": 8,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "hollowveil",
+     "rec": 12,
+     "arrive": 19.3,
+     "ready": 7.3,
+     "leave": 21.3,
+     "battles": 60,
+     "minutes": 10,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "lanternorchard",
+     "rec": 14,
+     "arrive": 21.3,
+     "ready": 7.3,
+     "leave": 23,
+     "battles": 70,
+     "minutes": 11,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "windstair",
+     "rec": 16,
+     "arrive": 23,
+     "ready": 7,
+     "leave": 25.3,
+     "battles": 80,
+     "minutes": 12,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "resonancescar",
+     "rec": 18,
+     "arrive": 25.3,
+     "ready": 7.3,
+     "leave": 27.3,
+     "battles": 90,
+     "minutes": 13,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "heartwood",
+     "rec": 20,
+     "arrive": 27.3,
+     "ready": 7.3,
+     "leave": 29.7,
+     "battles": 100,
+     "minutes": 15,
+     "losses": 0,
+     "grinds": 0
+    }
+   ],
+   "endAvg": 29.7,
+   "lossesAvg": 0,
+   "grindsAvg": 0,
+   "minutesAvg": 14
+  },
+  {
+   "opt": "A",
+   "feed": "none",
+   "end": 22,
+   "battles": 100,
+   "minutes": 25,
+   "losses": 0,
+   "grinds": 0,
+   "fed": 0,
+   "reach12": {
+    "battles": 40,
+    "minutes": 11
+   },
+   "reach22": {
+    "battles": 97,
+    "minutes": 24
+   },
+   "log": [
+    {
+     "id": "forgottenroad",
+     "rec": 4,
+     "arrive": 3,
+     "ready": -1,
+     "leave": 6.7,
+     "battles": 10,
+     "minutes": 4,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "gatheringhall",
+     "rec": 5,
+     "arrive": 6.7,
+     "ready": 1.7,
+     "leave": 9,
+     "battles": 20,
+     "minutes": 6,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "reliquary",
+     "rec": 6,
+     "arrive": 9,
+     "ready": 3,
+     "leave": 10,
+     "battles": 30,
+     "minutes": 8,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "drownedsteps",
+     "rec": 8,
+     "arrive": 10,
+     "ready": 2,
+     "leave": 12,
+     "battles": 40,
+     "minutes": 11,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "coldkiln",
+     "rec": 10,
+     "arrive": 12,
+     "ready": 2,
+     "leave": 14,
+     "battles": 50,
+     "minutes": 13,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "hollowveil",
+     "rec": 12,
+     "arrive": 14,
+     "ready": 2,
+     "leave": 15,
+     "battles": 60,
+     "minutes": 15,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "lanternorchard",
+     "rec": 14,
+     "arrive": 15,
+     "ready": 1,
+     "leave": 17,
+     "battles": 70,
+     "minutes": 17,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "windstair",
+     "rec": 16,
+     "arrive": 17,
+     "ready": 1,
+     "leave": 19,
+     "battles": 80,
+     "minutes": 19,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "resonancescar",
+     "rec": 18,
+     "arrive": 19,
+     "ready": 1,
+     "leave": 21,
+     "battles": 90,
+     "minutes": 22,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "heartwood",
+     "rec": 20,
+     "arrive": 21,
+     "ready": 1,
+     "leave": 22,
+     "battles": 100,
+     "minutes": 25,
+     "losses": 0,
+     "grinds": 0
+    }
+   ],
+   "endAvg": 22,
+   "lossesAvg": 0,
+   "grindsAvg": 0,
+   "minutesAvg": 24
+  },
+  {
+   "opt": "A",
+   "feed": "half",
+   "end": 25,
+   "battles": 100,
+   "minutes": 20,
+   "losses": 0,
+   "grinds": 0,
+   "fed": 1850,
+   "reach12": {
+    "battles": 31,
+    "minutes": 8
+   },
+   "reach22": {
+    "battles": 91,
+    "minutes": 18
+   },
+   "log": [
+    {
+     "id": "forgottenroad",
+     "rec": 4,
+     "arrive": 3,
+     "ready": -1,
+     "leave": 8.3,
+     "battles": 10,
+     "minutes": 4,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "gatheringhall",
+     "rec": 5,
+     "arrive": 8.3,
+     "ready": 3.3,
+     "leave": 10.7,
+     "battles": 20,
+     "minutes": 5,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "reliquary",
+     "rec": 6,
+     "arrive": 10.7,
+     "ready": 4.7,
+     "leave": 12,
+     "battles": 30,
+     "minutes": 7,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "drownedsteps",
+     "rec": 8,
+     "arrive": 12,
+     "ready": 4,
+     "leave": 14,
+     "battles": 40,
+     "minutes": 9,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "coldkiln",
+     "rec": 10,
+     "arrive": 14,
+     "ready": 4,
+     "leave": 15.7,
+     "battles": 50,
+     "minutes": 10,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "hollowveil",
+     "rec": 12,
+     "arrive": 15.7,
+     "ready": 3.7,
+     "leave": 17.3,
+     "battles": 60,
+     "minutes": 12,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "lanternorchard",
+     "rec": 14,
+     "arrive": 17.3,
+     "ready": 3.3,
+     "leave": 19.3,
+     "battles": 70,
+     "minutes": 14,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "windstair",
+     "rec": 16,
+     "arrive": 19.3,
+     "ready": 3.3,
+     "leave": 21.3,
+     "battles": 80,
+     "minutes": 16,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "resonancescar",
+     "rec": 18,
+     "arrive": 21.3,
+     "ready": 3.3,
+     "leave": 23,
+     "battles": 90,
+     "minutes": 18,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "heartwood",
+     "rec": 20,
+     "arrive": 23,
+     "ready": 3,
+     "leave": 25,
+     "battles": 100,
+     "minutes": 20,
+     "losses": 0,
+     "grinds": 0
+    }
+   ],
+   "endAvg": 25,
+   "lossesAvg": 0,
+   "grindsAvg": 0,
+   "minutesAvg": 19
+  },
+  {
+   "opt": "A",
+   "feed": "all",
+   "end": 25.3,
+   "battles": 100,
+   "minutes": 20,
+   "losses": 0,
+   "grinds": 0,
+   "fed": 2280,
+   "reach12": {
+    "battles": 31,
+    "minutes": 7
+   },
+   "reach22": {
+    "battles": 90,
+    "minutes": 18
+   },
+   "log": [
+    {
+     "id": "forgottenroad",
+     "rec": 4,
+     "arrive": 3,
+     "ready": -1,
+     "leave": 9.3,
+     "battles": 10,
+     "minutes": 4,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "gatheringhall",
+     "rec": 5,
+     "arrive": 9.3,
+     "ready": 4.3,
+     "leave": 11.3,
+     "battles": 20,
+     "minutes": 5,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "reliquary",
+     "rec": 6,
+     "arrive": 11.3,
+     "ready": 5.3,
+     "leave": 12.7,
+     "battles": 30,
+     "minutes": 7,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "drownedsteps",
+     "rec": 8,
+     "arrive": 12.7,
+     "ready": 4.7,
+     "leave": 14.3,
+     "battles": 40,
+     "minutes": 8,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "coldkiln",
+     "rec": 10,
+     "arrive": 14.3,
+     "ready": 4.3,
+     "leave": 16.3,
+     "battles": 50,
+     "minutes": 10,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "hollowveil",
+     "rec": 12,
+     "arrive": 16.3,
+     "ready": 4.3,
+     "leave": 17.7,
+     "battles": 60,
+     "minutes": 12,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "lanternorchard",
+     "rec": 14,
+     "arrive": 17.7,
+     "ready": 3.7,
+     "leave": 19.7,
+     "battles": 70,
+     "minutes": 14,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "windstair",
+     "rec": 16,
+     "arrive": 19.7,
+     "ready": 3.7,
+     "leave": 21.7,
+     "battles": 80,
+     "minutes": 16,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "resonancescar",
+     "rec": 18,
+     "arrive": 21.7,
+     "ready": 3.7,
+     "leave": 23,
+     "battles": 90,
+     "minutes": 18,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "heartwood",
+     "rec": 20,
+     "arrive": 23,
+     "ready": 3,
+     "leave": 25.3,
+     "battles": 100,
+     "minutes": 20,
+     "losses": 0,
+     "grinds": 0
+    }
+   ],
+   "endAvg": 25.3,
+   "lossesAvg": 0,
+   "grindsAvg": 0,
+   "minutesAvg": 19
+  },
+  {
+   "opt": "B",
+   "feed": "none",
+   "end": 27,
+   "battles": 100,
+   "minutes": 25,
+   "losses": 0,
+   "grinds": 0,
+   "fed": 0,
+   "reach12": {
+    "battles": 25,
+    "minutes": 8
+   },
+   "reach22": {
+    "battles": 71,
+    "minutes": 18
+   },
+   "log": [
+    {
+     "id": "forgottenroad",
+     "rec": 6,
+     "arrive": 3,
+     "ready": -3,
+     "leave": 7,
+     "battles": 10,
+     "minutes": 4,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "gatheringhall",
+     "rec": 8,
+     "arrive": 7,
+     "ready": -1,
+     "leave": 10.7,
+     "battles": 20,
+     "minutes": 7,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "reliquary",
+     "rec": 10,
+     "arrive": 10.7,
+     "ready": 0.7,
+     "leave": 13.3,
+     "battles": 30,
+     "minutes": 10,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "drownedsteps",
+     "rec": 12,
+     "arrive": 13.3,
+     "ready": 1.3,
+     "leave": 15.7,
+     "battles": 40,
+     "minutes": 11,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "coldkiln",
+     "rec": 14,
+     "arrive": 15.7,
+     "ready": 1.7,
+     "leave": 18,
+     "battles": 50,
+     "minutes": 13,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "hollowveil",
+     "rec": 17,
+     "arrive": 18,
+     "ready": 1,
+     "leave": 19.7,
+     "battles": 60,
+     "minutes": 16,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "lanternorchard",
+     "rec": 19,
+     "arrive": 19.7,
+     "ready": 0.7,
+     "leave": 21.7,
+     "battles": 70,
+     "minutes": 18,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "windstair",
+     "rec": 21,
+     "arrive": 21.7,
+     "ready": 0.7,
+     "leave": 23.7,
+     "battles": 80,
+     "minutes": 20,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "resonancescar",
+     "rec": 24,
+     "arrive": 23.7,
+     "ready": -0.3,
+     "leave": 25.3,
+     "battles": 90,
+     "minutes": 23,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "heartwood",
+     "rec": 27,
+     "arrive": 25.3,
+     "ready": -1.7,
+     "leave": 27,
+     "battles": 100,
+     "minutes": 25,
+     "losses": 0,
+     "grinds": 0
+    }
+   ],
+   "endAvg": 27,
+   "lossesAvg": 0.3,
+   "grindsAvg": 0,
+   "minutesAvg": 26
+  },
+  {
+   "opt": "B",
+   "feed": "half",
+   "end": 30,
+   "battles": 100,
+   "minutes": 20,
+   "losses": 0,
+   "grinds": 0,
+   "fed": 1360,
+   "reach12": {
+    "battles": 21,
+    "minutes": 7
+   },
+   "reach22": {
+    "battles": 61,
+    "minutes": 13
+   },
+   "log": [
+    {
+     "id": "forgottenroad",
+     "rec": 6,
+     "arrive": 3,
+     "ready": -3,
+     "leave": 8.3,
+     "battles": 10,
+     "minutes": 4,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "gatheringhall",
+     "rec": 8,
+     "arrive": 8.3,
+     "ready": 0.3,
+     "leave": 12.3,
+     "battles": 20,
+     "minutes": 6,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "reliquary",
+     "rec": 10,
+     "arrive": 12.3,
+     "ready": 2.3,
+     "leave": 15,
+     "battles": 30,
+     "minutes": 8,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "drownedsteps",
+     "rec": 12,
+     "arrive": 15,
+     "ready": 3,
+     "leave": 17.7,
+     "battles": 40,
+     "minutes": 9,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "coldkiln",
+     "rec": 14,
+     "arrive": 17.7,
+     "ready": 3.7,
+     "leave": 20.3,
+     "battles": 50,
+     "minutes": 11,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "hollowveil",
+     "rec": 17,
+     "arrive": 20.3,
+     "ready": 3.3,
+     "leave": 22.3,
+     "battles": 60,
+     "minutes": 13,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "lanternorchard",
+     "rec": 19,
+     "arrive": 22.3,
+     "ready": 3.3,
+     "leave": 24.3,
+     "battles": 70,
+     "minutes": 14,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "windstair",
+     "rec": 21,
+     "arrive": 24.3,
+     "ready": 3.3,
+     "leave": 26.7,
+     "battles": 80,
+     "minutes": 16,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "resonancescar",
+     "rec": 24,
+     "arrive": 26.7,
+     "ready": 2.7,
+     "leave": 28.7,
+     "battles": 90,
+     "minutes": 18,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "heartwood",
+     "rec": 27,
+     "arrive": 28.7,
+     "ready": 1.7,
+     "leave": 30,
+     "battles": 100,
+     "minutes": 20,
+     "losses": 0,
+     "grinds": 0
+    }
+   ],
+   "endAvg": 30,
+   "lossesAvg": 0.3,
+   "grindsAvg": 0,
+   "minutesAvg": 20
+  },
+  {
+   "opt": "B",
+   "feed": "all",
+   "end": 30,
+   "battles": 100,
+   "minutes": 19,
+   "losses": 0,
+   "grinds": 0,
+   "fed": 1670,
+   "reach12": {
+    "battles": 20,
+    "minutes": 6
+   },
+   "reach22": {
+    "battles": 58,
+    "minutes": 12
+   },
+   "log": [
+    {
+     "id": "forgottenroad",
+     "rec": 6,
+     "arrive": 3,
+     "ready": -3,
+     "leave": 9.3,
+     "battles": 10,
+     "minutes": 4,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "gatheringhall",
+     "rec": 8,
+     "arrive": 9.3,
+     "ready": 1.3,
+     "leave": 13,
+     "battles": 20,
+     "minutes": 6,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "reliquary",
+     "rec": 10,
+     "arrive": 13,
+     "ready": 3,
+     "leave": 15.7,
+     "battles": 30,
+     "minutes": 8,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "drownedsteps",
+     "rec": 12,
+     "arrive": 15.7,
+     "ready": 3.7,
+     "leave": 18.3,
+     "battles": 40,
+     "minutes": 9,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "coldkiln",
+     "rec": 14,
+     "arrive": 18.3,
+     "ready": 4.3,
+     "leave": 20.7,
+     "battles": 50,
+     "minutes": 10,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "hollowveil",
+     "rec": 17,
+     "arrive": 20.7,
+     "ready": 3.7,
+     "leave": 22.7,
+     "battles": 60,
+     "minutes": 13,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "lanternorchard",
+     "rec": 19,
+     "arrive": 22.7,
+     "ready": 3.7,
+     "leave": 25,
+     "battles": 70,
+     "minutes": 14,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "windstair",
+     "rec": 21,
+     "arrive": 25,
+     "ready": 4,
+     "leave": 27,
+     "battles": 80,
+     "minutes": 15,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "resonancescar",
+     "rec": 24,
+     "arrive": 27,
+     "ready": 3,
+     "leave": 29.3,
+     "battles": 90,
+     "minutes": 17,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "heartwood",
+     "rec": 27,
+     "arrive": 29.3,
+     "ready": 2.3,
+     "leave": 30,
+     "battles": 100,
+     "minutes": 19,
+     "losses": 0,
+     "grinds": 0
+    }
+   ],
+   "endAvg": 30,
+   "lossesAvg": 0.3,
+   "grindsAvg": 0,
+   "minutesAvg": 19
+  },
+  {
+   "opt": "C",
+   "feed": "none",
+   "end": 20.7,
+   "battles": 100,
+   "minutes": 23,
+   "losses": 0,
+   "grinds": 0,
+   "fed": 0,
+   "reach12": {
+    "battles": 30,
+    "minutes": 8
+   },
+   "reach22": null,
+   "log": [
+    {
+     "id": "forgottenroad",
+     "rec": 4,
+     "arrive": 3,
+     "ready": -1,
+     "leave": 6.7,
+     "battles": 10,
+     "minutes": 4,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "gatheringhall",
+     "rec": 5,
+     "arrive": 6.7,
+     "ready": 1.7,
+     "leave": 9.7,
+     "battles": 20,
+     "minutes": 6,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "reliquary",
+     "rec": 6,
+     "arrive": 9.7,
+     "ready": 3.7,
+     "leave": 12,
+     "battles": 30,
+     "minutes": 8,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "drownedsteps",
+     "rec": 8,
+     "arrive": 12,
+     "ready": 4,
+     "leave": 14,
+     "battles": 40,
+     "minutes": 9,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "coldkiln",
+     "rec": 10,
+     "arrive": 14,
+     "ready": 4,
+     "leave": 15,
+     "battles": 50,
+     "minutes": 11,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "hollowveil",
+     "rec": 12,
+     "arrive": 15,
+     "ready": 3,
+     "leave": 16.7,
+     "battles": 60,
+     "minutes": 13,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "lanternorchard",
+     "rec": 14,
+     "arrive": 16.7,
+     "ready": 2.7,
+     "leave": 18,
+     "battles": 70,
+     "minutes": 15,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "windstair",
+     "rec": 16,
+     "arrive": 18,
+     "ready": 2,
+     "leave": 19,
+     "battles": 80,
+     "minutes": 17,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "resonancescar",
+     "rec": 18,
+     "arrive": 19,
+     "ready": 1,
+     "leave": 20,
+     "battles": 90,
+     "minutes": 20,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "heartwood",
+     "rec": 20,
+     "arrive": 20,
+     "ready": 0,
+     "leave": 20.7,
+     "battles": 100,
+     "minutes": 23,
+     "losses": 0,
+     "grinds": 0
+    }
+   ],
+   "endAvg": 20.9,
+   "lossesAvg": 0,
+   "grindsAvg": 0,
+   "minutesAvg": 22
+  },
+  {
+   "opt": "C",
+   "feed": "half",
+   "end": 23.3,
+   "battles": 100,
+   "minutes": 18,
+   "losses": 0,
+   "grinds": 0,
+   "fed": 1860,
+   "reach12": {
+    "battles": 22,
+    "minutes": 5
+   },
+   "reach22": {
+    "battles": 91,
+    "minutes": 16
+   },
+   "log": [
+    {
+     "id": "forgottenroad",
+     "rec": 4,
+     "arrive": 3,
+     "ready": -1,
+     "leave": 8.3,
+     "battles": 10,
+     "minutes": 4,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "gatheringhall",
+     "rec": 5,
+     "arrive": 8.3,
+     "ready": 3.3,
+     "leave": 11.7,
+     "battles": 20,
+     "minutes": 5,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "reliquary",
+     "rec": 6,
+     "arrive": 11.7,
+     "ready": 5.7,
+     "leave": 13.7,
+     "battles": 30,
+     "minutes": 6,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "drownedsteps",
+     "rec": 8,
+     "arrive": 13.7,
+     "ready": 5.7,
+     "leave": 15.7,
+     "battles": 40,
+     "minutes": 7,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "coldkiln",
+     "rec": 10,
+     "arrive": 15.7,
+     "ready": 5.7,
+     "leave": 17.3,
+     "battles": 50,
+     "minutes": 8,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "hollowveil",
+     "rec": 12,
+     "arrive": 17.3,
+     "ready": 5.3,
+     "leave": 18.7,
+     "battles": 60,
+     "minutes": 10,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "lanternorchard",
+     "rec": 14,
+     "arrive": 18.7,
+     "ready": 4.7,
+     "leave": 20,
+     "battles": 70,
+     "minutes": 12,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "windstair",
+     "rec": 16,
+     "arrive": 20,
+     "ready": 4,
+     "leave": 21,
+     "battles": 80,
+     "minutes": 14,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "resonancescar",
+     "rec": 18,
+     "arrive": 21,
+     "ready": 3,
+     "leave": 22.3,
+     "battles": 90,
+     "minutes": 16,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "heartwood",
+     "rec": 20,
+     "arrive": 22.3,
+     "ready": 2.3,
+     "leave": 23.3,
+     "battles": 100,
+     "minutes": 18,
+     "losses": 0,
+     "grinds": 0
+    }
+   ],
+   "endAvg": 23.3,
+   "lossesAvg": 0,
+   "grindsAvg": 0,
+   "minutesAvg": 18
+  },
+  {
+   "opt": "C",
+   "feed": "all",
+   "end": 23.7,
+   "battles": 100,
+   "minutes": 17,
+   "losses": 0,
+   "grinds": 0,
+   "fed": 2280,
+   "reach12": {
+    "battles": 21,
+    "minutes": 5
+   },
+   "reach22": {
+    "battles": 91,
+    "minutes": 16
+   },
+   "log": [
+    {
+     "id": "forgottenroad",
+     "rec": 4,
+     "arrive": 3,
+     "ready": -1,
+     "leave": 9.3,
+     "battles": 10,
+     "minutes": 4,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "gatheringhall",
+     "rec": 5,
+     "arrive": 9.3,
+     "ready": 4.3,
+     "leave": 12.7,
+     "battles": 20,
+     "minutes": 5,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "reliquary",
+     "rec": 6,
+     "arrive": 12.7,
+     "ready": 6.7,
+     "leave": 14.3,
+     "battles": 30,
+     "minutes": 6,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "drownedsteps",
+     "rec": 8,
+     "arrive": 14.3,
+     "ready": 6.3,
+     "leave": 16,
+     "battles": 40,
+     "minutes": 7,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "coldkiln",
+     "rec": 10,
+     "arrive": 16,
+     "ready": 6,
+     "leave": 17.7,
+     "battles": 50,
+     "minutes": 8,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "hollowveil",
+     "rec": 12,
+     "arrive": 17.7,
+     "ready": 5.7,
+     "leave": 19,
+     "battles": 60,
+     "minutes": 10,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "lanternorchard",
+     "rec": 14,
+     "arrive": 19,
+     "ready": 5,
+     "leave": 20.3,
+     "battles": 70,
+     "minutes": 12,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "windstair",
+     "rec": 16,
+     "arrive": 20.3,
+     "ready": 4.3,
+     "leave": 21.3,
+     "battles": 80,
+     "minutes": 13,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "resonancescar",
+     "rec": 18,
+     "arrive": 21.3,
+     "ready": 3.3,
+     "leave": 22.3,
+     "battles": 90,
+     "minutes": 15,
+     "losses": 0,
+     "grinds": 0
+    },
+    {
+     "id": "heartwood",
+     "rec": 20,
+     "arrive": 22.3,
+     "ready": 2.3,
+     "leave": 23.7,
+     "battles": 100,
+     "minutes": 17,
+     "losses": 0,
+     "grinds": 0
+    }
+   ],
+   "endAvg": 23.7,
+   "lossesAvg": 0,
+   "grindsAvg": 0,
+   "minutesAvg": 17
+  }
+ ],
+ "highLevelSaves": [
+  {
+   "opt": "base",
+   "heartwoodRec": 20,
+   "xpNeed25": 966,
+   "xpFromHeartwoodAt25": "full",
+   "partyAt30": "keeps its levels (no option takes levels away)"
+  },
+  {
+   "opt": "A",
+   "heartwoodRec": 20,
+   "xpNeed25": 966,
+   "xpFromHeartwoodAt25": "reduced to 25-75% on battles 5+ levels below",
+   "partyAt30": "keeps its levels (no option takes levels away)"
+  },
+  {
+   "opt": "B",
+   "heartwoodRec": 27,
+   "xpNeed25": 966,
+   "xpFromHeartwoodAt25": "full",
+   "partyAt30": "keeps its levels (no option takes levels away)"
+  },
+  {
+   "opt": "C",
+   "heartwoodRec": 20,
+   "xpNeed25": 2849,
+   "xpFromHeartwoodAt25": "full",
+   "partyAt30": "keeps its levels (no option takes levels away)"
+  }
+ ]
+}
