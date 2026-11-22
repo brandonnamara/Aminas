@@ -89,8 +89,13 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   const n0 = await ev(() => A.State.state.items.length); await page.$eval('[data-act=fBuy][data-id=driftclub]', (b) => b.click()); await sleep(300);
   ok((await ev(() => A.State.state.items.length)) === n0 && !(await page.$('[data-act=fConfirm]')), 'and pressing one changes nothing');
   await shot('08-shop');
+  // Phase 18A: diagnostics only (same click, same wait, same check): if the Forge is still open, print what was in the
+  // modal layer just before and after the click, to find the cause of the intermittent failure.
+  const dbg0 = await ev(() => ({ kids: [...document.querySelector('#modal-root').children].map((o) => o.className + '|' + ((o.querySelector('.sheet') || {}).className || '') + '|' + ((o.querySelector('h2,.sh-t,.title') || {}).textContent || '').slice(0, 40)), toasts: document.querySelector('#toast-root').textContent.slice(0, 120), t: performance.now() }));
   await page.click('.overlay:last-child [data-act=close]'); await sleep(300);
-  ok(!(await page.$('.sheet.forge')), 'the Forge closes');
+  const dbg1 = await ev(() => ({ kids: [...document.querySelector('#modal-root').children].map((o) => o.className + '|' + ((o.querySelector('.sheet') || {}).className || '') + '|' + ((o.querySelector('h2,.sh-t,.title') || {}).textContent || '').slice(0, 40)), forgeIn: !!document.querySelector('.sheet.forge'), t: performance.now() }));
+  const fc = !(await page.$('.sheet.forge')); if (!fc) console.log('DEBUG before ' + JSON.stringify(dbg0) + '\nDEBUG after ' + JSON.stringify(dbg1));
+  ok(fc, 'the Forge closes');
 
   /* ---------- persistence across a reload ---------- */
   await ev(() => A.State.save()); await page.reload(); await page.waitForSelector('.logo');

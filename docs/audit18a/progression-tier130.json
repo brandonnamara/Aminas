@@ -1,0 +1,864 @@
+{
+ "tier": "1.3,1.15",
+ "thresholds": {
+  "A": [
+   22,
+   23,
+   23,
+   23,
+   24,
+   27,
+   26,
+   30,
+   29,
+   29
+  ],
+  "starter": [
+   3,
+   4,
+   5,
+   8,
+   10,
+   12,
+   13,
+   13,
+   16,
+   19
+  ],
+  "B": [
+   22,
+   22,
+   23,
+   22,
+   23,
+   25,
+   24,
+   28,
+   28,
+   27
+  ],
+  "C": [
+   22,
+   24,
+   24,
+   24,
+   26,
+   29,
+   29,
+   34,
+   34,
+   35
+  ]
+ },
+ "bands": {
+  "A": {
+   "label": "A · 22–30 (brief target, current cap 30)",
+   "cap": 30,
+   "rec": [
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    29,
+    30
+   ]
+  },
+  "B": {
+   "label": "B · 21–28 (fits under the cap)",
+   "cap": 30,
+   "rec": [
+    21,
+    22,
+    23,
+    24,
+    25,
+    25,
+    26,
+    27,
+    27,
+    28
+   ]
+  },
+  "C": {
+   "label": "C · 22–36 (cap raised to 40)",
+   "cap": 40,
+   "rec": [
+    22,
+    24,
+    25,
+    27,
+    28,
+    30,
+    31,
+    33,
+    34,
+    36
+   ]
+  }
+ },
+ "profiles": {
+  "rarelyFed": {
+   "feed": "none",
+   "label": "Rarely fed, balanced trio"
+  },
+  "fedRegularly": {
+   "feed": "half",
+   "label": "Fed regularly (half of food), balanced trio"
+  },
+  "fedAll": {
+   "feed": "all",
+   "label": "Fed with all food, balanced trio"
+  },
+  "prepared": {
+   "feed": "half",
+   "moves": 4,
+   "gear": true,
+   "label": "Fed regularly + moves at Lv 4 + best gear worn"
+  },
+  "challenger": {
+   "feed": "half",
+   "moves": 5,
+   "gear": true,
+   "replays": true,
+   "label": "Prepared + every Starter challenge done (moves Lv 5, extra replays)"
+  }
+ },
+ "seeds": [
+  11,
+  22
+ ],
+ "triesPerFirstTry": 10,
+ "results": {
+  "A": {
+   "rarelyFed": {
+    "label": "Rarely fed, balanced trio",
+    "starterEnd": 22,
+    "end": 30,
+    "losses": 0.5,
+    "grinds": 0,
+    "minutes": 52,
+    "firstTry": [
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     40,
+     100,
+     100
+    ],
+    "ready": [
+     0,
+     0.7,
+     1,
+     1,
+     1.3,
+     1.3,
+     1.3,
+     0.7,
+     1,
+     0
+    ],
+    "slack": [
+     0,
+     0.7,
+     2,
+     3,
+     3.3,
+     1.3,
+     3.3,
+     -0.3,
+     1,
+     1
+    ],
+    "capAt": [
+     9,
+     9
+    ]
+   },
+   "fedRegularly": {
+    "label": "Fed regularly (half of food), balanced trio",
+    "starterEnd": 25,
+    "end": 30,
+    "losses": 0.5,
+    "grinds": 0,
+    "minutes": 47,
+    "firstTry": [
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     50,
+     100,
+     100
+    ],
+    "ready": [
+     3,
+     3.7,
+     4.3,
+     4.7,
+     4,
+     3,
+     2,
+     1,
+     1,
+     0
+    ],
+    "slack": [
+     3,
+     3.7,
+     5.3,
+     6.7,
+     6,
+     3,
+     4,
+     0,
+     1,
+     1
+    ],
+    "capAt": [
+     5,
+     5
+    ]
+   },
+   "fedAll": {
+    "label": "Fed with all food, balanced trio",
+    "starterEnd": 25.3,
+    "end": 30,
+    "losses": 1,
+    "grinds": 0,
+    "minutes": 49,
+    "firstTry": [
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     50,
+     100,
+     100
+    ],
+    "ready": [
+     3.3,
+     4.3,
+     4.7,
+     5,
+     4,
+     3,
+     2,
+     1,
+     1,
+     0
+    ],
+    "slack": [
+     3.3,
+     4.3,
+     5.7,
+     7,
+     6,
+     3,
+     4,
+     0,
+     1,
+     1
+    ],
+    "capAt": [
+     4,
+     4
+    ]
+   },
+   "prepared": {
+    "label": "Fed regularly + moves at Lv 4 + best gear worn",
+    "starterEnd": 25,
+    "end": 30,
+    "losses": 0,
+    "grinds": 0,
+    "minutes": 38,
+    "firstTry": [
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100
+    ],
+    "ready": [
+     3,
+     3.7,
+     4.3,
+     4.7,
+     4,
+     3,
+     2,
+     1,
+     1,
+     0
+    ],
+    "slack": [
+     3,
+     3.7,
+     5.3,
+     6.7,
+     6,
+     3,
+     4,
+     0,
+     1,
+     1
+    ],
+    "capAt": [
+     5,
+     5
+    ]
+   },
+   "challenger": {
+    "label": "Prepared + every Starter challenge done (moves Lv 5, extra replays)",
+    "starterEnd": 28,
+    "end": 30,
+    "losses": 0,
+    "grinds": 0,
+    "minutes": 35,
+    "firstTry": [
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100
+    ],
+    "ready": [
+     6,
+     7,
+     6,
+     5,
+     4,
+     3,
+     2,
+     1,
+     1,
+     0
+    ],
+    "slack": [
+     6,
+     7,
+     7,
+     7,
+     6,
+     3,
+     4,
+     0,
+     1,
+     1
+    ],
+    "capAt": [
+     2,
+     2
+    ]
+   }
+  },
+  "B": {
+   "rarelyFed": {
+    "label": "Rarely fed, balanced trio",
+    "starterEnd": 22,
+    "end": 30,
+    "losses": 0,
+    "grinds": 0,
+    "minutes": 46,
+    "firstTry": [
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100
+    ],
+    "ready": [
+     1,
+     1.7,
+     2,
+     1.7,
+     1.7,
+     2.7,
+     2.7,
+     2.3,
+     2.7,
+     2
+    ],
+    "slack": [
+     0,
+     1.7,
+     2,
+     3.7,
+     3.7,
+     2.7,
+     4.7,
+     1.3,
+     1.7,
+     3
+    ],
+    "capAt": [
+     10,
+     10
+    ]
+   },
+   "fedRegularly": {
+    "label": "Fed regularly (half of food), balanced trio",
+    "starterEnd": 25,
+    "end": 30,
+    "losses": 0,
+    "grinds": 0,
+    "minutes": 42,
+    "firstTry": [
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100
+    ],
+    "ready": [
+     4,
+     4.7,
+     5,
+     5.3,
+     5,
+     5,
+     4,
+     3,
+     3,
+     2
+    ],
+    "slack": [
+     3,
+     4.7,
+     5,
+     7.3,
+     7,
+     5,
+     6,
+     2,
+     2,
+     3
+    ],
+    "capAt": [
+     5,
+     5
+    ]
+   },
+   "fedAll": {
+    "label": "Fed with all food, balanced trio",
+    "starterEnd": 25.3,
+    "end": 30,
+    "losses": 0,
+    "grinds": 0,
+    "minutes": 42,
+    "firstTry": [
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100
+    ],
+    "ready": [
+     4.3,
+     5,
+     5.7,
+     6,
+     5,
+     5,
+     4,
+     3,
+     3,
+     2
+    ],
+    "slack": [
+     3.3,
+     5,
+     5.7,
+     8,
+     7,
+     5,
+     6,
+     2,
+     2,
+     3
+    ],
+    "capAt": [
+     4,
+     4
+    ]
+   },
+   "prepared": {
+    "label": "Fed regularly + moves at Lv 4 + best gear worn",
+    "starterEnd": 25,
+    "end": 30,
+    "losses": 0,
+    "grinds": 0,
+    "minutes": 34,
+    "firstTry": [
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100
+    ],
+    "ready": [
+     4,
+     4.7,
+     5,
+     5.3,
+     5,
+     5,
+     4,
+     3,
+     3,
+     2
+    ],
+    "slack": [
+     3,
+     4.7,
+     5,
+     7.3,
+     7,
+     5,
+     6,
+     2,
+     2,
+     3
+    ],
+    "capAt": [
+     5,
+     5
+    ]
+   },
+   "challenger": {
+    "label": "Prepared + every Starter challenge done (moves Lv 5, extra replays)",
+    "starterEnd": 28,
+    "end": 30,
+    "losses": 0,
+    "grinds": 0,
+    "minutes": 31,
+    "firstTry": [
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100
+    ],
+    "ready": [
+     7,
+     8,
+     7,
+     6,
+     5,
+     5,
+     4,
+     3,
+     3,
+     2
+    ],
+    "slack": [
+     6,
+     8,
+     7,
+     8,
+     7,
+     5,
+     6,
+     2,
+     2,
+     3
+    ],
+    "capAt": [
+     2,
+     2
+    ]
+   }
+  },
+  "C": {
+   "rarelyFed": {
+    "label": "Rarely fed, balanced trio",
+    "starterEnd": 22,
+    "end": 34.7,
+    "losses": 2,
+    "grinds": 1,
+    "minutes": 63,
+    "firstTry": [
+     100,
+     100,
+     100,
+     100,
+     100,
+     90,
+     90,
+     0,
+     90,
+     100
+    ],
+    "ready": [
+     0,
+     -0.3,
+     0.7,
+     -0.8,
+     -0.3,
+     -1.3,
+     -1.3,
+     -1.7,
+     -0.7,
+     -1.7
+    ],
+    "slack": [
+     0,
+     -0.3,
+     1.7,
+     2.1,
+     1.7,
+     -0.3,
+     0.7,
+     -2.7,
+     -0.7,
+     -0.7
+    ],
+    "capAt": [
+     null,
+     null
+    ]
+   },
+   "fedRegularly": {
+    "label": "Fed regularly (half of food), balanced trio",
+    "starterEnd": 25,
+    "end": 39,
+    "losses": 0,
+    "grinds": 0,
+    "minutes": 48,
+    "firstTry": [
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100
+    ],
+    "ready": [
+     3,
+     2.7,
+     3.3,
+     3,
+     3.3,
+     2.7,
+     3,
+     2.3,
+     2.7,
+     1.9
+    ],
+    "slack": [
+     3,
+     2.7,
+     4.3,
+     6,
+     5.3,
+     3.7,
+     5,
+     1.3,
+     2.7,
+     2.9
+    ],
+    "capAt": [
+     null,
+     null
+    ]
+   },
+   "fedAll": {
+    "label": "Fed with all food, balanced trio",
+    "starterEnd": 25.3,
+    "end": 39.1,
+    "losses": 0,
+    "grinds": 0,
+    "minutes": 47,
+    "firstTry": [
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100
+    ],
+    "ready": [
+     3.3,
+     3.3,
+     4,
+     3.3,
+     3.7,
+     3,
+     3.3,
+     2.5,
+     2.9,
+     2
+    ],
+    "slack": [
+     3.3,
+     3.3,
+     5,
+     6.3,
+     5.7,
+     4,
+     5.3,
+     1.5,
+     2.9,
+     3
+    ],
+    "capAt": [
+     null,
+     null
+    ]
+   },
+   "prepared": {
+    "label": "Fed regularly + moves at Lv 4 + best gear worn",
+    "starterEnd": 25,
+    "end": 39.3,
+    "losses": 0,
+    "grinds": 0,
+    "minutes": 38,
+    "firstTry": [
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100
+    ],
+    "ready": [
+     3,
+     2.7,
+     3.7,
+     3,
+     3.7,
+     3,
+     3.3,
+     2.7,
+     3,
+     2
+    ],
+    "slack": [
+     3,
+     2.7,
+     4.7,
+     6,
+     5.7,
+     4,
+     5.3,
+     1.7,
+     3,
+     3
+    ],
+    "capAt": [
+     null,
+     null
+    ]
+   },
+   "challenger": {
+    "label": "Prepared + every Starter challenge done (moves Lv 5, extra replays)",
+    "starterEnd": 28,
+    "end": 40,
+    "losses": 0,
+    "grinds": 0,
+    "minutes": 33,
+    "firstTry": [
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100,
+     100
+    ],
+    "ready": [
+     6,
+     6,
+     6.7,
+     6,
+     6,
+     5,
+     5,
+     4,
+     4,
+     3
+    ],
+    "slack": [
+     6,
+     6,
+     7.7,
+     9,
+     8,
+     6,
+     7,
+     3,
+     4,
+     4
+    ],
+    "capAt": [
+     null,
+     null
+    ]
+   }
+  }
+ },
+ "note": "Sandbox only: the proposed dungeons and any level cap change exist only inside the simulator."
+}
