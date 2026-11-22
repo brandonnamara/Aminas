@@ -1,6 +1,9 @@
 # Phase 16B — Interface and quality-of-life polish
 
-Branch `p16b-ui-polish`, made from `p16a-onboarding` at `311a3b6`. Before branching I checked that the local and
+Branch `p16b-ui-polish`, made from `p16a-onboarding` at `311a3b6`. Review page: https://claude.ai/artifact/BM4odjLHXkkBMqyTxGFhmC · Development preview: Version 37 of
+https://claude.ai/artifact/ShbtpoFoauudCMFtMCfogK
+
+Before branching I checked that the local and
 remote heads matched and the working tree was clean. `main` is untouched at `0fc9e36` and nothing is merged.
 
 The Phase 15 and Phase 16A switches are unchanged and still off by default; the new opening is not turned on. Phase
