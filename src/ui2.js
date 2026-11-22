@@ -52,8 +52,15 @@
     return '<div class="dd ' + k + ' d-' + id + '"><div class="dd-art">' + (Art.hasEnv(d.battles[Math.max(0, Math.min(9, at))].env || d.env) ? Art.envBg(d.battles[Math.max(0, Math.min(9, at))].env || d.env) : Art.battleBg('', id)) + '<span class="dd-num">' + (boss.islandBoss ? 'ISLAND BOSS · ' : '') + 'DUNGEON ' + d.index + '</span></div>' +
       '<div class="dd-b"><h3>' + esc(d.name) + ' ' + chip(d.el) + ' ' + stateTag(k) + '</h3><div class="dd-a">' + actions + '</div><p>' + esc(d.theme) + '</p><p class="muted small-t"><b>Recommended level</b> ' + d.recommended + ' · <b>Rewards</b> ' + esc(d.rewardText) + '</p>' +
       '<div class="bpath">' + nodes + '</div><div class="secs">' + secs + '</div>' +
+      (k === 'completed' && R.Challenge ? chHtml(s, id) : '') + // Phase 17D: optional replay challenges
       (mv || mech ? '<div class="dn-move' + (boss.islandBoss ? ' prism-t' : '') + '">' + I('warn') + ' ' + esc(boss.title) + (mech ? ': <b>' + esc(mech.name) + '</b> (' + esc(mech.desc) + ')' : '') + (mv ? (mech ? ' and ' : ': ') + '<b>' + esc(mv.name) + '</b>' : '') + '</div>' : '') +
       '</div></div>';
+  }
+  // Phase 17D: optional challenges for a full replay of a cleared dungeon (one-time rewards, clearly optional)
+  function chHtml(s, id) {
+    const c = R.Challenge.status(s, id), ess = Object.keys(c.reward.ess)[0];
+    return '<div class="ch17"><div class="ch17-t">' + I('star') + ' <b>Optional challenges</b> <span class="muted">· replay from battle 1 · each pays once: ' + I('gold') + ' ' + c.reward.gold + ' and ' + (Art.essIcon ? Art.essIcon(ess) : '') + ' ' + c.reward.ess[ess] + ' ' + esc(D.ELEMENTS[ess].name) + ' Essence' + (c.all ? '' : ', all three ' + I('gem') + ' ' + c.allReward.gems) + '</span></div>' +
+      '<ul>' + c.list.map((x) => '<li class="' + (x.done ? 'ok' : '') + '">' + (x.done ? I('check') : '<i class="dot"></i>') + '<b>' + esc(x.name) + '</b> <span class="muted">' + esc(x.desc) + '</span></li>').join('') + '</ul></div>';
   }
   UI.act('dungeons', () => { UI.closeAll(); UI.dungeons(); });
   UI.act('dSel', (el) => { UI.dSel = el.dataset.id; UI.dungeons(el.closest('.overlay'), el.dataset.id); });
@@ -61,7 +68,7 @@
   UI.act('dWhy', (el) => { const s = st(), id = el.dataset.id, bl = R.dungeonBlocker(s, id); if (!bl) return; if (bl.dungeon) { UI.dungeons(el.closest('.overlay'), bl.dungeon); return; } UI.go(A.Nav.resolve(s, { id: 'p', type: 'dungeon_clear', dungeon: id })); });
   UI.act('dropRun', (el) => UI.confirm('Leave the dungeon?', 'Your progress is kept: next time you start at the same battle. Health resets when you come back.', 'Leave', () => { R.abandonRun(st()); S.save(); UI.dungeons(el.closest('.overlay')); }));
   UI.act('resumeRun', (el) => { UI.close(el.closest('.overlay')); UI.nextEncounter(); });
-  UI.act('enterDungeon', (el) => { const id = el.dataset.id, from = +(el.dataset.from || 0); UI.pickTeam({ size: 3, title: 'Choose your party · ' + D.DUNGEONS[id].name, dungeon: id, go: 'Enter the dungeon', onGo: (sel) => { const r = R.startRun(st(), id, sel, { from }); if (!r.ok) return false; S.save(); UI.closeAll(); UI.nextEncounter(); return true; } }); });
+  UI.act('enterDungeon', (el) => { const id = el.dataset.id, from = +(el.dataset.from || 0); UI.pickTeam({ size: 3, title: 'Choose your party · ' + D.DUNGEONS[id].name, dungeon: id, from, go: 'Enter the dungeon', onGo: (sel) => { const r = R.startRun(st(), id, sel, { from }); if (!r.ok) return false; S.save(); UI.closeAll(); UI.nextEncounter(); return true; } }); });
 
   /* ---------- team picker (dungeons, survival, PvP roster, defence teams) ---------- */
   // o: {size, exact?, title, go, initial?, dungeon?, note?, onGo(sel) -> true closes}
@@ -89,9 +96,14 @@
       const bb = d && R.bossBrief ? R.bossBrief(s, o.dungeon, sel) : null;
       const bossHtml = bb ? '<div class="pp-syn pp-boss"><div>' + I('warn') + ' <b>' + esc(bb.title || 'The guardian') + '</b> ' + (bb.known ? bb.els.map(chip).join(' ') + ' <span class="muted">Weak to</span> ' + (bb.weakTo.length ? bb.weakTo.map(chip).join(' ') : '<span class="muted">nothing</span>') + (bb.resists.length ? ' <span class="muted">· resists</span> ' + bb.resists.map(chip).join(' ') : '') : '<span class="muted">Not met yet: its element shows here once you have faced it.</span>') + '</div>' +
         (bb.advice.length ? '<div class="pp-adv">' + bb.advice.map((x) => '<span class="' + (x.k === 'good' ? 'good' : x.k === 'bad' ? 'bad' : 'muted') + '">' + esc(x.t) + '</span>').join(' ') + '</div>' : '') + '</div>' : '';
+      // Phase 17D: advice for a small party (never blocks), and the replay challenges this party would qualify for
+      const adv = d && R.partyAdvice ? R.partyAdvice(s, o.dungeon, sel) : null;
+      const advHtml = adv ? '<div class="pp-syn pp-adv17' + (adv.hard ? ' hard' : '') + '">' + I(adv.k === 'room' ? 'paw' : 'compass') + ' <span>' + esc(adv.t) + '</span>' + (adv.k === 'recruit' ? ' <button class="btn small ghost" data-act="explore">' + I('compass') + 'Explore</button>' : '') + '</div>' : '';
+      const chs = d && R.Challenge && R.Challenge.open(s, o.dungeon) && o.from === 0 ? R.Challenge.status(s, o.dungeon) : null;
+      const chLine = chs && !chs.all ? '<div class="pp-syn pp-ch17">' + I('star') + ' <span class="muted">Optional challenges:</span> ' + chs.list.map((x) => '<span class="' + (x.done ? 'good' : x.k === 'kindred' && R.Challenge.kindred(s, sel) ? 'good' : 'muted') + '">' + (x.done ? '✓ ' : '') + esc(x.name) + (!x.done && x.k === 'kindred' ? (R.Challenge.kindred(s, sel) ? ' (this party qualifies)' : ' (needs three of one element)') : '') + '</span>').join(' · ') + '</div>' : '';
       const synHtml = o.size <= 3 ? '<div class="pp-syn">' + (syn.length ? syn.map((k) => '<div>' + UI.synChips([k]) + ' <span class="muted">' + esc(D.SYNERGIES[k].desc) + '</span></div>').join('') : '<span class="muted">No team synergy yet. Pair two of one element (Kindred), bring Light with Dark (Twilight Pact), or Fire, Water and Nature together (Elemental Triangle).</span>') + '</div>' : '';
       ov.innerHTML = UI.sheet(esc(o.title),
-        '<div class="party-row' + (o.size > 3 ? ' many' : '') + '">' + slots + '<div class="muted" style="font-size:.8rem;align-self:center">Pick ' + (o.exact ? 'exactly ' : 'up to ') + o.size + '. ' + (o.size <= 3 ? 'The first one fights first. ' : 'They fight in this order. ') + info + '</div></div>' + bossHtml + synHtml + '<div class="grid">' +
+        '<div class="party-row' + (o.size > 3 ? ' many' : '') + '">' + slots + '<div class="muted" style="font-size:.8rem;align-self:center">Pick ' + (o.exact ? 'exactly ' : 'up to ') + o.size + '. ' + (o.size <= 3 ? 'The first one fights first. ' : 'They fight in this order. ') + info + '</div></div>' + advHtml + bossHtml + chLine + synHtml + '<div class="grid">' +
         list.map((a) => { const sp = D.SPECIES[a.sp], on = sel.indexOf(a.uid); return '<div class="card ' + (on >= 0 ? 'sel' : '') + '" data-pp="' + a.uid + '">' + artBox(a.sp) + (on >= 0 ? '<span class="cnt">#' + (on + 1) + '</span>' : '') + '<div class="nm">' + esc(sp.name) + '</div><div>' + chip(sp.el) + '</div><div class="lvl">Lv ' + a.lv + '</div></div>'; }).join('') + '</div>',
         '<button class="btn ghost" data-act="close">Back</button><button class="btn gold ' + (sel.length >= need ? '' : 'off') + '" id="pp-go">' + esc(o.go) + '</button>', 'wide');
       ov.querySelectorAll('[data-pp]').forEach((c) => (c.onclick = () => { Au.play('tap'); const u = +c.dataset.pp, i = sel.indexOf(u); if (i >= 0) sel.splice(i, 1); else if (sel.length < o.size) sel.push(u); draw(); }));
@@ -596,6 +608,8 @@
       (out.newSp || []).forEach((sp) => list.push({ k: 'amina', id: sp }));
       groups.push({ title: dname + (out.first ? ' · first clear' : ' cleared'), icon: isl ? 'boss' : 'gate', list });
     }
+    if (out.challenges && out.challenges.fresh.length) { const C = D.CHALLENGE17, el = out.challenges.el, n = out.challenges.fresh.length, lst = [{ k: 'gold', n: C.reward.gold * n }, { k: 'essence', el, n: C.reward.essence * n }]; if (out.challenges.all) lst.push({ k: 'gems', n: C.allThree.gems });
+      groups.push({ title: 'Challenge' + (n > 1 ? 's' : '') + ' complete: ' + out.challenges.fresh.map((k) => C.list[k].name).join(', '), icon: 'star', list: lst }); } // Phase 17D
     if (out.items && out.items.length) groups.push({ title: 'Equipment found', icon: 'anvil', list: out.items.map((id) => ({ k: 'item', id })) });
     const spoilsHtml = groups.filter((g) => g.list.length).map((g) => RW.group(g)).join('');
     const lore = out.lore && out.lore.length ? '<div class="v-note">' + I('book') + ' New journal entr' + (out.lore.length > 1 ? 'ies' : 'y') + ': ' + out.lore.map((k) => '<b>' + esc(D.LORE[k].title) + '</b>') .join(', ') + '</div>' : '';

@@ -1,0 +1,23 @@
+{
+ "daily": {
+  "goldMax": 260,
+  "foodMax": 65,
+  "gems": 2,
+  "gemsPer30Days": 60
+ },
+ "moonShrineLv4PerDay": 18,
+ "codexOnce": {
+  "gold": 6830,
+  "gems": 77
+ },
+ "challengesOnce": {
+  "gold": 3000,
+  "essence": 180,
+  "gems": 20
+ },
+ "existingOneTimeGems": {
+  "quests": 103,
+  "dungeons": 162,
+  "survival": 34
+ }
+}

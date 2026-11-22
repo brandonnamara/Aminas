@@ -1,0 +1,468 @@
+{
+ "seeds": 100,
+ "team": "Lumifern, Cannonis, Emberix (tactical player); guardianTrying: a player going for the guardian challenge (Acinus, Cannonis, Emberix; for the barrier guardian Lumifern, Cannonis, Emberix); kindred: best of nature/water/fire trios",
+ "dungeons": [
+  {
+   "id": "forgottenroad",
+   "rec": 4,
+   "levels": {
+    "0": {
+     "lv": 4,
+     "clear": 100,
+     "flawless": 0,
+     "guardian": 100,
+     "guardianTrying": 100,
+     "kindredBest": "nature 100%",
+     "kindred": {
+      "nature": 100,
+      "water": 100,
+      "fire": 100
+     }
+    },
+    "3": {
+     "lv": 7,
+     "clear": 100,
+     "flawless": 100,
+     "guardian": 42,
+     "guardianTrying": 42,
+     "kindredBest": "nature 100%",
+     "kindred": {
+      "nature": 100,
+      "water": 100,
+      "fire": 100
+     }
+    },
+    "6": {
+     "lv": 10,
+     "clear": 100,
+     "flawless": 100,
+     "guardian": 100,
+     "guardianTrying": 100,
+     "kindredBest": "nature 100%",
+     "kindred": {
+      "nature": 100,
+      "water": 100,
+      "fire": 100
+     }
+    }
+   }
+  },
+  {
+   "id": "gatheringhall",
+   "rec": 5,
+   "levels": {
+    "0": {
+     "lv": 5,
+     "clear": 100,
+     "flawless": 0,
+     "guardian": 68,
+     "guardianTrying": 100,
+     "kindredBest": "nature 100%",
+     "kindred": {
+      "nature": 100,
+      "water": 98,
+      "fire": 100
+     }
+    },
+    "3": {
+     "lv": 8,
+     "clear": 100,
+     "flawless": 100,
+     "guardian": 0,
+     "guardianTrying": 100,
+     "kindredBest": "nature 100%",
+     "kindred": {
+      "nature": 100,
+      "water": 100,
+      "fire": 100
+     }
+    },
+    "6": {
+     "lv": 11,
+     "clear": 100,
+     "flawless": 100,
+     "guardian": 0,
+     "guardianTrying": 100,
+     "kindredBest": "nature 100%",
+     "kindred": {
+      "nature": 100,
+      "water": 100,
+      "fire": 100
+     }
+    }
+   }
+  },
+  {
+   "id": "reliquary",
+   "rec": 6,
+   "levels": {
+    "0": {
+     "lv": 6,
+     "clear": 100,
+     "flawless": 0,
+     "guardian": 37,
+     "guardianTrying": 100,
+     "kindredBest": "nature 100%",
+     "kindred": {
+      "nature": 100,
+      "water": 100,
+      "fire": 100
+     }
+    },
+    "3": {
+     "lv": 9,
+     "clear": 100,
+     "flawless": 1,
+     "guardian": 0,
+     "guardianTrying": 100,
+     "kindredBest": "nature 100%",
+     "kindred": {
+      "nature": 100,
+      "water": 100,
+      "fire": 100
+     }
+    },
+    "6": {
+     "lv": 12,
+     "clear": 100,
+     "flawless": 100,
+     "guardian": 0,
+     "guardianTrying": 100,
+     "kindredBest": "nature 100%",
+     "kindred": {
+      "nature": 100,
+      "water": 100,
+      "fire": 100
+     }
+    }
+   }
+  },
+  {
+   "id": "drownedsteps",
+   "rec": 8,
+   "levels": {
+    "0": {
+     "lv": 8,
+     "clear": 100,
+     "flawless": 0,
+     "guardian": 30,
+     "guardianTrying": 100,
+     "kindredBest": "nature 100%",
+     "kindred": {
+      "nature": 100,
+      "water": 100,
+      "fire": 24
+     }
+    },
+    "3": {
+     "lv": 11,
+     "clear": 100,
+     "flawless": 100,
+     "guardian": 0,
+     "guardianTrying": 100,
+     "kindredBest": "nature 100%",
+     "kindred": {
+      "nature": 100,
+      "water": 100,
+      "fire": 100
+     }
+    },
+    "6": {
+     "lv": 14,
+     "clear": 100,
+     "flawless": 100,
+     "guardian": 0,
+     "guardianTrying": 100,
+     "kindredBest": "nature 100%",
+     "kindred": {
+      "nature": 100,
+      "water": 100,
+      "fire": 100
+     }
+    }
+   }
+  },
+  {
+   "id": "coldkiln",
+   "rec": 10,
+   "levels": {
+    "0": {
+     "lv": 10,
+     "clear": 45,
+     "flawless": 0,
+     "guardian": 27,
+     "guardianTrying": 87,
+     "kindredBest": "water 100%",
+     "kindred": {
+      "nature": 0,
+      "water": 100,
+      "fire": 41
+     }
+    },
+    "3": {
+     "lv": 13,
+     "clear": 100,
+     "flawless": 95,
+     "guardian": 0,
+     "guardianTrying": 100,
+     "kindredBest": "nature 100%",
+     "kindred": {
+      "nature": 100,
+      "water": 100,
+      "fire": 100
+     }
+    },
+    "6": {
+     "lv": 16,
+     "clear": 100,
+     "flawless": 100,
+     "guardian": 0,
+     "guardianTrying": 100,
+     "kindredBest": "nature 100%",
+     "kindred": {
+      "nature": 100,
+      "water": 100,
+      "fire": 100
+     }
+    }
+   }
+  },
+  {
+   "id": "hollowveil",
+   "rec": 12,
+   "levels": {
+    "0": {
+     "lv": 12,
+     "clear": 100,
+     "flawless": 0,
+     "guardian": 36,
+     "guardianTrying": 100,
+     "kindredBest": "nature 100%",
+     "kindred": {
+      "nature": 100,
+      "water": 100,
+      "fire": 100
+     }
+    },
+    "3": {
+     "lv": 15,
+     "clear": 100,
+     "flawless": 0,
+     "guardian": 0,
+     "guardianTrying": 100,
+     "kindredBest": "nature 100%",
+     "kindred": {
+      "nature": 100,
+      "water": 100,
+      "fire": 100
+     }
+    },
+    "6": {
+     "lv": 18,
+     "clear": 100,
+     "flawless": 100,
+     "guardian": 0,
+     "guardianTrying": 100,
+     "kindredBest": "nature 100%",
+     "kindred": {
+      "nature": 100,
+      "water": 100,
+      "fire": 100
+     }
+    }
+   }
+  },
+  {
+   "id": "lanternorchard",
+   "rec": 14,
+   "levels": {
+    "0": {
+     "lv": 14,
+     "clear": 100,
+     "flawless": 0,
+     "guardian": 53,
+     "guardianTrying": 100,
+     "kindredBest": "nature 100%",
+     "kindred": {
+      "nature": 100,
+      "water": 100,
+      "fire": 100
+     }
+    },
+    "3": {
+     "lv": 17,
+     "clear": 100,
+     "flawless": 100,
+     "guardian": 0,
+     "guardianTrying": 100,
+     "kindredBest": "nature 100%",
+     "kindred": {
+      "nature": 100,
+      "water": 100,
+      "fire": 100
+     }
+    },
+    "6": {
+     "lv": 20,
+     "clear": 100,
+     "flawless": 100,
+     "guardian": 0,
+     "guardianTrying": 100,
+     "kindredBest": "nature 100%",
+     "kindred": {
+      "nature": 100,
+      "water": 100,
+      "fire": 100
+     }
+    }
+   }
+  },
+  {
+   "id": "windstair",
+   "rec": 16,
+   "levels": {
+    "0": {
+     "lv": 16,
+     "clear": 100,
+     "flawless": 0,
+     "guardian": 15,
+     "guardianTrying": 100,
+     "kindredBest": "water 100%",
+     "kindred": {
+      "nature": 0,
+      "water": 100,
+      "fire": 100
+     }
+    },
+    "3": {
+     "lv": 19,
+     "clear": 100,
+     "flawless": 100,
+     "guardian": 0,
+     "guardianTrying": 100,
+     "kindredBest": "water 100%",
+     "kindred": {
+      "nature": 98,
+      "water": 100,
+      "fire": 100
+     }
+    },
+    "6": {
+     "lv": 22,
+     "clear": 100,
+     "flawless": 100,
+     "guardian": 0,
+     "guardianTrying": 100,
+     "kindredBest": "nature 100%",
+     "kindred": {
+      "nature": 100,
+      "water": 100,
+      "fire": 100
+     }
+    }
+   }
+  },
+  {
+   "id": "resonancescar",
+   "rec": 18,
+   "levels": {
+    "0": {
+     "lv": 18,
+     "clear": 100,
+     "flawless": 0,
+     "guardian": 12,
+     "guardianTrying": 100,
+     "kindredBest": "nature 100%",
+     "kindred": {
+      "nature": 100,
+      "water": 100,
+      "fire": 100
+     }
+    },
+    "3": {
+     "lv": 21,
+     "clear": 100,
+     "flawless": 100,
+     "guardian": 0,
+     "guardianTrying": 100,
+     "kindredBest": "nature 100%",
+     "kindred": {
+      "nature": 100,
+      "water": 100,
+      "fire": 100
+     }
+    },
+    "6": {
+     "lv": 24,
+     "clear": 100,
+     "flawless": 100,
+     "guardian": 0,
+     "guardianTrying": 100,
+     "kindredBest": "nature 100%",
+     "kindred": {
+      "nature": 100,
+      "water": 100,
+      "fire": 100
+     }
+    }
+   }
+  },
+  {
+   "id": "heartwood",
+   "rec": 20,
+   "levels": {
+    "0": {
+     "lv": 20,
+     "clear": 100,
+     "flawless": 0,
+     "guardian": 70,
+     "guardianTrying": 100,
+     "kindredBest": "nature 100%",
+     "kindred": {
+      "nature": 100,
+      "water": 98,
+      "fire": 100
+     }
+    },
+    "3": {
+     "lv": 23,
+     "clear": 100,
+     "flawless": 100,
+     "guardian": 0,
+     "guardianTrying": 100,
+     "kindredBest": "nature 100%",
+     "kindred": {
+      "nature": 100,
+      "water": 100,
+      "fire": 100
+     }
+    },
+    "6": {
+     "lv": 26,
+     "clear": 100,
+     "flawless": 100,
+     "guardian": 0,
+     "guardianTrying": 100,
+     "kindredBest": "nature 100%",
+     "kindred": {
+      "nature": 100,
+      "water": 100,
+      "fire": 100
+     }
+    }
+   }
+  }
+ ],
+ "totals": {
+  "perDungeon": {
+   "gold": 300,
+   "essence": 18,
+   "gems": 2
+  },
+  "island": {
+   "gold": 3000,
+   "essence": 180,
+   "gems": 20
+  }
+ }
+}

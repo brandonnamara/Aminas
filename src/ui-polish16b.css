@@ -69,3 +69,12 @@ body.calm .ov-ghost16 { display: none; }
 .rel17 .rel-who .art { width: 3.4rem; height: 3.4rem; flex: 0 0 auto; }
 .rel17 .rel-get { white-space: nowrap; }
 .hx-now { margin-left: auto; }
+/* Phase 17D: optional dungeon challenges, party advice, the milestones count (existing colours and type) */
+.ch17{margin-top:.55rem;padding:.45rem .6rem;border-radius:10px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);font-size:.78rem}
+.ch17-t{display:flex;flex-wrap:wrap;align-items:center;gap:.3rem}.ch17 ul{list-style:none;margin:.3rem 0 0;padding:0;display:grid;gap:.2rem}
+.ch17 li{display:flex;gap:.35rem;align-items:baseline}.ch17 li.ok b{color:#8cffa0}.ch17 .dot{display:inline-block;width:.5rem;height:.5rem;border-radius:50%;border:1.5px solid currentColor;opacity:.6;flex:none}
+.ch17 svg,.pp-ch17 svg,.pp-adv17 svg{width:1em;height:1em;vertical-align:-.15em}
+.pp-adv17{display:flex;flex-direction:row;justify-content:flex-start;text-align:left;align-items:center;gap:.4rem;flex-wrap:nowrap}.pp-adv17>span{flex:1 1 auto;min-width:0}.pp-adv17.hard{border-color:rgba(255,200,90,.45)}.pp-adv17 .btn{margin-left:auto}
+.pp-ch17{display:block;font-size:.78rem;text-align:left}.pp-ch17>*{display:inline}
+.badge17{display:inline-block;min-width:1.2em;padding:0 .3em;margin-left:.25em;border-radius:99px;background:#ff5d7a;color:#fff;font-size:.72em;line-height:1.35;text-align:center}
+.m17 .mrow.bonus h3{font-size:.92rem}

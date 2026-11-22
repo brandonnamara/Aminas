@@ -256,6 +256,7 @@
   UI.act('releaseAsk', (el) => {
     const uid = +el.dataset.uid, c = R.Release.check(st(), uid); if (!c.inst) return;
     const inst = c.inst, sp = D.SPECIES[inst.sp], g = c.gives;
+    const shown = { lv: inst.lv, total: JSON.parse(JSON.stringify(g.total)) }; // what this sheet promises; checked again on release
     const gets = Object.keys(g.total).map((k) => '<span class="rel-get">' + (Art.essIcon ? Art.essIcon(k) : '') + ' <b>' + g.total[k] + '</b> ' + esc(essName(k)) + '</span>').join(' ');
     const body = '<div class="rel17"><div class="rel-who"><div class="art">' + Art.portrait(inst.sp) + '</div><div><b>' + esc(sp.name) + '</b> · Lv ' + inst.lv + '<br><span class="muted small-t">Released Aminas return to the wild. You will not get this one back.</span></div></div>' +
       (c.ok ? '<p>It leaves you ' + gets + '.' + (g.spent ? ' <span class="muted">(Half the essence spent on its moves comes back.)</span>' : '') + '</p>' : '<p class="bad">' + esc(R.Release.why[c.reason] || 'It cannot be released.') + (c.reasons.length > 1 ? ' <span class="muted">(' + c.reasons.slice(1).map((r) => R.Release.why[r]).join(' ') + ')</span>' : '') + '</p>') +
@@ -263,7 +264,7 @@
     const ov = UI.modal(UI.sheet('Release ' + esc(sp.name) + '?', body, '<button class="btn ghost" data-act="close">Keep it</button>' + (c.ok ? '<button class="btn gold" id="rel-go">Release</button>' : ''), 'narrow'));
     const go = $('#rel-go', ov); if (go) go.onclick = () => {
       if (go._busy) return; go._busy = true;
-      const r = R.Release.release(st(), uid, true);
+      const r = R.Release.release(st(), uid, true, shown);
       if (!r.ok) { Au.play('no'); UI.toast(R.Release.why[r.reason] || 'That did not work.', 't'); UI.close(ov); return; }
       S.save(); R.drain(); R.after(st()); Au.play('level'); UI.close(ov);
       UI.toast(sp.name + ' returned to the wild. ' + Object.keys(r.essence).map((k) => '+' + r.essence[k] + ' ' + essName(k)).join(', ') + '.', 't');
@@ -276,7 +277,7 @@
 (function (root) {
   'use strict';
   const A = root.A, D = A.Data, R = A.Rules, S = A.State, UI = A.UI, Art = A.Art, Au = A.Audio;
-  const $ = (q, el) => (el || document).querySelector(q), st = () => S.state, I = (n) => (UI.icon ? UI.icon(n) : ''), essName = (el) => D.ELEMENTS[el].name + ' Essence';
+  const $ = (q, el) => (el || document).querySelector(q), st = () => S.state, I = (n) => (A.Art && A.Art.icon ? A.Art.icon(n) : ''), essName = (el) => D.ELEMENTS[el].name + ' Essence';
   UI.act('hHatchNow', (el) => {
     const slot = +el.dataset.i, s = st(), cost = R.hatchNowCost(s, slot); if (!cost) return;
     const body = '<p>Hatch this egg now for <b>' + cost + ' gem' + (cost > 1 ? 's' : '') + '</b> (1 gem for every 6 minutes left, as with buildings).</p><p class="muted small-t">You have ' + s.res.gems + ' gems.</p>';

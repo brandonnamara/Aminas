@@ -327,32 +327,36 @@
     all(st).forEach((b) => {
       if (!W.def(b).produces || b.level < 1 || b.state === 'stored' || b.state === 'ruined' || b.state === 'constructing') return;
       const per = W.perMin(st, b), cap = W.capOf(st, b);
-      if (!per) { b.last = t; return; }
-      if (!b.last || b.last > t) b.last = t;
-      const ticks = Math.floor((t - b.last) / TICK_MS), ld = W.levelData(b);
+      const ld = W.levelData(b), daily = !!(ld && ld.dayCap && W.prodKind(b) === 'gems');
+      if (!per) { if (!(daily && b.last > t)) b.last = t; return; }
+      // Phase 17D: a building with a daily limit never rewinds its clock. If the device clock goes back, it simply waits
+      // until real time passes the moment it last produced, so turning the clock forward and back cannot pay twice.
+      if (!b.last || (b.last > t && !daily)) b.last = t;
+      const ticks = Math.max(0, Math.floor((t - b.last) / TICK_MS));
       // Phase 17C: a gem producer with a daily moonlight limit (the Moon Shrine) makes gems at its rate until it has
       // condensed that day's moonlight, then rests until midnight (device time). Its storage works as before, so an
       // offline player loses nothing beyond what the storage could already hold.
-      if (ticks > 0 && ld.dayCap && W.prodKind(b) === 'gems') {
+      if (ticks > 0 && daily) {
         let left = ticks; b.stock = b.stock || 0;
         while (left > 0 && b.stock < cap) {
           const tt = b.last + TICK_MS, key = W.dayKey(tt);
-          if (!b.moon || b.moon.day !== key) b.moon = { day: key, made: 0 };
+          if (!b.moon || W.dayOrd(key) > W.dayOrd(b.moon.day)) b.moon = { day: key, made: 0 }; // a day never comes back (time zones, clock changes)
           const room = Math.max(0, ld.dayCap - b.moon.made);
           if (room <= 0) { const nx = W.nextDay(tt), skip = Math.max(1, Math.floor((nx - b.last) / TICK_MS)); b.last += Math.min(left, skip) * TICK_MS; left -= Math.min(left, skip); continue; }
           const add = Math.min(per, room, cap - b.stock); b.stock += add; b.moon.made += add; b.last = tt; left--;
         }
         if (left > 0) b.last += left * TICK_MS;
       } else if (ticks > 0) { b.stock = Math.min(cap, (b.stock || 0) + ticks * per); b.last += ticks * TICK_MS; }
-      if ((b.stock || 0) >= cap) { b.stock = cap; b.last = t; }
+      if ((b.stock || 0) >= cap) { b.stock = cap; if (!(b.last > t)) b.last = t; }
     });
   };
   W.dayKey = (t) => { const d = new Date(t); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); };
+  W.dayOrd = (k) => { const p = String(k || '0-0-0').split('-').map(Number); return p[0] * 10000 + p[1] * 100 + p[2]; };
   W.nextDay = (t) => { const d = new Date(t); return +new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1); };
   // Moonlight left today for a building with a daily limit: { cap, made, left } (null for other buildings)
   W.moonlight = function (st, b, t) {
     const ld = b && b.level >= 1 ? W.levelData(b) : null; if (!ld || !ld.dayCap) return null;
-    const key = W.dayKey(t || now()), made = b.moon && b.moon.day === key ? b.moon.made : 0;
+    const key = W.dayKey(t || now()), made = b.moon && W.dayOrd(b.moon.day) >= W.dayOrd(key) ? b.moon.made : 0;
     return { cap: ld.dayCap, made: Math.min(ld.dayCap, made), left: Math.max(0, ld.dayCap - made) };
   };
   W.stock = (st, id) => (st.buildings[id] ? Math.floor(st.buildings[id].stock || 0) : 0);

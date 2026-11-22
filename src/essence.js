@@ -150,7 +150,7 @@
     const out = Object.assign({}, back); out[sp.el] = (out[sp.el] || 0) + main;
     return { el: sp.el, main, back, total: out, spent };
   };
-  Rel.why = { invalid: 'That Amina is not here.', last: 'It is your only one of its kind.', companion: 'It is your companion.', busy: 'It is in a dungeon run or Survival.', team: 'It is in a saved team (Island Defence or the 5v5 roster).', home: 'It lives in a building. Move it out first.', gear: 'It is wearing equipment. Take it off first.', fav: 'It is a favourite.', legendary: 'Legendary Aminas cannot be released.' };
+  Rel.why = { invalid: 'That Amina is not here.', last: 'It is your only one of its kind.', companion: 'It is your companion.', busy: 'It is in a dungeon run or Survival.', team: 'It is in a saved team (Island Defence or the 5v5 roster).', home: 'It lives in a building. Move it out first.', gear: 'It is wearing equipment. Take it off first.', fav: 'It is a favourite.', legendary: 'Legendary Aminas cannot be released.', changed: 'It changed since you opened this. Have another look.' };
   Rel.check = function (st, uid) {
     const inst = R.inst(st, uid); if (!inst) return { ok: false, reason: 'invalid' };
     const sp = D.SPECIES[inst.sp], reasons = [];
@@ -167,9 +167,12 @@
     return { ok: !reasons.length, reason: reasons[0] || null, reasons, gives: Rel.essenceFor(inst), inst };
   };
   // confirm must be true: the panel only sends it from its confirmation button
-  Rel.release = function (st, uid, confirm) {
+  // Phase 17D: every protection is checked again at the moment of release (not when the sheet opened), and when the
+  // sheet passes what it showed (expect: { lv, total }), a release whose Amina or essence changed meanwhile is refused.
+  Rel.release = function (st, uid, confirm, expect) {
     if (confirm !== true) return { ok: false, reason: 'confirm' };
     const c = Rel.check(st, uid); if (!c.ok) return c;
+    if (expect && (expect.lv !== c.inst.lv || JSON.stringify(expect.total) !== JSON.stringify(c.gives.total))) return { ok: false, reason: 'changed', reasons: ['changed'], inst: c.inst, gives: c.gives };
     const g = c.gives; Object.keys(g.total).forEach((el) => R.Essence.gain(st, el, g.total[el], 'release'));
     st.aminas = st.aminas.filter((a) => a.uid !== uid);
     if (Array.isArray(st.party)) st.party = st.party.filter((u) => u !== uid);

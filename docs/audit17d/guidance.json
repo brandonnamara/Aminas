@@ -1,0 +1,337 @@
+{
+ "note": "3 seeds each, no feeding; recruit = befriend Acinus, Gaiaroki (Meadow, Lv 2) before the Gathering Hall, as the picker advises",
+ "results": {
+  "17C solo": {
+   "losses": 7.3,
+   "grinds": 3,
+   "minutes": 32,
+   "end": 23,
+   "example": {
+    "plan": "solo",
+    "losses": 7,
+    "grinds": 3,
+    "battles": 137,
+    "minutes": 32,
+    "end": 23,
+    "party": [
+     "aurelith 23"
+    ],
+    "recruitedAt": [],
+    "log": [
+     {
+      "id": "forgottenroad",
+      "arrive": 3,
+      "tries": 1
+     },
+     {
+      "id": "gatheringhall",
+      "arrive": 7,
+      "tries": 1
+     },
+     {
+      "id": "reliquary",
+      "arrive": 9,
+      "tries": 3
+     },
+     {
+      "id": "drownedsteps",
+      "arrive": 11,
+      "tries": 1
+     },
+     {
+      "id": "coldkiln",
+      "arrive": 12,
+      "tries": 2
+     },
+     {
+      "id": "hollowveil",
+      "arrive": 14,
+      "tries": 3
+     },
+     {
+      "id": "lanternorchard",
+      "arrive": 16,
+      "tries": 1
+     },
+     {
+      "id": "windstair",
+      "arrive": 17,
+      "tries": 1
+     },
+     {
+      "id": "resonancescar",
+      "arrive": 19,
+      "tries": 3
+     },
+     {
+      "id": "heartwood",
+      "arrive": 21,
+      "tries": 1
+     }
+    ]
+   }
+  },
+  "17C recruit": {
+   "losses": 0.3,
+   "grinds": 0,
+   "minutes": 24,
+   "end": 22,
+   "example": {
+    "plan": "recruit",
+    "losses": 0,
+    "grinds": 0,
+    "battles": 100,
+    "minutes": 24,
+    "end": 22,
+    "party": [
+     "aurelith 22",
+     "calyxar 22",
+     "rockraki 22"
+    ],
+    "recruitedAt": [
+     "acinus before gatheringhall",
+     "gaiaroki before gatheringhall"
+    ],
+    "log": [
+     {
+      "id": "forgottenroad",
+      "arrive": 3,
+      "tries": 1
+     },
+     {
+      "id": "gatheringhall",
+      "arrive": 3.7,
+      "tries": 1
+     },
+     {
+      "id": "reliquary",
+      "arrive": 8.3,
+      "tries": 1
+     },
+     {
+      "id": "drownedsteps",
+      "arrive": 9.3,
+      "tries": 1
+     },
+     {
+      "id": "coldkiln",
+      "arrive": 12,
+      "tries": 1
+     },
+     {
+      "id": "hollowveil",
+      "arrive": 14,
+      "tries": 1
+     },
+     {
+      "id": "lanternorchard",
+      "arrive": 15,
+      "tries": 1
+     },
+     {
+      "id": "windstair",
+      "arrive": 17,
+      "tries": 1
+     },
+     {
+      "id": "resonancescar",
+      "arrive": 19,
+      "tries": 1
+     },
+     {
+      "id": "heartwood",
+      "arrive": 21,
+      "tries": 1
+     }
+    ]
+   }
+  },
+  "17D solo": {
+   "losses": 7.3,
+   "grinds": 3,
+   "minutes": 32,
+   "end": 23,
+   "example": {
+    "plan": "solo",
+    "losses": 7,
+    "grinds": 3,
+    "battles": 137,
+    "minutes": 32,
+    "end": 23,
+    "party": [
+     "aurelith 23"
+    ],
+    "recruitedAt": [],
+    "log": [
+     {
+      "id": "forgottenroad",
+      "arrive": 3,
+      "tries": 1
+     },
+     {
+      "id": "gatheringhall",
+      "arrive": 7,
+      "tries": 1
+     },
+     {
+      "id": "reliquary",
+      "arrive": 9,
+      "tries": 3
+     },
+     {
+      "id": "drownedsteps",
+      "arrive": 11,
+      "tries": 1
+     },
+     {
+      "id": "coldkiln",
+      "arrive": 12,
+      "tries": 2
+     },
+     {
+      "id": "hollowveil",
+      "arrive": 14,
+      "tries": 3
+     },
+     {
+      "id": "lanternorchard",
+      "arrive": 16,
+      "tries": 1
+     },
+     {
+      "id": "windstair",
+      "arrive": 17,
+      "tries": 1
+     },
+     {
+      "id": "resonancescar",
+      "arrive": 19,
+      "tries": 3
+     },
+     {
+      "id": "heartwood",
+      "arrive": 21,
+      "tries": 1
+     }
+    ]
+   }
+  },
+  "17D recruit": {
+   "losses": 0.3,
+   "grinds": 0,
+   "minutes": 24,
+   "end": 22,
+   "example": {
+    "plan": "recruit",
+    "losses": 0,
+    "grinds": 0,
+    "battles": 100,
+    "minutes": 24,
+    "end": 22,
+    "party": [
+     "aurelith 22",
+     "calyxar 22",
+     "rockraki 22"
+    ],
+    "recruitedAt": [
+     "acinus before gatheringhall",
+     "gaiaroki before gatheringhall"
+    ],
+    "log": [
+     {
+      "id": "forgottenroad",
+      "arrive": 3,
+      "tries": 1
+     },
+     {
+      "id": "gatheringhall",
+      "arrive": 3.7,
+      "tries": 1
+     },
+     {
+      "id": "reliquary",
+      "arrive": 8.3,
+      "tries": 1
+     },
+     {
+      "id": "drownedsteps",
+      "arrive": 9.3,
+      "tries": 1
+     },
+     {
+      "id": "coldkiln",
+      "arrive": 12,
+      "tries": 1
+     },
+     {
+      "id": "hollowveil",
+      "arrive": 14,
+      "tries": 1
+     },
+     {
+      "id": "lanternorchard",
+      "arrive": 15,
+      "tries": 1
+     },
+     {
+      "id": "windstair",
+      "arrive": 17,
+      "tries": 1
+     },
+     {
+      "id": "resonancescar",
+      "arrive": 19,
+      "tries": 1
+     },
+     {
+      "id": "heartwood",
+      "arrive": 21,
+      "tries": 1
+     }
+    ]
+   }
+  }
+ },
+ "advice": [
+  {
+   "id": "forgottenroad",
+   "advice": "recruit"
+  },
+  {
+   "id": "gatheringhall",
+   "advice": "recruit"
+  },
+  {
+   "id": "reliquary",
+   "advice": "recruit (hard)"
+  },
+  {
+   "id": "drownedsteps",
+   "advice": "recruit (hard)"
+  },
+  {
+   "id": "coldkiln",
+   "advice": "recruit (hard)"
+  },
+  {
+   "id": "hollowveil",
+   "advice": "recruit (hard)"
+  },
+  {
+   "id": "lanternorchard",
+   "advice": "recruit (hard)"
+  },
+  {
+   "id": "windstair",
+   "advice": "recruit (hard)"
+  },
+  {
+   "id": "resonancescar",
+   "advice": "recruit (hard)"
+  },
+  {
+   "id": "heartwood",
+   "advice": "recruit (hard)"
+  }
+ ]
+}

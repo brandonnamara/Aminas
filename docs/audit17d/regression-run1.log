@@ -1,0 +1,166 @@
+baseline: 5 passed, 0 failed
+campaign: 60 passed, 0 failed
+migration v0.6: 22 passed, 0 failed
+modes: 41 passed, 0 failed
+forge: 53 passed, 0 failed
+dev8: 49 passed, 0 failed
+browser v0.6: 48 passed, 0 failed
+browser dev7: 30 passed, 0 failed
+browser dev8: 42 passed, 0 failed
+browser env1: 20 passed, 0 failed
+browser env1.2: 10 passed, 0 failed
+browser library: 11 passed, 0 failed
+PASSED: 19 passed, 0 failed (browser-env3)
+PASSED: 10 passed, 0 failed (browser-env4)
+PASSED: 12 passed, 0 failed (browser-ui5)
+browser-ui6.test.js: FAILED
+  ok  every new text/surface pair meets WCAG AA 4.5:1 (lowest 8.5)
+  ok  the prismatic icon collection has 52 icons, all 16×16 crisp pixel sprites with the shared ink outline
+  ok  every icon the game uses (41 names) resolves to artwork
+  ok  control glyphs stay clean line icons and the Dev 8 currency and essence sprites are unchanged
+  ok  every element has its own glyph, and element chips carry it with their name (colour is never the only cue)
+  ok  the main navigation uses the prismatic icons
+  ok  fighter panels show the element glyph, name and level, and a segmented crystal health bar
+  ok  the enemy health fill matches the real health (1.000 vs 1.000)
+  ok  the turn indicator says whose move it is and who acts first, using the game’s own speed rule
+  ok  every move is a ready crystal button with its element gem and colour
+  ok  a special move states its cost in words (“Special · every 3”)
+  ok  a recharging move is dimmed, unavailable and shows the turns left (2)
+  ok  Silence greys out special moves and leaves basic moves available
+  ok  tapping a move lights it as the chosen move (with an activation flash) and the rest wait
+  ok  the acting Amina’s panel lights up and the turn indicator names who is acting
+  ok  damage: the fill drops while a pale “lost health” band holds behind it (fill 0.46, band 1.00)
+  ok  a damage number appears over the target (-37)
+  ok  the band then drains to the new health, and bar, number and real health agree (32)
+  ok  critical health (below 25%) turns the panel and bar red and says “Critical”
+  ok  healing shows a bright band first and the fill grows into it
+  ok  conditions show as buffs and debuffs with icons and remaining turns (burn 2, soak 1, attack down ×2, regen 3, guarding)
+  ok  tapping a condition explains it in words, with its turns left, on screen
+  ok  guardians and the Island Boss carry a boss tag, and the Island Boss gets a title card on entry (“The Island BossThe Heartwood StagNature · Battle 10 of 10Prism Shift: Its element keeps shifting. Watch the colour and change your approach.Tap to begin”)
+  ok  battle panels, party, moves and turn indicator never overlap or leave the screen at iPhone SE, iPhone 13/14, iPhone Pro Max, iPad landscape
+  ok  moves and party buttons stay at least 44 px in both directions on every size (smallest 44 px: abtn.swap at iPhone SE)
+  ok  in portrait the game still asks to rotate (landscape only, as before)
+  ok  one reward tile renders every reward kind with its icon (gold, food, gems, essence, xp, rankxp, rank, item, amina, island)
+  ok  tiles say what was received and how much (“+1,200 Gold”, “Fire Essence”, “Rank 7”, “Legendary Amina”)
+  ok  the rarity ladder gives six distinct looks: common, uncommon, rare, epic, legendary, mythic
+  ok  celebration rises with rarity and common stays calm (sparks: common 0, rare 24, epic 32, mythic 34)
+  ok  a reward card names where the reward came from (“The Forgotten Road”)
+  ok  a normal win gets the victory banner with where it happened (“Overgrown Reliquary · battle 5 of 10”)
+  ok  the spoils shown are exactly what the rules paid (+22 gold, +4 food)
+  ok  a guardian victory gets the gold crown banner and frame
+  ok  equipment found in the battle is shown on the result card (no card on top of the result any more)
+  ok  the result card fits the screen (its contents scroll inside it)
+  ok  the Island Boss victory gets the full spectrum banner and frame
+  ok  unlocking a new island is its own highlighted moment on the result (“New island unlockedVerdant WildsIt is now part of the sanctuary.”)
+  ok  defeat is quiet and atmospheric: what is kept comes first, no celebration effects
+  ok  a new Amina is the largest thing on its card (150 px) with a quiet collection line (“Collection 3 / 63”)
+  ok  a legendary Amina gets the legendary frame and tag
+  ok  combat decoration animates normally (pzwipe, pzcrit) and stops in Battery saver (0) and with Reduce motion (0)
+  ok  with Reduce motion health changes are instant and the battle opens without the wipe
+FAIL  saves are unchanged: no new save fields, and nothing from the new interface is written to the save (extra: d17)
+  ok  no script errors
+FAILED: 44 passed, 1 failed (browser-ui6)
+
+browser-arena7.test.js: FAILED
+  ok  all 63 Aminas build with a valid rig and the full clip set (idle, ready, attack, special, hit, heavy hit, heal, guard, victory, defeat, move)
+  ok  movement is not identical: 14 distinct temperament / fighting-style combinations across the roster
+  ok  every attack and special reaches the foe between 0.30 and 0.42 s, inside the existing battle beat (battle length unchanged)
+  ok  evolution lines move with more weight as they grow
+  ok  a dungeon battle opens on the 3D stage
+  ok  your move: your Amina is active (cyan ring, outline) and the foe carries the target reticle
+  ok  the active Amina plays its battle-ready move when its turn begins (ready)
+  ok  pressing an attack closes the reticle on the foe before the move is played
+  ok  releasing clears the preview
+  ok  when you are faster the arena highlights you, then the foe, in the rules’ order (p → e), then returns to your turn
+  ok  when the foe is faster the highlight follows it first (e → p)
+  ok  between turns no panel is marked as targeted
+  ok  after a turn the creatures are back in their idle and every effect has finished (effects alive: 0)
+  ok  the attack played its style clip and the impact landed on the foe
+  ok  every element sends voxel effects across the arena (fire:36+shot, resonance:52, water:53+shot, earth:36+shot)
+  ok  a super-effective hit gets the heavy reaction (hitBig), a freeze-frame and a shockwave
+  ok  a special move plays the ultimate: its own clip, a gathering column and the camera leaning in
+  ok  healing plays the heal animation with its rising light
+  ok  each of the 10 arenas has its own atmosphere (pollen, dust, spores, bubbles, embers, wisps, fireflies, gusts, glitter, leaves)
+  ok  a guardian battle keeps its boss presentation and adds boss lighting
+  ok  the Island Boss keeps its prismatic presentation (halo, title card) with the Heartwood atmosphere
+  ok  draw calls stay within budget in boss arenas (31, 34; budget 45)
+  ok  the arena link and effects work in other battle modes (practice on resonancescar: 2 moves, raid on hollowveil: 2 moves, survival on reliquary: 2 moves)
+  info  memory rounds: warm-up 14 geometries (4 templates); measured 17, 17, 17 (5 templates, 3 textures)
+  ok  leaving battles frees their arenas, effects and highlights (after a warm-up round, GPU geometries after three boss battles: 17, after three more: 17, after three more: 17)
+  ok  Battery saver halves the arena particles (30 → 15) and the attack effects (43 → 26 cubes)
+  ok  Reduce motion keeps only a little of the effects (10 cubes), skips the battle-ready move, the camera moves and the freeze-frame
+  ok  on the 2D stage your Amina glows as active and the foe carries the target brackets
+  ok  the 2D stage sends an element-coloured streak across for attacks
+FAIL  saves are unchanged: no new fields and nothing from the arena is written
+  ok  no script errors
+FAILED: 29 passed, 1 failed (browser-arena7)
+
+PASSED: 31 passed, 0 failed (browser-bench-battle)
+browser-perf-fix.test.js: FAILED
+  ok  with no evidence the page is assumed to get 60 fps (exactly the earlier rule)
+  ok  a steady 60 fps page is read as 60 fps
+  ok  a steady 30 fps page is read as 30 fps
+  ok  a 30 fps page with the odd late frame is still read as 30 fps
+  ok  a 120 Hz screen changes nothing (budgets never go below a 60 fps frame)
+  ok  irregular, janky frames are not mistaken for a capped page
+  ok  the estimate follows the page back to 60 fps (e.g. Low Power Mode turned off)
+       60 fps page, light frames: {"prStart":2,"prEnd":2,"display":{"fps":60,"steady":true,"samples":40},"saverWouldStart":0,"firstWhy":null,"lowered":0,"judged":3,"slowPct":0,"fps":60,"saverNow":false}
+  ok  a healthy 60 fps 3D view stays at full resolution (2x) with no Battery saver (as before)
+       30 fps page, light frames: {"prStart":2,"prEnd":2,"display":{"fps":30,"steady":true,"samples":40},"saverWouldStart":0,"firstWhy":null,"lowered":0,"judged":3,"slowPct":0,"fps":30,"saverNow":false}
+  ok  a 3D view on a page capped at 30 fps reads the page as 30 fps
+  ok  and draws a steady ~30 fps (30)
+  ok  steady 30 fps frames are not counted as slow during moves (0% slow; the old rule counted ~88% on the iPhone)
+  ok  stable 30 fps does not lower the resolution (stays at 2x)
+  ok  stable 30 fps does not switch Battery saver on
+       60 fps page, struggling  : {"prStart":2,"prEnd":1.75,"display":{"fps":20,"steady":true,"samples":40},"saverWouldStart":0,"firstWhy":null,"lowered":1,"judged":7,"slowPct":14,"fps":19.6,"saverNow":false}
+FAIL  a device that is really struggling at 60 fps first steps its resolution down (2x → 1x, 1 steps)
+FAIL  and, still slow at 1x, switches Battery saver on
+FAIL  its heavy frames do not talk the estimate down to a lower frame rate
+FAIL  the reason is recorded (view, slow frames, the page frame rate it judged against)
+       30 fps page, struggling  : {"prStart":2,"prEnd":1,"display":{"fps":30,"steady":true,"samples":38},"saverWouldStart":2,"firstWhy":{"at":36678,"view":"viewer:lumifern","windowMs":1600,"frames":15,"slowFrames":15,"quickFrames":0,"pixelRatio":1,"cap":2,"targetFps":60,"displayFps":30,"boosting":true,"result":"battery-saver"},"lowered":4,"judged":6,"slowPct":100,"fps":9.4,"saverNow":false}
+  ok  on a 30 fps page, frames slower than 30 fps still lower the resolution and trigger Battery saver
+       30 fps, GPU always behind: {"prStart":2,"prEnd":1,"display":{"fps":60,"steady":false,"samples":0},"saverWouldStart":3,"firstWhy":{"at":48628,"view":"viewer:lumifern","windowMs":1533,"frames":46,"slowFrames":46,"quickFrames":0,"pixelRatio":1,"cap":2,"targetFps":60,"displayFps":60,"boosting":true,"result":"battery-saver"},"lowered":4,"judged":7,"slowPct":100,"fps":30,"saverNow":false}
+  ok  frames that come at 30 fps because the GPU cannot keep up are still caught (no evidence of a capped page)
+  ok  island Auto quality: a steady 30 fps page stays on High; frames slower than that still step down to Balanced
+  ok  island Auto quality on a 60 fps page works exactly as before
+  ok  returning to the app starts a fresh estimate
+  ok  no script errors
+FAILED: 19 passed, 4 failed (browser-perf-fix)
+
+PASSED: 38 passed, 0 failed (browser-showcase8)
+PASSED: 38 passed, 0 failed (browser-p8fix)
+PASSED: 47 passed, 0 failed (browser-roster8b)
+raid12a: 31 passed, 0 failed
+PASSED: 18 passed, 0 failed (browser-raid12a)
+hideseek: 60 passed, 0 failed
+PASSED: 41 passed, 0 failed (browser-hideseek)
+hideseek12c: 30 passed, 0 failed
+PASSED: 58 passed, 0 failed (browser-hideseek12c)
+progression13a: 40 passed, 0 failed
+PASSED: 41 passed, 0 failed (browser-progress13a)
+hatchery13b: 41 passed, 0 failed
+PASSED: 35 passed, 0 failed (browser-hatchery13b)
+gear13c: 46 passed, 0 failed
+PASSED: 39 passed, 0 failed (browser-gear13c)
+economy13d: 14 passed, 0 failed
+PASSED: 5 passed, 0 failed (browser-rewards13d)
+PASSED: 31 passed, 0 failed (browser-models14)
+PASSED: 16 passed, 0 failed (browser-world14)
+40 passed, 0 failed
+browser-roster15b: 37 passed, 0 failed
+browser-combat15c: 33 passed, 0 failed
+browser-final15d: 37 passed, 0 failed
+PASSED: 12 passed, 0 failed (browser-intro14)
+onboard16: 37 passed, 0 failed
+69 passed, 0 failed (browser-onboard16)
+savefile16b: 47 passed, 0 failed
+34 passed, 0 failed (browser-polish16b)
+20 passed, 0 failed (browser-stability16c)
+combat17b: 31 passed, 0 failed
+rewards17b: 39 passed, 0 failed
+10 passed, 0 failed (browser-combat17b)
+progression17c: 48 passed, 0 failed
+14 passed, 0 failed (browser-progression17c)
+replay17d: 70 passed, 0 failed
+15 passed, 0 failed (browser-replay17d)
+EXIT 1

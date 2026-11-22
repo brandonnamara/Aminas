@@ -23,7 +23,10 @@ const battleGold = D.DUNGEONS.reliquary.battles.reduce((a, x) => a + 10 + x.lv *
 ok(out.cleared && out.first && st.res.gems - r0.gems === Math.round(5 * mult()) + 2 && st.owned.terraki && out.items.indexOf('barkvest') >= 0, 'first clear: its gems (and section gems), Gaiaroki II and its own item');
 ok(st.res.gold - r0.gold === battleGold + secGold + Math.round(150 * mult()), 'first clear: battle gold + section rewards + the first-clear gold, exactly');
 r0 = res(st); R.startRun(st, 'reliquary', uids, { from: 0 }); out = runTo(st);
-ok(out.cleared && !out.first && !out.partial && st.res.gems === r0.gems && st.res.gold - r0.gold === battleGold + Math.round(50 * mult()), 'full replay: battle gold + the repeat reward, no gems, no section rewards again');
+// Phase 17D: a full replay may also complete optional challenges, paid separately (100 gold each, 2 gems for all three);
+// the dungeon's own replay reward checked here is unchanged.
+const chG = out.challenges ? out.challenges.fresh.length * D.CHALLENGE17.reward.gold : 0, chGems = out.challenges && out.challenges.all ? D.CHALLENGE17.allThree.gems : 0;
+ok(out.cleared && !out.first && !out.partial && st.res.gems - chGems === r0.gems && st.res.gold - chG - r0.gold === battleGold + Math.round(50 * mult()), 'full replay: battle gold + the repeat reward, no gems, no section rewards again' + (chG ? ' (plus ' + chG + ' challenge gold, paid separately)' : ''));
 ok(st.dungeon.reliquary.clears === 2 && st.owned.sylvaneer2, 'the second clear still gives Sylvaneer II');
 r0 = res(st); const items0 = st.items.length; R.startRun(st, 'reliquary', uids, { from: 9 }); out = runTo(st);
 const bossGold = 10 + D.DUNGEONS.reliquary.battles[9].lv * 3 + 20;
