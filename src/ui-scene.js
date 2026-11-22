@@ -58,7 +58,7 @@
       full = b.text || ''; tx.textContent = ''; typing = true; nx.style.visibility = 'hidden';
       let c = 0;
       const step = () => { c += auto ? 3 : 1; tx.textContent = full.slice(0, c); if (c < full.length) tm = setTimeout(step, speed); else { typing = false; nx.style.visibility = 'visible'; scheduleAuto(); } };
-      if (calm) { tx.textContent = full; typing = false; nx.style.visibility = 'visible'; scheduleAuto(); } else step();
+      if (calm || st().settings.textSpeed === 'instant') { tx.textContent = full; typing = false; nx.style.visibility = 'visible'; scheduleAuto(); } else step();
       if (b.who === 'entity' && /…$/.test(full)) Au.play('hum');
     };
     let jumpTo = null;

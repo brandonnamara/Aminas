@@ -1,0 +1,61 @@
+/* Aminas — Phase 16B interface polish. Same colours, shapes and layouts; only sizes, spacing, states and motion are
+   refined. Every animation here is off under Reduce Motion (body.calm) and the system reduce-motion preference. */
+
+/* ---------- dialogue text size (Settings › Dialogue text size, or Aa on any dialogue) ---------- */
+.tsz-l .dlg-text, .tsz-l .sc-text { font-size: 1.3rem; line-height: 1.42; }
+.tsz-xl .dlg-text, .tsz-xl .sc-text { font-size: 1.52rem; line-height: 1.38; }
+.tsz-l .dlg.o16 .dlg-text { font-size: 1.28rem; }
+.tsz-xl .dlg.o16 .dlg-text { font-size: 1.5rem; }
+.tsz-l .dlg-name, .tsz-l .sc-name { font-size: 1.08em; }
+.tsz-xl .dlg-name, .tsz-xl .sc-name { font-size: 1.16em; }
+/* larger text: the panel may grow upwards but stops below the controls and scrolls inside itself */
+.tsz-l .dlg .dlg-box, .tsz-xl .dlg .dlg-box { max-height: calc(100% - 5.2rem - var(--sat, 0px) - var(--sab, 0px)); overflow-y: auto; overscroll-behavior: contain; }
+.tsz-l .scene .sc-box, .tsz-xl .scene .sc-box { max-height: calc(100% - 5.2rem - var(--sat, 0px) - var(--sab, 0px)); overflow-y: auto; overscroll-behavior: contain; }
+.tsz16 { min-width: 2.6rem; font-weight: 800; letter-spacing: -.02em; }
+.tsz16 small { font-size: .78em; }
+.tsz16[data-size="large"] { font-size: 1.05em; } .tsz16[data-size="larger"] { font-size: 1.15em; }
+.dlg-ctl .btn, .sc-ctl .btn { min-height: 2.5rem; }
+
+/* ---------- touch: pressed states where there were none, refusal shake ---------- */
+.pill:active, .dtab:active, .ftab:active, [data-act="colSet"]:active, .chip-btn:active, .hubcard:active, .dSel:active, [data-act="dSel"]:active, .fitem:active, [data-act="vPlay"]:active, .x:active { transform: translateY(1px) scale(.985); filter: brightness(1.12); }
+.nope16 { animation: nope16 .36s ease-in-out; }
+@keyframes nope16 { 20% { transform: translateX(-4px); } 40% { transform: translateX(4px); } 60% { transform: translateX(-3px); } 80% { transform: translateX(2px); } }
+/* keyboard and switch-control users see where they are */
+button:focus-visible, [data-act]:focus-visible { outline: 2px solid var(--pz-cyan, #8ff0ff); outline-offset: 2px; }
+
+/* ---------- panels: a short fade on close ---------- */
+.ov-ghost16 { position: absolute; inset: 0; z-index: 49; pointer-events: none; display: flex; align-items: center; justify-content: center; padding: calc(.5rem + var(--sat, 0px)) calc(.8rem + var(--sar, 0px)) calc(.5rem + var(--sab, 0px)) calc(.8rem + var(--sal, 0px)); animation: ghost16 .15s ease-in forwards; }
+.ov-ghost16 > .sheet { animation: none; }
+@keyframes ghost16 { from { opacity: 1; } to { opacity: 0; transform: scale(.985); } }
+
+/* ---------- readability: the smallest labels grow slightly. Body text and secondary notes reach 10.5 px at iPhone
+   landscape; tightly packed labels (bottom-bar names, battle party names, move numbers) reach 9.5 px so they still fit
+   their unchanged buttons. ---------- */
+.nm .chip, .xpl span, .seldots, .fchip, .hx-state, .hx-cap, .hx-up-h span, .small-t, .tier, .fi-d, .hc-meta, .dg-isle .muted, .dd-num, .tagp, .pst em, .pst small, .fp-lv, .hpn, .bt-w, .seg button, .pg-lv, .pg-xpt, .btn small, .hx-sb small, .dl-t small,
+.pill.rank small, .mission-pill > b, .mission-pill .go, .mission-pill .mo, .pill small, .fchip small, .hx-up-n small, .hx-out small, .hx-note, .wait span, .bn small, .secs .sec, .ess-c small { font-size: 10.5px !important; }
+.nbtn span, .ab-pow, .ab-sp, .ab-main small, .bt-n, .bt-f { font-size: 9.5px !important; }
+/* HUD round buttons (Ask, Settings, companion arrows): a larger invisible touch area, same look */
+#hud .round::after { content: ''; position: absolute; inset: -4px; border-radius: 50%; }
+#hud .round.xs::after { inset: -9px; }
+
+/* ---------- scrolling: long panels scroll smoothly and keep their scroll inside ---------- */
+.sh-body { overscroll-behavior: contain; -webkit-overflow-scrolling: touch; scroll-padding-bottom: 1rem; }
+
+/* ---------- save files ---------- */
+.sf-row .btn .ico { transform: rotate(90deg); }
+.sf-sum { display: grid; grid-template-columns: repeat(auto-fill, minmax(7.4rem, 1fr)); gap: .3rem .6rem; margin: .2rem 0 .4rem; }
+.sf-sum span { display: grid; min-width: 0; padding: .25rem .45rem; border-radius: 8px; background: rgba(255, 255, 255, .05); }
+.sf-sum small { font-size: max(.62rem, 10.5px); letter-spacing: .08em; text-transform: uppercase; color: var(--pz-muted, #cfc6ee); }
+.sf-sum b { font-size: .9rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sf-cmp { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; }
+@media (max-width: 640px) { .sf-cmp { grid-template-columns: 1fr; } }
+.warn16 { color: #ffd978; }
+
+body.calm .nope16, body.calm .ov-ghost16 { animation: none !important; }
+body.calm .ov-ghost16 { display: none; }
+@media (prefers-reduced-motion: reduce) { .nope16, .ov-ghost16 { animation: none !important; } .ov-ghost16 { display: none; } }
+
+/* ---------- Phase 16A follow-up (only visible with its switch on): the opening's smallest labels ---------- */
+.o16-fight small, .o16-stepn, .o16-moves em, .mission-pill .o16-pro, .o16-chip small { font-size: 10.5px !important; }
+.o16-coach { font-size: max(.82rem, 13px); }
+.o16-mini { width: 2.2rem; height: 2.7rem; }

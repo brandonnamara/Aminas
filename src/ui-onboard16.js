@@ -35,7 +35,7 @@
   // beat in the game uses it while the switch is on. Typing pauses briefly at punctuation, so a hesitation reads as
   // one; the Entity's portrait reacts when its mood changes; Speed (slow / normal / fast, the existing setting), Auto
   // and Skip are always available; Space, Enter or a tap advances. Reduce Motion shows each line at once.
-  const SPEEDS = ['slow', 'normal', 'fast'], SPEED_MS = { slow: 30, normal: 18, fast: 8 }, SPEED_T = { slow: 'Slow', normal: 'Normal', fast: 'Fast' };
+  const SPEEDS = ['slow', 'normal', 'fast', 'instant'], SPEED_MS = { slow: 30, normal: 18, fast: 8, instant: 0 }, SPEED_T = { slow: 'Slow', normal: 'Normal', fast: 'Fast', instant: 'Instant' };
   UI.o16Talk = function (lines, done, opts) {
     opts = opts || {};
     const box = document.createElement('div'); box.className = 'dlg v7 o16' + (opts.cls ? ' ' + opts.cls : '');
@@ -48,7 +48,7 @@
     const ent = $('.o16-ent', box), you = $('.o16-you', box), nm = $('.dlg-name', box), tx = $('.dlg-text', box), nx = $('.dlg-next', box), dots = $('.o16-dots', box);
     dots.innerHTML = lines.map(() => '<i></i>').join('');
     let i = -1, typing = false, tm = null, full = '', mood = null, auto = false, autoTm = null, finished = false, c = 0;
-    const speed = () => SPEED_MS[(st() && st().settings.textSpeed) || 'normal'] || 18;
+    const speed = () => { const k = (st() && st().settings.textSpeed) || 'normal'; return k in SPEED_MS ? SPEED_MS[k] : 18; };
     const talk = (v) => { const e = $('.ent-vox', ent); if (e) e.classList.toggle('talk', v); };
     const keys = (e) => { if (!box.isConnected) return; if (e.key === ' ' || e.key === 'Enter' || e.key === 'ArrowRight') { e.preventDefault(); adv(); } else if (e.key === 'Escape') finish(); };
     const finish = () => {
@@ -86,7 +86,7 @@
       nm.textContent = narr ? '' : mine ? nameOf() : opts.name || 'The Entity';
       $$('i', dots).forEach((d, k) => d.classList.toggle('on', k <= i));
       full = mine ? '“' + fill(ln[1]) + '”' : fill(ln[1]); tx.textContent = ''; typing = true; nx.style.visibility = 'hidden'; talk(!narr && !mine); c = 0;
-      if (calm()) stop(); else step();
+      if (calm() || (st() && st().settings.textSpeed === 'instant')) stop(); else step();
       if (!narr && !mine && /…$|—$/.test(full.trim())) snd('hum');
     };
     const adv = () => { if (finished) return; if (typing) { clearTimeout(tm); stop(); } else next(); };
@@ -330,7 +330,8 @@
     if (O.mark(s, 'home')) S.save();
     const o = O.rec(s); if (o.seen.handoff && !force) return;
     if (UI.o16Handing) return; UI.o16Handing = true;
-    UI.queue.push({ type: 'fn', fn: (done) => UI.script(W16.handoff, () => { UI.o16Handing = false; O.mark(st(), 'handoff'); O.update(st()); S.save(); UI.refresh(); done(); }) });
+    const cq = A.Quests.current(s), lines = cq && cq.id === 'm_road' && W16.handoffTracked ? W16.handoff.slice(0, -1).concat([W16.handoffTracked]) : W16.handoff;
+    UI.queue.push({ type: 'fn', fn: (done) => UI.script(lines, () => { UI.o16Handing = false; O.mark(st(), 'handoff'); O.update(st()); S.save(); UI.refresh(); done(); }) });
     UI.pump();
   }
   const showIsland0 = UI.showIsland;

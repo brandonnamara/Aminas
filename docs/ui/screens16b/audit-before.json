@@ -1,0 +1,2037 @@
+{
+ "island": {
+  "controls": 16,
+  "small": 8,
+  "smallList": [
+   {
+    "w": 41,
+    "h": 41,
+    "t": "Player profile: Rowan",
+    "act": "profile"
+   },
+   {
+    "w": 110,
+    "h": 29,
+    "t": "Player Rank 1, open profile",
+    "act": "profile"
+   },
+   {
+    "w": 132,
+    "h": 24,
+    "t": "Island map",
+    "act": "map"
+   },
+   {
+    "w": 220,
+    "h": 29,
+    "t": "Wallet: currencies and essen",
+    "act": "wallet"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Ask The Entity",
+    "act": "ask"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Settings",
+    "act": "settings"
+   },
+   {
+    "w": 26,
+    "h": 26,
+    "t": "Previous Amina",
+    "act": "selPrev"
+   },
+   {
+    "w": 26,
+    "h": 26,
+    "t": "Next Amina",
+    "act": "selNext"
+   }
+  ],
+  "tinyText": 15,
+  "tinyList": [
+   {
+    "px": 9.555,
+    "t": "PLAYER RANK 1"
+   },
+   {
+    "px": 9.828,
+    "t": "Current task"
+   },
+   {
+    "px": 10.101,
+    "t": "Remove 3 obstacles on Sunlit S"
+   },
+   {
+    "px": 9.828,
+    "t": "Go"
+   },
+   {
+    "px": 8.19,
+    "t": "Nature"
+   },
+   {
+    "px": 8.736,
+    "t": "Lv 9"
+   },
+   {
+    "px": 8.736,
+    "t": "0 / 185 xp"
+   },
+   {
+    "px": 9.828,
+    "t": "2 / 4"
+   },
+   {
+    "px": 8.463,
+    "t": "Build"
+   },
+   {
+    "px": 8.463,
+    "t": "Creatures"
+   },
+   {
+    "px": 8.463,
+    "t": "Tasks"
+   },
+   {
+    "px": 8.736,
+    "t": "Battle"
+   },
+   {
+    "px": 8.463,
+    "t": "Explore"
+   },
+   {
+    "px": 8.463,
+    "t": "Hatchery"
+   },
+   {
+    "px": 9.009,
+    "t": "Achievement"
+   }
+  ],
+  "clipped": [],
+  "offscreen": []
+ },
+ "settings": {
+  "controls": 27,
+  "small": 19,
+  "smallList": [
+   {
+    "w": 41,
+    "h": 41,
+    "t": "Player profile: Rowan",
+    "act": "profile"
+   },
+   {
+    "w": 110,
+    "h": 29,
+    "t": "Player Rank 1, open profile",
+    "act": "profile"
+   },
+   {
+    "w": 132,
+    "h": 24,
+    "t": "Island map",
+    "act": "map"
+   },
+   {
+    "w": 220,
+    "h": 29,
+    "t": "Wallet: currencies and essen",
+    "act": "wallet"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Ask The Entity",
+    "act": "ask"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Settings",
+    "act": "settings"
+   },
+   {
+    "w": 26,
+    "h": 26,
+    "t": "Previous Amina",
+    "act": "selPrev"
+   },
+   {
+    "w": 26,
+    "h": 26,
+    "t": "Next Amina",
+    "act": "selNext"
+   },
+   {
+    "w": 35,
+    "h": 35,
+    "t": "Close",
+    "act": "close"
+   },
+   {
+    "w": 41,
+    "h": 23,
+    "t": "Music",
+    "act": "setPref"
+   },
+   {
+    "w": 41,
+    "h": 23,
+    "t": "Sound effects",
+    "act": "setPref"
+   },
+   {
+    "w": 41,
+    "h": 23,
+    "t": "Reduce motion",
+    "act": "setPref"
+   },
+   {
+    "w": 41,
+    "h": 23,
+    "t": "Show the build grid all the ",
+    "act": "setPref"
+   },
+   {
+    "w": 41,
+    "h": 23,
+    "t": "3D creatures",
+    "act": "setPref"
+   },
+   {
+    "w": 41,
+    "h": 23,
+    "t": "3D voxel island",
+    "act": "setPref"
+   },
+   {
+    "w": 41,
+    "h": 23,
+    "t": "Day and night light on the i",
+    "act": "setPref"
+   },
+   {
+    "w": 41,
+    "h": 23,
+    "t": "Battery saver",
+    "act": "setPref"
+   },
+   {
+    "w": 121,
+    "h": 37,
+    "t": "Title screen",
+    "act": "toTitle"
+   },
+   {
+    "w": 76,
+    "h": 37,
+    "t": "Close",
+    "act": "close"
+   }
+  ],
+  "tinyText": 14,
+  "tinyList": [
+   {
+    "px": 9.555,
+    "t": "PLAYER RANK 1"
+   },
+   {
+    "px": 9.828,
+    "t": "Current task"
+   },
+   {
+    "px": 10.101,
+    "t": "Remove 3 obstacles on Sunlit S"
+   },
+   {
+    "px": 9.828,
+    "t": "Go"
+   },
+   {
+    "px": 8.19,
+    "t": "Dark"
+   },
+   {
+    "px": 8.736,
+    "t": "Lv 6"
+   },
+   {
+    "px": 8.736,
+    "t": "0 / 107 xp"
+   },
+   {
+    "px": 9.828,
+    "t": "4 / 4"
+   },
+   {
+    "px": 8.463,
+    "t": "Build"
+   },
+   {
+    "px": 8.463,
+    "t": "Creatures"
+   },
+   {
+    "px": 8.463,
+    "t": "Tasks"
+   },
+   {
+    "px": 8.736,
+    "t": "Battle"
+   },
+   {
+    "px": 8.463,
+    "t": "Explore"
+   },
+   {
+    "px": 8.463,
+    "t": "Hatchery"
+   }
+  ],
+  "clipped": [],
+  "offscreen": [
+   "setPref"
+  ]
+ },
+ "collection": {
+  "controls": 57,
+  "small": 28,
+  "smallList": [
+   {
+    "w": 41,
+    "h": 41,
+    "t": "Player profile: Rowan",
+    "act": "profile"
+   },
+   {
+    "w": 110,
+    "h": 29,
+    "t": "Player Rank 1, open profile",
+    "act": "profile"
+   },
+   {
+    "w": 132,
+    "h": 24,
+    "t": "Island map",
+    "act": "map"
+   },
+   {
+    "w": 220,
+    "h": 29,
+    "t": "Wallet: currencies and essen",
+    "act": "wallet"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Ask The Entity",
+    "act": "ask"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Settings",
+    "act": "settings"
+   },
+   {
+    "w": 26,
+    "h": 26,
+    "t": "Previous Amina",
+    "act": "selPrev"
+   },
+   {
+    "w": 26,
+    "h": 26,
+    "t": "Next Amina",
+    "act": "selNext"
+   },
+   {
+    "w": 35,
+    "h": 35,
+    "t": "Close",
+    "act": "close"
+   },
+   {
+    "w": 32,
+    "h": 27,
+    "t": "All",
+    "act": "colSet"
+   },
+   {
+    "w": 58,
+    "h": 27,
+    "t": "Light 1/6",
+    "act": "colSet"
+   },
+   {
+    "w": 57,
+    "h": 27,
+    "t": "Dark 1/6",
+    "act": "colSet"
+   },
+   {
+    "w": 67,
+    "h": 27,
+    "t": "Nature 1/9",
+    "act": "colSet"
+   },
+   {
+    "w": 55,
+    "h": 27,
+    "t": "Fire 1/12",
+    "act": "colSet"
+   },
+   {
+    "w": 65,
+    "h": 27,
+    "t": "Water 0/9",
+    "act": "colSet"
+   },
+   {
+    "w": 62,
+    "h": 27,
+    "t": "Earth 0/6",
+    "act": "colSet"
+   },
+   {
+    "w": 61,
+    "h": 27,
+    "t": "Wind 0/3",
+    "act": "colSet"
+   },
+   {
+    "w": 90,
+    "h": 27,
+    "t": "Resonance 0/3",
+    "act": "colSet"
+   },
+   {
+    "w": 63,
+    "h": 27,
+    "t": "Metal 0/9",
+    "act": "colSet"
+   },
+   {
+    "w": 29,
+    "h": 27,
+    "t": "All",
+    "act": "colSet"
+   },
+   {
+    "w": 70,
+    "h": 27,
+    "t": "Befriended",
+    "act": "colSet"
+   },
+   {
+    "w": 55,
+    "h": 27,
+    "t": "Missing",
+    "act": "colSet"
+   },
+   {
+    "w": 33,
+    "h": 27,
+    "t": "No.",
+    "act": "colSet"
+   },
+   {
+    "w": 42,
+    "h": 27,
+    "t": "Level",
+    "act": "colSet"
+   },
+   {
+    "w": 56,
+    "h": 27,
+    "t": "Element",
+    "act": "colSet"
+   },
+   {
+    "w": 35,
+    "h": 27,
+    "t": "A–Z",
+    "act": "colSet"
+   },
+   {
+    "w": 85,
+    "h": 37,
+    "t": "Bag",
+    "act": "bag"
+   },
+   {
+    "w": 76,
+    "h": 37,
+    "t": "Close",
+    "act": "close"
+   }
+  ],
+  "tinyText": 78,
+  "tinyList": [
+   {
+    "px": 9.555,
+    "t": "PLAYER RANK 1"
+   },
+   {
+    "px": 9.828,
+    "t": "Current task"
+   },
+   {
+    "px": 10.101,
+    "t": "Remove 3 obstacles on Sunlit S"
+   },
+   {
+    "px": 9.828,
+    "t": "Go"
+   },
+   {
+    "px": 8.19,
+    "t": "Dark"
+   },
+   {
+    "px": 8.736,
+    "t": "Lv 6"
+   },
+   {
+    "px": 8.736,
+    "t": "0 / 107 xp"
+   },
+   {
+    "px": 9.828,
+    "t": "4 / 4"
+   },
+   {
+    "px": 8.463,
+    "t": "Build"
+   },
+   {
+    "px": 8.463,
+    "t": "Creatures"
+   },
+   {
+    "px": 8.463,
+    "t": "Tasks"
+   },
+   {
+    "px": 8.736,
+    "t": "Battle"
+   },
+   {
+    "px": 8.463,
+    "t": "Explore"
+   },
+   {
+    "px": 8.463,
+    "t": "Hatchery"
+   },
+   {
+    "px": 10.101,
+    "t": "All"
+   }
+  ],
+  "clipped": [],
+  "offscreen": [
+   "#15???Undiscovered",
+   "#16???Undiscovered",
+   "#17???Undiscovered",
+   "#18???Undiscovered",
+   "#19???Undiscovered",
+   "#20???Undiscovered",
+   "#21???Undiscovered"
+  ]
+ },
+ "detail": {
+  "controls": 33,
+  "small": 25,
+  "smallList": [
+   {
+    "w": 41,
+    "h": 41,
+    "t": "Player profile: Rowan",
+    "act": "profile"
+   },
+   {
+    "w": 110,
+    "h": 29,
+    "t": "Player Rank 1, open profile",
+    "act": "profile"
+   },
+   {
+    "w": 132,
+    "h": 24,
+    "t": "Island map",
+    "act": "map"
+   },
+   {
+    "w": 220,
+    "h": 29,
+    "t": "Wallet: currencies and essen",
+    "act": "wallet"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Ask The Entity",
+    "act": "ask"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Settings",
+    "act": "settings"
+   },
+   {
+    "w": 26,
+    "h": 26,
+    "t": "Previous Amina",
+    "act": "selPrev"
+   },
+   {
+    "w": 26,
+    "h": 26,
+    "t": "Next Amina",
+    "act": "selNext"
+   },
+   {
+    "w": 35,
+    "h": 35,
+    "t": "Close",
+    "act": "close"
+   },
+   {
+    "w": 73,
+    "h": 25,
+    "t": "Hop",
+    "act": "vPlay"
+   },
+   {
+    "w": 73,
+    "h": 25,
+    "t": "Attack",
+    "act": "vPlay"
+   },
+   {
+    "w": 73,
+    "h": 25,
+    "t": "Ouch",
+    "act": "vPlay"
+   },
+   {
+    "w": 73,
+    "h": 25,
+    "t": "Cheer",
+    "act": "vPlay"
+   },
+   {
+    "w": 73,
+    "h": 25,
+    "t": "Special",
+    "act": "vPlay"
+   },
+   {
+    "w": 89,
+    "h": 35,
+    "t": "Berry Snack: costs 3 food, g",
+    "act": "detailFeed"
+   },
+   {
+    "w": 95,
+    "h": 35,
+    "t": "Honey Feast: costs 10 food, ",
+    "act": "detailFeed"
+   },
+   {
+    "w": 58,
+    "h": 27,
+    "t": "About",
+    "act": "dTab"
+   },
+   {
+    "w": 56,
+    "h": 27,
+    "t": "Battle",
+    "act": "dTab"
+   },
+   {
+    "w": 61,
+    "h": 27,
+    "t": "Moves",
+    "act": "dTab"
+   },
+   {
+    "w": 51,
+    "h": 27,
+    "t": "Gear",
+    "act": "dTab"
+   },
+   {
+    "w": 65,
+    "h": 27,
+    "t": "Growth",
+    "act": "dTab"
+   },
+   {
+    "w": 97,
+    "h": 35,
+    "t": "Snack 3",
+    "act": "detailFeed"
+   },
+   {
+    "w": 99,
+    "h": 35,
+    "t": "Feast 10",
+    "act": "detailFeed"
+   },
+   {
+    "w": 89,
+    "h": 35,
+    "t": "Evolve",
+    "act": "evoAsk"
+   },
+   {
+    "w": 76,
+    "h": 37,
+    "t": "Close",
+    "act": "close"
+   }
+  ],
+  "tinyText": 37,
+  "tinyList": [
+   {
+    "px": 9.555,
+    "t": "PLAYER RANK 1"
+   },
+   {
+    "px": 9.828,
+    "t": "Current task"
+   },
+   {
+    "px": 10.101,
+    "t": "Remove 3 obstacles on Sunlit S"
+   },
+   {
+    "px": 9.828,
+    "t": "Go"
+   },
+   {
+    "px": 8.19,
+    "t": "Dark"
+   },
+   {
+    "px": 8.736,
+    "t": "Lv 6"
+   },
+   {
+    "px": 8.736,
+    "t": "0 / 107 xp"
+   },
+   {
+    "px": 9.828,
+    "t": "4 / 4"
+   },
+   {
+    "px": 8.463,
+    "t": "Build"
+   },
+   {
+    "px": 8.463,
+    "t": "Creatures"
+   },
+   {
+    "px": 8.463,
+    "t": "Tasks"
+   },
+   {
+    "px": 8.736,
+    "t": "Battle"
+   },
+   {
+    "px": 8.463,
+    "t": "Explore"
+   },
+   {
+    "px": 8.463,
+    "t": "Hatchery"
+   },
+   {
+    "px": 10.101,
+    "t": "Hop"
+   }
+  ],
+  "clipped": [],
+  "offscreen": []
+ },
+ "hatchery": {
+  "controls": 24,
+  "small": 14,
+  "smallList": [
+   {
+    "w": 41,
+    "h": 41,
+    "t": "Player profile: Rowan",
+    "act": "profile"
+   },
+   {
+    "w": 110,
+    "h": 29,
+    "t": "Player Rank 1, open profile",
+    "act": "profile"
+   },
+   {
+    "w": 132,
+    "h": 24,
+    "t": "Island map",
+    "act": "map"
+   },
+   {
+    "w": 220,
+    "h": 29,
+    "t": "Wallet: currencies and essen",
+    "act": "wallet"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Ask The Entity",
+    "act": "ask"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Settings",
+    "act": "settings"
+   },
+   {
+    "w": 26,
+    "h": 26,
+    "t": "Previous Amina",
+    "act": "selPrev"
+   },
+   {
+    "w": 26,
+    "h": 26,
+    "t": "Next Amina",
+    "act": "selNext"
+   },
+   {
+    "w": 35,
+    "h": 35,
+    "t": "Close",
+    "act": "close"
+   },
+   {
+    "w": 355,
+    "h": 32,
+    "t": "Slot 1Empty: the next egg go",
+    "act": "hSlot"
+   },
+   {
+    "w": 101,
+    "h": 35,
+    "t": "Upgrade",
+    "act": "hUpgrade"
+   },
+   {
+    "w": 100,
+    "h": 37,
+    "t": "Breed",
+    "act": "hStart"
+   },
+   {
+    "w": 124,
+    "h": 35,
+    "t": "Recipe book",
+    "act": "hBook"
+   },
+   {
+    "w": 76,
+    "h": 37,
+    "t": "Close",
+    "act": "close"
+   }
+  ],
+  "tinyText": 46,
+  "tinyList": [
+   {
+    "px": 9.555,
+    "t": "PLAYER RANK 1"
+   },
+   {
+    "px": 9.828,
+    "t": "Current task"
+   },
+   {
+    "px": 10.101,
+    "t": "Remove 3 obstacles on Sunlit S"
+   },
+   {
+    "px": 9.828,
+    "t": "Go"
+   },
+   {
+    "px": 8.19,
+    "t": "Dark"
+   },
+   {
+    "px": 8.736,
+    "t": "Lv 6"
+   },
+   {
+    "px": 8.736,
+    "t": "0 / 107 xp"
+   },
+   {
+    "px": 9.828,
+    "t": "4 / 4"
+   },
+   {
+    "px": 8.463,
+    "t": "Build"
+   },
+   {
+    "px": 8.463,
+    "t": "Creatures"
+   },
+   {
+    "px": 8.463,
+    "t": "Tasks"
+   },
+   {
+    "px": 8.736,
+    "t": "Battle"
+   },
+   {
+    "px": 8.463,
+    "t": "Explore"
+   },
+   {
+    "px": 8.463,
+    "t": "Hatchery"
+   },
+   {
+    "px": 10.2375,
+    "t": "Lv 1"
+   }
+  ],
+  "clipped": [],
+  "offscreen": []
+ },
+ "forge": {
+  "controls": 25,
+  "small": 17,
+  "smallList": [
+   {
+    "w": 41,
+    "h": 41,
+    "t": "Player profile: Rowan",
+    "act": "profile"
+   },
+   {
+    "w": 110,
+    "h": 29,
+    "t": "Player Rank 1, open profile",
+    "act": "profile"
+   },
+   {
+    "w": 132,
+    "h": 24,
+    "t": "Island map",
+    "act": "map"
+   },
+   {
+    "w": 220,
+    "h": 29,
+    "t": "Wallet: currencies and essen",
+    "act": "wallet"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Ask The Entity",
+    "act": "ask"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Settings",
+    "act": "settings"
+   },
+   {
+    "w": 26,
+    "h": 26,
+    "t": "Previous Amina",
+    "act": "selPrev"
+   },
+   {
+    "w": 26,
+    "h": 26,
+    "t": "Next Amina",
+    "act": "selNext"
+   },
+   {
+    "w": 35,
+    "h": 35,
+    "t": "Close",
+    "act": "close"
+   },
+   {
+    "w": 167,
+    "h": 40,
+    "t": "Crafting",
+    "act": "fTab"
+   },
+   {
+    "w": 167,
+    "h": 40,
+    "t": "Equipment",
+    "act": "fTab"
+   },
+   {
+    "w": 167,
+    "h": 40,
+    "t": "Equipment Merge",
+    "act": "fTab"
+   },
+   {
+    "w": 167,
+    "h": 40,
+    "t": "Equipment Shop",
+    "act": "fTab"
+   },
+   {
+    "w": 58,
+    "h": 35,
+    "t": "Craft",
+    "act": "fCraft"
+   },
+   {
+    "w": 58,
+    "h": 35,
+    "t": "Craft",
+    "act": "fCraft"
+   },
+   {
+    "w": 58,
+    "h": 35,
+    "t": "Craft",
+    "act": "fCraft"
+   },
+   {
+    "w": 76,
+    "h": 37,
+    "t": "Close",
+    "act": "close"
+   }
+  ],
+  "tinyText": 33,
+  "tinyList": [
+   {
+    "px": 9.555,
+    "t": "PLAYER RANK 1"
+   },
+   {
+    "px": 9.828,
+    "t": "Current task"
+   },
+   {
+    "px": 10.101,
+    "t": "Remove 3 obstacles on Sunlit S"
+   },
+   {
+    "px": 9.828,
+    "t": "Go"
+   },
+   {
+    "px": 8.19,
+    "t": "Dark"
+   },
+   {
+    "px": 8.736,
+    "t": "Lv 6"
+   },
+   {
+    "px": 8.736,
+    "t": "0 / 107 xp"
+   },
+   {
+    "px": 9.828,
+    "t": "4 / 4"
+   },
+   {
+    "px": 8.463,
+    "t": "Build"
+   },
+   {
+    "px": 8.463,
+    "t": "Creatures"
+   },
+   {
+    "px": 8.463,
+    "t": "Tasks"
+   },
+   {
+    "px": 8.736,
+    "t": "Battle"
+   },
+   {
+    "px": 8.463,
+    "t": "Explore"
+   },
+   {
+    "px": 8.463,
+    "t": "Hatchery"
+   },
+   {
+    "px": 10.2375,
+    "t": "Lv 1"
+   }
+  ],
+  "clipped": [],
+  "offscreen": []
+ },
+ "bag": {
+  "controls": 18,
+  "small": 10,
+  "smallList": [
+   {
+    "w": 41,
+    "h": 41,
+    "t": "Player profile: Rowan",
+    "act": "profile"
+   },
+   {
+    "w": 110,
+    "h": 29,
+    "t": "Player Rank 1, open profile",
+    "act": "profile"
+   },
+   {
+    "w": 132,
+    "h": 24,
+    "t": "Island map",
+    "act": "map"
+   },
+   {
+    "w": 220,
+    "h": 29,
+    "t": "Wallet: currencies and essen",
+    "act": "wallet"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Ask The Entity",
+    "act": "ask"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Settings",
+    "act": "settings"
+   },
+   {
+    "w": 26,
+    "h": 26,
+    "t": "Previous Amina",
+    "act": "selPrev"
+   },
+   {
+    "w": 26,
+    "h": 26,
+    "t": "Next Amina",
+    "act": "selNext"
+   },
+   {
+    "w": 35,
+    "h": 35,
+    "t": "Close",
+    "act": "close"
+   },
+   {
+    "w": 76,
+    "h": 37,
+    "t": "Close",
+    "act": "close"
+   }
+  ],
+  "tinyText": 15,
+  "tinyList": [
+   {
+    "px": 9.555,
+    "t": "PLAYER RANK 1"
+   },
+   {
+    "px": 9.828,
+    "t": "Current task"
+   },
+   {
+    "px": 10.101,
+    "t": "Remove 3 obstacles on Sunlit S"
+   },
+   {
+    "px": 9.828,
+    "t": "Go"
+   },
+   {
+    "px": 8.19,
+    "t": "Dark"
+   },
+   {
+    "px": 8.736,
+    "t": "Lv 6"
+   },
+   {
+    "px": 8.736,
+    "t": "0 / 107 xp"
+   },
+   {
+    "px": 9.828,
+    "t": "4 / 4"
+   },
+   {
+    "px": 8.463,
+    "t": "Build"
+   },
+   {
+    "px": 8.463,
+    "t": "Creatures"
+   },
+   {
+    "px": 8.463,
+    "t": "Tasks"
+   },
+   {
+    "px": 8.736,
+    "t": "Battle"
+   },
+   {
+    "px": 8.463,
+    "t": "Explore"
+   },
+   {
+    "px": 8.463,
+    "t": "Hatchery"
+   },
+   {
+    "px": 9.828,
+    "t": "To equip something, open an Am"
+   }
+  ],
+  "clipped": [],
+  "offscreen": []
+ },
+ "battlehub": {
+  "controls": 20,
+  "small": 10,
+  "smallList": [
+   {
+    "w": 41,
+    "h": 41,
+    "t": "Player profile: Rowan",
+    "act": "profile"
+   },
+   {
+    "w": 110,
+    "h": 29,
+    "t": "Player Rank 1, open profile",
+    "act": "profile"
+   },
+   {
+    "w": 132,
+    "h": 24,
+    "t": "Island map",
+    "act": "map"
+   },
+   {
+    "w": 220,
+    "h": 29,
+    "t": "Wallet: currencies and essen",
+    "act": "wallet"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Ask The Entity",
+    "act": "ask"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Settings",
+    "act": "settings"
+   },
+   {
+    "w": 26,
+    "h": 26,
+    "t": "Previous Amina",
+    "act": "selPrev"
+   },
+   {
+    "w": 26,
+    "h": 26,
+    "t": "Next Amina",
+    "act": "selNext"
+   },
+   {
+    "w": 35,
+    "h": 35,
+    "t": "Close",
+    "act": "close"
+   },
+   {
+    "w": 76,
+    "h": 37,
+    "t": "Close",
+    "act": "close"
+   }
+  ],
+  "tinyText": 18,
+  "tinyList": [
+   {
+    "px": 9.555,
+    "t": "PLAYER RANK 1"
+   },
+   {
+    "px": 9.828,
+    "t": "Current task"
+   },
+   {
+    "px": 10.101,
+    "t": "Remove 3 obstacles on Sunlit S"
+   },
+   {
+    "px": 9.828,
+    "t": "Go"
+   },
+   {
+    "px": 8.19,
+    "t": "Dark"
+   },
+   {
+    "px": 8.736,
+    "t": "Lv 6"
+   },
+   {
+    "px": 8.736,
+    "t": "0 / 107 xp"
+   },
+   {
+    "px": 9.828,
+    "t": "4 / 4"
+   },
+   {
+    "px": 8.463,
+    "t": "Build"
+   },
+   {
+    "px": 8.463,
+    "t": "Creatures"
+   },
+   {
+    "px": 8.463,
+    "t": "Tasks"
+   },
+   {
+    "px": 8.736,
+    "t": "Battle"
+   },
+   {
+    "px": 8.463,
+    "t": "Explore"
+   },
+   {
+    "px": 8.463,
+    "t": "Hatchery"
+   },
+   {
+    "px": 10.92,
+    "t": "Dungeons, the Island Map, Expl"
+   }
+  ],
+  "clipped": [],
+  "offscreen": []
+ },
+ "dungeons": {
+  "controls": 27,
+  "small": 19,
+  "smallList": [
+   {
+    "w": 41,
+    "h": 41,
+    "t": "Player profile: Rowan",
+    "act": "profile"
+   },
+   {
+    "w": 110,
+    "h": 29,
+    "t": "Player Rank 1, open profile",
+    "act": "profile"
+   },
+   {
+    "w": 132,
+    "h": 24,
+    "t": "Island map",
+    "act": "map"
+   },
+   {
+    "w": 220,
+    "h": 29,
+    "t": "Wallet: currencies and essen",
+    "act": "wallet"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Ask The Entity",
+    "act": "ask"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Settings",
+    "act": "settings"
+   },
+   {
+    "w": 26,
+    "h": 26,
+    "t": "Previous Amina",
+    "act": "selPrev"
+   },
+   {
+    "w": 26,
+    "h": 26,
+    "t": "Next Amina",
+    "act": "selNext"
+   },
+   {
+    "w": 35,
+    "h": 35,
+    "t": "Close",
+    "act": "close"
+   },
+   {
+    "w": 175,
+    "h": 42,
+    "t": "1The Forgotten RoadBattle 1 ",
+    "act": "dSel"
+   },
+   {
+    "w": 175,
+    "h": 42,
+    "t": "The Gathering HallClear the ",
+    "act": "dSel"
+   },
+   {
+    "w": 175,
+    "h": 42,
+    "t": "The Overgrown ReliquaryClear",
+    "act": "dSel"
+   },
+   {
+    "w": 175,
+    "h": 42,
+    "t": "The Drowned StepsClear the O",
+    "act": "dSel"
+   },
+   {
+    "w": 175,
+    "h": 42,
+    "t": "The Cold KilnClear the Drown",
+    "act": "dSel"
+   },
+   {
+    "w": 175,
+    "h": 42,
+    "t": "The Hollow VeilClear the Col",
+    "act": "dSel"
+   },
+   {
+    "w": 175,
+    "h": 42,
+    "t": "The Lantern OrchardClear the",
+    "act": "dSel"
+   },
+   {
+    "w": 161,
+    "h": 37,
+    "t": "Enter · battle 1",
+    "act": "enterDungeon"
+   },
+   {
+    "w": 113,
+    "h": 37,
+    "t": "Journal",
+    "act": "journal"
+   },
+   {
+    "w": 76,
+    "h": 37,
+    "t": "Close",
+    "act": "close"
+   }
+  ],
+  "tinyText": 42,
+  "tinyList": [
+   {
+    "px": 9.555,
+    "t": "PLAYER RANK 1"
+   },
+   {
+    "px": 9.828,
+    "t": "Current task"
+   },
+   {
+    "px": 10.101,
+    "t": "Remove 3 obstacles on Sunlit S"
+   },
+   {
+    "px": 9.828,
+    "t": "Go"
+   },
+   {
+    "px": 8.19,
+    "t": "Dark"
+   },
+   {
+    "px": 8.736,
+    "t": "Lv 6"
+   },
+   {
+    "px": 8.736,
+    "t": "0 / 107 xp"
+   },
+   {
+    "px": 9.828,
+    "t": "4 / 4"
+   },
+   {
+    "px": 8.463,
+    "t": "Build"
+   },
+   {
+    "px": 8.463,
+    "t": "Creatures"
+   },
+   {
+    "px": 8.463,
+    "t": "Tasks"
+   },
+   {
+    "px": 8.736,
+    "t": "Battle"
+   },
+   {
+    "px": 8.463,
+    "t": "Explore"
+   },
+   {
+    "px": 8.463,
+    "t": "Hatchery"
+   },
+   {
+    "px": 10.647,
+    "t": "Sunlit Sanctuary"
+   }
+  ],
+  "clipped": [],
+  "offscreen": [
+   "The Lantern OrchardC"
+  ]
+ },
+ "journal": {
+  "controls": 18,
+  "small": 10,
+  "smallList": [
+   {
+    "w": 41,
+    "h": 41,
+    "t": "Player profile: Rowan",
+    "act": "profile"
+   },
+   {
+    "w": 110,
+    "h": 29,
+    "t": "Player Rank 1, open profile",
+    "act": "profile"
+   },
+   {
+    "w": 132,
+    "h": 24,
+    "t": "Island map",
+    "act": "map"
+   },
+   {
+    "w": 220,
+    "h": 29,
+    "t": "Wallet: currencies and essen",
+    "act": "wallet"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Ask The Entity",
+    "act": "ask"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Settings",
+    "act": "settings"
+   },
+   {
+    "w": 26,
+    "h": 26,
+    "t": "Previous Amina",
+    "act": "selPrev"
+   },
+   {
+    "w": 26,
+    "h": 26,
+    "t": "Next Amina",
+    "act": "selNext"
+   },
+   {
+    "w": 35,
+    "h": 35,
+    "t": "Close",
+    "act": "close"
+   },
+   {
+    "w": 76,
+    "h": 37,
+    "t": "Close",
+    "act": "close"
+   }
+  ],
+  "tinyText": 15,
+  "tinyList": [
+   {
+    "px": 9.555,
+    "t": "PLAYER RANK 1"
+   },
+   {
+    "px": 9.828,
+    "t": "Current task"
+   },
+   {
+    "px": 10.101,
+    "t": "Remove 3 obstacles on Sunlit S"
+   },
+   {
+    "px": 9.828,
+    "t": "Go"
+   },
+   {
+    "px": 8.19,
+    "t": "Dark"
+   },
+   {
+    "px": 8.736,
+    "t": "Lv 6"
+   },
+   {
+    "px": 8.736,
+    "t": "0 / 107 xp"
+   },
+   {
+    "px": 9.828,
+    "t": "4 / 4"
+   },
+   {
+    "px": 8.463,
+    "t": "Build"
+   },
+   {
+    "px": 8.463,
+    "t": "Creatures"
+   },
+   {
+    "px": 8.463,
+    "t": "Tasks"
+   },
+   {
+    "px": 8.736,
+    "t": "Battle"
+   },
+   {
+    "px": 8.463,
+    "t": "Explore"
+   },
+   {
+    "px": 8.463,
+    "t": "Hatchery"
+   },
+   {
+    "px": 9.828,
+    "t": "0 of 9 found."
+   }
+  ],
+  "clipped": [],
+  "offscreen": []
+ },
+ "profile": {
+  "controls": 21,
+  "small": 13,
+  "smallList": [
+   {
+    "w": 41,
+    "h": 41,
+    "t": "Player profile: Rowan",
+    "act": "profile"
+   },
+   {
+    "w": 110,
+    "h": 29,
+    "t": "Player Rank 1, open profile",
+    "act": "profile"
+   },
+   {
+    "w": 132,
+    "h": 24,
+    "t": "Island map",
+    "act": "map"
+   },
+   {
+    "w": 220,
+    "h": 29,
+    "t": "Wallet: currencies and essen",
+    "act": "wallet"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Ask The Entity",
+    "act": "ask"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Settings",
+    "act": "settings"
+   },
+   {
+    "w": 26,
+    "h": 26,
+    "t": "Previous Amina",
+    "act": "selPrev"
+   },
+   {
+    "w": 26,
+    "h": 26,
+    "t": "Next Amina",
+    "act": "selNext"
+   },
+   {
+    "w": 35,
+    "h": 35,
+    "t": "Close",
+    "act": "close"
+   },
+   {
+    "w": 90,
+    "h": 27,
+    "t": "Player Stats",
+    "act": "pfTab"
+   },
+   {
+    "w": 110,
+    "h": 27,
+    "t": "Achievements 1",
+    "act": "pfTab"
+   },
+   {
+    "w": 104,
+    "h": 27,
+    "t": "Customisation",
+    "act": "pfTab"
+   },
+   {
+    "w": 76,
+    "h": 37,
+    "t": "Close",
+    "act": "close"
+   }
+  ],
+  "tinyText": 42,
+  "tinyList": [
+   {
+    "px": 9.555,
+    "t": "PLAYER RANK 1"
+   },
+   {
+    "px": 9.828,
+    "t": "Current task"
+   },
+   {
+    "px": 10.101,
+    "t": "Remove 3 obstacles on Sunlit S"
+   },
+   {
+    "px": 9.828,
+    "t": "Go"
+   },
+   {
+    "px": 8.19,
+    "t": "Dark"
+   },
+   {
+    "px": 8.736,
+    "t": "Lv 6"
+   },
+   {
+    "px": 8.736,
+    "t": "0 / 107 xp"
+   },
+   {
+    "px": 9.828,
+    "t": "4 / 4"
+   },
+   {
+    "px": 8.463,
+    "t": "Build"
+   },
+   {
+    "px": 8.463,
+    "t": "Creatures"
+   },
+   {
+    "px": 8.463,
+    "t": "Tasks"
+   },
+   {
+    "px": 8.736,
+    "t": "Battle"
+   },
+   {
+    "px": 8.463,
+    "t": "Explore"
+   },
+   {
+    "px": 8.463,
+    "t": "Hatchery"
+   },
+   {
+    "px": 10.92,
+    "t": "Player Stats"
+   }
+  ],
+  "clipped": [],
+  "offscreen": []
+ },
+ "dialogue": {
+  "controls": 18,
+  "small": 10,
+  "smallList": [
+   {
+    "w": 41,
+    "h": 41,
+    "t": "Player profile: Rowan",
+    "act": "profile"
+   },
+   {
+    "w": 110,
+    "h": 29,
+    "t": "Player Rank 1, open profile",
+    "act": "profile"
+   },
+   {
+    "w": 132,
+    "h": 24,
+    "t": "Island map",
+    "act": "map"
+   },
+   {
+    "w": 220,
+    "h": 29,
+    "t": "Wallet: currencies and essen",
+    "act": "wallet"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Ask The Entity",
+    "act": "ask"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Settings",
+    "act": "settings"
+   },
+   {
+    "w": 26,
+    "h": 26,
+    "t": "Previous Amina",
+    "act": "selPrev"
+   },
+   {
+    "w": 26,
+    "h": 26,
+    "t": "Next Amina",
+    "act": "selNext"
+   },
+   {
+    "w": 55,
+    "h": 35,
+    "t": "Auto",
+    "act": ""
+   },
+   {
+    "w": 52,
+    "h": 35,
+    "t": "Skip",
+    "act": ""
+   }
+  ],
+  "tinyText": 15,
+  "tinyList": [
+   {
+    "px": 9.555,
+    "t": "PLAYER RANK 1"
+   },
+   {
+    "px": 9.828,
+    "t": "Current task"
+   },
+   {
+    "px": 10.101,
+    "t": "Remove 3 obstacles on Sunlit S"
+   },
+   {
+    "px": 9.828,
+    "t": "Go"
+   },
+   {
+    "px": 8.19,
+    "t": "Dark"
+   },
+   {
+    "px": 8.736,
+    "t": "Lv 6"
+   },
+   {
+    "px": 8.736,
+    "t": "0 / 107 xp"
+   },
+   {
+    "px": 9.828,
+    "t": "4 / 4"
+   },
+   {
+    "px": 8.463,
+    "t": "Build"
+   },
+   {
+    "px": 8.463,
+    "t": "Creatures"
+   },
+   {
+    "px": 8.463,
+    "t": "Tasks"
+   },
+   {
+    "px": 8.736,
+    "t": "Battle"
+   },
+   {
+    "px": 8.463,
+    "t": "Explore"
+   },
+   {
+    "px": 8.463,
+    "t": "Hatchery"
+   },
+   {
+    "px": 9.828,
+    "t": "The Entity"
+   }
+  ],
+  "clipped": [],
+  "offscreen": []
+ },
+ "battle": {
+  "controls": 7,
+  "small": 1,
+  "smallList": [
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Leave the battle",
+    "act": "bRetreat"
+   }
+  ],
+  "tinyText": 19,
+  "tinyList": [
+   {
+    "px": 10.92,
+    "t": "Gaiaroki"
+   },
+   {
+    "px": 8.736,
+    "t": "Lv 2"
+   },
+   {
+    "px": 9.009,
+    "t": "53 / 53"
+   },
+   {
+    "px": 10.647,
+    "t": "53"
+   },
+   {
+    "px": 10.647,
+    "t": "Forgotten Road · 1/10"
+   },
+   {
+    "px": 8.463,
+    "t": "Turn 1"
+   },
+   {
+    "px": 10.101,
+    "t": "Your move"
+   },
+   {
+    "px": 8.19,
+    "t": "You act first"
+   },
+   {
+    "px": 10.92,
+    "t": "Lumifern"
+   },
+   {
+    "px": 8.736,
+    "t": "Lv 12"
+   },
+   {
+    "px": 9.009,
+    "t": "101 / 101"
+   },
+   {
+    "px": 10.647,
+    "t": "101"
+   },
+   {
+    "px": 7.644,
+    "t": "Lumifern"
+   },
+   {
+    "px": 7.644,
+    "t": "Acinus"
+   },
+   {
+    "px": 7.644,
+    "t": "Emberix"
+   }
+  ],
+  "clipped": [],
+  "offscreen": []
+ }
+}

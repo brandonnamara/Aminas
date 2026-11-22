@@ -1,0 +1,1776 @@
+{
+ "island": {
+  "controls": 16,
+  "small": 8,
+  "smallList": [
+   {
+    "w": 41,
+    "h": 41,
+    "t": "Player profile: Rowan",
+    "act": "profile"
+   },
+   {
+    "w": 119,
+    "h": 31,
+    "t": "Player Rank 1, open profile",
+    "act": "profile"
+   },
+   {
+    "w": 132,
+    "h": 24,
+    "t": "Island map",
+    "act": "map"
+   },
+   {
+    "w": 220,
+    "h": 29,
+    "t": "Wallet: currencies and essen",
+    "act": "wallet"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Ask The Entity",
+    "act": "ask"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Settings",
+    "act": "settings"
+   },
+   {
+    "w": 44,
+    "h": 26,
+    "t": "Previous Amina",
+    "act": "selPrev"
+   },
+   {
+    "w": 44,
+    "h": 26,
+    "t": "Next Amina",
+    "act": "selNext"
+   }
+  ],
+  "tinyText": 11,
+  "tinyList": [
+   {
+    "px": 8.2,
+    "t": "Nature",
+    "c": "span.chip.nature < nm"
+   },
+   {
+    "px": 8.7,
+    "t": "Lv 9",
+    "c": "span. < xpl"
+   },
+   {
+    "px": 8.7,
+    "t": "0 / 185 xp",
+    "c": "span. < xpl"
+   },
+   {
+    "px": 9.8,
+    "t": "2 / 4",
+    "c": "span.seldots < selnav"
+   },
+   {
+    "px": 8.5,
+    "t": "Build",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Creatures",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Tasks",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.7,
+    "t": "Battle",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Explore",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Hatchery",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 9,
+    "t": "Achievement",
+    "c": "small. < "
+   }
+  ],
+  "clipped": [],
+  "offscreen": []
+ },
+ "settings": {
+  "controls": 27,
+  "small": 15,
+  "smallList": [
+   {
+    "w": 41,
+    "h": 41,
+    "t": "Player profile: Rowan",
+    "act": "profile"
+   },
+   {
+    "w": 119,
+    "h": 31,
+    "t": "Player Rank 1, open profile",
+    "act": "profile"
+   },
+   {
+    "w": 132,
+    "h": 24,
+    "t": "Island map",
+    "act": "map"
+   },
+   {
+    "w": 220,
+    "h": 29,
+    "t": "Wallet: currencies and essen",
+    "act": "wallet"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Ask The Entity",
+    "act": "ask"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Settings",
+    "act": "settings"
+   },
+   {
+    "w": 26,
+    "h": 26,
+    "t": "Previous Amina",
+    "act": "selPrev"
+   },
+   {
+    "w": 26,
+    "h": 26,
+    "t": "Next Amina",
+    "act": "selNext"
+   },
+   {
+    "w": 44,
+    "h": 23,
+    "t": "Music",
+    "act": "setPref"
+   },
+   {
+    "w": 44,
+    "h": 23,
+    "t": "Sound effects",
+    "act": "setPref"
+   },
+   {
+    "w": 44,
+    "h": 23,
+    "t": "Reduce motion",
+    "act": "setPref"
+   },
+   {
+    "w": 44,
+    "h": 23,
+    "t": "Show the build grid all the ",
+    "act": "setPref"
+   },
+   {
+    "w": 40,
+    "h": 23,
+    "t": "Day and night light on the i",
+    "act": "setPref"
+   },
+   {
+    "w": 40,
+    "h": 23,
+    "t": "Battery saver",
+    "act": "setPref"
+   },
+   {
+    "w": 74,
+    "h": 36,
+    "t": "Close",
+    "act": "close"
+   }
+  ],
+  "tinyText": 10,
+  "tinyList": [
+   {
+    "px": 8.2,
+    "t": "Nature",
+    "c": "span.chip.nature < nm"
+   },
+   {
+    "px": 8.7,
+    "t": "Lv 9",
+    "c": "span. < xpl"
+   },
+   {
+    "px": 8.7,
+    "t": "0 / 185 xp",
+    "c": "span. < xpl"
+   },
+   {
+    "px": 9.8,
+    "t": "2 / 4",
+    "c": "span.seldots < selnav"
+   },
+   {
+    "px": 8.5,
+    "t": "Build",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Creatures",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Tasks",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.7,
+    "t": "Battle",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Explore",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Hatchery",
+    "c": "span. < nbtn"
+   }
+  ],
+  "clipped": [],
+  "offscreen": [
+   "setPref"
+  ]
+ },
+ "collection": {
+  "controls": 57,
+  "small": 21,
+  "smallList": [
+   {
+    "w": 41,
+    "h": 41,
+    "t": "Player profile: Rowan",
+    "act": "profile"
+   },
+   {
+    "w": 119,
+    "h": 31,
+    "t": "Player Rank 1, open profile",
+    "act": "profile"
+   },
+   {
+    "w": 132,
+    "h": 24,
+    "t": "Island map",
+    "act": "map"
+   },
+   {
+    "w": 220,
+    "h": 29,
+    "t": "Wallet: currencies and essen",
+    "act": "wallet"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Ask The Entity",
+    "act": "ask"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Settings",
+    "act": "settings"
+   },
+   {
+    "w": 26,
+    "h": 26,
+    "t": "Previous Amina",
+    "act": "selPrev"
+   },
+   {
+    "w": 26,
+    "h": 26,
+    "t": "Next Amina",
+    "act": "selNext"
+   },
+   {
+    "w": 32,
+    "h": 27,
+    "t": "All",
+    "act": "colSet"
+   },
+   {
+    "w": 61,
+    "h": 27,
+    "t": "Light 1/6",
+    "act": "colSet"
+   },
+   {
+    "w": 60,
+    "h": 27,
+    "t": "Dark 1/6",
+    "act": "colSet"
+   },
+   {
+    "w": 70,
+    "h": 27,
+    "t": "Nature 1/9",
+    "act": "colSet"
+   },
+   {
+    "w": 59,
+    "h": 27,
+    "t": "Fire 1/12",
+    "act": "colSet"
+   },
+   {
+    "w": 69,
+    "h": 27,
+    "t": "Water 0/9",
+    "act": "colSet"
+   },
+   {
+    "w": 29,
+    "h": 27,
+    "t": "All",
+    "act": "colSet"
+   },
+   {
+    "w": 70,
+    "h": 27,
+    "t": "Befriended",
+    "act": "colSet"
+   },
+   {
+    "w": 55,
+    "h": 27,
+    "t": "Missing",
+    "act": "colSet"
+   },
+   {
+    "w": 33,
+    "h": 27,
+    "t": "No.",
+    "act": "colSet"
+   },
+   {
+    "w": 44,
+    "h": 27,
+    "t": "Level",
+    "act": "colSet"
+   },
+   {
+    "w": 56,
+    "h": 27,
+    "t": "Element",
+    "act": "colSet"
+   },
+   {
+    "w": 35,
+    "h": 27,
+    "t": "A–Z",
+    "act": "colSet"
+   }
+  ],
+  "tinyText": 62,
+  "tinyList": [
+   {
+    "px": 8.2,
+    "t": "Nature",
+    "c": "span.chip.nature < nm"
+   },
+   {
+    "px": 8.7,
+    "t": "Lv 9",
+    "c": "span. < xpl"
+   },
+   {
+    "px": 8.7,
+    "t": "0 / 185 xp",
+    "c": "span. < xpl"
+   },
+   {
+    "px": 9.8,
+    "t": "2 / 4",
+    "c": "span.seldots < selnav"
+   },
+   {
+    "px": 8.5,
+    "t": "Build",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Creatures",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Tasks",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.7,
+    "t": "Battle",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Explore",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Hatchery",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 10.1,
+    "t": "All",
+    "c": "button.fchip.on < fchips"
+   },
+   {
+    "px": 10.1,
+    "t": "Light 1/6",
+    "c": "button.fchip..el-light < fchips"
+   },
+   {
+    "px": 10.1,
+    "t": "Dark 1/6",
+    "c": "button.fchip..el-dark < fchips"
+   },
+   {
+    "px": 10.1,
+    "t": "Nature 1/9",
+    "c": "button.fchip..el-nature < fchips"
+   },
+   {
+    "px": 10.1,
+    "t": "Fire 1/12",
+    "c": "button.fchip..el-fire < fchips"
+   }
+  ],
+  "clipped": [],
+  "offscreen": [
+   "#15???Undiscovered",
+   "#16???Undiscovered",
+   "#17???Undiscovered",
+   "#18???Undiscovered",
+   "#19???Undiscovered",
+   "#20???Undiscovered",
+   "#21???Undiscovered"
+  ]
+ },
+ "detail": {
+  "controls": 33,
+  "small": 20,
+  "smallList": [
+   {
+    "w": 41,
+    "h": 41,
+    "t": "Player profile: Rowan",
+    "act": "profile"
+   },
+   {
+    "w": 119,
+    "h": 31,
+    "t": "Player Rank 1, open profile",
+    "act": "profile"
+   },
+   {
+    "w": 132,
+    "h": 24,
+    "t": "Island map",
+    "act": "map"
+   },
+   {
+    "w": 220,
+    "h": 29,
+    "t": "Wallet: currencies and essen",
+    "act": "wallet"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Ask The Entity",
+    "act": "ask"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Settings",
+    "act": "settings"
+   },
+   {
+    "w": 26,
+    "h": 26,
+    "t": "Previous Amina",
+    "act": "selPrev"
+   },
+   {
+    "w": 26,
+    "h": 26,
+    "t": "Next Amina",
+    "act": "selNext"
+   },
+   {
+    "w": 73,
+    "h": 25,
+    "t": "Hop",
+    "act": "vPlay"
+   },
+   {
+    "w": 73,
+    "h": 25,
+    "t": "Attack",
+    "act": "vPlay"
+   },
+   {
+    "w": 73,
+    "h": 25,
+    "t": "Ouch",
+    "act": "vPlay"
+   },
+   {
+    "w": 73,
+    "h": 25,
+    "t": "Cheer",
+    "act": "vPlay"
+   },
+   {
+    "w": 73,
+    "h": 25,
+    "t": "Special",
+    "act": "vPlay"
+   },
+   {
+    "w": 58,
+    "h": 27,
+    "t": "About",
+    "act": "dTab"
+   },
+   {
+    "w": 56,
+    "h": 27,
+    "t": "Battle",
+    "act": "dTab"
+   },
+   {
+    "w": 61,
+    "h": 27,
+    "t": "Moves",
+    "act": "dTab"
+   },
+   {
+    "w": 97,
+    "h": 35,
+    "t": "Snack 3",
+    "act": "detailFeed"
+   },
+   {
+    "w": 99,
+    "h": 35,
+    "t": "Feast 10",
+    "act": "detailFeed"
+   },
+   {
+    "w": 89,
+    "h": 35,
+    "t": "Evolve",
+    "act": "evoAsk"
+   },
+   {
+    "w": 76,
+    "h": 37,
+    "t": "Close",
+    "act": "close"
+   }
+  ],
+  "tinyText": 20,
+  "tinyList": [
+   {
+    "px": 8.2,
+    "t": "Nature",
+    "c": "span.chip.nature < nm"
+   },
+   {
+    "px": 8.7,
+    "t": "Lv 9",
+    "c": "span. < xpl"
+   },
+   {
+    "px": 8.7,
+    "t": "0 / 185 xp",
+    "c": "span. < xpl"
+   },
+   {
+    "px": 9.8,
+    "t": "2 / 4",
+    "c": "span.seldots < selnav"
+   },
+   {
+    "px": 8.5,
+    "t": "Build",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Creatures",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Tasks",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.7,
+    "t": "Battle",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Explore",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Hatchery",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 10.1,
+    "t": "Hop",
+    "c": "button.fchip < clipbar"
+   },
+   {
+    "px": 10.1,
+    "t": "Attack",
+    "c": "button.fchip < clipbar"
+   },
+   {
+    "px": 10.1,
+    "t": "Ouch",
+    "c": "button.fchip < clipbar"
+   },
+   {
+    "px": 10.1,
+    "t": "Cheer",
+    "c": "button.fchip < clipbar"
+   },
+   {
+    "px": 10.1,
+    "t": "Special",
+    "c": "button.fchip < clipbar"
+   }
+  ],
+  "clipped": [],
+  "offscreen": []
+ },
+ "hatchery": {
+  "controls": 24,
+  "small": 9,
+  "smallList": [
+   {
+    "w": 41,
+    "h": 41,
+    "t": "Player profile: Rowan",
+    "act": "profile"
+   },
+   {
+    "w": 119,
+    "h": 31,
+    "t": "Player Rank 1, open profile",
+    "act": "profile"
+   },
+   {
+    "w": 132,
+    "h": 24,
+    "t": "Island map",
+    "act": "map"
+   },
+   {
+    "w": 220,
+    "h": 29,
+    "t": "Wallet: currencies and essen",
+    "act": "wallet"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Ask The Entity",
+    "act": "ask"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Settings",
+    "act": "settings"
+   },
+   {
+    "w": 26,
+    "h": 26,
+    "t": "Previous Amina",
+    "act": "selPrev"
+   },
+   {
+    "w": 26,
+    "h": 26,
+    "t": "Next Amina",
+    "act": "selNext"
+   },
+   {
+    "w": 100,
+    "h": 37,
+    "t": "Breed",
+    "act": "hStart"
+   }
+  ],
+  "tinyText": 24,
+  "tinyList": [
+   {
+    "px": 8.2,
+    "t": "Nature",
+    "c": "span.chip.nature < nm"
+   },
+   {
+    "px": 8.7,
+    "t": "Lv 9",
+    "c": "span. < xpl"
+   },
+   {
+    "px": 8.7,
+    "t": "0 / 185 xp",
+    "c": "span. < xpl"
+   },
+   {
+    "px": 9.8,
+    "t": "2 / 4",
+    "c": "span.seldots < selnav"
+   },
+   {
+    "px": 8.5,
+    "t": "Build",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Creatures",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Tasks",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.7,
+    "t": "Battle",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Explore",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Hatchery",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 10.2,
+    "t": "Lv 1",
+    "c": "span.lv < "
+   },
+   {
+    "px": 9,
+    "t": "Idle",
+    "c": "span.hx-state.s-idle < "
+   },
+   {
+    "px": 9.6,
+    "t": "Breeding slots · 0 of 1 in use",
+    "c": "div.hx-cap < hx-left-col"
+   },
+   {
+    "px": 9.6,
+    "t": "· 0 of 1 in use",
+    "c": "span.muted < hx-cap"
+   },
+   {
+    "px": 9.8,
+    "t": "1 breeding slot",
+    "c": "span. < hx-up-h"
+   }
+  ],
+  "clipped": [],
+  "offscreen": []
+ },
+ "forge": {
+  "controls": 25,
+  "small": 9,
+  "smallList": [
+   {
+    "w": 41,
+    "h": 41,
+    "t": "Player profile: Rowan",
+    "act": "profile"
+   },
+   {
+    "w": 119,
+    "h": 31,
+    "t": "Player Rank 1, open profile",
+    "act": "profile"
+   },
+   {
+    "w": 132,
+    "h": 24,
+    "t": "Island map",
+    "act": "map"
+   },
+   {
+    "w": 220,
+    "h": 29,
+    "t": "Wallet: currencies and essen",
+    "act": "wallet"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Ask The Entity",
+    "act": "ask"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Settings",
+    "act": "settings"
+   },
+   {
+    "w": 26,
+    "h": 26,
+    "t": "Previous Amina",
+    "act": "selPrev"
+   },
+   {
+    "w": 26,
+    "h": 26,
+    "t": "Next Amina",
+    "act": "selNext"
+   },
+   {
+    "w": 58,
+    "h": 35,
+    "t": "Craft",
+    "act": "fCraft"
+   }
+  ],
+  "tinyText": 19,
+  "tinyList": [
+   {
+    "px": 8.2,
+    "t": "Nature",
+    "c": "span.chip.nature < nm"
+   },
+   {
+    "px": 8.7,
+    "t": "Lv 9",
+    "c": "span. < xpl"
+   },
+   {
+    "px": 8.7,
+    "t": "0 / 185 xp",
+    "c": "span. < xpl"
+   },
+   {
+    "px": 9.8,
+    "t": "2 / 4",
+    "c": "span.seldots < selnav"
+   },
+   {
+    "px": 8.5,
+    "t": "Build",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Creatures",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Tasks",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.7,
+    "t": "Battle",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Explore",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Hatchery",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 10.2,
+    "t": "Lv 1",
+    "c": "span.lv < "
+   },
+   {
+    "px": 9.8,
+    "t": "Craft equipment from gold, foo",
+    "c": "p.muted.small-t < fpanel"
+   },
+   {
+    "px": 8.5,
+    "t": "Tier I · Common",
+    "c": "span.tier.t-common < fi-b"
+   },
+   {
+    "px": 9.8,
+    "t": "Washed up on the Forgotten Roa",
+    "c": "div.fi-d.muted < fi-b"
+   },
+   {
+    "px": 8.5,
+    "t": "Tier I · Common",
+    "c": "span.tier.t-common < fi-b"
+   }
+  ],
+  "clipped": [],
+  "offscreen": []
+ },
+ "bag": {
+  "controls": 18,
+  "small": 8,
+  "smallList": [
+   {
+    "w": 41,
+    "h": 41,
+    "t": "Player profile: Rowan",
+    "act": "profile"
+   },
+   {
+    "w": 119,
+    "h": 31,
+    "t": "Player Rank 1, open profile",
+    "act": "profile"
+   },
+   {
+    "w": 132,
+    "h": 24,
+    "t": "Island map",
+    "act": "map"
+   },
+   {
+    "w": 220,
+    "h": 29,
+    "t": "Wallet: currencies and essen",
+    "act": "wallet"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Ask The Entity",
+    "act": "ask"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Settings",
+    "act": "settings"
+   },
+   {
+    "w": 26,
+    "h": 26,
+    "t": "Previous Amina",
+    "act": "selPrev"
+   },
+   {
+    "w": 26,
+    "h": 26,
+    "t": "Next Amina",
+    "act": "selNext"
+   }
+  ],
+  "tinyText": 11,
+  "tinyList": [
+   {
+    "px": 8.2,
+    "t": "Nature",
+    "c": "span.chip.nature < nm"
+   },
+   {
+    "px": 8.7,
+    "t": "Lv 9",
+    "c": "span. < xpl"
+   },
+   {
+    "px": 8.7,
+    "t": "0 / 185 xp",
+    "c": "span. < xpl"
+   },
+   {
+    "px": 9.8,
+    "t": "2 / 4",
+    "c": "span.seldots < selnav"
+   },
+   {
+    "px": 8.5,
+    "t": "Build",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Creatures",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Tasks",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.7,
+    "t": "Battle",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Explore",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Hatchery",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 9.8,
+    "t": "To equip something, open an Am",
+    "c": "p.muted.small-t < sh-body"
+   }
+  ],
+  "clipped": [],
+  "offscreen": []
+ },
+ "battlehub": {
+  "controls": 20,
+  "small": 8,
+  "smallList": [
+   {
+    "w": 41,
+    "h": 41,
+    "t": "Player profile: Rowan",
+    "act": "profile"
+   },
+   {
+    "w": 119,
+    "h": 31,
+    "t": "Player Rank 1, open profile",
+    "act": "profile"
+   },
+   {
+    "w": 132,
+    "h": 24,
+    "t": "Island map",
+    "act": "map"
+   },
+   {
+    "w": 220,
+    "h": 29,
+    "t": "Wallet: currencies and essen",
+    "act": "wallet"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Ask The Entity",
+    "act": "ask"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Settings",
+    "act": "settings"
+   },
+   {
+    "w": 26,
+    "h": 26,
+    "t": "Previous Amina",
+    "act": "selPrev"
+   },
+   {
+    "w": 26,
+    "h": 26,
+    "t": "Next Amina",
+    "act": "selNext"
+   }
+  ],
+  "tinyText": 12,
+  "tinyList": [
+   {
+    "px": 8.2,
+    "t": "Nature",
+    "c": "span.chip.nature < nm"
+   },
+   {
+    "px": 8.7,
+    "t": "Lv 9",
+    "c": "span. < xpl"
+   },
+   {
+    "px": 8.7,
+    "t": "0 / 185 xp",
+    "c": "span. < xpl"
+   },
+   {
+    "px": 9.8,
+    "t": "2 / 4",
+    "c": "span.seldots < selnav"
+   },
+   {
+    "px": 8.5,
+    "t": "Build",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Creatures",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Tasks",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.7,
+    "t": "Battle",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Explore",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Hatchery",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 9.8,
+    "t": "0 / 10 dungeons cleared",
+    "c": "span.hc-meta < hubcard"
+   },
+   {
+    "px": 9.8,
+    "t": "Practice against the computer",
+    "c": "span.hc-meta < hubcard"
+   }
+  ],
+  "clipped": [],
+  "offscreen": []
+ },
+ "dungeons": {
+  "controls": 27,
+  "small": 8,
+  "smallList": [
+   {
+    "w": 41,
+    "h": 41,
+    "t": "Player profile: Rowan",
+    "act": "profile"
+   },
+   {
+    "w": 119,
+    "h": 31,
+    "t": "Player Rank 1, open profile",
+    "act": "profile"
+   },
+   {
+    "w": 132,
+    "h": 24,
+    "t": "Island map",
+    "act": "map"
+   },
+   {
+    "w": 220,
+    "h": 29,
+    "t": "Wallet: currencies and essen",
+    "act": "wallet"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Ask The Entity",
+    "act": "ask"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Settings",
+    "act": "settings"
+   },
+   {
+    "w": 26,
+    "h": 26,
+    "t": "Previous Amina",
+    "act": "selPrev"
+   },
+   {
+    "w": 26,
+    "h": 26,
+    "t": "Next Amina",
+    "act": "selNext"
+   }
+  ],
+  "tinyText": 28,
+  "tinyList": [
+   {
+    "px": 8.2,
+    "t": "Nature",
+    "c": "span.chip.nature < nm"
+   },
+   {
+    "px": 8.7,
+    "t": "Lv 9",
+    "c": "span. < xpl"
+   },
+   {
+    "px": 8.7,
+    "t": "0 / 185 xp",
+    "c": "span. < xpl"
+   },
+   {
+    "px": 9.8,
+    "t": "2 / 4",
+    "c": "span.seldots < selnav"
+   },
+   {
+    "px": 8.5,
+    "t": "Build",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Creatures",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Tasks",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.7,
+    "t": "Battle",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Explore",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Hatchery",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 9.8,
+    "t": "0 / 10 dungeons · 0 / 100 batt",
+    "c": "span.muted < dg-isle"
+   },
+   {
+    "px": 9.3,
+    "t": "DUNGEON 1",
+    "c": "span.dd-num < dd-art"
+   },
+   {
+    "px": 9.3,
+    "t": "Available",
+    "c": "span.tagp.play < "
+   },
+   {
+    "px": 9.8,
+    "t": "Recommended level 4 · Rewards ",
+    "c": "p.muted.small-t < dd-b"
+   },
+   {
+    "px": 9.8,
+    "t": "Recommended level",
+    "c": "b. < muted"
+   }
+  ],
+  "clipped": [],
+  "offscreen": [
+   "The Lantern OrchardC"
+  ]
+ },
+ "journal": {
+  "controls": 18,
+  "small": 8,
+  "smallList": [
+   {
+    "w": 41,
+    "h": 41,
+    "t": "Player profile: Rowan",
+    "act": "profile"
+   },
+   {
+    "w": 119,
+    "h": 31,
+    "t": "Player Rank 1, open profile",
+    "act": "profile"
+   },
+   {
+    "w": 132,
+    "h": 24,
+    "t": "Island map",
+    "act": "map"
+   },
+   {
+    "w": 220,
+    "h": 29,
+    "t": "Wallet: currencies and essen",
+    "act": "wallet"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Ask The Entity",
+    "act": "ask"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Settings",
+    "act": "settings"
+   },
+   {
+    "w": 26,
+    "h": 26,
+    "t": "Previous Amina",
+    "act": "selPrev"
+   },
+   {
+    "w": 26,
+    "h": 26,
+    "t": "Next Amina",
+    "act": "selNext"
+   }
+  ],
+  "tinyText": 11,
+  "tinyList": [
+   {
+    "px": 8.2,
+    "t": "Nature",
+    "c": "span.chip.nature < nm"
+   },
+   {
+    "px": 8.7,
+    "t": "Lv 9",
+    "c": "span. < xpl"
+   },
+   {
+    "px": 8.7,
+    "t": "0 / 185 xp",
+    "c": "span. < xpl"
+   },
+   {
+    "px": 9.8,
+    "t": "2 / 4",
+    "c": "span.seldots < selnav"
+   },
+   {
+    "px": 8.5,
+    "t": "Build",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Creatures",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Tasks",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.7,
+    "t": "Battle",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Explore",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Hatchery",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 9.8,
+    "t": "0 of 9 found.",
+    "c": "p.muted.small-t < "
+   }
+  ],
+  "clipped": [],
+  "offscreen": []
+ },
+ "profile": {
+  "controls": 21,
+  "small": 8,
+  "smallList": [
+   {
+    "w": 41,
+    "h": 41,
+    "t": "Player profile: Rowan",
+    "act": "profile"
+   },
+   {
+    "w": 119,
+    "h": 31,
+    "t": "Player Rank 1, open profile",
+    "act": "profile"
+   },
+   {
+    "w": 132,
+    "h": 24,
+    "t": "Island map",
+    "act": "map"
+   },
+   {
+    "w": 220,
+    "h": 29,
+    "t": "Wallet: currencies and essen",
+    "act": "wallet"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Ask The Entity",
+    "act": "ask"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Settings",
+    "act": "settings"
+   },
+   {
+    "w": 26,
+    "h": 26,
+    "t": "Previous Amina",
+    "act": "selPrev"
+   },
+   {
+    "w": 26,
+    "h": 26,
+    "t": "Next Amina",
+    "act": "selNext"
+   }
+  ],
+  "tinyText": 13,
+  "tinyList": [
+   {
+    "px": 8.2,
+    "t": "Nature",
+    "c": "span.chip.nature < nm"
+   },
+   {
+    "px": 8.7,
+    "t": "Lv 9",
+    "c": "span. < xpl"
+   },
+   {
+    "px": 8.7,
+    "t": "0 / 185 xp",
+    "c": "span. < xpl"
+   },
+   {
+    "px": 9.8,
+    "t": "2 / 4",
+    "c": "span.seldots < selnav"
+   },
+   {
+    "px": 8.5,
+    "t": "Build",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Creatures",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Tasks",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.7,
+    "t": "Battle",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Explore",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Hatchery",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 9,
+    "t": "40 / 75 xp",
+    "c": "em. < pst"
+   },
+   {
+    "px": 9,
+    "t": "0 lost",
+    "c": "em. < pst"
+   },
+   {
+    "px": 9.8,
+    "t": "Playing since 11/22/2026. Ever",
+    "c": "p.muted.small-t < ppanel"
+   }
+  ],
+  "clipped": [],
+  "offscreen": []
+ },
+ "dialogue": {
+  "controls": 19,
+  "small": 8,
+  "smallList": [
+   {
+    "w": 41,
+    "h": 41,
+    "t": "Player profile: Rowan",
+    "act": "profile"
+   },
+   {
+    "w": 119,
+    "h": 31,
+    "t": "Player Rank 1, open profile",
+    "act": "profile"
+   },
+   {
+    "w": 132,
+    "h": 24,
+    "t": "Island map",
+    "act": "map"
+   },
+   {
+    "w": 220,
+    "h": 29,
+    "t": "Wallet: currencies and essen",
+    "act": "wallet"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Ask The Entity",
+    "act": "ask"
+   },
+   {
+    "w": 37,
+    "h": 37,
+    "t": "Settings",
+    "act": "settings"
+   },
+   {
+    "w": 26,
+    "h": 26,
+    "t": "Previous Amina",
+    "act": "selPrev"
+   },
+   {
+    "w": 26,
+    "h": 26,
+    "t": "Next Amina",
+    "act": "selNext"
+   }
+  ],
+  "tinyText": 11,
+  "tinyList": [
+   {
+    "px": 8.2,
+    "t": "Nature",
+    "c": "span.chip.nature < nm"
+   },
+   {
+    "px": 8.7,
+    "t": "Lv 9",
+    "c": "span. < xpl"
+   },
+   {
+    "px": 8.7,
+    "t": "0 / 185 xp",
+    "c": "span. < xpl"
+   },
+   {
+    "px": 9.8,
+    "t": "2 / 4",
+    "c": "span.seldots < selnav"
+   },
+   {
+    "px": 8.5,
+    "t": "Build",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Creatures",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Tasks",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.7,
+    "t": "Battle",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Explore",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 8.5,
+    "t": "Hatchery",
+    "c": "span. < nbtn"
+   },
+   {
+    "px": 9.8,
+    "t": "The Entity",
+    "c": "div.dlg-name < "
+   }
+  ],
+  "clipped": [],
+  "offscreen": []
+ },
+ "battle": {
+  "controls": 7,
+  "small": 0,
+  "smallList": [],
+  "tinyText": 14,
+  "tinyList": [
+   {
+    "px": 8.7,
+    "t": "Lv 2",
+    "c": "span.fp-lv < fp-head"
+   },
+   {
+    "px": 9,
+    "t": "53 / 53",
+    "c": "span.hpn < fp-foot"
+   },
+   {
+    "px": 8.5,
+    "t": "Turn 1",
+    "c": "span.bt-n < b-turn"
+   },
+   {
+    "px": 10.1,
+    "t": "Your move",
+    "c": "span.bt-w < b-turn"
+   },
+   {
+    "px": 8.2,
+    "t": "You act first",
+    "c": "span.bt-f.first < b-turn"
+   },
+   {
+    "px": 8.7,
+    "t": "Lv 12",
+    "c": "span.fp-lv < fp-head"
+   },
+   {
+    "px": 9,
+    "t": "101 / 101",
+    "c": "span.hpn < fp-foot"
+   },
+   {
+    "px": 7.6,
+    "t": "Lumifern",
+    "c": "span.pm-n < pm"
+   },
+   {
+    "px": 7.6,
+    "t": "Acinus",
+    "c": "span.pm-n < pm"
+   },
+   {
+    "px": 7.6,
+    "t": "Emberix",
+    "c": "span.pm-n < pm"
+   },
+   {
+    "px": 9,
+    "t": "Pow 40",
+    "c": "span.ab-pow < "
+   },
+   {
+    "px": 9,
+    "t": "Pow 45",
+    "c": "span.ab-pow < "
+   },
+   {
+    "px": 9,
+    "t": "Special · every 3",
+    "c": "span.ab-sp < "
+   },
+   {
+    "px": 9,
+    "t": "Uses your turn",
+    "c": "small. < ab-main"
+   }
+  ],
+  "clipped": [],
+  "offscreen": []
+ }
+}

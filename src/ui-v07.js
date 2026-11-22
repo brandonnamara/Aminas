@@ -47,7 +47,7 @@
     $('#app').appendChild(box);
     let i = -1, typing = false, tm = null, full = '', mood = null, auto = false, autoTm = null, finished = false;
     const ent = $('.dlg-ent', box), nm = $('.dlg-name', box), tx = $('.dlg-text', box), nx = $('.dlg-next', box);
-    const speed = { fast: 8, normal: 18, slow: 30 }[st().settings.textSpeed] || 18, calm = UI.calm && UI.calm();
+    const speed = { fast: 8, normal: 18, slow: 30 }[st().settings.textSpeed] || 18, calm = UI.calm && UI.calm(), instant = st().settings.textSpeed === 'instant';
     const talk = (on) => { const e = $('.ent-vox', ent); if (e) e.classList.toggle('talk', on); };
     const finish = () => {
       if (finished) return; finished = true; clearTimeout(tm); clearTimeout(autoTm);
@@ -72,7 +72,7 @@
       let c = 0;
       const stop = () => { typing = false; nx.style.visibility = 'visible'; talk(false); scheduleAuto(); };
       const step = () => { c += auto ? 3 : 1; tx.textContent = full.slice(0, c); if (c < full.length) tm = setTimeout(step, speed); else stop(); };
-      if (calm) { tx.textContent = full; stop(); } else step();
+      if (calm || instant) { tx.textContent = full; stop(); } else step();
       if (!narr && /\.\.\.|…|—$/.test(ln[1].trim().slice(-2))) Au.play('hum');
     };
     box.addEventListener('click', (e) => {

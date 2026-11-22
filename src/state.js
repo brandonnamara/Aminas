@@ -57,7 +57,7 @@
       party: [],                 // last chosen party uids
       run: null,                 // active dungeon run
       recipes: {},               // breeding recipes discovered
-      settings: { music: true, sfx: true, eggSpeed: 'fast', textSpeed: 'normal', timers: 'normal', grid: true, reduceMotion: false, creatures3d: true, dayNight: true, batterySaver: false, voxIsland: true, quality: 'auto' },
+      settings: { music: true, sfx: true, eggSpeed: 'fast', textSpeed: 'normal', textSize: 'normal', timers: 'normal', grid: true, reduceMotion: false, creatures3d: true, dayNight: true, batterySaver: false, voxIsland: true, quality: 'auto' },
       story: { used: {}, slips: {}, asked: {}, scenes: {} },
       lastSaved: 0,
     };
@@ -247,6 +247,8 @@
     ['roster'].forEach((k) => { if (st.pvp && Array.isArray(st.pvp[k])) st.pvp[k] = st.pvp[k].filter((u) => uids[u]); });
     ['attack', 'defence'].forEach((k) => { if (st.defence && Array.isArray(st.defence[k])) st.defence[k] = st.defence[k].filter((u) => uids[u]); });
     if (['normal', 'quick'].indexOf(st.settings.timers) < 0) st.settings.timers = 'normal';
+    if (['slow', 'normal', 'fast', 'instant'].indexOf(st.settings.textSpeed) < 0) st.settings.textSpeed = 'normal'; // Phase 16B: + instant
+    if (['normal', 'large', 'larger'].indexOf(st.settings.textSize) < 0) st.settings.textSize = 'normal'; // Phase 16B: dialogue text size
     if (['auto', 'high', 'balanced'].indexOf(st.settings.quality) < 0) st.settings.quality = 'auto'; // Environment Phase 3
     if (A.World) A.World.validate(st);
     if (A.Quests) A.Quests.scan(st);

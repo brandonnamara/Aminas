@@ -51,8 +51,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms)); const SHOTS = proce
   /* ---------------- 4. the Entity's dialogue ---------------- */
   await sleep(600); await shot('o16-dialogue');
   ok(await inView('.dlg.o16 .dlg-box') && await inView('.dlg.o16 .dlg-skip') && await inView('.dlg.o16 .o16-spd'), 'the dialogue panel, Skip and Speed fit the screen');
-  const sp = await ev(async () => { const s = A.State.state, b = document.querySelector('.dlg.o16 .o16-spd'), a = s.settings.textSpeed; b.click(); const c = s.settings.textSpeed; b.click(); b.click(); return [a, c, s.settings.textSpeed, b.textContent.trim()]; });
-  ok(sp[0] === 'normal' && sp[1] === 'fast' && sp[2] === 'normal', 'Speed cycles the existing text-speed setting (normal → fast → slow → normal) and saves it');
+  const sp = await ev(async () => { const s = A.State.state, b = document.querySelector('.dlg.o16 .o16-spd'), a = s.settings.textSpeed; b.click(); const c = s.settings.textSpeed; b.click(); const d = s.settings.textSpeed; b.click(); b.click(); return [a, c, s.settings.textSpeed, d]; });
+  ok(sp[0] === 'normal' && sp[1] === 'fast' && sp[3] === 'instant' && sp[2] === 'normal', 'Speed cycles the text-speed setting (normal → fast → instant (Phase 16B) → slow → normal) and saves it');
   const adv = await ev(async () => { const t = () => document.querySelector('.dlg.o16 .dlg-text').textContent; document.querySelector('.dlg.o16 .dlg-box').click(); await new Promise((r) => setTimeout(r, 60)); const a = t(); document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' })); await new Promise((r) => setTimeout(r, 400)); return [a, t()]; });
   ok(adv[0].length > 0 && adv[1] !== adv[0], 'a tap finishes the line, and Enter (or Space) moves on');
   // walk the whole conversation and collect it
@@ -167,7 +167,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms)); const SHOTS = proce
   await page.waitForSelector('#world'); await page.waitForSelector('.dlg.o16', { timeout: 20000 }); await shot('o16-handoff');
   const ho = await ev(async () => { const out = []; for (let g = 0; g < 20 && document.querySelector('.dlg.o16'); g++) { const d = document.querySelector('.dlg.o16'); if (d.querySelector('.dlg-next').style.visibility !== 'visible') d.querySelector('.dlg-box').click(); await new Promise((r) => setTimeout(r, 30)); out.push(d.querySelector('.dlg-text').textContent); d.querySelector('.dlg-box').click(); await new Promise((r) => setTimeout(r, 300)); } return out; });
   await sleep(600);
-  ok(ho.some((t) => /done it before/.test(t)) && ho.some((t) => /tasks are top left/.test(t)), 'back home, the Entity hands over (with one slip about the player)');
+  ok(ho.some((t) => /done it before/.test(t)) && ho.some((t) => /top left/.test(t)), 'back home, the Entity hands over (with one slip about the player)');
   ok(await ev(() => A.Onboard16.kind(A.State.state) === 'complete' && !document.querySelector('.o16p') && !!document.querySelector('.mission-pill')), 'the prologue completes and the HUD returns to the ordinary task list');
   ok(await ev(() => A.State.state.dungeon.forgottenroad.next === 1 && A.State.state.dungeon.forgottenroad.clears === 0), 'dungeon progress is the game’s own: battle 2 is next, nothing extra cleared');
 

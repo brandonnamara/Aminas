@@ -122,7 +122,14 @@
     });
   };
   Q.visible = (st) => Q.list().filter((q) => Q.status(st, q) !== 'locked');
-  Q.current = (st) => D.QUESTS.filter((q) => !q.side).find((q) => st.missions[q.id] !== 'claimed' && Q.status(st, q) !== 'locked') || null;
+  // Phase 16B: the tracked quest. Same list, same unlock order, same rewards. One refinement: a main quest whose
+  // dungeon the player is already partway through (a run in progress, or battles won but the guardian not yet beaten)
+  // is tracked ahead of quests not yet started (and stays tracked, ready to claim, once its dungeon is cleared), so the
+  // task pill, its Go button and the story all point at the same place. Nothing about claiming or unlocking changes.
+  Q.inDungeon = (st, q) => q.objectives.some((ob) => ob.type === 'dungeon_clear' && (((st.dungeon || {})[ob.dungeon] || {}).clears | 0) < (ob.count || 1) && ((st.run && st.run.d === ob.dungeon) || (((st.dungeon || {})[ob.dungeon] || {}).next | 0) > 0));
+  Q.current = (st) => { const open = D.QUESTS.filter((q) => !q.side && st.missions[q.id] !== 'claimed' && Q.status(st, q) !== 'locked'); return open.find((q) => q.objectives.some((ob) => ob.type === 'dungeon_clear') && (Q.status(st, q) === 'ready' || Q.inDungeon(st, q))) || open[0] || null; };
+  // Where the player stands inside a dungeon objective (for the task pill): 'Battle 3 of 10', or ''.
+  Q.dungeonStep = (st, q) => { const ob = q && q.objectives.find((o) => o.type === 'dungeon_clear'); if (!ob) return ''; const rec = (st.dungeon || {})[ob.dungeon] || {}, d = D.DUNGEONS[ob.dungeon]; if (!d || (rec.clears | 0) >= (ob.count || 1)) return ''; const n = st.run && st.run.d === ob.dungeon ? st.run.battle : rec.next | 0; return n > 0 || (st.run && st.run.d === ob.dungeon) ? 'Battle ' + (n + 1) + ' of ' + d.battles.length : ''; };
   Q.claimable = (st) => Q.list().filter((q) => Q.status(st, q) === 'ready').length;
 
   // Short human label for an objective (built from ids + data, never parsed back).

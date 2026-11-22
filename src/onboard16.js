@@ -181,6 +181,9 @@
       L('t', 'The road has more battles and a guardian at the end. Finish it when you’re ready; it will keep your place.'),
       L('n', 'Your tasks are top left. I’ll stop hovering now. Try to look as if you’ll miss it.'),
     ],
+    // Phase 16B: when the road's own quest is open, the last line says it is the tracked task, so the dialogue and
+    // the task pill agree (the pill tracks a dungeon you are partway through first)
+    handoffTracked: L('n', 'The road is pinned top left, with your place in it. The smaller jobs are under Tasks. I’ll stop hovering now. Try to look as if you’ll miss it.'),
     coach: {
       moves: 'Your move. Tap an attack.',
       health: 'These bars are health. Empty theirs before they empty yours.',

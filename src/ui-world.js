@@ -172,7 +172,7 @@
     if (cm) {
       const rdy = Q.status(s, cm) === 'ready', ob = Q.nextObjective(s, cm), p = Q.progress(s, cm), op = p.objs.find((o) => o.ob === ob);
       h += '<button class="pill mission-pill ' + (rdy ? 'ready' : '') + '" data-act="questGo" data-id="' + cm.id + '"><b>' + (rdy ? 'Ready to claim' : 'Current task') + '</b><span class="mt">' + esc(cm.title) + '</span>' +
-        '<span class="mo">' + (rdy ? 'Tap to claim your reward.' : esc(Q.label(ob)) + (op && op.total > 1 ? ' · ' + fmt(op.cur) + '/' + fmt(op.total) : '')) + '</span><span class="go">' + (rdy ? 'Claim' : 'Go') + ' ' + I('arrow') + '</span></button>';
+        '<span class="mo">' + (rdy ? 'Tap to claim your reward.' : esc(Q.label(ob)) + (Q.dungeonStep && Q.dungeonStep(s, cm) ? ' · ' + Q.dungeonStep(s, cm) : op && op.total > 1 ? ' · ' + fmt(op.cur) + '/' + fmt(op.total) : '')) + '</span><span class="go">' + (rdy ? 'Claim' : 'Go') + ' ' + I('arrow') + '</span></button>';
     } else if (s.flags.arcDone) h += '<button class="pill mission-pill" data-act="missions"><b>Chapter One complete</b><span class="mt">Sanctuary tasks remain</span></button>';
     if (a && UI.selectorHtml) h += UI.selectorHtml(s);
     const eggReady = R.eggsReady(s) > 0;
