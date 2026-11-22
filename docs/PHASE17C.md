@@ -125,12 +125,13 @@ Gem income per day from the Moon Shrine (collected regularly over a week):
 
 | Shrine level, residents | 17B, plays 16 h | 17B, plays 4 h | 17C |
 |---|---|---|---|
-| Lv 2, level-10 resident | 768 | 192 | 10.3 |
-| Lv 4, level-20 residents | 3,182 | 936 | 20.6 |
-| Lv 4, level-30 residents | 4,161 | 1,224 | 20.6 |
-| Lv 4, away a week, collects once | 70 | — | 20.6 |
+| Lv 2, level-10 resident | 768 | 192 | 9 |
+| Lv 4, level-20 residents | 3,182 | 936 | 18 |
+| Lv 4, level-30 residents | 4,161 | 1,224 | 18 |
+| Lv 4, away a week, collects once | 70 | — | 18 |
 
-(17C's per-day figure is over 8 calendar days touched by the week; the cap is per calendar day: 6/9/13/18.)
+(17C is the cap per calendar day, 6/9/13/18 by level; the week-long simulation collected exactly the cap for every
+calendar day it touched, whether collecting often or once.)
 
 The 17B shrine was the economy: thousands of gems a day against ~300 one-time gems from quests, dungeons and Survival
 and ~10 a day from ruins. In 17C it gives at most 6/9/13/18 a day by level.
@@ -182,8 +183,8 @@ The first full run (`regression-run1.log`) had 1,731 passed and 7 failed. All ar
   behaviour they test is unchanged and still checked.
 - `browser-perf-fix` (4): timing-sensitive frame-rate checks. They also fail intermittently on the unchanged 17B code
   (1 of 3 runs there; 1 of 4 on 17C). Not changed.
-- `browser-dev7` (1, "the Forge closes"): intermittent (3 of 21 runs on 17C, 0 of 5 on 17B; no failures in the last 14
-  runs). 17C does not touch the Forge; the check waits a fixed 300 ms after closing. Not changed, but noted.
+- `browser-dev7` (1, "the Forge closes"): intermittent: a check failed in 3 of 21 runs on 17C (twice this one), 0 of 5 on 17B, and none of
+  the last 14 runs. 17C does not touch the Forge; the check waits a fixed 300 ms after closing. Not changed, but noted.
 - `docs/ui/screens15d/status-chips.png` is rewritten by a test run and was restored before committing.
 
 ## 10. Known limitations and concerns
