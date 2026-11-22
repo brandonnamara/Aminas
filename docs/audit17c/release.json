@@ -1,0 +1,38 @@
+{
+ "table": [
+  {
+   "lv": 1,
+   "stage": 1,
+   "essence": 3
+  },
+  {
+   "lv": 5,
+   "stage": 1,
+   "essence": 7
+  },
+  {
+   "lv": 10,
+   "stage": 1,
+   "essence": 12
+  },
+  {
+   "lv": 20,
+   "stage": 2,
+   "essence": 27
+  },
+  {
+   "lv": 30,
+   "stage": 3,
+   "essence": 42
+  }
+ ],
+ "loop": {
+  "essencePerHatchling": 3,
+  "moveToLevel5": 175,
+  "hatchlingsPerMove": 59,
+  "goldPerMove": 2360,
+  "foodPerMove": 1475,
+  "vsFeedingUp": "feeding a duplicate from 1 to 10 costs about 150 food (Feasts) and adds 9 essence: ~17 food per essence",
+  "exchange": "1 gem = 3 essence (30 gems a day)"
+ }
+}

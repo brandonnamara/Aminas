@@ -40,7 +40,7 @@
     duskrend:    { name: 'Dusk Rend',      el: 'dark',   type: 'dmg',    power: 70, cd: 2, desc: 'Claws of folded twilight.' },
     vinewhip:    { name: 'Vine Whip',      el: 'nature', type: 'dmg',    power: 40, cd: 0, desc: 'A lashing vine.' },
     leafguard:   { name: 'Leaf Guard',     el: 'nature', type: 'guard',  power: 0,  cd: 2, desc: 'Halves the next hit you take.' },
-    mend:        { name: 'Mend',           el: 'nature', type: 'heal',   power: 0,  cd: 3, desc: 'Restores 25% of your health, then a little more for 2 turns.', fx: { k: 'regen', p: 1, n: 2, self: true } },
+    mend:        { name: 'Mend',           el: 'nature', type: 'heal',   power: 0,  cd: 3, desc: 'Restores 30% of your health, then a little more for 3 turns.', fx: { k: 'regen', p: 1, n: 3, self: true } }, // Phase 17C: 25% / 2 turns before
     emberflick:  { name: 'Ember Flick',    el: 'fire',   type: 'dmg',    power: 40, cd: 0, desc: 'A spit of warm sparks. 20% chance to burn.', fx: { k: 'burn', p: 0.2, n: 2 } },
     flarebite:   { name: 'Flare Bite',     el: 'fire',   type: 'dmg',    power: 60, cd: 2, desc: 'A blazing chomp. 50% chance to burn.', fx: { k: 'burn', p: 0.5, n: 2 } },
     bubblepop:   { name: 'Bubble Pop',     el: 'water',  type: 'dmg',    power: 40, cd: 0, desc: 'A cheerful burst of bubbles.' },
@@ -50,7 +50,7 @@
     gust:        { name: 'Gust',           el: 'wind',   type: 'dmg',    power: 40, cd: 0, desc: 'A snapping gust.' },
     cyclonespin: { name: 'Cyclone Spin',   el: 'wind',   type: 'weaken', power: 40, cd: 2, desc: 'Damages the foe and lowers its attack.' },
     echowave:    { name: 'Echo Wave',      el: 'resonance', type: 'dmg', power: 50, cd: 1, desc: 'Strikes true; never resisted, never amplified.', neutral: true },
-    hum:         { name: 'Hum',            el: 'resonance', type: 'heal', power: 0, cd: 3, desc: 'A low note that mends you for 25%, then a little more for 2 turns.', fx: { k: 'regen', p: 1, n: 2, self: true } },
+    hum:         { name: 'Hum',            el: 'resonance', type: 'heal', power: 0, cd: 3, desc: 'A low note that mends you for 30%, then a little more for 3 turns.', fx: { k: 'regen', p: 1, n: 3, self: true } }, // Phase 17C: 25% / 2 turns before
     // Guardian moves: never in a species list. A guardian spends a turn charging (telegraphed), then unleashes.
     // A guard raised against a guardian move blocks three quarters of it (instead of half).
     rootcrush:   { name: 'Root Crush',     el: 'earth',  type: 'dmg',    power: 95, cd: 0, boss: true, tell: 'Stone and root tear up through the flagstones. Root Crush is coming!', desc: 'The Sentinel drives stone and root up through the floor. Nature and Water Aminas resist it.' },
@@ -97,6 +97,8 @@
     silence: { name: 'Silenced', short: 'Hush',  color: '#c9b8ff', desc: 'Only basic abilities can be chosen.' },
   };
   D.STATUS_RULES = { burn: 0.06, regen: 0.05, soak: 0.7, twilight: 0.03 };
+  // Phase 17C: XP from foes well below an Amina's level (dungeons and Survival). scale[gap] for a gap of 3, 4, 5+ levels.
+  D.XP17 = { on: true, scale: { 3: 0.75, 4: 0.5, 5: 0.25 } };
   // Phase 17B: combat refinements. Each switch can be turned off on its own (the simulator compares them one by one);
   // with every switch false the battle rules are exactly those of Phase 17A.
   D.COMBAT17 = {
@@ -107,6 +109,8 @@
     soakSlows: true,     // a charging guardian that is soaked sputters and unleashes one turn later (once per charge)
     swift: 0.15,         // one of your swift Aminas acting before its foe deals this much more (0 = off)
     tailwind: true,      // Wind moves are never resisted (Wind's weakness on defence stays)
+    tankCounter: 0.5,    // Phase 17C: a tank's counter is stronger (replaces `counter` for the tank role; 0 = same)
+    guardReflect: 0.25,  // Phase 17C: a guard turns this share of the blow back on the attacker (0 = off)
     smartAuto: true,     // the auto-battle uses guard, heal, soak and attack-lowering moves when they help
   };
   // Team synergies, decided by the elements of the party you bring.

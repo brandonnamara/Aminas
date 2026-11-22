@@ -1,0 +1,598 @@
+{
+ "lv15": {
+  "base": {
+   "lines": {
+    "lumifern": {
+     "el": "light",
+     "role": "balanced",
+     "leg": false,
+     "win": 81
+    },
+    "umbrit": {
+     "el": "dark",
+     "role": "swift",
+     "leg": false,
+     "win": 82
+    },
+    "cannonis": {
+     "el": "water",
+     "role": "tank",
+     "leg": false,
+     "win": 84.7
+    },
+    "kairyu": {
+     "el": "water",
+     "role": "swift",
+     "leg": false,
+     "win": 78.7
+    },
+    "aquaflora": {
+     "el": "water",
+     "role": "mystic",
+     "leg": false,
+     "win": 83.8
+    },
+    "gaiaroki": {
+     "el": "earth",
+     "role": "bruiser",
+     "leg": false,
+     "win": 60.2
+    },
+    "pyrocell": {
+     "el": "earth",
+     "role": "tank",
+     "leg": false,
+     "win": 63.2
+    },
+    "acinus": {
+     "el": "nature",
+     "role": "tank",
+     "leg": false,
+     "win": 65.3
+    },
+    "sylvaneer": {
+     "el": "nature",
+     "role": "swift",
+     "leg": false,
+     "win": 49.2
+    },
+    "terraflora": {
+     "el": "nature",
+     "role": "mystic",
+     "leg": false,
+     "win": 52
+    },
+    "emberix": {
+     "el": "fire",
+     "role": "swift",
+     "leg": false,
+     "win": 77
+    },
+    "pyrokai": {
+     "el": "fire",
+     "role": "bruiser",
+     "leg": false,
+     "win": 82.2
+    },
+    "igniflare": {
+     "el": "fire",
+     "role": "bruiser",
+     "leg": false,
+     "win": 82.2
+    },
+    "pyrospark": {
+     "el": "fire",
+     "role": "mystic",
+     "leg": false,
+     "win": 79.8
+    },
+    "zephyr": {
+     "el": "wind",
+     "role": "swift",
+     "leg": false,
+     "win": 60.5
+    },
+    "voltar": {
+     "el": "dark",
+     "role": "mystic",
+     "leg": false,
+     "win": 94.7
+    },
+    "zeep": {
+     "el": "metal",
+     "role": "tank",
+     "leg": false,
+     "win": 56
+    },
+    "aimza": {
+     "el": "resonance",
+     "role": "mystic",
+     "leg": false,
+     "win": 86.3
+    },
+    "lumi": {
+     "el": "light",
+     "role": "mystic",
+     "leg": false,
+     "win": 81.2
+    },
+    "meta": {
+     "el": "metal",
+     "role": "mystic",
+     "leg": true,
+     "win": 59.7
+    },
+    "atem": {
+     "el": "metal",
+     "role": "bruiser",
+     "leg": true,
+     "win": 65
+    }
+   },
+   "el": {
+    "light": 81.1,
+    "dark": 88.3,
+    "water": 82.4,
+    "earth": 61.7,
+    "nature": 55.5,
+    "fire": 80.3,
+    "wind": 60.5,
+    "metal": 56,
+    "resonance": 86.3
+   },
+   "role": {
+    "balanced": 81,
+    "swift": 69.5,
+    "tank": 67.3,
+    "mystic": 79.6,
+    "bruiser": 74.9
+   }
+  },
+  "mod": {
+   "lines": {
+    "lumifern": {
+     "el": "light",
+     "role": "balanced",
+     "leg": false,
+     "win": 81
+    },
+    "umbrit": {
+     "el": "dark",
+     "role": "swift",
+     "leg": false,
+     "win": 82
+    },
+    "cannonis": {
+     "el": "water",
+     "role": "tank",
+     "leg": false,
+     "win": 84.7
+    },
+    "kairyu": {
+     "el": "water",
+     "role": "swift",
+     "leg": false,
+     "win": 78.7
+    },
+    "aquaflora": {
+     "el": "water",
+     "role": "mystic",
+     "leg": false,
+     "win": 83.8
+    },
+    "gaiaroki": {
+     "el": "earth",
+     "role": "bruiser",
+     "leg": false,
+     "win": 60.2
+    },
+    "pyrocell": {
+     "el": "earth",
+     "role": "tank",
+     "leg": false,
+     "win": 63.2
+    },
+    "acinus": {
+     "el": "nature",
+     "role": "tank",
+     "leg": false,
+     "win": 66
+    },
+    "sylvaneer": {
+     "el": "nature",
+     "role": "swift",
+     "leg": false,
+     "win": 53.7
+    },
+    "terraflora": {
+     "el": "nature",
+     "role": "mystic",
+     "leg": false,
+     "win": 54.5
+    },
+    "emberix": {
+     "el": "fire",
+     "role": "swift",
+     "leg": false,
+     "win": 77
+    },
+    "pyrokai": {
+     "el": "fire",
+     "role": "bruiser",
+     "leg": false,
+     "win": 82.2
+    },
+    "igniflare": {
+     "el": "fire",
+     "role": "bruiser",
+     "leg": false,
+     "win": 82.2
+    },
+    "pyrospark": {
+     "el": "fire",
+     "role": "mystic",
+     "leg": false,
+     "win": 79.8
+    },
+    "zephyr": {
+     "el": "wind",
+     "role": "swift",
+     "leg": false,
+     "win": 60.5
+    },
+    "voltar": {
+     "el": "dark",
+     "role": "mystic",
+     "leg": false,
+     "win": 94.7
+    },
+    "zeep": {
+     "el": "metal",
+     "role": "tank",
+     "leg": false,
+     "win": 56.3
+    },
+    "aimza": {
+     "el": "resonance",
+     "role": "mystic",
+     "leg": false,
+     "win": 90
+    },
+    "lumi": {
+     "el": "light",
+     "role": "mystic",
+     "leg": false,
+     "win": 81.2
+    },
+    "meta": {
+     "el": "metal",
+     "role": "mystic",
+     "leg": true,
+     "win": 60.3
+    },
+    "atem": {
+     "el": "metal",
+     "role": "bruiser",
+     "leg": true,
+     "win": 65.2
+    }
+   },
+   "el": {
+    "light": 81.1,
+    "dark": 88.3,
+    "water": 82.4,
+    "earth": 61.7,
+    "nature": 58.1,
+    "fire": 80.3,
+    "wind": 60.5,
+    "metal": 56.3,
+    "resonance": 90
+   },
+   "role": {
+    "balanced": 81,
+    "swift": 70.4,
+    "tank": 67.5,
+    "mystic": 80.7,
+    "bruiser": 74.9
+   }
+  }
+ },
+ "lv25": {
+  "base": {
+   "lines": {
+    "lumifern": {
+     "el": "light",
+     "role": "balanced",
+     "leg": false,
+     "win": 66.2
+    },
+    "umbrit": {
+     "el": "dark",
+     "role": "swift",
+     "leg": false,
+     "win": 83
+    },
+    "cannonis": {
+     "el": "water",
+     "role": "tank",
+     "leg": false,
+     "win": 84.8
+    },
+    "kairyu": {
+     "el": "water",
+     "role": "swift",
+     "leg": false,
+     "win": 78.5
+    },
+    "aquaflora": {
+     "el": "water",
+     "role": "mystic",
+     "leg": false,
+     "win": 75
+    },
+    "gaiaroki": {
+     "el": "earth",
+     "role": "bruiser",
+     "leg": false,
+     "win": 56.3
+    },
+    "pyrocell": {
+     "el": "earth",
+     "role": "tank",
+     "leg": false,
+     "win": 60.7
+    },
+    "acinus": {
+     "el": "nature",
+     "role": "tank",
+     "leg": false,
+     "win": 60.8
+    },
+    "sylvaneer": {
+     "el": "nature",
+     "role": "swift",
+     "leg": false,
+     "win": 51
+    },
+    "terraflora": {
+     "el": "nature",
+     "role": "mystic",
+     "leg": false,
+     "win": 53.7
+    },
+    "emberix": {
+     "el": "fire",
+     "role": "swift",
+     "leg": false,
+     "win": 74.7
+    },
+    "pyrokai": {
+     "el": "fire",
+     "role": "bruiser",
+     "leg": false,
+     "win": 83.7
+    },
+    "igniflare": {
+     "el": "fire",
+     "role": "bruiser",
+     "leg": false,
+     "win": 83.7
+    },
+    "pyrospark": {
+     "el": "fire",
+     "role": "mystic",
+     "leg": false,
+     "win": 75.3
+    },
+    "zephyr": {
+     "el": "wind",
+     "role": "swift",
+     "leg": false,
+     "win": 59.5
+    },
+    "voltar": {
+     "el": "dark",
+     "role": "mystic",
+     "leg": false,
+     "win": 73.8
+    },
+    "zeep": {
+     "el": "metal",
+     "role": "tank",
+     "leg": false,
+     "win": 57.8
+    },
+    "aimza": {
+     "el": "resonance",
+     "role": "mystic",
+     "leg": false,
+     "win": 72.5
+    },
+    "lumi": {
+     "el": "light",
+     "role": "mystic",
+     "leg": false,
+     "win": 63.3
+    },
+    "meta": {
+     "el": "metal",
+     "role": "mystic",
+     "leg": true,
+     "win": 63
+    },
+    "atem": {
+     "el": "metal",
+     "role": "bruiser",
+     "leg": true,
+     "win": 65.7
+    }
+   },
+   "el": {
+    "light": 64.8,
+    "dark": 78.4,
+    "water": 79.4,
+    "earth": 58.5,
+    "nature": 55.2,
+    "fire": 79.4,
+    "wind": 59.5,
+    "metal": 57.8,
+    "resonance": 72.5
+   },
+   "role": {
+    "balanced": 66.2,
+    "swift": 69.3,
+    "tank": 66,
+    "mystic": 68.9,
+    "bruiser": 74.6
+   }
+  },
+  "mod": {
+   "lines": {
+    "lumifern": {
+     "el": "light",
+     "role": "balanced",
+     "leg": false,
+     "win": 66.2
+    },
+    "umbrit": {
+     "el": "dark",
+     "role": "swift",
+     "leg": false,
+     "win": 83
+    },
+    "cannonis": {
+     "el": "water",
+     "role": "tank",
+     "leg": false,
+     "win": 84.8
+    },
+    "kairyu": {
+     "el": "water",
+     "role": "swift",
+     "leg": false,
+     "win": 78.5
+    },
+    "aquaflora": {
+     "el": "water",
+     "role": "mystic",
+     "leg": false,
+     "win": 75
+    },
+    "gaiaroki": {
+     "el": "earth",
+     "role": "bruiser",
+     "leg": false,
+     "win": 56.3
+    },
+    "pyrocell": {
+     "el": "earth",
+     "role": "tank",
+     "leg": false,
+     "win": 60.7
+    },
+    "acinus": {
+     "el": "nature",
+     "role": "tank",
+     "leg": false,
+     "win": 61
+    },
+    "sylvaneer": {
+     "el": "nature",
+     "role": "swift",
+     "leg": false,
+     "win": 52.5
+    },
+    "terraflora": {
+     "el": "nature",
+     "role": "mystic",
+     "leg": false,
+     "win": 54.3
+    },
+    "emberix": {
+     "el": "fire",
+     "role": "swift",
+     "leg": false,
+     "win": 74.7
+    },
+    "pyrokai": {
+     "el": "fire",
+     "role": "bruiser",
+     "leg": false,
+     "win": 83.7
+    },
+    "igniflare": {
+     "el": "fire",
+     "role": "bruiser",
+     "leg": false,
+     "win": 83.7
+    },
+    "pyrospark": {
+     "el": "fire",
+     "role": "mystic",
+     "leg": false,
+     "win": 75.3
+    },
+    "zephyr": {
+     "el": "wind",
+     "role": "swift",
+     "leg": false,
+     "win": 59.5
+    },
+    "voltar": {
+     "el": "dark",
+     "role": "mystic",
+     "leg": false,
+     "win": 73.8
+    },
+    "zeep": {
+     "el": "metal",
+     "role": "tank",
+     "leg": false,
+     "win": 58.7
+    },
+    "aimza": {
+     "el": "resonance",
+     "role": "mystic",
+     "leg": false,
+     "win": 81.5
+    },
+    "lumi": {
+     "el": "light",
+     "role": "mystic",
+     "leg": false,
+     "win": 63.3
+    },
+    "meta": {
+     "el": "metal",
+     "role": "mystic",
+     "leg": true,
+     "win": 63.3
+    },
+    "atem": {
+     "el": "metal",
+     "role": "bruiser",
+     "leg": true,
+     "win": 66.8
+    }
+   },
+   "el": {
+    "light": 64.8,
+    "dark": 78.4,
+    "water": 79.4,
+    "earth": 58.5,
+    "nature": 55.9,
+    "fire": 79.4,
+    "wind": 59.5,
+    "metal": 58.7,
+    "resonance": 81.5
+   },
+   "role": {
+    "balanced": 66.2,
+    "swift": 69.6,
+    "tank": 66.3,
+    "mystic": 70.5,
+    "bruiser": 74.6
+   }
+  }
+ }
+}

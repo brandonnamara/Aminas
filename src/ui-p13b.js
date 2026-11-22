@@ -51,7 +51,7 @@
     return '<div class="hx-slot busy' + (e.ready ? ' ready' : '') + (P.laid === i ? ' laid' : '') + '" data-slot="' + i + '">' + P.egg(egg.parents, { size: 26, crack: e.ready ? 1 : 0, cls: e.ready ? 'wob' : '' }) +
       '<div class="hx-sb"><b>Slot ' + (i + 1) + ' <span class="muted">· ' + esc(eggName(s, egg)) + '</span></b><div class="bar xp" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + Math.round(e.progress * 100) + '"><i style="width:' + Math.round(e.progress * 100) + '%"></i></div>' +
       '<small class="hx-left">' + (e.ready ? (full ? 'Ready, but there is no room (' + D.MAX_INSTANCES + ' Aminas at most)' : 'Ready to hatch') : leftText(e.left)) + '</small></div>' +
-      (e.ready ? '<button class="btn small gold" data-act="hHatch" data-i="' + i + '">' + I('egg') + 'Hatch</button>' : '') + '</div>';
+      (e.ready ? '<button class="btn small gold" data-act="hHatch" data-i="' + i + '">' + I('egg') + 'Hatch</button>' : R.hatchNowCost ? '<button class="btn small ghost hx-now" data-act="hHatchNow" data-i="' + i + '">' + I('gem') + 'Hatch now</button>' : '') + '</div>'; // Phase 17C
   }
   const slotsHtml = (s, n) => Array.from({ length: D.MAX_EGG_SLOTS }, (_, i) => slotRow(s, i, n)).join('');
   const stateChip = (x) => '<span class="hx-state s-' + x.state + '">' + H.STATE_NAME[x.state] + (x.state === 'ready' && x.ready > 1 ? ' · ' + x.ready : '') + '</span>';

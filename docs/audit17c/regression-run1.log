@@ -1,0 +1,173 @@
+baseline: 5 passed, 0 failed
+campaign: 60 passed, 0 failed
+migration v0.6: 22 passed, 0 failed
+modes: 41 passed, 0 failed
+forge: 53 passed, 0 failed
+dev8: 49 passed, 0 failed
+browser v0.6: 48 passed, 0 failed
+browser-dev7.test.js: FAILED
+  ok  the Old Forge is on the island
+  ok  tapping it opens its building panel with its name
+  ok  it is restored through the normal building system
+  ok  the Forge opens with exactly four tabs, in order: Crafting | Equipment | Equipment Merge | Equipment Shop
+  ok  Confirm pressed three times crafts one Driftwood Club and charges 120 gold once
+  ok  a second craft makes a second club
+  ok  higher recipes show as locked behind Forge level
+  ok  Equipment tab: equipping raises Kairyu’s battle attack (22 → 23)
+  ok  the equipped item is marked as equipped
+  ok  the merge preview shows the result (Ironbound Club, Tier II) before confirming
+  ok  it warns that one input is equipped and where the result goes
+  ok  merging (Confirm pressed twice) uses both clubs once and puts the Ironbound Club on Kairyu
+  ok  buying a Sun Charm charges 200 gold and adds it
+  ok  with too little gold the Buy buttons are disabled
+  ok  and pressing one changes nothing
+FAIL  the Forge closes
+  ok  after a reload: items, equipment, the Forge and gold are as left (ironclub,suncharm)
+  ok  no timers pile up across 6 screen changes (4 → 4 live intervals)
+  ok  hidden: every island animation is paused (0 running)
+  ok  back: the island animates again
+  ok  a still island (no input for a while) pauses its ambient decoration
+  ok  any touch wakes it
+  ok  idle 3D battle renders at the 30 fps budget (24.5 frames/s)
+  ok  hidden: the 3D view draws nothing and requests no frames
+  ok  after 6 more hide/show cycles there is still one render loop (25 frame requests in 1 s)
+  ok  leaving the battle stops the 3D loop
+  ok  667×375: the Forge fits the screen and its tabs are touch-sized
+  ok  932×430: the Forge fits the screen and its tabs are touch-sized
+  ok  portrait: the game asks to rotate (landscape game)
+  ok  no script errors
+
+browser dev7: 29 passed, 1 failed
+
+browser dev8: 42 passed, 0 failed
+browser env1: 20 passed, 0 failed
+browser env1.2: 10 passed, 0 failed
+browser library: 11 passed, 0 failed
+PASSED: 19 passed, 0 failed (browser-env3)
+PASSED: 10 passed, 0 failed (browser-env4)
+PASSED: 12 passed, 0 failed (browser-ui5)
+PASSED: 45 passed, 0 failed (browser-ui6)
+PASSED: 30 passed, 0 failed (browser-arena7)
+PASSED: 31 passed, 0 failed (browser-bench-battle)
+browser-perf-fix.test.js: FAILED
+  ok  with no evidence the page is assumed to get 60 fps (exactly the earlier rule)
+  ok  a steady 60 fps page is read as 60 fps
+  ok  a steady 30 fps page is read as 30 fps
+  ok  a 30 fps page with the odd late frame is still read as 30 fps
+  ok  a 120 Hz screen changes nothing (budgets never go below a 60 fps frame)
+  ok  irregular, janky frames are not mistaken for a capped page
+  ok  the estimate follows the page back to 60 fps (e.g. Low Power Mode turned off)
+       60 fps page, light frames: {"prStart":2,"prEnd":2,"display":{"fps":60,"steady":true,"samples":40},"saverWouldStart":0,"firstWhy":null,"lowered":0,"judged":3,"slowPct":0,"fps":60,"saverNow":false}
+  ok  a healthy 60 fps 3D view stays at full resolution (2x) with no Battery saver (as before)
+       30 fps page, light frames: {"prStart":2,"prEnd":2,"display":{"fps":30,"steady":true,"samples":40},"saverWouldStart":0,"firstWhy":null,"lowered":0,"judged":3,"slowPct":0,"fps":30,"saverNow":false}
+  ok  a 3D view on a page capped at 30 fps reads the page as 30 fps
+  ok  and draws a steady ~30 fps (30)
+  ok  steady 30 fps frames are not counted as slow during moves (0% slow; the old rule counted ~88% on the iPhone)
+  ok  stable 30 fps does not lower the resolution (stays at 2x)
+  ok  stable 30 fps does not switch Battery saver on
+       60 fps page, struggling  : {"prStart":2,"prEnd":1.75,"display":{"fps":20,"steady":true,"samples":40},"saverWouldStart":0,"firstWhy":null,"lowered":1,"judged":7,"slowPct":14,"fps":19.4,"saverNow":false}
+FAIL  a device that is really struggling at 60 fps first steps its resolution down (2x → 1x, 1 steps)
+FAIL  and, still slow at 1x, switches Battery saver on
+FAIL  its heavy frames do not talk the estimate down to a lower frame rate
+FAIL  the reason is recorded (view, slow frames, the page frame rate it judged against)
+       30 fps page, struggling  : {"prStart":2,"prEnd":1,"display":{"fps":30,"steady":true,"samples":34},"saverWouldStart":2,"firstWhy":{"at":36477,"view":"viewer:lumifern","windowMs":1583,"frames":15,"slowFrames":15,"quickFrames":0,"pixelRatio":1,"cap":2,"targetFps":60,"displayFps":30,"boosting":true,"result":"battery-saver"},"lowered":4,"judged":6,"slowPct":100,"fps":9.4,"saverNow":false}
+  ok  on a 30 fps page, frames slower than 30 fps still lower the resolution and trigger Battery saver
+       30 fps, GPU always behind: {"prStart":2,"prEnd":1,"display":{"fps":60,"steady":false,"samples":0},"saverWouldStart":3,"firstWhy":{"at":48460,"view":"viewer:lumifern","windowMs":1533,"frames":46,"slowFrames":46,"quickFrames":0,"pixelRatio":1,"cap":2,"targetFps":60,"displayFps":60,"boosting":true,"result":"battery-saver"},"lowered":4,"judged":7,"slowPct":100,"fps":30,"saverNow":false}
+  ok  frames that come at 30 fps because the GPU cannot keep up are still caught (no evidence of a capped page)
+  ok  island Auto quality: a steady 30 fps page stays on High; frames slower than that still step down to Balanced
+  ok  island Auto quality on a 60 fps page works exactly as before
+  ok  returning to the app starts a fresh estimate
+  ok  no script errors
+FAILED: 19 passed, 4 failed (browser-perf-fix)
+
+PASSED: 38 passed, 0 failed (browser-showcase8)
+PASSED: 38 passed, 0 failed (browser-p8fix)
+PASSED: 47 passed, 0 failed (browser-roster8b)
+raid12a: 31 passed, 0 failed
+PASSED: 18 passed, 0 failed (browser-raid12a)
+hideseek: 60 passed, 0 failed
+PASSED: 41 passed, 0 failed (browser-hideseek)
+hideseek12c: 30 passed, 0 failed
+PASSED: 58 passed, 0 failed (browser-hideseek12c)
+progression13a: 40 passed, 0 failed
+browser-progress13a.test.js: FAILED
+  ok  the details screen shows level and experience at the top: Lv 11, “219 / 249 XP · 30 to Lv 12”
+  ok  each feed says its cost and benefit before it is used (“Berry Snack 3 → +18 XP”, “Honey Feast 10 → +70 XP · Lv 12”), with the food in hand (33)
+  ok  and how far evolution is: “Evolves at Lv 12 (1 level, 30 XP to go).”
+  ok  Battle shows the four stats with the gain the next level brings (HP 96 +5)
+  ok  a Berry Snack takes 3 food and gives 18 XP (food 33 → 30, XP 219 → 237)
+  ok  the gain is reported in place (“+18 XP · 3 food used”), the numbers update, and nothing pops up over the screen
+  ok  feeding keeps the screen open on the same Amina, the same tab and the same scroll position (the page is updated, not rebuilt)
+  ok  the experience bar slides to its new length (0.4s)
+  ok  a Honey Feast takes 10 food and carries the extra XP over the level-up (Lv 12, 58 XP, food 20)
+  ok  the level-up is announced in place with every stat gain: “Level up! Lv 11 → 12 · HP +5 · ATK +1 · DEF +1 · SPD +1”
+  ok  level, stats and the list below all show the new level (HP 101)
+  ok  the “ready to evolve” notice waits while the level-up is shown (they used to land on top of each other)
+  ok  the evolution prompt shows what will change before you decide: HP101→143+42, ATK24→35+11, DEF22→30+8, SPD22→28+6; “A new signature move replaces Sun Sprout and keeps its level (Lv 1).”
+  ok  Evolve (even double-tapped) evolves once: Lumifern II, level and XP kept, 60 gold and 15 food spent once
+  ok  the ceremony ends on the new form, by name, with its stage (“Stage 2 of 3 · Lv 12 kept”)
+  ok  and shows what changed: HP101→143+42, ATK24→35+11, DEF22→30+8, SPD22→28+6; “New move: Radiant Burst (Lv 1, Power 70) replaces Sun Sprout.”
+  ok  nothing else talks over the ceremony, and it fits the screen with its button
+  ok  the Entity’s remark follows once the ceremony is closed
+  ok  the details screen now shows Lumifern II at the same level, with its new move and the next evolution (“Evolves at Lv 22 (10 levels, 4,784 XP to go).”)
+  ok  Growth lists the next evolution’s requirements and what is still missing: “no:Level 22 (now Lv 12 · 10 levels, 4,784 XP to go)” · “no:160 gold (you have 440) · 40 food (you have 5, 35 short)”
+  ok  a third-stage Amina is shown as the final form
+  ok  when food is short the buttons say how much more is needed (“Berry Snack 3 · need 1 more”)
+  ok  a feed without enough food spends nothing and says why, on the screen: “Not enough food: Honey Feast needs 10, you have 2 (8 short). Berry farms and rewards give food.”
+  ok  at the highest level the strip says Max level, shows no further stat gain, and the feeds are switched off
+  ok  with one Lumifern left (the other evolved), its page shows that one (Lv 3)
+  ok  feeding it feeds that one only
+  ok  with two, the strip shows the higher one and marks it in the list
+  ok  tapping the other one in the list shows that one in the strip
+  ok  and the strip stays on it after feeding
+FAIL  Moves shows all five levels of each move with its effect and essence cost (Glow Pulse: Lv 1 40 | Lv 2 43 10 | Lv 3 47 25 | Lv 4 51 50 | Lv 5 55 90)
+  ok  with the current effect, the next one, and the essence in hand against the cost before upgrading (“12 / 10 Light EssenceUpgrade · 10”)
+  ok  a move upgrade is confirmed on the move itself: name, new level and the improvement (“Glow Pulse upgraded to Lv 2: Power 40 → Power 43 · 10 Light Essence used”)
+  ok  with no full-screen banner
+  ok  and the same Amina, tab and scroll position (tab “Moves”, scroll 60)
+  ok  an upgrade costs exactly the essence shown (12 → 2) and the track moves on to Lv 2
+  ok  when essence is short it says how much more is needed and where it comes from
+  ok  equipment bonuses are shown inside the stats (ATK 37, of which +2 from the Driftwood Club)
+  ok  with Reduce Motion the bar and messages change without animation, and feeding works the same
+  ok  feeding the companion from the island still shows the level-up banner (now with SPD), and the evolution notice no longer covers it
+  ok  the collection, an undiscovered Amina’s page and the PvP menu open as before
+  ok  no script errors
+FAILED: 40 passed, 1 failed (browser-progress13a)
+
+hatchery13b: 41 passed, 0 failed
+PASSED: 35 passed, 0 failed (browser-hatchery13b)
+gear13c: 46 passed, 0 failed
+PASSED: 39 passed, 0 failed (browser-gear13c)
+economy13d: 14 passed, 0 failed
+PASSED: 5 passed, 0 failed (browser-rewards13d)
+PASSED: 31 passed, 0 failed (browser-models14)
+PASSED: 16 passed, 0 failed (browser-world14)
+40 passed, 0 failed
+browser-roster15b: 37 passed, 0 failed
+browser-combat15c: 33 passed, 0 failed
+browser-final15d: 37 passed, 0 failed
+PASSED: 12 passed, 0 failed (browser-intro14)
+onboard16: 37 passed, 0 failed
+69 passed, 0 failed (browser-onboard16)
+savefile16b: 47 passed, 0 failed
+34 passed, 0 failed (browser-polish16b)
+20 passed, 0 failed (browser-stability16c)
+combat17b: 31 passed, 0 failed
+rewards17b: 39 passed, 0 failed
+browser-combat17b.test.js: FAILED
+  ok  a cleared dungeon: "Fight the boss again · battle reward only", and its replay reward
+  ok  party picker, guardian not met: its title and an answer to Kiln Flare, no element ( The Kiln Mother Not met yet: its element shows here once you have faced it.You can guard when it charges Kiln Flare.)
+  ok  once met: its element, what it is weak to and what it resists, as element chips
+  ok  advice for the chosen party: Reefback hits its weakness; Berrant’s kept Leaf Guard answers the charge
+  ok  the brief fits inside the screen
+  ok  Berrant (Acinus II) shows Vine Whip, Verdant Crash, its kept Leaf Guard, and Switch
+  ok  four buttons in two rows of two: nothing overlaps or leaves the screen
+  ok  the kept move and Switch share the second row
+FAIL  guarding a hit readies a counter, and the battle log says so (events: use:p guard:p use:e hit:p counter:p reflect:e)
+  ok  no script errors
+
+FAILED: 9 passed, 1 failed (browser-combat17b)
+
+progression17c: 48 passed, 0 failed
+14 passed, 0 failed (browser-progression17c)
+EXIT 1

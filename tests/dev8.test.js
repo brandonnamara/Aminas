@@ -61,7 +61,8 @@ ok(d5 > d1 && d5 / d1 > 1.25, 'a Level 5 move deals more real damage than Level 
   ok(pebble < plain, 'the upgraded guard blocks more than the Level 1 guard (' + plain + ' → ' + pebble + ')'); }
 { const s2 = play(); R.addAmina(s2, 'aimza', 10); const am = s2.aminas[1]; am.mv = [1, 5];
   const f = R.partyFighter(s2, am); f.hp = 1; const b = B.create([f], B.fighter('gaiaroki', 1), { rng: seeded(3) }); const evs = B.act(b, { t: 'ab', id: 'hum' });
-  const heal = evs.find((x) => x.t === 'heal' && x.who === 'p'); ok(heal && heal.amt === Math.round(f.hpMax * 0.4), 'a Level 5 healing move restores 40% at once'); }
+  const heal = evs.find((x) => x.t === 'heal' && x.who === 'p'); // Phase 17C (approved): heals are 5 points stronger at every level, so Level 5 restores 45% (40% before)
+  ok(heal && heal.amt === Math.round(f.hpMax * D.MOVE_LEVELS.heal[5]) && D.MOVE_LEVELS.heal[5] === 0.45, 'a Level 5 healing move restores 45% at once'); }
 ok(R.partyFighter(play(), play().aminas[0]).mvl.glowpulse === 1 && dmgAt(1) === dmgAt(1), 'Level 1 moves behave exactly as before');
 
 /* ---------- habitat production ---------- */

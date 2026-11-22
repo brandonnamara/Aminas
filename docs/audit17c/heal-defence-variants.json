@@ -1,0 +1,281 @@
+{
+ "17B": {
+  "defensive": [
+   55.5,
+   79.8
+  ],
+  "healStatus": [
+   67.3,
+   90
+  ],
+  "balanced": [
+   68.5,
+   94.5
+  ],
+  "swiftWind": [
+   68.5,
+   92.8
+  ],
+  "basic": [
+   16.8,
+   75.3
+  ],
+  "defensiveGuardCycle": [
+   51.5,
+   79.8
+  ],
+  "balancedGuardCycle": [
+   68.5,
+   94.5
+  ],
+  "healValue": -0.5
+ },
+ "heal +5%": {
+  "defensive": [
+   55.5,
+   79.8
+  ],
+  "healStatus": [
+   67.3,
+   90.5
+  ],
+  "balanced": [
+   68.5,
+   94.5
+  ],
+  "swiftWind": [
+   68.5,
+   92.8
+  ],
+  "basic": [
+   16.8,
+   75.3
+  ],
+  "defensiveGuardCycle": [
+   51.5,
+   79.8
+  ],
+  "balancedGuardCycle": [
+   68.5,
+   94.5
+  ],
+  "healValue": 1.7
+ },
+ "regen 3 turns": {
+  "defensive": [
+   55.5,
+   79.8
+  ],
+  "healStatus": [
+   66.8,
+   89.8
+  ],
+  "balanced": [
+   68.5,
+   94.5
+  ],
+  "swiftWind": [
+   68.5,
+   92.8
+  ],
+  "basic": [
+   16.8,
+   75.3
+  ],
+  "defensiveGuardCycle": [
+   51.5,
+   79.8
+  ],
+  "balancedGuardCycle": [
+   68.5,
+   94.5
+  ],
+  "healValue": -0.2
+ },
+ "heal +5% & regen 3": {
+  "defensive": [
+   55.5,
+   79.8
+  ],
+  "healStatus": [
+   67.5,
+   90.5
+  ],
+  "balanced": [
+   68.5,
+   94.5
+  ],
+  "swiftWind": [
+   68.5,
+   92.8
+  ],
+  "basic": [
+   16.8,
+   75.3
+  ],
+  "defensiveGuardCycle": [
+   51.5,
+   79.8
+  ],
+  "balancedGuardCycle": [
+   68.5,
+   94.5
+  ],
+  "healValue": 2.2
+ },
+ "tank counter 60%": {
+  "defensive": [
+   58.5,
+   79.8
+  ],
+  "healStatus": [
+   67.3,
+   90
+  ],
+  "balanced": [
+   68.3,
+   94.5
+  ],
+  "swiftWind": [
+   68.5,
+   92.8
+  ],
+  "basic": [
+   16.8,
+   75.3
+  ],
+  "defensiveGuardCycle": [
+   58.8,
+   84
+  ],
+  "balancedGuardCycle": [
+   68.3,
+   94.5
+  ],
+  "healValue": 0
+ },
+ "guard recoil 25%": {
+  "defensive": [
+   58.8,
+   79.8
+  ],
+  "healStatus": [
+   67,
+   90
+  ],
+  "balanced": [
+   68.3,
+   94.5
+  ],
+  "swiftWind": [
+   68.5,
+   92.8
+  ],
+  "basic": [
+   16.8,
+   75
+  ],
+  "defensiveGuardCycle": [
+   58.3,
+   85.3
+  ],
+  "balancedGuardCycle": [
+   68.3,
+   94.5
+  ],
+  "healValue": 0.3
+ },
+ "guard recoil 40%": {
+  "defensive": [
+   58.3,
+   81
+  ],
+  "healStatus": [
+   66.8,
+   90
+  ],
+  "balanced": [
+   68.3,
+   94.5
+  ],
+  "swiftWind": [
+   68.5,
+   92.8
+  ],
+  "basic": [
+   17.3,
+   74.8
+  ],
+  "defensiveGuardCycle": [
+   63,
+   88.8
+  ],
+  "balancedGuardCycle": [
+   68.3,
+   94.5
+  ],
+  "healValue": -0.8
+ },
+ "recoil 25% & tank counter 50%": {
+  "defensive": [
+   58.8,
+   81
+  ],
+  "healStatus": [
+   67,
+   90
+  ],
+  "balanced": [
+   68.3,
+   94.5
+  ],
+  "swiftWind": [
+   68.5,
+   92.8
+  ],
+  "basic": [
+   16.3,
+   75
+  ],
+  "defensiveGuardCycle": [
+   64.3,
+   89
+  ],
+  "balancedGuardCycle": [
+   68.3,
+   94.5
+  ],
+  "healValue": -0.5
+ },
+ "heal +5% & regen 3 & recoil 25%": {
+  "defensive": [
+   58.8,
+   79.8
+  ],
+  "healStatus": [
+   67.3,
+   90.5
+  ],
+  "balanced": [
+   68.3,
+   94.5
+  ],
+  "swiftWind": [
+   68.5,
+   92.8
+  ],
+  "basic": [
+   16.8,
+   75
+  ],
+  "defensiveGuardCycle": [
+   58.3,
+   85.3
+  ],
+  "balancedGuardCycle": [
+   68.3,
+   94.5
+  ],
+  "healValue": 3
+ }
+}

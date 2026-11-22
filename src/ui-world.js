@@ -505,9 +505,11 @@
             return '<button class="prodopt' + (on ? ' on' : '') + '" role="radio" aria-checked="' + on + '" data-act="setProd" data-id="' + id + '" data-k="' + k + '">' + I(k) + '<b>' + esc(W.kindName(k) === 'gold' ? 'Gold' : W.kindName(k)) + '</b><small>' + (rate ? (rate < 1 ? rate.toFixed(2) : rate.toFixed(1)) + ' / min' : 'needs a resident') + ' · stores ' + ld.capMin + ' min</small>' + (on ? '<em>Active</em>' : '') + '</button>'; }).join('') + '</div>' +
             '<p class="muted small-t">Switching collects whatever is stored first, in the resource it was made as. Nothing is lost or converted.</p>';
         }
-        body += '<div class="kv"><b>Produces:</b> ' + (per ? (per < 1 ? per.toFixed(2) : per.toFixed(1)) + ' ' + kn + ' / min' : '<span class="bad">nothing yet</span>' + (d.perResident ? ' — it needs a resident.' : '')) + '</div>';
+        const ml0 = W.moonlight && W.prodKind(b) === 'gems' ? W.moonlight(s, b) : null; body += '<div class="kv"><b>Produces:</b> ' + (per ? (per < 1 ? per.toFixed(2) : per.toFixed(1)) + ' ' + kn + ' / min' + (ml0 ? ', up to ' + ml0.cap + ' a day' : '') : '<span class="bad">nothing yet</span>' + (d.perResident ? ' — it needs a resident.' : '')) + '</div>';
         body += '<div class="kv"><b>Ready:</b> ' + fmt(stock) + ' / ' + fmt(cap) + ' ' + kn + '<div class="bar"><i style="width:' + pct(stock, cap) + '%"></i></div></div>';
         if (d.affinity && d.affinity.length && d.perResident) body += '<div class="kv muted">+50% for ' + d.affinity.map((e) => D.ELEMENTS[e].name).join(' or ') + ' residents.</div>';
+        // Phase 17C: the Moon Shrine's daily moonlight
+        const ml = W.moonlight && W.moonlight(s, b); if (ml && W.prodKind(b) === 'gems') body += '<div class="kv"><b>Moonlight today:</b> ' + fmt(Math.floor(ml.made)) + ' / ' + ml.cap + ' gems' + (ml.left <= 0 ? ' <span class="muted">· it rests until midnight</span>' : '') + '<div class="muted small-t">Residents make it faster, but it condenses at most ' + ml.cap + ' gems a day (more at higher levels). Nothing is lost while you are away: what it made stays stored until you collect it.</div></div>';
         foot += '<button class="btn gold ' + (stock >= 1 ? '' : 'off') + '" data-act="collectB" data-id="' + id + '" data-hl="collect">' + ic + 'Collect ' + (stock >= 1 ? fmt(stock) : '') + '</button>';
       }
       if (d.perResident && b.level >= 1) {

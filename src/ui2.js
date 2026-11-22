@@ -483,6 +483,7 @@
         case 'guard': if (e.who === 'p') d.pGuard = true; else d.eGuard = true; bLog(nameOf(e.who) + ' braces for impact.'); bRender(); await sleep(450); break;
         // Phase 17B: a guard that took a hit readies a counter; healing clears what wore the Amina down
         case 'hold': floatAt('e', 'Sputters!', 'status'); bLog(e.name + ' is soaked: ' + e.abName + ' sputters and waits a turn.'); await sleep(620); break;
+        case 'reflect': if (e.who === 'p') d.pHp = e.hp; else d.eHp = e.hp; floatAt(e.who, '-' + e.dmg, 'status', 'Recoil'); Au.play('hit'); bLog(nameOf(e.who) + ' is caught by the guard’s recoil.'); bRender(); await sleep(440); break;
         case 'counter': floatAt(e.who, 'Counter ready', 'status'); bLog(nameOf(e.who) + ' held firm and is ready to strike back!'); bRender(); await sleep(420); break;
         case 'cleanse': if (e.who === 'p') d.pWeak = e.weak; else d.eWeak = e.weak; floatAt(e.who, 'Cleansed', 'heal'); bLog(nameOf(e.who) + ' shakes off what was wearing it down.'); bRender(); await sleep(380); break;
         case 'weak': if (e.who === 'p') d.pWeak = (d.pWeak || 0) + 1; else d.eWeak = (d.eWeak || 0) + 1; floatAt(e.who, 'ATK down', 'status'); bLog(nameOf(e.who) + '’s attack fell!'); bRender(); await sleep(450); break;
@@ -583,7 +584,7 @@
     const rows = out.xp.map((x, i) => {
       const lvl = x.levels.length ? '<div class="lvlup">' + I('xp') + ' Level up! Lv ' + x.levels[0].from + ' → ' + x.levels[x.levels.length - 1].to + '</div>' : '';
       const evo = x.evoReady ? '<div class="lvlup evo">' + I('spark') + ' Ready to evolve (you choose when)</div>' : '';
-      return '<div class="xprow' + (x.alive ? ' cheer' : ' down') + '" style="--i:' + i + '"><div class="art">' + Art.portrait(x.sp) + '</div><div class="grow"><b>' + esc(D.SPECIES[x.sp].name) + '</b> <span class="muted">+' + x.gained + ' xp' + (x.alive ? '' : ' (fainted: half)') + '</span>' + lvl + evo + '</div></div>';
+      return '<div class="xprow' + (x.alive ? ' cheer' : ' down') + '" style="--i:' + i + '"><div class="art">' + Art.portrait(x.sp) + '</div><div class="grow"><b>' + esc(D.SPECIES[x.sp].name) + '</b> <span class="muted">+' + x.gained + ' xp' + (x.alive ? '' : ' (fainted: half)') + (x.scaled ? ' · ' + Math.round(x.scaled * 100) + '%: the foe was ' + x.gap + ' levels below' : '') + '</span>' + lvl + evo + '</div></div>';
     }).join('');
     const groups = [];
     const spoils = [{ k: 'gold', n: out.gold }, { k: 'food', n: out.food }];

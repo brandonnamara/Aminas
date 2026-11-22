@@ -43,10 +43,11 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms)); const SHOTS = proce
   ok(Math.abs(lay.bs[2].t - lay.bs[3].t) < 2 && lay.bs[3].t > lay.bs[0].t + 5, 'the kept move and Switch share the second row');
   await shot('battle-three-moves');
   // guard, take the hit, see the counter message
-  await ev(() => { A.UI.B.b.rng = () => 0.99; const B = A.Rules.Battle, act0 = B.act; window.__ev = []; B.act = function () { const r = act0.apply(this, arguments); window.__ev.push(...r.map((e) => e.t + (e.who ? ':' + e.who : ''))); return r; }; document.querySelector('#b-actions .abtn[data-id="leafguard"]').click(); });
+  await ev(() => { A.UI.B.b.rng = () => 0.99; const B = A.Rules.Battle, act0 = B.act; window.__ev = []; window.__log = []; const lg = document.querySelector('#b-log'); new MutationObserver(() => window.__log.push(lg.textContent)).observe(lg, { childList: true, subtree: true, characterData: true }); B.act = function () { const r = act0.apply(this, arguments); window.__ev.push(...r.map((e) => e.t + (e.who ? ':' + e.who : ''))); return r; }; document.querySelector('#b-actions .abtn[data-id="leafguard"]').click(); });
   await until(() => !A.UI.B.busy && document.querySelector('#b-actions .abtn.ready'), null, 30000);
   const evT = await ev(() => window.__ev.join(' '));
-  const logT = await ev(() => document.querySelector('#b-log').textContent);
+  // Phase 17C: guard recoil now follows the counter message in the log, so read every line shown, not just the last.
+  const logT = await ev(() => window.__log.join(' | ') + ' | ' + document.querySelector('#b-log').textContent);
   ok(/hit:p counter:p/.test(evT) && /ready to strike back/.test(logT), 'guarding a hit readies a counter, and the battle log says so (events: ' + evT + ')');
   await shot('battle-counter');
   await ev(() => { A.UI.leaveBattle(() => {}); A.Rules.abandonRun(A.State.state); });

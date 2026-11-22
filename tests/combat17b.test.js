@@ -11,7 +11,8 @@ ok(R.retainedMove('acinus') === null && R.retainedMove('berrant') === 'leafguard
 ok(R.retainedMove('duskmantle') === 'gloomveil' && R.retainedMove('aeolus') === 'cyclonespin' && R.retainedMove('aimza2') === 'hum' && R.retainedMove('zeep3') === 'ironwall', 'Dark and Wind keep their attack-lowering move, Resonance its heal, Metal its guard');
 ok(D.ROSTER.filter((s) => s.stage > 1).every((s) => R.retainedMove(s.id)), 'every evolved form keeps one');
 const pf = party('berrant', 14); ok(pf.abil.length === 3 && pf.abil[2] === 'leafguard' && pf.cd.leafguard === 0 && pf.retained === 'leafguard', 'your evolved Amina fights with three moves (its two plus the kept one)');
-ok(D.SPECIES.berrant.abil.length === 2 && R.moveLevels(inst('berrant', 14)).leafguard === undefined, 'species data and the two upgradable move slots are unchanged');
+// Phase 17C: the kept move has its own (third) upgradable slot; before 17C it was always Level 1 and not in moveLevels
+ok(D.SPECIES.berrant.abil.length === 2 && R.moveLevels(inst('berrant', 14)).leafguard === 1 && inst('berrant', 14).mv.length === 2, 'species data unchanged; the kept move reads Level 1 from an unupgraded third slot');
 ok(B.fighter('berrant', 14).abil.length === 2 && R.enemyFromSpec({ sp: 'berrant', lv: 14 }).abil.length === 2, 'foes keep their two moves');
 ok(party('acinus', 5).abil.length === 2, 'a first form is unchanged');
 
@@ -23,7 +24,8 @@ ok(!B.usable(B.cur(b), 'leafguard'), 'and the guard move recharges: no guarding 
 const e0 = b.enemy.hp; b.rng = () => 0.5; ev = B.act(b, { t: 'ab', id: 'vinewhip' }); const hitC = e0 - b.enemy.hp;
 ok(!B.cur(b).counter, 'the counter is spent by the next attack');
 const b2 = B.create([party('berrant', 14)], B.fighter('gaiaroki', 14), { rng: () => 0.5 }); b2.enemy.hp = e0; B.act(b2, { t: 'ab', id: 'vinewhip' }); const hitN = e0 - b2.enemy.hp;
-ok(hitC > hitN && Math.abs(hitC / hitN - 1.3) < 0.08, 'a counter hits about 30% harder (' + hitN + ' → ' + hitC + ')');
+// Berrant is a tank: from Phase 17C a tank's counter is 50% (30% for other roles)
+ok(hitC > hitN && Math.abs(hitC / hitN - (1 + C.tankCounter)) < 0.08, 'a tank’s counter hits about 50% harder (' + hitN + ' → ' + hitC + ')');
 
 
 /* ---------- heal: cleanse and brace ---------- */

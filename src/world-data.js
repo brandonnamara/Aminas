@@ -56,7 +56,7 @@
     moonshrine: { name: 'Moon Shrine', cat: 'story', story: true, w: 2, h: 2, canMove: true, canStore: false, req: { struct: 'tidegate' },
       produces: 'gems', perResident: true, affinity: ['dark', 'light'], art: 'moonshrine',
       desc: 'A hilltop shrine, half swallowed by ivy. Its resident slowly condenses gems from moonlight. Opens the Dusk Grove.',
-      levels: [L(130, 0, { rate: 0.25, capMin: 40, capacity: 1 }), L(800, 300, { rate: 0.3, capMin: 60, capacity: 1 }), L(2400, 900, { rate: 0.35, capMin: 90, capacity: 2 }), L(6000, 1800, { rate: 0.4, capMin: 120, capacity: 2 })] },
+      levels: [L(130, 0, { rate: 0.25, capMin: 40, capacity: 1, dayCap: 6 }), L(800, 300, { rate: 0.3, capMin: 60, capacity: 1, dayCap: 9 }), L(2400, 900, { rate: 0.35, capMin: 90, capacity: 2, dayCap: 13 }), L(6000, 1800, { rate: 0.4, capMin: 120, capacity: 2, dayCap: 18 })] }, // Phase 17C: dayCap = moonlight, the most gems it condenses in a day
     hatchery: { name: 'Old Hatchery', cat: 'story', story: true, w: 3, h: 3, canMove: true, canStore: false, req: { struct: 'tidegate' }, art: 'hatchery',
       desc: 'A dome of cracked shell-stone. Restores breeding. Every upgrade adds one more breeding slot and shortens incubation.',
       levels: [L(110, 0, { eggTime: 1, slots: 1 }), L(500, 120, { eggTime: 0.85, slots: 2 }), L(1500, 600, { eggTime: 0.7, slots: 3 }), L(4000, 1500, { eggTime: 0.55, slots: 4 }), L(9000, 3000, { eggTime: 0.4, slots: 5 })] },

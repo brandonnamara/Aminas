@@ -1,0 +1,12 @@
+{
+ "17B": {
+  "withHeal": 63.2,
+  "neverHeal": 63.7,
+  "value": -0.5
+ },
+ "17C": {
+  "withHeal": 68.7,
+  "neverHeal": 66.3,
+  "value": 2.3
+ }
+}

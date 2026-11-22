@@ -1,0 +1,1726 @@
+{
+ "base": [
+  {
+   "id": "forgottenroad",
+   "rec": 4,
+   "battles": [
+    {
+     "i": 0,
+     "sp": "gaiaroki",
+     "lv": 2,
+     "power": 0.83,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 1,
+     "sp": "terraflora",
+     "lv": 2,
+     "power": 0.74,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 2,
+     "sp": "gaiaroki",
+     "lv": 3,
+     "power": 0.97,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 3,
+     "sp": "acinus",
+     "lv": 3,
+     "power": 0.84,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 4,
+     "sp": "gaiaroki",
+     "lv": 3,
+     "power": 0.97,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 5,
+     "sp": "acinus",
+     "lv": 3,
+     "power": 0.84,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 6,
+     "sp": "sylvaneer",
+     "lv": 4,
+     "power": 0.92,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 7,
+     "sp": "gaiaroki",
+     "lv": 4,
+     "power": 1.19,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 8,
+     "sp": "sylvaneer",
+     "lv": 4,
+     "power": 0.92,
+     "move": null,
+     "herald": true
+    },
+    {
+     "i": 9,
+     "sp": "gaiaroki",
+     "lv": 4,
+     "power": 1.55,
+     "move": null,
+     "herald": false
+    }
+   ]
+  },
+  {
+   "id": "gatheringhall",
+   "rec": 5,
+   "battles": [
+    {
+     "i": 0,
+     "sp": "acinus",
+     "lv": 3,
+     "power": 0.73,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 1,
+     "sp": "gaiaroki",
+     "lv": 3,
+     "power": 0.84,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 2,
+     "sp": "voltar",
+     "lv": 4,
+     "power": 0.88,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 3,
+     "sp": "voltar",
+     "lv": 4,
+     "power": 0.88,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 4,
+     "sp": "voltar",
+     "lv": 4,
+     "power": 0.88,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 5,
+     "sp": "voltar",
+     "lv": 4,
+     "power": 0.88,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 6,
+     "sp": "terraflora",
+     "lv": 5,
+     "power": 1.08,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 7,
+     "sp": "acinus",
+     "lv": 5,
+     "power": 1,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 8,
+     "sp": "terraflora",
+     "lv": 5,
+     "power": 1.08,
+     "move": "lampsout",
+     "herald": true
+    },
+    {
+     "i": 9,
+     "sp": "voltar",
+     "lv": 7,
+     "power": 2.16,
+     "move": "lampsout",
+     "herald": false
+    }
+   ]
+  },
+  {
+   "id": "reliquary",
+   "rec": 6,
+   "battles": [
+    {
+     "i": 0,
+     "sp": "acinus",
+     "lv": 3,
+     "power": 0.63,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 1,
+     "sp": "gaiaroki",
+     "lv": 3,
+     "power": 0.72,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 2,
+     "sp": "acinus",
+     "lv": 4,
+     "power": 0.75,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 3,
+     "sp": "terraflora",
+     "lv": 4,
+     "power": 0.76,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 4,
+     "sp": "acinus",
+     "lv": 4,
+     "power": 0.75,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 5,
+     "sp": "terraflora",
+     "lv": 4,
+     "power": 0.76,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 6,
+     "sp": "sylvaneer",
+     "lv": 5,
+     "power": 0.85,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 7,
+     "sp": "acinus",
+     "lv": 5,
+     "power": 0.86,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 8,
+     "sp": "sylvaneer",
+     "lv": 5,
+     "power": 0.85,
+     "move": "rootcrush",
+     "herald": true
+    },
+    {
+     "i": 9,
+     "sp": "terraki",
+     "lv": 6,
+     "power": 2.61,
+     "move": "rootcrush",
+     "herald": false
+    }
+   ]
+  },
+  {
+   "id": "drownedsteps",
+   "rec": 8,
+   "battles": [
+    {
+     "i": 0,
+     "sp": "cannonis",
+     "lv": 6,
+     "power": 0.77,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 1,
+     "sp": "sylvaneer",
+     "lv": 6,
+     "power": 0.75,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 2,
+     "sp": "gaiaroki",
+     "lv": 7,
+     "power": 1.06,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 3,
+     "sp": "kairyu",
+     "lv": 7,
+     "power": 0.84,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 4,
+     "sp": "gaiaroki",
+     "lv": 7,
+     "power": 1.06,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 5,
+     "sp": "kairyu",
+     "lv": 7,
+     "power": 0.84,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 6,
+     "sp": "cannonis",
+     "lv": 8,
+     "power": 1,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 7,
+     "sp": "cannonis",
+     "lv": 8,
+     "power": 1,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 8,
+     "sp": "cannonis",
+     "lv": 8,
+     "power": 1,
+     "move": "undertow",
+     "herald": true
+    },
+    {
+     "i": 9,
+     "sp": "kairyu",
+     "lv": 10,
+     "power": 1.84,
+     "move": "undertow",
+     "herald": false
+    }
+   ]
+  },
+  {
+   "id": "coldkiln",
+   "rec": 10,
+   "battles": [
+    {
+     "i": 0,
+     "sp": "pyrokai",
+     "lv": 8,
+     "power": 0.99,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 1,
+     "sp": "emberix",
+     "lv": 8,
+     "power": 0.79,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 2,
+     "sp": "igniflare",
+     "lv": 9,
+     "power": 1.1,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 3,
+     "sp": "pyrocell",
+     "lv": 9,
+     "power": 0.89,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 4,
+     "sp": "igniflare",
+     "lv": 9,
+     "power": 1.1,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 5,
+     "sp": "pyrocell",
+     "lv": 9,
+     "power": 0.89,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 6,
+     "sp": "pyrokai",
+     "lv": 10,
+     "power": 1.21,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 7,
+     "sp": "pyrokai",
+     "lv": 10,
+     "power": 1.21,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 8,
+     "sp": "pyrokai",
+     "lv": 10,
+     "power": 1.21,
+     "move": "kilnflare",
+     "herald": true
+    },
+    {
+     "i": 9,
+     "sp": "pyroforge",
+     "lv": 11,
+     "power": 3.56,
+     "move": "kilnflare",
+     "herald": false
+    }
+   ]
+  },
+  {
+   "id": "hollowveil",
+   "rec": 12,
+   "battles": [
+    {
+     "i": 0,
+     "sp": "voltar",
+     "lv": 9,
+     "power": 0.39,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 1,
+     "sp": "voltar2",
+     "lv": 9,
+     "power": 0.77,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 2,
+     "sp": "zeep",
+     "lv": 10,
+     "power": 0.4,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 3,
+     "sp": "zeep",
+     "lv": 10,
+     "power": 0.4,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 4,
+     "sp": "zeep",
+     "lv": 11,
+     "power": 0.47,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 5,
+     "sp": "zeep",
+     "lv": 11,
+     "power": 0.47,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 6,
+     "sp": "duskmantle",
+     "lv": 11,
+     "power": 0.9,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 7,
+     "sp": "voltar2",
+     "lv": 12,
+     "power": 1.08,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 8,
+     "sp": "duskmantle",
+     "lv": 12,
+     "power": 1,
+     "move": "unsaidverdict",
+     "herald": true
+    },
+    {
+     "i": 9,
+     "sp": "zeep2",
+     "lv": 13,
+     "power": 1.34,
+     "move": "unsaidverdict",
+     "herald": false
+    }
+   ]
+  },
+  {
+   "id": "lanternorchard",
+   "rec": 14,
+   "battles": [
+    {
+     "i": 0,
+     "sp": "lumi",
+     "lv": 12,
+     "power": 0.43,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 1,
+     "sp": "lumifern",
+     "lv": 12,
+     "power": 0.4,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 2,
+     "sp": "lumi",
+     "lv": 13,
+     "power": 0.47,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 3,
+     "sp": "igniflare",
+     "lv": 13,
+     "power": 0.55,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 4,
+     "sp": "lumi",
+     "lv": 13,
+     "power": 0.47,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 5,
+     "sp": "igniflare",
+     "lv": 13,
+     "power": 0.55,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 6,
+     "sp": "aquaflora2",
+     "lv": 14,
+     "power": 1.06,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 7,
+     "sp": "lumi2",
+     "lv": 14,
+     "power": 1.06,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 8,
+     "sp": "aquaflora2",
+     "lv": 14,
+     "power": 1.06,
+     "move": "lampglare",
+     "herald": true
+    },
+    {
+     "i": 9,
+     "sp": "lumi2",
+     "lv": 16,
+     "power": 2.03,
+     "move": "lampglare",
+     "herald": false
+    }
+   ]
+  },
+  {
+   "id": "windstair",
+   "rec": 16,
+   "battles": [
+    {
+     "i": 0,
+     "sp": "zephyr",
+     "lv": 14,
+     "power": 0.41,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 1,
+     "sp": "igniflare",
+     "lv": 14,
+     "power": 0.5,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 2,
+     "sp": "pyrohawk",
+     "lv": 15,
+     "power": 0.98,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 3,
+     "sp": "pyrospark",
+     "lv": 15,
+     "power": 0.48,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 4,
+     "sp": "pyrohawk",
+     "lv": 15,
+     "power": 0.98,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 5,
+     "sp": "pyrospark",
+     "lv": 15,
+     "power": 0.48,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 6,
+     "sp": "aeolus",
+     "lv": 16,
+     "power": 0.99,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 7,
+     "sp": "aeolus",
+     "lv": 16,
+     "power": 0.99,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 8,
+     "sp": "aeolus",
+     "lv": 16,
+     "power": 0.99,
+     "move": "galeforce",
+     "herald": true
+    },
+    {
+     "i": 9,
+     "sp": "pyrohawk",
+     "lv": 18,
+     "power": 2.03,
+     "move": "galeforce",
+     "herald": false
+    }
+   ]
+  },
+  {
+   "id": "resonancescar",
+   "rec": 18,
+   "battles": [
+    {
+     "i": 0,
+     "sp": "aimza",
+     "lv": 15,
+     "power": 0.41,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 1,
+     "sp": "zeep2",
+     "lv": 15,
+     "power": 0.77,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 2,
+     "sp": "aimza2",
+     "lv": 16,
+     "power": 0.91,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 3,
+     "sp": "voltar2",
+     "lv": 16,
+     "power": 0.91,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 4,
+     "sp": "aimza2",
+     "lv": 17,
+     "power": 0.97,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 5,
+     "sp": "voltar2",
+     "lv": 17,
+     "power": 0.97,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 6,
+     "sp": "aimza2",
+     "lv": 17,
+     "power": 0.97,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 7,
+     "sp": "aimza2",
+     "lv": 18,
+     "power": 1.05,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 8,
+     "sp": "aimza2",
+     "lv": 18,
+     "power": 1.05,
+     "move": "resonantcollapse",
+     "herald": true
+    },
+    {
+     "i": 9,
+     "sp": "aimza2",
+     "lv": 20,
+     "power": 1.53,
+     "move": "resonantcollapse",
+     "herald": false
+    }
+   ]
+  },
+  {
+   "id": "heartwood",
+   "rec": 20,
+   "battles": [
+    {
+     "i": 0,
+     "sp": "sylvaneer2",
+     "lv": 17,
+     "power": 0.77,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 1,
+     "sp": "solarbloom",
+     "lv": 17,
+     "power": 0.8,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 2,
+     "sp": "aimza2",
+     "lv": 18,
+     "power": 0.91,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 3,
+     "sp": "sylvaneer2",
+     "lv": 18,
+     "power": 0.84,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 4,
+     "sp": "duskmantle",
+     "lv": 19,
+     "power": 0.91,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 5,
+     "sp": "reefback",
+     "lv": 19,
+     "power": 0.92,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 6,
+     "sp": "terraki",
+     "lv": 19,
+     "power": 1.09,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 7,
+     "sp": "duskmantle",
+     "lv": 20,
+     "power": 0.98,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 8,
+     "sp": "sylvaneer2",
+     "lv": 20,
+     "power": 0.98,
+     "move": "prismfall",
+     "herald": true
+    },
+    {
+     "i": 9,
+     "sp": "sylvaneer2",
+     "lv": 24,
+     "power": 2.84,
+     "move": "prismfall",
+     "herald": false
+    }
+   ]
+  }
+ ],
+ "mod": [
+  {
+   "id": "forgottenroad",
+   "rec": 4,
+   "battles": [
+    {
+     "i": 0,
+     "sp": "gaiaroki",
+     "lv": 2,
+     "power": 0.83,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 1,
+     "sp": "terraflora",
+     "lv": 2,
+     "power": 0.74,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 2,
+     "sp": "gaiaroki",
+     "lv": 3,
+     "power": 0.97,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 3,
+     "sp": "acinus",
+     "lv": 3,
+     "power": 0.84,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 4,
+     "sp": "gaiaroki",
+     "lv": 3,
+     "power": 0.97,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 5,
+     "sp": "acinus",
+     "lv": 3,
+     "power": 0.84,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 6,
+     "sp": "sylvaneer",
+     "lv": 4,
+     "power": 0.92,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 7,
+     "sp": "gaiaroki",
+     "lv": 4,
+     "power": 1.19,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 8,
+     "sp": "sylvaneer",
+     "lv": 4,
+     "power": 0.92,
+     "move": null,
+     "herald": true
+    },
+    {
+     "i": 9,
+     "sp": "gaiaroki",
+     "lv": 4,
+     "power": 1.55,
+     "move": null,
+     "herald": false
+    }
+   ]
+  },
+  {
+   "id": "gatheringhall",
+   "rec": 5,
+   "battles": [
+    {
+     "i": 0,
+     "sp": "acinus",
+     "lv": 3,
+     "power": 0.73,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 1,
+     "sp": "gaiaroki",
+     "lv": 3,
+     "power": 0.84,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 2,
+     "sp": "voltar",
+     "lv": 4,
+     "power": 0.88,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 3,
+     "sp": "voltar",
+     "lv": 4,
+     "power": 0.88,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 4,
+     "sp": "voltar",
+     "lv": 4,
+     "power": 0.88,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 5,
+     "sp": "voltar",
+     "lv": 4,
+     "power": 0.88,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 6,
+     "sp": "terraflora",
+     "lv": 5,
+     "power": 1.08,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 7,
+     "sp": "acinus",
+     "lv": 5,
+     "power": 1,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 8,
+     "sp": "terraflora",
+     "lv": 5,
+     "power": 1.08,
+     "move": "lampsout",
+     "herald": true
+    },
+    {
+     "i": 9,
+     "sp": "voltar",
+     "lv": 7,
+     "power": 2.16,
+     "move": "lampsout",
+     "herald": false
+    }
+   ]
+  },
+  {
+   "id": "reliquary",
+   "rec": 6,
+   "battles": [
+    {
+     "i": 0,
+     "sp": "acinus",
+     "lv": 3,
+     "power": 0.63,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 1,
+     "sp": "gaiaroki",
+     "lv": 3,
+     "power": 0.72,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 2,
+     "sp": "acinus",
+     "lv": 4,
+     "power": 0.75,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 3,
+     "sp": "terraflora",
+     "lv": 4,
+     "power": 0.76,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 4,
+     "sp": "acinus",
+     "lv": 4,
+     "power": 0.75,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 5,
+     "sp": "terraflora",
+     "lv": 4,
+     "power": 0.76,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 6,
+     "sp": "sylvaneer",
+     "lv": 5,
+     "power": 0.85,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 7,
+     "sp": "acinus",
+     "lv": 5,
+     "power": 0.86,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 8,
+     "sp": "sylvaneer",
+     "lv": 5,
+     "power": 0.85,
+     "move": "rootcrush",
+     "herald": true
+    },
+    {
+     "i": 9,
+     "sp": "terraki",
+     "lv": 6,
+     "power": 2.61,
+     "move": "rootcrush",
+     "herald": false
+    }
+   ]
+  },
+  {
+   "id": "drownedsteps",
+   "rec": 8,
+   "battles": [
+    {
+     "i": 0,
+     "sp": "cannonis",
+     "lv": 6,
+     "power": 0.77,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 1,
+     "sp": "sylvaneer",
+     "lv": 6,
+     "power": 0.75,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 2,
+     "sp": "gaiaroki",
+     "lv": 7,
+     "power": 1.06,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 3,
+     "sp": "kairyu",
+     "lv": 7,
+     "power": 0.84,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 4,
+     "sp": "gaiaroki",
+     "lv": 7,
+     "power": 1.06,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 5,
+     "sp": "kairyu",
+     "lv": 7,
+     "power": 0.84,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 6,
+     "sp": "cannonis",
+     "lv": 8,
+     "power": 1,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 7,
+     "sp": "cannonis",
+     "lv": 8,
+     "power": 1,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 8,
+     "sp": "cannonis",
+     "lv": 8,
+     "power": 1,
+     "move": "undertow",
+     "herald": true
+    },
+    {
+     "i": 9,
+     "sp": "kairyu",
+     "lv": 10,
+     "power": 1.84,
+     "move": "undertow",
+     "herald": false
+    }
+   ]
+  },
+  {
+   "id": "coldkiln",
+   "rec": 10,
+   "battles": [
+    {
+     "i": 0,
+     "sp": "pyrokai",
+     "lv": 8,
+     "power": 0.99,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 1,
+     "sp": "emberix",
+     "lv": 8,
+     "power": 0.79,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 2,
+     "sp": "igniflare",
+     "lv": 9,
+     "power": 1.1,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 3,
+     "sp": "pyrocell",
+     "lv": 9,
+     "power": 0.89,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 4,
+     "sp": "igniflare",
+     "lv": 9,
+     "power": 1.1,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 5,
+     "sp": "pyrocell",
+     "lv": 9,
+     "power": 0.89,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 6,
+     "sp": "pyrokai",
+     "lv": 10,
+     "power": 1.21,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 7,
+     "sp": "pyrokai",
+     "lv": 10,
+     "power": 1.21,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 8,
+     "sp": "pyrokai",
+     "lv": 10,
+     "power": 1.21,
+     "move": "kilnflare",
+     "herald": true
+    },
+    {
+     "i": 9,
+     "sp": "pyroforge",
+     "lv": 11,
+     "power": 3.56,
+     "move": "kilnflare",
+     "herald": false
+    }
+   ]
+  },
+  {
+   "id": "hollowveil",
+   "rec": 12,
+   "battles": [
+    {
+     "i": 0,
+     "sp": "voltar",
+     "lv": 9,
+     "power": 0.39,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 1,
+     "sp": "voltar2",
+     "lv": 9,
+     "power": 0.77,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 2,
+     "sp": "zeep",
+     "lv": 10,
+     "power": 0.4,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 3,
+     "sp": "zeep",
+     "lv": 10,
+     "power": 0.4,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 4,
+     "sp": "zeep",
+     "lv": 11,
+     "power": 0.47,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 5,
+     "sp": "zeep",
+     "lv": 11,
+     "power": 0.47,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 6,
+     "sp": "duskmantle",
+     "lv": 11,
+     "power": 0.9,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 7,
+     "sp": "voltar2",
+     "lv": 12,
+     "power": 1.08,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 8,
+     "sp": "duskmantle",
+     "lv": 12,
+     "power": 1,
+     "move": "unsaidverdict",
+     "herald": true
+    },
+    {
+     "i": 9,
+     "sp": "zeep2",
+     "lv": 13,
+     "power": 1.34,
+     "move": "unsaidverdict",
+     "herald": false
+    }
+   ]
+  },
+  {
+   "id": "lanternorchard",
+   "rec": 14,
+   "battles": [
+    {
+     "i": 0,
+     "sp": "lumi",
+     "lv": 12,
+     "power": 0.43,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 1,
+     "sp": "lumifern",
+     "lv": 12,
+     "power": 0.4,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 2,
+     "sp": "lumi",
+     "lv": 13,
+     "power": 0.47,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 3,
+     "sp": "igniflare",
+     "lv": 13,
+     "power": 0.55,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 4,
+     "sp": "lumi",
+     "lv": 13,
+     "power": 0.47,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 5,
+     "sp": "igniflare",
+     "lv": 13,
+     "power": 0.55,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 6,
+     "sp": "aquaflora2",
+     "lv": 14,
+     "power": 1.06,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 7,
+     "sp": "lumi2",
+     "lv": 14,
+     "power": 1.06,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 8,
+     "sp": "aquaflora2",
+     "lv": 14,
+     "power": 1.06,
+     "move": "lampglare",
+     "herald": true
+    },
+    {
+     "i": 9,
+     "sp": "lumi2",
+     "lv": 16,
+     "power": 2.03,
+     "move": "lampglare",
+     "herald": false
+    }
+   ]
+  },
+  {
+   "id": "windstair",
+   "rec": 16,
+   "battles": [
+    {
+     "i": 0,
+     "sp": "zephyr",
+     "lv": 14,
+     "power": 0.41,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 1,
+     "sp": "igniflare",
+     "lv": 14,
+     "power": 0.5,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 2,
+     "sp": "pyrohawk",
+     "lv": 15,
+     "power": 0.98,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 3,
+     "sp": "pyrospark",
+     "lv": 15,
+     "power": 0.48,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 4,
+     "sp": "pyrohawk",
+     "lv": 15,
+     "power": 0.98,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 5,
+     "sp": "pyrospark",
+     "lv": 15,
+     "power": 0.48,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 6,
+     "sp": "aeolus",
+     "lv": 16,
+     "power": 0.99,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 7,
+     "sp": "aeolus",
+     "lv": 16,
+     "power": 0.99,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 8,
+     "sp": "aeolus",
+     "lv": 16,
+     "power": 0.99,
+     "move": "galeforce",
+     "herald": true
+    },
+    {
+     "i": 9,
+     "sp": "pyrohawk",
+     "lv": 18,
+     "power": 2.03,
+     "move": "galeforce",
+     "herald": false
+    }
+   ]
+  },
+  {
+   "id": "resonancescar",
+   "rec": 18,
+   "battles": [
+    {
+     "i": 0,
+     "sp": "aimza",
+     "lv": 15,
+     "power": 0.41,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 1,
+     "sp": "zeep2",
+     "lv": 15,
+     "power": 0.77,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 2,
+     "sp": "aimza2",
+     "lv": 16,
+     "power": 0.91,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 3,
+     "sp": "voltar2",
+     "lv": 16,
+     "power": 0.91,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 4,
+     "sp": "aimza2",
+     "lv": 17,
+     "power": 0.97,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 5,
+     "sp": "voltar2",
+     "lv": 17,
+     "power": 0.97,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 6,
+     "sp": "aimza2",
+     "lv": 17,
+     "power": 0.97,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 7,
+     "sp": "aimza2",
+     "lv": 18,
+     "power": 1.05,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 8,
+     "sp": "aimza2",
+     "lv": 18,
+     "power": 1.05,
+     "move": "resonantcollapse",
+     "herald": true
+    },
+    {
+     "i": 9,
+     "sp": "aimza2",
+     "lv": 20,
+     "power": 1.53,
+     "move": "resonantcollapse",
+     "herald": false
+    }
+   ]
+  },
+  {
+   "id": "heartwood",
+   "rec": 20,
+   "battles": [
+    {
+     "i": 0,
+     "sp": "sylvaneer2",
+     "lv": 17,
+     "power": 0.77,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 1,
+     "sp": "solarbloom",
+     "lv": 17,
+     "power": 0.8,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 2,
+     "sp": "aimza2",
+     "lv": 18,
+     "power": 0.91,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 3,
+     "sp": "sylvaneer2",
+     "lv": 18,
+     "power": 0.84,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 4,
+     "sp": "duskmantle",
+     "lv": 19,
+     "power": 0.91,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 5,
+     "sp": "reefback",
+     "lv": 19,
+     "power": 0.92,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 6,
+     "sp": "terraki",
+     "lv": 19,
+     "power": 1.09,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 7,
+     "sp": "duskmantle",
+     "lv": 20,
+     "power": 0.98,
+     "move": null,
+     "herald": false
+    },
+    {
+     "i": 8,
+     "sp": "sylvaneer2",
+     "lv": 20,
+     "power": 0.98,
+     "move": "prismfall",
+     "herald": true
+    },
+    {
+     "i": 9,
+     "sp": "sylvaneer2",
+     "lv": 24,
+     "power": 2.84,
+     "move": "prismfall",
+     "herald": false
+    }
+   ]
+  }
+ ]
+}

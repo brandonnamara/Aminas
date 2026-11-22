@@ -1,0 +1,58 @@
+{
+ "all": {
+  "defensive": 58,
+  "healStatus": 65.3,
+  "balanced": 67.8,
+  "swiftWind": 67.5,
+  "advantage": 70.3
+ },
+ "no_retain": {
+  "defensive": 58,
+  "healStatus": 64.8,
+  "balanced": 60.5,
+  "swiftWind": 52.8,
+  "advantage": 69.8
+ },
+ "no_counter": {
+  "defensive": 56.5,
+  "healStatus": 65.3,
+  "balanced": 67.8,
+  "swiftWind": 67.5,
+  "advantage": 72.5
+ },
+ "no_cleanse": {
+  "defensive": 58,
+  "healStatus": 65.3,
+  "balanced": 67.8,
+  "swiftWind": 67.5,
+  "advantage": 70.3
+ },
+ "no_healBrace": {
+  "defensive": 58,
+  "healStatus": 65.3,
+  "balanced": 67.8,
+  "swiftWind": 67.5,
+  "advantage": 70.3
+ },
+ "no_soakSlows": {
+  "defensive": 58,
+  "healStatus": 64.8,
+  "balanced": 67.5,
+  "swiftWind": 67.5,
+  "advantage": 69.8
+ },
+ "no_swift": {
+  "defensive": 58,
+  "healStatus": 64.3,
+  "balanced": 67.3,
+  "swiftWind": 61.5,
+  "advantage": 63.8
+ },
+ "no_tailwind": {
+  "defensive": 58,
+  "healStatus": 65.3,
+  "balanced": 67.8,
+  "swiftWind": 68,
+  "advantage": 70.3
+ }
+}

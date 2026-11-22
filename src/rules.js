@@ -403,7 +403,7 @@
     if (C.tailwind && ab.el === 'wind' && eff < 1) eff = 1;                 // Phase 17B: Wind is never resisted
     const stab = ab.el === att.el ? 1.2 : 1;
     // Phase 17B: a counter after a guard that took a hit, and a swift Amina's edge when it acts first
-    const edge = (att.counter && C.counter ? 1 + C.counter : 1) * (att.swiftEdge && att.first && C.swift ? 1 + C.swift : 1);
+    const edge = (att.counter && C.counter ? 1 + (att.role === 'tank' && C.tankCounter ? C.tankCounter : C.counter) : 1) * (att.swiftEdge && att.first && C.swift ? 1 + C.swift : 1);
     const A_ = att.atk * (att.boost || 1) * edge * (1 - 0.2 * Math.min(3, att.weak));
     const base = ((2 * att.lv / 5 + 2) * ab.power * A_ / Math.max(1, def.def)) / DIV + 2;
     const rand = 0.92 + rng() * 0.16;
@@ -472,6 +472,9 @@
       const readied = !!(hadGuard && D.COMBAT17 && D.COMBAT17.counter && def.hp > 0 && r.dmg > 0); if (readied) def.counter = true;
       ev.push({ t: 'hit', who: foe, dmg, eff: R.effLabel(r.eff), hp: def.hp, guarded: hadGuard, el: ab.el, big: !!ab.boss, blocked: dmg === 0 });
       if (readied) ev.push({ t: 'counter', who: foe });
+      // Phase 17C: a guard also turns part of the blow back on the attacker (thorns, a shell's recoil)
+      const back = hadGuard && D.COMBAT17 && D.COMBAT17.guardReflect && r.dmg > 0 && att.hp > 0 ? Math.max(1, Math.round(r.dmg * D.COMBAT17.guardReflect)) : 0;
+      if (back) { att.hp = Math.max(0, att.hp - back); ev.push({ t: 'reflect', who, dmg: back, hp: att.hp }); thresholds(att, who, ev); }
       thresholds(def, foe, ev);
       if (ab.type === 'drain') {
         const amt = Math.min(att.hpMax - att.hp, Math.ceil(r.dmg / 2));
@@ -732,13 +735,19 @@
     return B.create(party, R.enemyFromSpec(enc.spec), { rng });
   };
   // xp and carry-over health for a won battle (shared by dungeons and survival)
-  function partyAfterWin(st, b, baseXp, hpStore, heal) {
+  // Phase 17C (XP option A): a foe well below an Amina's level teaches it less. Same level or up to two below: full
+  // XP; three below 75%, four below 50%, five or more 25%. Foes above its level always give full XP.
+  R.xpScale = function (memberLv, foeLv) {
+    const X = D.XP17; if (!X || !X.on || foeLv == null) return 1;
+    const gap = memberLv - foeLv; return gap >= 5 ? X.scale[5] : gap >= 3 ? X.scale[gap] : 1;
+  };
+  function partyAfterWin(st, b, baseXp, hpStore, heal, foeLv) {
     const xp = [];
     b.party.forEach((f) => {
       const inst = R.inst(st, f.uid); if (!inst) return;
-      const alive = f.hp > 0;
-      const r = R.addXp(st, inst, alive ? baseXp : Math.round(baseXp / 2));
-      xp.push({ uid: f.uid, sp: inst.sp, gained: r.gained, levels: r.levels, evolved: r.evolved, evoReady: r.evoReady, alive });
+      const alive = f.hp > 0, k = R.xpScale(inst.lv, foeLv);
+      const r = R.addXp(st, inst, Math.round((alive ? baseXp : Math.round(baseXp / 2)) * k));
+      xp.push({ uid: f.uid, sp: inst.sp, gained: r.gained, levels: r.levels, evolved: r.evolved, evoReady: r.evoReady, alive, scaled: k < 1 ? k : null, gap: k < 1 ? inst.lv - foeLv : 0 });
       const hpMax = R.statsWithGear(st, inst).hp;
       const prev = alive ? f.hp : Math.round(hpMax * 0.2);
       hpStore[f.uid] = Math.max(1, Math.min(hpMax, prev + (alive ? Math.round(hpMax * heal) : 0)));
@@ -763,7 +772,7 @@
     out.gold = 10 + spec.lv * 3 + (spec.boss ? 20 : 0); out.food = 4 + (spec.boss ? 6 : 0);
     R.addRes(st, { gold: out.gold, food: out.food });
     run.gold += out.gold; run.food += out.food;
-    out.xp = partyAfterWin(st, b, baseXp, run.hp, 0.4);
+    out.xp = partyAfterWin(st, b, baseXp, run.hp, 0.4, spec.lv);
     R.gainRankXp(st, spec.boss ? 15 : 8);
     run.battle = idx + 1;
     if (!wasCleared) rec.next = Math.min(NB() - 1, Math.max(rec.next, run.battle));
@@ -901,7 +910,7 @@
     const spec = SV.spec(st), out = { win: b.result === 'win', wave: run.wave, xp: [], milestone: null };
     if (!out.win) { st.stats.losses++; return svEnd(st, out); }
     st.stats.wins++;
-    out.xp = partyAfterWin(st, b, Math.round((10 + spec.lv * 3) * (spec.boss ? 1.5 : 1)), run.hp, D.SURVIVAL.healBetween);
+    out.xp = partyAfterWin(st, b, Math.round((10 + spec.lv * 3) * (spec.boss ? 1.5 : 1)), run.hp, D.SURVIVAL.healBetween, spec.lv);
     run.earned.gold += D.SURVIVAL.perWave.gold * run.wave; run.earned.food += D.SURVIVAL.perWave.food * run.wave;
     const ms = D.SURVIVAL.milestones[run.wave];
     if (ms && !rec.milestones[run.wave]) {

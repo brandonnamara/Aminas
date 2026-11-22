@@ -125,14 +125,16 @@
   const pips = (lv) => '<span class="mv-pips" aria-label="Level ' + lv + ' of 5">' + [1, 2, 3, 4, 5].map((i) => '<i class="' + (i <= lv ? 'on' : '') + '"></i>').join('') + '</span>';
   UI.movesHtml = function (s, inst) {
     const sp = D.SPECIES[inst.sp];
-    return '<div class="moves" data-uid="' + inst.uid + '">' + [0, 1].map((slot) => {
+    // Phase 17C: an evolved Amina's kept first-form move is a third row, upgraded the same way (its own level)
+    const slots = R.moveSlotIds ? R.moveSlotIds(inst).map((_, i) => i) : [0, 1], base = D.SPECIES[D.LINES[sp.line].ids[0]];
+    return '<div class="moves" data-uid="' + inst.uid + '">' + slots.map((slot) => {
       const m = R.moveInfo(s, inst, slot), ab = m.ab;
-      const kind = ab.cd ? 'Signature move · every ' + (ab.cd + 1) + ' turns' : 'Basic move';
+      const kind = slot === 2 ? 'Kept from ' + base.name + ' · every ' + (ab.cd + 1) + ' turns' : ab.cd ? 'Signature move · every ' + (ab.cd + 1) + ' turns' : 'Basic move';
       const btn = m.max ? '<span class="chip good">Level 5</span>' : '<button class="btn small ' + (m.ok ? 'gold' : 'off') + '" data-act="mvUp" data-uid="' + inst.uid + '" data-slot="' + slot + '" data-lv="' + m.lv + '"' + (m.ok ? '' : ' aria-disabled="true"') + '>' + I('up') + 'Upgrade · ' + Art.essIcon(m.el) + m.cost + '</button>';
       return '<div class="mv" data-slot="' + slot + '"><div class="mv-h"><b>' + esc(ab.name) + '</b> ' + chip(ab.el) + ' <span class="mv-lv">Lv ' + m.lv + '</span>' + pips(m.lv) + '</div><small class="muted">' + kind + ' · ' + esc(ab.desc) + '</small>' +
         '<div class="mv-fx"><span>' + esc(m.now.text) + '</span>' + (m.next ? I('arrow') + '<span class="good">' + esc(m.next.text) + '</span>' : '') + '</div>' + (UI.P13 ? UI.P13.track(m) : '') +
-        '<div class="mv-cost">' + (m.max ? '<span class="muted">Fully upgraded.</span>' : '<span>' + Art.essIcon(m.el) + ' ' + fmt(m.have) + ' / ' + m.cost + ' ' + esc(PX.essName(m.el)) + '</span>' + (m.reason && m.reason !== 'max' ? ' <span class="bad">' + esc(m.reason === 'essence' && UI.P13 ? UI.P13.essShort(m) : R.MOVE_WHY[m.reason]) + '</span>' : '')) + btn + '</div></div>';
-    }).join('') + '<p class="muted small-t">Move levels stay with ' + esc(sp.name) + ' when it evolves: its signature move grows into the next form’s move at the same level.</p></div>';
+        '<div class="mv-cost">' + (m.max ? '<span class="muted">Fully upgraded.</span>' : '<span>' + Art.essIcon(m.el) + ' ' + fmt(m.have) + ' / ' + m.cost + ' ' + esc(PX.essName(m.el)) + '</span>' + (m.reason && m.reason !== 'max' ? ' <span class="bad">' + esc(m.reason === 'essence' && UI.P13 ? UI.P13.essShort(m) : R.MOVE_WHY[m.reason]) + '</span>' : '')) + btn + (m.reason === 'essence' && R.Essence.exchange ? ' <button class="btn small ghost" data-act="essEx" data-el="' + m.el + '" data-need="' + (m.cost - m.have) + '">' + I('gem') + 'Exchange gems</button>' : '') + '</div></div>'; // Phase 17C
+    }).join('') + '<p class="muted small-t">Move levels stay with ' + esc(sp.name) + ' when it evolves: its signature move grows into the next form’s move at the same level.' + (slots.length > 2 ? ' It also keeps ' + esc(base.name) + '’s special as a third move, with its own level.' : '') + '</p></div>';
   };
   const mvLast = {};
   UI.act('mvUp', (el) => {
@@ -239,4 +241,54 @@
     $('#lp-back').onclick = () => { if (st() && st().starter) UI.showIsland(); else UI.showTitle(); };
   };
   UI.act('lpScene', () => UI.livingPixelScene());
+})(typeof window !== 'undefined' ? window : globalThis);
+
+/* Phase 17C: favourites and releasing duplicates (rules in essence.js, R.Release). The release sheet says exactly
+   what it gives, that the Codex keeps the species, and why a protected Amina cannot go. Nothing happens without the
+   confirmation button. */
+(function (root) {
+  'use strict';
+  const A = root.A, D = A.Data, R = A.Rules, S = A.State, UI = A.UI, Art = A.Art, Au = A.Audio;
+  const $ = (q, el) => (el || document).querySelector(q), st = () => S.state, esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const essName = (el) => D.ELEMENTS[el].name + ' Essence';
+  const redraw = (uid) => { const inst = R.inst(st(), uid); const ov = document.querySelector('.overlay[data-detail], .overlay'); if (UI.detail && inst && ov && ov._sp) UI.detail(ov._sp, { uid: ov._uid || uid, ov }); };
+  UI.act('favToggle', (el) => { const uid = +el.dataset.uid, inst = R.inst(st(), uid); if (!inst) return; R.Release.setFav(st(), uid, !inst.fav); S.save(); Au.play('tap'); redraw(uid); });
+  UI.act('releaseAsk', (el) => {
+    const uid = +el.dataset.uid, c = R.Release.check(st(), uid); if (!c.inst) return;
+    const inst = c.inst, sp = D.SPECIES[inst.sp], g = c.gives;
+    const gets = Object.keys(g.total).map((k) => '<span class="rel-get">' + (Art.essIcon ? Art.essIcon(k) : '') + ' <b>' + g.total[k] + '</b> ' + esc(essName(k)) + '</span>').join(' ');
+    const body = '<div class="rel17"><div class="rel-who"><div class="art">' + Art.portrait(inst.sp) + '</div><div><b>' + esc(sp.name) + '</b> · Lv ' + inst.lv + '<br><span class="muted small-t">Released Aminas return to the wild. You will not get this one back.</span></div></div>' +
+      (c.ok ? '<p>It leaves you ' + gets + '.' + (g.spent ? ' <span class="muted">(Half the essence spent on its moves comes back.)</span>' : '') + '</p>' : '<p class="bad">' + esc(R.Release.why[c.reason] || 'It cannot be released.') + (c.reasons.length > 1 ? ' <span class="muted">(' + c.reasons.slice(1).map((r) => R.Release.why[r]).join(' ') + ')</span>' : '') + '</p>') +
+      '<p class="muted small-t">Your Codex keeps ' + esc(sp.name) + ', and you keep your other ' + esc(sp.name) + '.</p></div>';
+    const ov = UI.modal(UI.sheet('Release ' + esc(sp.name) + '?', body, '<button class="btn ghost" data-act="close">Keep it</button>' + (c.ok ? '<button class="btn gold" id="rel-go">Release</button>' : ''), 'narrow'));
+    const go = $('#rel-go', ov); if (go) go.onclick = () => {
+      if (go._busy) return; go._busy = true;
+      const r = R.Release.release(st(), uid, true);
+      if (!r.ok) { Au.play('no'); UI.toast(R.Release.why[r.reason] || 'That did not work.', 't'); UI.close(ov); return; }
+      S.save(); R.drain(); R.after(st()); Au.play('level'); UI.close(ov);
+      UI.toast(sp.name + ' returned to the wild. ' + Object.keys(r.essence).map((k) => '+' + r.essence[k] + ' ' + essName(k)).join(', ') + '.', 't');
+      const dov = document.querySelector('.overlay'); if (dov && dov._sp && UI.detail) { const left = st().aminas.find((a) => a.sp === dov._sp); UI.detail(dov._sp, { uid: left ? left.uid : null, ov: dov }); }
+    };
+  });
+})(typeof window !== 'undefined' ? window : globalThis);
+
+/* Phase 17C: the gem conveniences' panels. Both say exactly what they cost before anything is spent. */
+(function (root) {
+  'use strict';
+  const A = root.A, D = A.Data, R = A.Rules, S = A.State, UI = A.UI, Art = A.Art, Au = A.Audio;
+  const $ = (q, el) => (el || document).querySelector(q), st = () => S.state, I = (n) => (UI.icon ? UI.icon(n) : ''), essName = (el) => D.ELEMENTS[el].name + ' Essence';
+  UI.act('hHatchNow', (el) => {
+    const slot = +el.dataset.i, s = st(), cost = R.hatchNowCost(s, slot); if (!cost) return;
+    const body = '<p>Hatch this egg now for <b>' + cost + ' gem' + (cost > 1 ? 's' : '') + '</b> (1 gem for every 6 minutes left, as with buildings).</p><p class="muted small-t">You have ' + s.res.gems + ' gems.</p>';
+    const ov = UI.modal(UI.sheet('Hatch now?', body, '<button class="btn ghost" data-act="close">Wait</button><button class="btn gold' + (s.res.gems >= cost ? '' : ' off') + '" id="hn-go">' + I('gem') + 'Spend ' + cost + ' gem' + (cost > 1 ? 's' : '') + '</button>', 'narrow'));
+    $('#hn-go', ov).onclick = () => { const r = R.hatchNow(st(), slot); if (!r.ok) { Au.play('no'); UI.toast(r.reason === 'gems' ? 'Not enough gems.' : 'It is already ready.', 't'); return; } S.save(); Au.play('coin'); UI.close(ov); if (UI.hatchTick) UI.hatchTick(); };
+  });
+  UI.act('essEx', (el) => {
+    const s = st(), e = el.dataset.el, need = Math.max(0, +el.dataset.need || 0), rate = D.GEMS17.exchangeRate, left = R.Essence.exchangeLeft(s);
+    const want = Math.min(left, Math.max(1, Math.ceil(need / rate))), body = '<p>Exchange gems for ' + (Art.essIcon ? Art.essIcon(e) : '') + ' <b>' + essName(e) + '</b> at ' + rate + ' essence per gem.</p>' +
+      '<p class="muted small-t">Up to ' + D.GEMS17.exchangeDaily + ' gems a day (' + left + ' left today). You have ' + s.res.gems + ' gems and ' + R.Essence.get(s, e) + ' ' + essName(e) + '.</p>' + (need ? '<p>This move needs <b>' + need + '</b> more.</p>' : '');
+    const ok = want > 0 && s.res.gems >= want;
+    const ov = UI.modal(UI.sheet('Exchange gems', body, '<button class="btn ghost" data-act="close">Not now</button><button class="btn gold' + (ok ? '' : ' off') + '" id="ex-go">' + I('gem') + want + ' gem' + (want > 1 ? 's' : '') + ' → ' + want * rate + ' essence</button>', 'narrow'));
+    $('#ex-go', ov).onclick = () => { const r = R.Essence.exchange(st(), e, want); if (!r.ok) { Au.play('no'); UI.toast(r.reason === 'daily' ? 'That is today’s limit.' : 'Not enough gems.', 't'); return; } S.save(); R.drain(); Au.play('coin'); UI.close(ov); UI.toast('+' + r.n + ' ' + essName(e) + '.', 't'); const box = el.closest('.moves'); if (box && UI.refreshMoves) UI.refreshMoves(+box.dataset.uid); };
+  });
 })(typeof window !== 'undefined' ? window : globalThis);

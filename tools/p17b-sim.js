@@ -3,7 +3,7 @@
 // Run: node tools/p17b-sim.js [outDir]  (default docs/audit17b). Deterministic. Times assume 4.5 s per turn.
 const fs = require('fs'), path = require('path'), vm = require('vm'), { execSync } = require('child_process');
 const ROOT = path.join(__dirname, '..'), OUT = process.argv[2] || path.join(ROOT, 'docs', 'audit17b'); fs.mkdirSync(OUT, { recursive: true });
-const BASE_REF = '316fa38';
+const BASE_REF = process.env.BASE_REF || '316fa38'; // Phase 17C compares against 17B: BASE_REF=8ded42a
 function loadAt(ref) { // the rule scripts, in index.html order, from a git commit (ref) or the working tree (null)
   const read = (f) => (ref ? execSync('git show ' + ref + ':' + f, { cwd: ROOT, maxBuffer: 64e6 }).toString() : fs.readFileSync(path.join(ROOT, f), 'utf8'));
   const store = {}, ctx = { console, Math, Date, JSON, setTimeout, clearTimeout, localStorage: { getItem: (k) => (k in store ? store[k] : null), setItem: (k, v) => { store[k] = String(v); }, removeItem: (k) => { delete store[k]; } } };
@@ -34,6 +34,7 @@ function Game(A, name) {
       if (kind === 'auto') { if (!legal.length) { const o = b.party.findIndex((q, k) => k !== b.pi && q.hp > 0); return o >= 0 ? { t: 'sw', to: o } : null; } return B.autoAction(b); }
       // 'tactical': the same strategic player in both versions (it can only use the moves each version gives it)
       if (e.charging) { const gd = of('guard'); if (gd) return { t: 'ab', id: gd.id }; }
+      if (kind === 'guardCycle') { const gd = of('guard'); if (gd && e.hp > e.hpMax * 0.25 && !p.counter) return { t: 'ab', id: gd.id }; } // guard whenever it is ready, then strike with the counter
       const h = of('heal'); if (h && (g.healRule ? g.healRule(b, p, e) : e.hp > e.hpMax * 0.3 && (p.hp < p.hpMax * 0.45 || (p.st.burn > 0 && p.hp < p.hpMax * 0.7)))) return { t: 'ab', id: h.id };
       const w = of('weaken'); if (w && e.weak < 2 && e.hp > e.hpMax * 0.45 && (e.boss || e.move || e.hpMax > p.hpMax)) return { t: 'ab', id: w.id };
       const sk = legal.filter((x) => (D.ABILITIES[x.id].fx || {}).k === 'soak').sort((x, y) => D.ABILITIES[y.id].fx.p - D.ABILITIES[x.id].fx.p)[0]; if (sk && e.move && !e.charging && e.chargeIn <= 0 && !(e.st.soak > 0)) return { t: 'ab', id: sk.id };
@@ -66,7 +67,7 @@ function Game(A, name) {
 }
 module.exports = { Game, loadAt, seeded, pct, mean };
 if (process.env.P17B_LIB) return; // used as a library by experiments
-const base = Game(loadAt(BASE_REF), 'Phase 17A'), mod = Game(loadAt(null), 'Phase 17B');
+const base = Game(loadAt(BASE_REF), process.env.BASE_NAME || 'Phase 17A'), mod = Game(loadAt(null), process.env.MOD_NAME || 'Phase 17B');
 const DUN = base.D.CAMPAIGN.starter.dungeons;
 const NAME = Object.fromEntries(DUN.map((id) => [id, base.D.DUNGEONS[id].name.replace(/^The /, '')]));
 
@@ -85,6 +86,7 @@ const TEAMS = {
   balanced: { label: 'Balanced roles', lines: ['lumifern', 'cannonis', 'emberix'], pol: 'tactical' },
   swiftWind: { label: 'Swift and Wind', lines: ['zephyr', 'kairyu', 'umbrit'], pol: 'tactical' },
   autoBattle: { label: 'Game auto-battle (balanced)', lines: ['lumifern', 'cannonis', 'emberix'], pol: 'auto' },
+  defensiveCycle: { label: 'Defensive, guard-and-counter play', lines: ['acinus', 'zeep', 'terraflora'], pol: 'guardCycle' },
 };
 const OFFS = [-2, -1, 0, 1, 2];
 

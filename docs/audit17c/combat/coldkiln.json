@@ -1,0 +1,548 @@
+{
+ "base": {
+  "rec": 10,
+  "boss": {
+   "sp": "pyroforge",
+   "lv": 11,
+   "boss": true,
+   "title": "The Kiln Mother",
+   "hpMult": 1.55,
+   "scale": 1.5,
+   "move": "kilnflare",
+   "base17": {
+    "sp": "pyroforge"
+   }
+  },
+  "teams": {
+   "basicOnly": [
+    {
+     "off": -2,
+     "lv": 8,
+     "firstTry": 0,
+     "within6": 0
+    },
+    {
+     "off": -1,
+     "lv": 9,
+     "firstTry": 0,
+     "within6": 0
+    },
+    {
+     "off": 0,
+     "lv": 10,
+     "firstTry": 0,
+     "within6": 9
+    },
+    {
+     "off": 1,
+     "lv": 11,
+     "firstTry": 6,
+     "within6": 93.5
+    },
+    {
+     "off": 2,
+     "lv": 12,
+     "firstTry": 100,
+     "within6": 100
+    }
+   ],
+   "advantage": [
+    {
+     "off": -2,
+     "lv": 8,
+     "firstTry": 43.5,
+     "within6": 100
+    },
+    {
+     "off": -1,
+     "lv": 9,
+     "firstTry": 97,
+     "within6": 100
+    },
+    {
+     "off": 0,
+     "lv": 10,
+     "firstTry": 100,
+     "within6": 100
+    },
+    {
+     "off": 1,
+     "lv": 11,
+     "firstTry": 100,
+     "within6": 100
+    },
+    {
+     "off": 2,
+     "lv": 12,
+     "firstTry": 100,
+     "within6": 100
+    }
+   ],
+   "defensive": [
+    {
+     "off": -2,
+     "lv": 8,
+     "firstTry": 0,
+     "within6": 0
+    },
+    {
+     "off": -1,
+     "lv": 9,
+     "firstTry": 0,
+     "within6": 0
+    },
+    {
+     "off": 0,
+     "lv": 10,
+     "firstTry": 0,
+     "within6": 5
+    },
+    {
+     "off": 1,
+     "lv": 11,
+     "firstTry": 0,
+     "within6": 100
+    },
+    {
+     "off": 2,
+     "lv": 12,
+     "firstTry": 100,
+     "within6": 100
+    }
+   ],
+   "healStatus": [
+    {
+     "off": -2,
+     "lv": 8,
+     "firstTry": 0,
+     "within6": 1.5
+    },
+    {
+     "off": -1,
+     "lv": 9,
+     "firstTry": 3,
+     "within6": 36
+    },
+    {
+     "off": 0,
+     "lv": 10,
+     "firstTry": 39,
+     "within6": 98.5
+    },
+    {
+     "off": 1,
+     "lv": 11,
+     "firstTry": 90,
+     "within6": 100
+    },
+    {
+     "off": 2,
+     "lv": 12,
+     "firstTry": 100,
+     "within6": 100
+    }
+   ],
+   "balanced": [
+    {
+     "off": -2,
+     "lv": 8,
+     "firstTry": 0,
+     "within6": 0
+    },
+    {
+     "off": -1,
+     "lv": 9,
+     "firstTry": 9.5,
+     "within6": 36.5
+    },
+    {
+     "off": 0,
+     "lv": 10,
+     "firstTry": 44,
+     "within6": 97.5
+    },
+    {
+     "off": 1,
+     "lv": 11,
+     "firstTry": 91.5,
+     "within6": 100
+    },
+    {
+     "off": 2,
+     "lv": 12,
+     "firstTry": 100,
+     "within6": 100
+    }
+   ],
+   "swiftWind": [
+    {
+     "off": -2,
+     "lv": 8,
+     "firstTry": 0.5,
+     "within6": 5
+    },
+    {
+     "off": -1,
+     "lv": 9,
+     "firstTry": 9.5,
+     "within6": 82.5
+    },
+    {
+     "off": 0,
+     "lv": 10,
+     "firstTry": 32,
+     "within6": 100
+    },
+    {
+     "off": 1,
+     "lv": 11,
+     "firstTry": 56.5,
+     "within6": 100
+    },
+    {
+     "off": 2,
+     "lv": 12,
+     "firstTry": 100,
+     "within6": 100
+    }
+   ],
+   "autoBattle": [
+    {
+     "off": -2,
+     "lv": 8,
+     "firstTry": 0,
+     "within6": 0
+    },
+    {
+     "off": -1,
+     "lv": 9,
+     "firstTry": 9.5,
+     "within6": 36.5
+    },
+    {
+     "off": 0,
+     "lv": 10,
+     "firstTry": 44,
+     "within6": 97.5
+    },
+    {
+     "off": 1,
+     "lv": 11,
+     "firstTry": 91.5,
+     "within6": 100
+    },
+    {
+     "off": 2,
+     "lv": 12,
+     "firstTry": 100,
+     "within6": 100
+    }
+   ],
+   "defensiveCycle": [
+    {
+     "off": -2,
+     "lv": 8,
+     "firstTry": 0,
+     "within6": 0
+    },
+    {
+     "off": -1,
+     "lv": 9,
+     "firstTry": 0,
+     "within6": 0
+    },
+    {
+     "off": 0,
+     "lv": 10,
+     "firstTry": 0,
+     "within6": 2
+    },
+    {
+     "off": 1,
+     "lv": 11,
+     "firstTry": 0,
+     "within6": 99
+    },
+    {
+     "off": 2,
+     "lv": 12,
+     "firstTry": 100,
+     "within6": 100
+    }
+   ]
+  }
+ },
+ "mod": {
+  "rec": 10,
+  "boss": {
+   "sp": "pyroforge",
+   "lv": 11,
+   "boss": true,
+   "title": "The Kiln Mother",
+   "hpMult": 1.55,
+   "scale": 1.5,
+   "move": "kilnflare",
+   "base17": {
+    "sp": "pyroforge"
+   }
+  },
+  "teams": {
+   "basicOnly": [
+    {
+     "off": -2,
+     "lv": 8,
+     "firstTry": 0,
+     "within6": 0
+    },
+    {
+     "off": -1,
+     "lv": 9,
+     "firstTry": 0,
+     "within6": 0
+    },
+    {
+     "off": 0,
+     "lv": 10,
+     "firstTry": 0,
+     "within6": 9
+    },
+    {
+     "off": 1,
+     "lv": 11,
+     "firstTry": 6,
+     "within6": 93.5
+    },
+    {
+     "off": 2,
+     "lv": 12,
+     "firstTry": 100,
+     "within6": 100
+    }
+   ],
+   "advantage": [
+    {
+     "off": -2,
+     "lv": 8,
+     "firstTry": 43.5,
+     "within6": 100
+    },
+    {
+     "off": -1,
+     "lv": 9,
+     "firstTry": 97,
+     "within6": 100
+    },
+    {
+     "off": 0,
+     "lv": 10,
+     "firstTry": 100,
+     "within6": 100
+    },
+    {
+     "off": 1,
+     "lv": 11,
+     "firstTry": 100,
+     "within6": 100
+    },
+    {
+     "off": 2,
+     "lv": 12,
+     "firstTry": 100,
+     "within6": 100
+    }
+   ],
+   "defensive": [
+    {
+     "off": -2,
+     "lv": 8,
+     "firstTry": 0,
+     "within6": 0
+    },
+    {
+     "off": -1,
+     "lv": 9,
+     "firstTry": 0,
+     "within6": 0
+    },
+    {
+     "off": 0,
+     "lv": 10,
+     "firstTry": 0,
+     "within6": 47
+    },
+    {
+     "off": 1,
+     "lv": 11,
+     "firstTry": 0,
+     "within6": 100
+    },
+    {
+     "off": 2,
+     "lv": 12,
+     "firstTry": 100,
+     "within6": 100
+    }
+   ],
+   "healStatus": [
+    {
+     "off": -2,
+     "lv": 8,
+     "firstTry": 0,
+     "within6": 2
+    },
+    {
+     "off": -1,
+     "lv": 9,
+     "firstTry": 4,
+     "within6": 32.5
+    },
+    {
+     "off": 0,
+     "lv": 10,
+     "firstTry": 38.5,
+     "within6": 98.5
+    },
+    {
+     "off": 1,
+     "lv": 11,
+     "firstTry": 96.5,
+     "within6": 100
+    },
+    {
+     "off": 2,
+     "lv": 12,
+     "firstTry": 100,
+     "within6": 100
+    }
+   ],
+   "balanced": [
+    {
+     "off": -2,
+     "lv": 8,
+     "firstTry": 0,
+     "within6": 0
+    },
+    {
+     "off": -1,
+     "lv": 9,
+     "firstTry": 9.5,
+     "within6": 36.5
+    },
+    {
+     "off": 0,
+     "lv": 10,
+     "firstTry": 44,
+     "within6": 97.5
+    },
+    {
+     "off": 1,
+     "lv": 11,
+     "firstTry": 91.5,
+     "within6": 100
+    },
+    {
+     "off": 2,
+     "lv": 12,
+     "firstTry": 100,
+     "within6": 100
+    }
+   ],
+   "swiftWind": [
+    {
+     "off": -2,
+     "lv": 8,
+     "firstTry": 0.5,
+     "within6": 5
+    },
+    {
+     "off": -1,
+     "lv": 9,
+     "firstTry": 9.5,
+     "within6": 82.5
+    },
+    {
+     "off": 0,
+     "lv": 10,
+     "firstTry": 32,
+     "within6": 100
+    },
+    {
+     "off": 1,
+     "lv": 11,
+     "firstTry": 56.5,
+     "within6": 100
+    },
+    {
+     "off": 2,
+     "lv": 12,
+     "firstTry": 100,
+     "within6": 100
+    }
+   ],
+   "autoBattle": [
+    {
+     "off": -2,
+     "lv": 8,
+     "firstTry": 0,
+     "within6": 0
+    },
+    {
+     "off": -1,
+     "lv": 9,
+     "firstTry": 9.5,
+     "within6": 36.5
+    },
+    {
+     "off": 0,
+     "lv": 10,
+     "firstTry": 44,
+     "within6": 97.5
+    },
+    {
+     "off": 1,
+     "lv": 11,
+     "firstTry": 91.5,
+     "within6": 100
+    },
+    {
+     "off": 2,
+     "lv": 12,
+     "firstTry": 100,
+     "within6": 100
+    }
+   ],
+   "defensiveCycle": [
+    {
+     "off": -2,
+     "lv": 8,
+     "firstTry": 0,
+     "within6": 0
+    },
+    {
+     "off": -1,
+     "lv": 9,
+     "firstTry": 0,
+     "within6": 23.5
+    },
+    {
+     "off": 0,
+     "lv": 10,
+     "firstTry": 0,
+     "within6": 100
+    },
+    {
+     "off": 1,
+     "lv": 11,
+     "firstTry": 0,
+     "within6": 100
+    },
+    {
+     "off": 2,
+     "lv": 12,
+     "firstTry": 100,
+     "within6": 100
+    }
+   ]
+  }
+ }
+}

@@ -1,0 +1,73 @@
+{
+ "shrine": [
+  {
+   "level": 2,
+   "residentLv": 10,
+   "hoursPlayed": 16,
+   "before": 768,
+   "after": 10.3
+  },
+  {
+   "level": 2,
+   "residentLv": 10,
+   "hoursPlayed": 4,
+   "before": 192,
+   "after": 10.3
+  },
+  {
+   "level": 4,
+   "residentLv": 20,
+   "hoursPlayed": 16,
+   "before": 3182,
+   "after": 20.6
+  },
+  {
+   "level": 4,
+   "residentLv": 20,
+   "hoursPlayed": 4,
+   "before": 935.9,
+   "after": 20.6
+  },
+  {
+   "level": 4,
+   "residentLv": 30,
+   "hoursPlayed": 16,
+   "before": 4161,
+   "after": 20.6
+  },
+  {
+   "level": 4,
+   "residentLv": 30,
+   "hoursPlayed": 4,
+   "before": 1223.9,
+   "after": 20.6
+  },
+  {
+   "level": 4,
+   "residentLv": 30,
+   "hoursPlayed": 0,
+   "note": "away for a week, then collects once",
+   "before": 69.9,
+   "after": 20.6
+  }
+ ],
+ "gemFlow": {
+  "oneTime": {
+   "quests": 103,
+   "dungeons": 162,
+   "survival": 34
+  },
+  "perDayLate": {
+   "moonShrineBefore": 4161,
+   "moonShrineAfter": 20.6,
+   "ruinsIfSearchedAllDay": 9.6,
+   "legacyBossFarm17A": "closed in 17B"
+  },
+  "sinks": {
+   "forgeRecipesTotal": 22,
+   "essenceExchangePerDayMax": 30,
+   "hatchNowPerEgg": "1 gem per started 6 minutes left (an egg at \"normal\" speed: 1-5)",
+   "finishNow": "1 gem per started 6 minutes of a building timer"
+  }
+ }
+}
