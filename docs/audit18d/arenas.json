@@ -1,0 +1,1413 @@
+{
+ "note": "Chromium + SwiftShader software WebGL at 844x390 @2x; NOT an iPhone. ms = mean CPU+GPU cost of 40 back-to-back renders of the battle view.",
+ "tiers": {
+  "high": [
+   {
+    "id": "v_mossgate",
+    "base": "forgottenroad",
+    "verdant": {
+     "arena": "v_mossgate",
+     "ms": 96.03,
+     "calls": 21,
+     "triangles": 15504,
+     "geometries": 18,
+     "textures": 5,
+     "programs": 15
+    },
+    "before": {
+     "arena": "forgottenroad",
+     "ms": 62.07,
+     "calls": 21,
+     "triangles": 14120,
+     "geometries": 20,
+     "textures": 5,
+     "programs": 15
+    }
+   },
+   {
+    "id": "v_aqueduct",
+    "base": "drownedsteps",
+    "verdant": {
+     "arena": "v_aqueduct",
+     "ms": 51.66,
+     "calls": 22,
+     "triangles": 14296,
+     "geometries": 23,
+     "textures": 5,
+     "programs": 16
+    },
+    "before": {
+     "arena": "drownedsteps",
+     "ms": 57.71,
+     "calls": 21,
+     "triangles": 22310,
+     "geometries": 24,
+     "textures": 5,
+     "programs": 16
+    }
+   },
+   {
+    "id": "v_spore",
+    "base": "reliquary",
+    "verdant": {
+     "arena": "v_spore",
+     "ms": 54.59,
+     "calls": 23,
+     "triangles": 17578,
+     "geometries": 28,
+     "textures": 6,
+     "programs": 16
+    },
+    "before": {
+     "arena": "reliquary",
+     "ms": 49.11,
+     "calls": 23,
+     "triangles": 12902,
+     "geometries": 29,
+     "textures": 6,
+     "programs": 16
+    }
+   },
+   {
+    "id": "v_archive",
+    "base": "gatheringhall",
+    "verdant": {
+     "arena": "v_archive",
+     "ms": 64.76,
+     "calls": 25,
+     "triangles": 14592,
+     "geometries": 29,
+     "textures": 5,
+     "programs": 16
+    },
+    "before": {
+     "arena": "gatheringhall",
+     "ms": 58.21,
+     "calls": 24,
+     "triangles": 13002,
+     "geometries": 29,
+     "textures": 5,
+     "programs": 16
+    }
+   },
+   {
+    "id": "v_glow",
+    "base": "coldkiln",
+    "verdant": {
+     "arena": "v_glow",
+     "ms": 61.07,
+     "calls": 20,
+     "triangles": 17532,
+     "geometries": 30,
+     "textures": 4,
+     "programs": 14
+    },
+    "before": {
+     "arena": "coldkiln",
+     "ms": 63.34,
+     "calls": 20,
+     "triangles": 13818,
+     "geometries": 32,
+     "textures": 4,
+     "programs": 14
+    }
+   },
+   {
+    "id": "v_twinshrine",
+    "base": "lanternorchard",
+    "verdant": {
+     "arena": "v_twinshrine",
+     "ms": 63.11,
+     "calls": 29,
+     "triangles": 15842,
+     "geometries": 36,
+     "textures": 4,
+     "programs": 14
+    },
+    "before": {
+     "arena": "lanternorchard",
+     "ms": 63.28,
+     "calls": 29,
+     "triangles": 12974,
+     "geometries": 38,
+     "textures": 4,
+     "programs": 14
+    }
+   },
+   {
+    "id": "v_canopy",
+    "base": "windstair",
+    "verdant": {
+     "arena": "v_canopy",
+     "ms": 62.91,
+     "calls": 27,
+     "triangles": 17042,
+     "geometries": 38,
+     "textures": 5,
+     "programs": 16
+    },
+    "before": {
+     "arena": "windstair",
+     "ms": 59.23,
+     "calls": 28,
+     "triangles": 12658,
+     "geometries": 40,
+     "textures": 5,
+     "programs": 16
+    }
+   },
+   {
+    "id": "v_moonwell",
+    "base": "drownedsteps",
+    "verdant": {
+     "arena": "v_moonwell",
+     "ms": 53.36,
+     "calls": 22,
+     "triangles": 15698,
+     "geometries": 19,
+     "textures": 5,
+     "programs": 16
+    },
+    "before": {
+     "arena": "drownedsteps",
+     "ms": 54.75,
+     "calls": 21,
+     "triangles": 22310,
+     "geometries": 20,
+     "textures": 5,
+     "programs": 16
+    }
+   },
+   {
+    "id": "v_choir",
+    "base": "resonancescar",
+    "verdant": {
+     "arena": "v_choir",
+     "ms": 52.5,
+     "calls": 29,
+     "triangles": 24682,
+     "geometries": 31,
+     "textures": 6,
+     "programs": 17
+    },
+    "before": {
+     "arena": "resonancescar",
+     "ms": 51.25,
+     "calls": 29,
+     "triangles": 11064,
+     "geometries": 34,
+     "textures": 6,
+     "programs": 17
+    }
+   },
+   {
+    "id": "v_elderroot",
+    "base": "heartwood",
+    "verdant": {
+     "arena": "v_elderroot",
+     "ms": 62.32,
+     "calls": 23,
+     "triangles": 15250,
+     "geometries": 28,
+     "textures": 5,
+     "programs": 16
+    },
+    "before": {
+     "arena": "heartwood",
+     "ms": 63,
+     "calls": 23,
+     "triangles": 14082,
+     "geometries": 30,
+     "textures": 5,
+     "programs": 16
+    }
+   }
+  ],
+  "balanced": [
+   {
+    "id": "v_mossgate",
+    "base": "forgottenroad",
+    "verdant": {
+     "arena": "v_mossgate",
+     "ms": 59.73,
+     "calls": 20,
+     "triangles": 14780,
+     "geometries": 30,
+     "textures": 5,
+     "programs": 15
+    },
+    "before": {
+     "arena": "forgottenroad",
+     "ms": 58.8,
+     "calls": 20,
+     "triangles": 13396,
+     "geometries": 32,
+     "textures": 5,
+     "programs": 15
+    }
+   },
+   {
+    "id": "v_aqueduct",
+    "base": "drownedsteps",
+    "verdant": {
+     "arena": "v_aqueduct",
+     "ms": 47.32,
+     "calls": 21,
+     "triangles": 13812,
+     "geometries": 35,
+     "textures": 5,
+     "programs": 16
+    },
+    "before": {
+     "arena": "drownedsteps",
+     "ms": 63.28,
+     "calls": 20,
+     "triangles": 21802,
+     "geometries": 34,
+     "textures": 5,
+     "programs": 16
+    }
+   },
+   {
+    "id": "v_spore",
+    "base": "reliquary",
+    "verdant": {
+     "arena": "v_spore",
+     "ms": 50.14,
+     "calls": 22,
+     "triangles": 17334,
+     "geometries": 38,
+     "textures": 6,
+     "programs": 16
+    },
+    "before": {
+     "arena": "reliquary",
+     "ms": 46.38,
+     "calls": 22,
+     "triangles": 12670,
+     "geometries": 39,
+     "textures": 6,
+     "programs": 16
+    }
+   },
+   {
+    "id": "v_archive",
+    "base": "gatheringhall",
+    "verdant": {
+     "arena": "v_archive",
+     "ms": 57.86,
+     "calls": 24,
+     "triangles": 14364,
+     "geometries": 39,
+     "textures": 5,
+     "programs": 16
+    },
+    "before": {
+     "arena": "gatheringhall",
+     "ms": 55.34,
+     "calls": 23,
+     "triangles": 12774,
+     "geometries": 39,
+     "textures": 5,
+     "programs": 16
+    }
+   },
+   {
+    "id": "v_glow",
+    "base": "coldkiln",
+    "verdant": {
+     "arena": "v_glow",
+     "ms": 57.97,
+     "calls": 19,
+     "triangles": 17196,
+     "geometries": 40,
+     "textures": 4,
+     "programs": 14
+    },
+    "before": {
+     "arena": "coldkiln",
+     "ms": 56.9,
+     "calls": 19,
+     "triangles": 13518,
+     "geometries": 42,
+     "textures": 4,
+     "programs": 14
+    }
+   },
+   {
+    "id": "v_twinshrine",
+    "base": "lanternorchard",
+    "verdant": {
+     "arena": "v_twinshrine",
+     "ms": 54.11,
+     "calls": 28,
+     "triangles": 14966,
+     "geometries": 22,
+     "textures": 4,
+     "programs": 14
+    },
+    "before": {
+     "arena": "lanternorchard",
+     "ms": 56.44,
+     "calls": 28,
+     "triangles": 12134,
+     "geometries": 24,
+     "textures": 4,
+     "programs": 14
+    }
+   },
+   {
+    "id": "v_canopy",
+    "base": "windstair",
+    "verdant": {
+     "arena": "v_canopy",
+     "ms": 60.25,
+     "calls": 26,
+     "triangles": 16538,
+     "geometries": 24,
+     "textures": 5,
+     "programs": 16
+    },
+    "before": {
+     "arena": "windstair",
+     "ms": 57.65,
+     "calls": 27,
+     "triangles": 12154,
+     "geometries": 26,
+     "textures": 5,
+     "programs": 16
+    }
+   },
+   {
+    "id": "v_moonwell",
+    "base": "drownedsteps",
+    "verdant": {
+     "arena": "v_moonwell",
+     "ms": 47.88,
+     "calls": 21,
+     "triangles": 15214,
+     "geometries": 29,
+     "textures": 5,
+     "programs": 16
+    },
+    "before": {
+     "arena": "drownedsteps",
+     "ms": 50.74,
+     "calls": 20,
+     "triangles": 21802,
+     "geometries": 30,
+     "textures": 5,
+     "programs": 16
+    }
+   },
+   {
+    "id": "v_choir",
+    "base": "resonancescar",
+    "verdant": {
+     "arena": "v_choir",
+     "ms": 49.92,
+     "calls": 28,
+     "triangles": 24438,
+     "geometries": 41,
+     "textures": 6,
+     "programs": 17
+    },
+    "before": {
+     "arena": "resonancescar",
+     "ms": 47.12,
+     "calls": 28,
+     "triangles": 10808,
+     "geometries": 44,
+     "textures": 6,
+     "programs": 17
+    }
+   },
+   {
+    "id": "v_elderroot",
+    "base": "heartwood",
+    "verdant": {
+     "arena": "v_elderroot",
+     "ms": 56.31,
+     "calls": 22,
+     "triangles": 14838,
+     "geometries": 38,
+     "textures": 5,
+     "programs": 16
+    },
+    "before": {
+     "arena": "heartwood",
+     "ms": 60.4,
+     "calls": 22,
+     "triangles": 13706,
+     "geometries": 40,
+     "textures": 5,
+     "programs": 16
+    }
+   }
+  ]
+ },
+ "pairs": [],
+ "arenaOnly": [
+  {
+   "id": "v_mossgate",
+   "base": "forgottenroad",
+   "boss": false,
+   "tier": "high",
+   "verdant": {
+    "key": "v_mossgate",
+    "draws": 6,
+    "triangles": 8154
+   },
+   "before": {
+    "key": "forgottenroad",
+    "draws": 6,
+    "triangles": 8178
+   }
+  },
+  {
+   "id": "v_mossgate",
+   "base": "forgottenroad",
+   "boss": false,
+   "tier": "balanced",
+   "verdant": {
+    "key": "v_mossgate",
+    "draws": 5,
+    "triangles": 7432
+   },
+   "before": {
+    "key": "forgottenroad",
+    "draws": 5,
+    "triangles": 7456
+   }
+  },
+  {
+   "id": "v_mossgate",
+   "base": "forgottenroad",
+   "boss": false,
+   "tier": "saver",
+   "verdant": {
+    "key": "v_mossgate",
+    "draws": 3,
+    "triangles": 6672
+   },
+   "before": {
+    "key": "forgottenroad",
+    "draws": 3,
+    "triangles": 6732
+   }
+  },
+  {
+   "id": "v_mossgate",
+   "base": "forgottenroad",
+   "boss": true,
+   "tier": "high",
+   "verdant": {
+    "key": "v_mossgate",
+    "draws": 14,
+    "triangles": 8758
+   },
+   "before": {
+    "key": "forgottenroad",
+    "draws": 14,
+    "triangles": 8614
+   }
+  },
+  {
+   "id": "v_mossgate",
+   "base": "forgottenroad",
+   "boss": true,
+   "tier": "balanced",
+   "verdant": {
+    "key": "v_mossgate",
+    "draws": 13,
+    "triangles": 8036
+   },
+   "before": {
+    "key": "forgottenroad",
+    "draws": 13,
+    "triangles": 7892
+   }
+  },
+  {
+   "id": "v_mossgate",
+   "base": "forgottenroad",
+   "boss": true,
+   "tier": "saver",
+   "verdant": {
+    "key": "v_mossgate",
+    "draws": 11,
+    "triangles": 7276
+   },
+   "before": {
+    "key": "forgottenroad",
+    "draws": 11,
+    "triangles": 7168
+   }
+  },
+  {
+   "id": "v_aqueduct",
+   "base": "drownedsteps",
+   "boss": false,
+   "tier": "high",
+   "verdant": {
+    "key": "v_aqueduct",
+    "draws": 7,
+    "triangles": 6992
+   },
+   "before": {
+    "key": "drownedsteps",
+    "draws": 7,
+    "triangles": 6956
+   }
+  },
+  {
+   "id": "v_aqueduct",
+   "base": "drownedsteps",
+   "boss": false,
+   "tier": "balanced",
+   "verdant": {
+    "key": "v_aqueduct",
+    "draws": 6,
+    "triangles": 6510
+   },
+   "before": {
+    "key": "drownedsteps",
+    "draws": 6,
+    "triangles": 6450
+   }
+  },
+  {
+   "id": "v_aqueduct",
+   "base": "drownedsteps",
+   "boss": false,
+   "tier": "saver",
+   "verdant": {
+    "key": "v_aqueduct",
+    "draws": 4,
+    "triangles": 6026
+   },
+   "before": {
+    "key": "drownedsteps",
+    "draws": 4,
+    "triangles": 5990
+   }
+  },
+  {
+   "id": "v_aqueduct",
+   "base": "drownedsteps",
+   "boss": true,
+   "tier": "high",
+   "verdant": {
+    "key": "v_aqueduct",
+    "draws": 13,
+    "triangles": 7344
+   },
+   "before": {
+    "key": "drownedsteps",
+    "draws": 13,
+    "triangles": 7296
+   }
+  },
+  {
+   "id": "v_aqueduct",
+   "base": "drownedsteps",
+   "boss": true,
+   "tier": "balanced",
+   "verdant": {
+    "key": "v_aqueduct",
+    "draws": 12,
+    "triangles": 6862
+   },
+   "before": {
+    "key": "drownedsteps",
+    "draws": 12,
+    "triangles": 6790
+   }
+  },
+  {
+   "id": "v_aqueduct",
+   "base": "drownedsteps",
+   "boss": true,
+   "tier": "saver",
+   "verdant": {
+    "key": "v_aqueduct",
+    "draws": 10,
+    "triangles": 6378
+   },
+   "before": {
+    "key": "drownedsteps",
+    "draws": 10,
+    "triangles": 6330
+   }
+  },
+  {
+   "id": "v_spore",
+   "base": "reliquary",
+   "boss": false,
+   "tier": "high",
+   "verdant": {
+    "key": "v_spore",
+    "draws": 9,
+    "triangles": 6982
+   },
+   "before": {
+    "key": "reliquary",
+    "draws": 9,
+    "triangles": 6946
+   }
+  },
+  {
+   "id": "v_spore",
+   "base": "reliquary",
+   "boss": false,
+   "tier": "balanced",
+   "verdant": {
+    "key": "v_spore",
+    "draws": 8,
+    "triangles": 6740
+   },
+   "before": {
+    "key": "reliquary",
+    "draws": 8,
+    "triangles": 6716
+   }
+  },
+  {
+   "id": "v_spore",
+   "base": "reliquary",
+   "boss": false,
+   "tier": "saver",
+   "verdant": {
+    "key": "v_spore",
+    "draws": 6,
+    "triangles": 6484
+   },
+   "before": {
+    "key": "reliquary",
+    "draws": 6,
+    "triangles": 6436
+   }
+  },
+  {
+   "id": "v_spore",
+   "base": "reliquary",
+   "boss": true,
+   "tier": "high",
+   "verdant": {
+    "key": "v_spore",
+    "draws": 18,
+    "triangles": 7334
+   },
+   "before": {
+    "key": "reliquary",
+    "draws": 18,
+    "triangles": 7238
+   }
+  },
+  {
+   "id": "v_spore",
+   "base": "reliquary",
+   "boss": true,
+   "tier": "balanced",
+   "verdant": {
+    "key": "v_spore",
+    "draws": 17,
+    "triangles": 7092
+   },
+   "before": {
+    "key": "reliquary",
+    "draws": 17,
+    "triangles": 7008
+   }
+  },
+  {
+   "id": "v_spore",
+   "base": "reliquary",
+   "boss": true,
+   "tier": "saver",
+   "verdant": {
+    "key": "v_spore",
+    "draws": 15,
+    "triangles": 6836
+   },
+   "before": {
+    "key": "reliquary",
+    "draws": 15,
+    "triangles": 6728
+   }
+  },
+  {
+   "id": "v_archive",
+   "base": "gatheringhall",
+   "boss": false,
+   "tier": "high",
+   "verdant": {
+    "key": "v_archive",
+    "draws": 10,
+    "triangles": 7048
+   },
+   "before": {
+    "key": "gatheringhall",
+    "draws": 10,
+    "triangles": 7048
+   }
+  },
+  {
+   "id": "v_archive",
+   "base": "gatheringhall",
+   "boss": false,
+   "tier": "balanced",
+   "verdant": {
+    "key": "v_archive",
+    "draws": 9,
+    "triangles": 6820
+   },
+   "before": {
+    "key": "gatheringhall",
+    "draws": 9,
+    "triangles": 6820
+   }
+  },
+  {
+   "id": "v_archive",
+   "base": "gatheringhall",
+   "boss": false,
+   "tier": "saver",
+   "verdant": {
+    "key": "v_archive",
+    "draws": 7,
+    "triangles": 6540
+   },
+   "before": {
+    "key": "gatheringhall",
+    "draws": 7,
+    "triangles": 6576
+   }
+  },
+  {
+   "id": "v_archive",
+   "base": "gatheringhall",
+   "boss": true,
+   "tier": "high",
+   "verdant": {
+    "key": "v_archive",
+    "draws": 15,
+    "triangles": 7676
+   },
+   "before": {
+    "key": "gatheringhall",
+    "draws": 15,
+    "triangles": 7688
+   }
+  },
+  {
+   "id": "v_archive",
+   "base": "gatheringhall",
+   "boss": true,
+   "tier": "balanced",
+   "verdant": {
+    "key": "v_archive",
+    "draws": 14,
+    "triangles": 7448
+   },
+   "before": {
+    "key": "gatheringhall",
+    "draws": 14,
+    "triangles": 7460
+   }
+  },
+  {
+   "id": "v_archive",
+   "base": "gatheringhall",
+   "boss": true,
+   "tier": "saver",
+   "verdant": {
+    "key": "v_archive",
+    "draws": 12,
+    "triangles": 7168
+   },
+   "before": {
+    "key": "gatheringhall",
+    "draws": 12,
+    "triangles": 7216
+   }
+  },
+  {
+   "id": "v_glow",
+   "base": "coldkiln",
+   "boss": false,
+   "tier": "high",
+   "verdant": {
+    "key": "v_glow",
+    "draws": 6,
+    "triangles": 7848
+   },
+   "before": {
+    "key": "coldkiln",
+    "draws": 6,
+    "triangles": 7968
+   }
+  },
+  {
+   "id": "v_glow",
+   "base": "coldkiln",
+   "boss": false,
+   "tier": "balanced",
+   "verdant": {
+    "key": "v_glow",
+    "draws": 5,
+    "triangles": 7512
+   },
+   "before": {
+    "key": "coldkiln",
+    "draws": 5,
+    "triangles": 7668
+   }
+  },
+  {
+   "id": "v_glow",
+   "base": "coldkiln",
+   "boss": false,
+   "tier": "saver",
+   "verdant": {
+    "key": "v_glow",
+    "draws": 4,
+    "triangles": 7212
+   },
+   "before": {
+    "key": "coldkiln",
+    "draws": 4,
+    "triangles": 7332
+   }
+  },
+  {
+   "id": "v_glow",
+   "base": "coldkiln",
+   "boss": true,
+   "tier": "high",
+   "verdant": {
+    "key": "v_glow",
+    "draws": 14,
+    "triangles": 8296
+   },
+   "before": {
+    "key": "coldkiln",
+    "draws": 14,
+    "triangles": 8440
+   }
+  },
+  {
+   "id": "v_glow",
+   "base": "coldkiln",
+   "boss": true,
+   "tier": "balanced",
+   "verdant": {
+    "key": "v_glow",
+    "draws": 13,
+    "triangles": 7960
+   },
+   "before": {
+    "key": "coldkiln",
+    "draws": 13,
+    "triangles": 8140
+   }
+  },
+  {
+   "id": "v_glow",
+   "base": "coldkiln",
+   "boss": true,
+   "tier": "saver",
+   "verdant": {
+    "key": "v_glow",
+    "draws": 12,
+    "triangles": 7660
+   },
+   "before": {
+    "key": "coldkiln",
+    "draws": 12,
+    "triangles": 7804
+   }
+  },
+  {
+   "id": "v_twinshrine",
+   "base": "lanternorchard",
+   "boss": false,
+   "tier": "high",
+   "verdant": {
+    "key": "v_twinshrine",
+    "draws": 16,
+    "triangles": 8808
+   },
+   "before": {
+    "key": "lanternorchard",
+    "draws": 16,
+    "triangles": 8904
+   }
+  },
+  {
+   "id": "v_twinshrine",
+   "base": "lanternorchard",
+   "boss": false,
+   "tier": "balanced",
+   "verdant": {
+    "key": "v_twinshrine",
+    "draws": 15,
+    "triangles": 7932
+   },
+   "before": {
+    "key": "lanternorchard",
+    "draws": 15,
+    "triangles": 8064
+   }
+  },
+  {
+   "id": "v_twinshrine",
+   "base": "lanternorchard",
+   "boss": false,
+   "tier": "saver",
+   "verdant": {
+    "key": "v_twinshrine",
+    "draws": 14,
+    "triangles": 7080
+   },
+   "before": {
+    "key": "lanternorchard",
+    "draws": 14,
+    "triangles": 7092
+   }
+  },
+  {
+   "id": "v_twinshrine",
+   "base": "lanternorchard",
+   "boss": true,
+   "tier": "high",
+   "verdant": {
+    "key": "v_twinshrine",
+    "draws": 25,
+    "triangles": 9376
+   },
+   "before": {
+    "key": "lanternorchard",
+    "draws": 25,
+    "triangles": 9424
+   }
+  },
+  {
+   "id": "v_twinshrine",
+   "base": "lanternorchard",
+   "boss": true,
+   "tier": "balanced",
+   "verdant": {
+    "key": "v_twinshrine",
+    "draws": 24,
+    "triangles": 8500
+   },
+   "before": {
+    "key": "lanternorchard",
+    "draws": 24,
+    "triangles": 8584
+   }
+  },
+  {
+   "id": "v_twinshrine",
+   "base": "lanternorchard",
+   "boss": true,
+   "tier": "saver",
+   "verdant": {
+    "key": "v_twinshrine",
+    "draws": 23,
+    "triangles": 7648
+   },
+   "before": {
+    "key": "lanternorchard",
+    "draws": 23,
+    "triangles": 7612
+   }
+  },
+  {
+   "id": "v_canopy",
+   "base": "windstair",
+   "boss": false,
+   "tier": "high",
+   "verdant": {
+    "key": "v_canopy",
+    "draws": 14,
+    "triangles": 7000
+   },
+   "before": {
+    "key": "windstair",
+    "draws": 14,
+    "triangles": 7084
+   }
+  },
+  {
+   "id": "v_canopy",
+   "base": "windstair",
+   "boss": false,
+   "tier": "balanced",
+   "verdant": {
+    "key": "v_canopy",
+    "draws": 13,
+    "triangles": 6496
+   },
+   "before": {
+    "key": "windstair",
+    "draws": 13,
+    "triangles": 6580
+   }
+  },
+  {
+   "id": "v_canopy",
+   "base": "windstair",
+   "boss": false,
+   "tier": "saver",
+   "verdant": {
+    "key": "v_canopy",
+    "draws": 11,
+    "triangles": 6012
+   },
+   "before": {
+    "key": "windstair",
+    "draws": 11,
+    "triangles": 6024
+   }
+  },
+  {
+   "id": "v_canopy",
+   "base": "windstair",
+   "boss": true,
+   "tier": "high",
+   "verdant": {
+    "key": "v_canopy",
+    "draws": 22,
+    "triangles": 7592
+   },
+   "before": {
+    "key": "windstair",
+    "draws": 22,
+    "triangles": 7544
+   }
+  },
+  {
+   "id": "v_canopy",
+   "base": "windstair",
+   "boss": true,
+   "tier": "balanced",
+   "verdant": {
+    "key": "v_canopy",
+    "draws": 21,
+    "triangles": 7088
+   },
+   "before": {
+    "key": "windstair",
+    "draws": 21,
+    "triangles": 7040
+   }
+  },
+  {
+   "id": "v_canopy",
+   "base": "windstair",
+   "boss": true,
+   "tier": "saver",
+   "verdant": {
+    "key": "v_canopy",
+    "draws": 19,
+    "triangles": 6604
+   },
+   "before": {
+    "key": "windstair",
+    "draws": 19,
+    "triangles": 6484
+   }
+  },
+  {
+   "id": "v_moonwell",
+   "base": "drownedsteps",
+   "boss": false,
+   "tier": "high",
+   "verdant": {
+    "key": "v_moonwell",
+    "draws": 7,
+    "triangles": 6944
+   },
+   "before": {
+    "key": "drownedsteps",
+    "draws": 7,
+    "triangles": 6956
+   }
+  },
+  {
+   "id": "v_moonwell",
+   "base": "drownedsteps",
+   "boss": false,
+   "tier": "balanced",
+   "verdant": {
+    "key": "v_moonwell",
+    "draws": 6,
+    "triangles": 6462
+   },
+   "before": {
+    "key": "drownedsteps",
+    "draws": 6,
+    "triangles": 6450
+   }
+  },
+  {
+   "id": "v_moonwell",
+   "base": "drownedsteps",
+   "boss": false,
+   "tier": "saver",
+   "verdant": {
+    "key": "v_moonwell",
+    "draws": 4,
+    "triangles": 5978
+   },
+   "before": {
+    "key": "drownedsteps",
+    "draws": 4,
+    "triangles": 5990
+   }
+  },
+  {
+   "id": "v_moonwell",
+   "base": "drownedsteps",
+   "boss": true,
+   "tier": "high",
+   "verdant": {
+    "key": "v_moonwell",
+    "draws": 13,
+    "triangles": 7284
+   },
+   "before": {
+    "key": "drownedsteps",
+    "draws": 13,
+    "triangles": 7296
+   }
+  },
+  {
+   "id": "v_moonwell",
+   "base": "drownedsteps",
+   "boss": true,
+   "tier": "balanced",
+   "verdant": {
+    "key": "v_moonwell",
+    "draws": 12,
+    "triangles": 6802
+   },
+   "before": {
+    "key": "drownedsteps",
+    "draws": 12,
+    "triangles": 6790
+   }
+  },
+  {
+   "id": "v_moonwell",
+   "base": "drownedsteps",
+   "boss": true,
+   "tier": "saver",
+   "verdant": {
+    "key": "v_moonwell",
+    "draws": 10,
+    "triangles": 6318
+   },
+   "before": {
+    "key": "drownedsteps",
+    "draws": 10,
+    "triangles": 6330
+   }
+  },
+  {
+   "id": "v_choir",
+   "base": "resonancescar",
+   "boss": false,
+   "tier": "high",
+   "verdant": {
+    "key": "v_choir",
+    "draws": 17,
+    "triangles": 2898
+   },
+   "before": {
+    "key": "resonancescar",
+    "draws": 17,
+    "triangles": 2982
+   }
+  },
+  {
+   "id": "v_choir",
+   "base": "resonancescar",
+   "boss": false,
+   "tier": "balanced",
+   "verdant": {
+    "key": "v_choir",
+    "draws": 16,
+    "triangles": 2656
+   },
+   "before": {
+    "key": "resonancescar",
+    "draws": 16,
+    "triangles": 2728
+   }
+  },
+  {
+   "id": "v_choir",
+   "base": "resonancescar",
+   "boss": false,
+   "tier": "saver",
+   "verdant": {
+    "key": "v_choir",
+    "draws": 14,
+    "triangles": 2400
+   },
+   "before": {
+    "key": "resonancescar",
+    "draws": 14,
+    "triangles": 2484
+   }
+  },
+  {
+   "id": "v_choir",
+   "base": "resonancescar",
+   "boss": true,
+   "tier": "high",
+   "verdant": {
+    "key": "v_choir",
+    "draws": 30,
+    "triangles": 3334
+   },
+   "before": {
+    "key": "resonancescar",
+    "draws": 30,
+    "triangles": 3418
+   }
+  },
+  {
+   "id": "v_choir",
+   "base": "resonancescar",
+   "boss": true,
+   "tier": "balanced",
+   "verdant": {
+    "key": "v_choir",
+    "draws": 29,
+    "triangles": 3092
+   },
+   "before": {
+    "key": "resonancescar",
+    "draws": 29,
+    "triangles": 3164
+   }
+  },
+  {
+   "id": "v_choir",
+   "base": "resonancescar",
+   "boss": true,
+   "tier": "saver",
+   "verdant": {
+    "key": "v_choir",
+    "draws": 27,
+    "triangles": 2836
+   },
+   "before": {
+    "key": "resonancescar",
+    "draws": 27,
+    "triangles": 2920
+   }
+  },
+  {
+   "id": "v_elderroot",
+   "base": "heartwood",
+   "boss": false,
+   "tier": "high",
+   "verdant": {
+    "key": "v_elderroot",
+    "draws": 8,
+    "triangles": 7698
+   },
+   "before": {
+    "key": "heartwood",
+    "draws": 8,
+    "triangles": 7638
+   }
+  },
+  {
+   "id": "v_elderroot",
+   "base": "heartwood",
+   "boss": false,
+   "tier": "balanced",
+   "verdant": {
+    "key": "v_elderroot",
+    "draws": 7,
+    "triangles": 7288
+   },
+   "before": {
+    "key": "heartwood",
+    "draws": 7,
+    "triangles": 7264
+   }
+  },
+  {
+   "id": "v_elderroot",
+   "base": "heartwood",
+   "boss": false,
+   "tier": "saver",
+   "verdant": {
+    "key": "v_elderroot",
+    "draws": 5,
+    "triangles": 6936
+   },
+   "before": {
+    "key": "heartwood",
+    "draws": 5,
+    "triangles": 6876
+   }
+  },
+  {
+   "id": "v_elderroot",
+   "base": "heartwood",
+   "boss": true,
+   "tier": "high",
+   "verdant": {
+    "key": "v_elderroot",
+    "draws": 13,
+    "triangles": 8446
+   },
+   "before": {
+    "key": "heartwood",
+    "draws": 13,
+    "triangles": 8434
+   }
+  },
+  {
+   "id": "v_elderroot",
+   "base": "heartwood",
+   "boss": true,
+   "tier": "balanced",
+   "verdant": {
+    "key": "v_elderroot",
+    "draws": 12,
+    "triangles": 8036
+   },
+   "before": {
+    "key": "heartwood",
+    "draws": 12,
+    "triangles": 8060
+   }
+  },
+  {
+   "id": "v_elderroot",
+   "base": "heartwood",
+   "boss": true,
+   "tier": "saver",
+   "verdant": {
+    "key": "v_elderroot",
+    "draws": 10,
+    "triangles": 7684
+   },
+   "before": {
+    "key": "heartwood",
+    "draws": 10,
+    "triangles": 7672
+   }
+  }
+ ],
+ "errors": []
+}

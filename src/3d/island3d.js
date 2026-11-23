@@ -442,10 +442,12 @@ export function createIsland() {
   }
   // magic: slow motes of light that spiral up around the island's enchanted places (the Hatchery's egg, the
   // Tidegate, the Moonshrine, the Reliquary Gate, the glowing standing stones). One Points object, ~10 per place.
+  // Phase 18D: the Verdant Wilds' places drift with light too (one shared points mesh: no extra draw calls per place)
+  const SPARK_L = { elderroot: ['#9af2ff', 5.5, 2.4], v_choir: ['#e8fff0', 1.6, 1.2], v_shrine: ['#fff3c8', 1.8, 1.0], v_archive: ['#ffe9b0', 2.2, 1.4], v_aqueduct: ['#d8fbff', 2.6, 0.8] };
   const SPARK = { hatchery: [MAGIC.egg, 2.6, 1.4], tidegate: [MAGIC.water, 1.8, 1.6], moonshrine: [MAGIC.moon, 2.2, 1.2], reliquarygate: [MAGIC.life, 1.4, 1.4] };
   function buildSparks(items) {
     if (sparks) { groups.fx.remove(sparks); sparks.geometry.dispose(); sparks.material.dispose(); sparks = null; }
-    const src = []; items.forEach((it) => { const k = it.k === 'b' && it.state !== 'ruined' && it.state !== 'constructing' ? SPARK[it.type] : it.k === 'l' && it.kind === 'stones' && it.on ? [MAGIC.spirit, 1, 1.6] : null; if (k) src.push([it.x + it.w / 2, it.y + it.h / 2, k]); });
+    const src = []; items.forEach((it) => { const k = it.k === 'b' && it.state !== 'ruined' && it.state !== 'constructing' ? SPARK[it.type] : it.k === 'l' && it.kind === 'stones' && it.on ? [MAGIC.spirit, 1, 1.6] : it.k === 'l' ? SPARK_L[it.kind] || null : null; if (k) src.push([it.x + it.w / 2, it.y + it.h / 2, k]); });
     if (!src.length) return;
     const N = src.length * (COARSE ? 7 : 10), p = new Float32Array(N * 3), col = new Float32Array(N * 3), seed = new Float32Array(N * 4), c = new THREE.Color();
     for (let i = 0; i < N; i++) { const [x, z, k] = src[i % src.length]; c.set(k[0]); col.set([c.r, c.g, c.b], i * 3); seed.set([x, z, k[1], hash(i, 1, 88) * 6.28 + hash(i, 2, 88) * 100], i * 4); p.set([x, k[1] * hash(i, 3, 88) * 1.5, z], i * 3); seed[i * 4 + 2] = k[2]; seed[i * 4 + 3] = hash(i, 4, 88) * 6.28; p[i * 3 + 1] = k[1] * hash(i, 5, 88) * 1.6; }

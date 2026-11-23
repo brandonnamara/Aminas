@@ -1003,7 +1003,7 @@
   /* Phase 18B: the Verdant Wilds' places (src/verdant18b.js). Simple voxel pictures for the 2D island; on the voxel
      island the 3D models replace the pictures and only the tap area and the floating marker stay. */
   const V18C = { moss: '#5fa34e', mossD: '#3f7a3a', stone: '#b8b0a0', stoneD: '#8f8878', ivy: '#3f9a4a', water: '#5ab8e8', glow: '#bff7a8' };
-  const v18tag = (z, ch, ring, fill) => '<g transform="translate(0 ' + (-z) + ')"><g class="tagq">' + circ(0, 0, 12, '#1f2a1c', ' stroke="' + ring + '" stroke-width="2"') + '<text y="5" text-anchor="middle" font-size="' + (ch.length > 1 ? 12 : 16) + '" font-weight="800" fill="' + fill + '">' + ch + '</text></g></g>';
+  const v18tag = (z, ch, ring, fill, big) => '<g transform="translate(0 ' + (-z) + ')' + (big ? ' scale(1.25)' : '') + '"><g class="tagq">' + circ(0, 0, 12, '#1f2a1c', ' stroke="' + ring + '" stroke-width="' + (big ? 3 : 2) + '"') + '<text y="5" text-anchor="middle" font-size="' + (ch.length > 1 ? 12 : 16) + '" font-weight="800" fill="' + fill + '">' + ch + '</text></g></g>';
   const v18wall = (u, v, du, dv, h, seed) => sbox(u, v, 0, du, dv, h, V18C.stone, 'stone', seed) + vbox(u, v, h, du, dv, 3, V18C.moss);
   L.v18pic = function (kind) {
     let g = '';
@@ -1028,11 +1028,13 @@
     return g;
   };
   L.v18gate = function (gate, state) {
-    const lit = state !== 'locked', col = { earth: '#c49a5a', water: '#5ab8e8', nature: '#6ad06a', metal: '#b8c4d4', fire: '#ff9a4a', light: '#ffe58a', wind: '#bfe8ff', resonance: '#ff9ee0' }[gate.el] || '#bff7a8';
+    const lit = state !== 'locked', done = state === 'done', open = state === 'open', col = { earth: '#c49a5a', water: '#5ab8e8', nature: '#6ad06a', metal: '#b8c4d4', fire: '#ff9a4a', light: '#ffe58a', wind: '#bfe8ff', resonance: '#ff9ee0' }[gate.el] || '#bff7a8';
     let g = '';
     if (!(Art.voxHas && Art.voxHas('l', 'v_gate_' + gate.id))) g += vc(-0.32, 0, 0, 0.12, 0.16, 30, V18C.stoneD) + vc(0.32, 0, 0, 0.12, 0.16, 30, V18C.stoneD) + vbox(-0.42, -0.1, 30, 0.84, 0.2, 6, V18C.stone) + vbox(-0.42, -0.1, 36, 0.84, 0.2, 2, V18C.moss) + vbox(-0.26, -0.03, 0, 0.52, 0.06, 28, lit ? col : '#2a3326', lit ? { x: ' opacity=".55"' } : undefined);
+    // Phase 18D: readable at a glance: the open entrance glows on the ground, a cleared one shows a tick, locked ones are dim
+    if (open) g = ell(0, 0, 30, 15, col, ' opacity=".35" class="glow-soft v18-open-ring"') + g;
     g += ell(0, 0, 26, 13, 'transparent') + '<rect x="-18" y="-52" width="36" height="52" fill="transparent"/>';
-    return '<g class="v18g ' + state + '" data-hit="v18:' + gate.id + '" data-hl="v18:' + gate.id + '">' + g + v18tag(58, String(gate.n), lit ? col : '#7a8a70', lit ? '#fff' : '#b8c4b0') + '</g>';
+    return '<g class="v18g ' + state + '" data-hit="v18:' + gate.id + '" data-hl="v18:' + gate.id + '">' + g + v18tag(58, done ? '✓' : String(gate.n), done ? '#8cffa0' : lit ? col : '#7a8a70', done ? '#d8ffe0' : lit ? '#fff' : '#b8c4b0', open) + '</g>';
   };
   L.v18site = function (site, fresh) {
     const big = site.w * site.h > 2, has = Art.voxHas && Art.voxHas('l', site.kind);
@@ -1111,7 +1113,7 @@
     // Phase 18B: the Verdant Wilds' other places and the ten dungeon entrances (none of them changes a map cell)
     if (iid === 'verdant' && V18 && D.V18) {
       D.V18.sites.forEach((site) => { if (site.slot) return; lm.push({ x: site.x, y: site.y, w: site.w, h: site.h, v18: true, kind: site.kind, site: site.id, svg: L.v18site(site, !V18.seen(st, site.part || site.id)) }); });
-      D.V18.gates.forEach((gate) => { if (gate.site) return; const state = V18.gateState(st, gate.id).state; lm.push({ x: gate.x, y: gate.y, w: 1, h: 1, top: true, v18: true, kind: 'v_gate_' + gate.id, gate: gate.id, on: state !== 'locked', svg: L.v18gate(gate, state) }); });
+      D.V18.gates.forEach((gate) => { if (gate.site) return; const state = V18.cleared(st, gate.id) ? 'done' : V18.gateState(st, gate.id).state; lm.push({ x: gate.x, y: gate.y, w: 1, h: 1, top: true, v18: true, kind: 'v_gate_' + gate.id, gate: gate.id, on: state !== 'locked', svg: L.v18gate(gate, state) }); });
     }
     return lm;
   };

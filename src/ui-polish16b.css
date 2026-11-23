@@ -111,3 +111,6 @@ body.calm .lm .v18hum { animation: none; opacity: .08; }
 .v18-gift { border: 1px solid rgba(255, 230, 160, .4); border-radius: .7rem; padding: .5rem .6rem; background: linear-gradient(90deg, rgba(255, 246, 192, .14), rgba(120, 100, 200, .14)); display: flex; flex-direction: column; gap: .3rem; }
 .v18-gift p { margin: 0; }
 .v18-gift.done { opacity: .8; }
+/* Phase 18D: rare Explore encounters */
+.v18-rare-tag { margin: 0 0 .3rem; color: #ffe58a; font-weight: 700; font-size: .8rem; text-align: center; }
+.v18-rare-note { margin: .4rem 0 0; color: #ffe58a; opacity: .9; }

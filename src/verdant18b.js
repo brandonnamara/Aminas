@@ -171,10 +171,49 @@
     if (R.emit) R.emit('v18gift', { alt: true }); return { ok: true, kind: 'alt', el: o.el, essence: o.essence, gems: o.gems };
   };
 
+  /* ---------- Phase 18D: rare third-form encounters (one per Verdant Explore area, once ever) ----------
+     Eligibility: the area is open and all three of its usual finds have already been met (its steps are done).
+     Then the first exploration of each calendar day in that area makes one roll: 20% to meet the area's rare Amina, and
+     the eighth roll is certain, so it arrives within 8 days of daily play (median: day 4). More explorations the
+     same day roll nothing, so tapping cannot farm it; a clock set back never grants an extra roll (days only go forward).
+     Once met and befriended it never appears again. Befriending costs the usual food; it joins at level 26 (third
+     forms otherwise come from evolving at 22), so one Amina is offered per area: breeding and evolution stay the way to
+     get the rest. The finds are existing species already in the collection rules; nothing else is paid. */
+  D.V18.rare = { rate: 0.2, pity: 8, lv: 26, of: { glowcap: 'terraflora3', streamside: 'aquaflora3', canopyedge: 'pyrophoenix' } };
+  V.rareState = function (st, area) {
+    const sp = D.V18.rare.of[area]; if (!sp || !D.SPECIES[sp]) return { state: 'none' };
+    const r = (st.v18 && st.v18.rare && st.v18.rare[area]) || {};
+    if (r.met) return { state: 'met', sp, rolls: r.n | 0 };
+    const a = D.AREAS[area], n = ((st.stats && st.stats.explores) || {})[area] | 0;
+    if (!R.areaUnlocked(st, area) || n < a.steps.length) return { state: 'waiting', sp, rolls: r.n | 0 };
+    return { state: 'eligible', sp, rolls: r.n | 0, today: !!(r.day && W.dayOrd(r.day) >= W.dayOrd(W.dayKey(now()))) };
+  };
+  const explore0 = R.explore;
+  R.explore = function (st, id) {
+    const rs = D.V18.rare.of[id] ? V.rareState(st, id) : null;
+    if (rs && rs.state === 'eligible' && !rs.today && !st.pendingFind) {
+      st.v18 = st.v18 || { seen: {} }; st.v18.rare = st.v18.rare || {}; const r = (st.v18.rare[id] = st.v18.rare[id] || { n: 0 });
+      const day = W.dayKey(now()); r.day = day; r.n = (r.n | 0) + 1;
+      if (R.rng() < D.V18.rare.rate || r.n >= D.V18.rare.pity) {
+        st.stats.explores[id] = (st.stats.explores[id] | 0) + 1;
+        st.pendingFind = { area: id, sp: rs.sp, rare: true }; st.seen[rs.sp] = true; r.offered = (r.offered | 0) + 1;
+        R.emit('found', { sp: rs.sp, area: id, rare: true });
+        return { ok: true, type: 'find', find: st.pendingFind, cost: D.BEFRIEND_COST, rare: true };
+      }
+    }
+    return explore0.apply(this, arguments);
+  };
+  const befriend0 = R.befriend;
+  R.befriend = function (st) {
+    const f = st.pendingFind, rare = !!(f && f.rare), r = befriend0.apply(this, arguments);
+    if (rare && r && r.ok && r.inst) { r.inst.lv = D.V18.rare.lv; r.inst.xp = 0; st.v18.rare[f.area].met = now() || 1; r.rare = true; }
+    return r;
+  };
+
   /* ---------- Phase 18C: the arrival scene, once (also for saves that reached the island before 18C) ---------- */
   V.arrivalDue = (st) => !!(D.V18.live && st && W.islandUnlocked(st, D.V18.island) && st.currentIsland === D.V18.island && !(st.story && st.story.scenes && st.story.scenes.v_arrival) && !(st.story && st.story.pendingScene));
   V.queueArrival = function (st) { if (!V.arrivalDue(st)) return false; st.story = st.story || {}; st.story.pendingScene = 'v_arrival'; return true; };
-  if (R.on) R.on((ev) => { if (ev.name === 'traveled' && ev.data && ev.data.island === D.V18.island) { const st = A.State && A.State.state; if (st) V.queueArrival(st); } });
+  // queued by W.travel below, on the save that travelled (Phase 18D: not the global state, which may be another save)
 
   /* ---------- Phase 18C: each Verdant dungeon's first-clear item (existing items that had no source yet) ---------- */
   if (D.DUNGEON_GEAR) Object.assign(D.DUNGEON_GEAR, { v_mossgate: 'ironbark', v_aqueduct: 'tideplate', v_spore: 'heartmail', v_archive: 'stoneclub', v_glow: 'blazefang',
@@ -184,7 +223,7 @@
   const travel0 = W.travel;
   W.travel = function (st, id) {
     if (D.ISLANDS[id] && !W.islandLive(id)) return { ok: false, reason: 'notready', text: D.ISLANDS[id].name + ' is not ready to visit yet.' };
-    return travel0.apply(this, arguments);
+    const r = travel0.apply(this, arguments); if (r && r.ok && id === D.V18.island && V.queueArrival) V.queueArrival(st); return r;
   };
   const byBoss0 = W.unlockByBoss;
   // the usual answers come first ('already', 'boss'); 'notready' only when the island could otherwise be opened
@@ -209,6 +248,8 @@
     // a save whose Island Boss fell while the next island was not ready gets that island once it is marked ready
     D.ISLAND_ORDER.forEach((iid) => { const c = D.CAMPAIGN[iid]; if (c && c.next && W.islandLive(c.next) && !W.islandUnlocked(st, c.next) && R.islandBossDefeated(st, iid)) W.unlockByBoss(st, c.next); });
     if (st.v18.gift && typeof st.v18.gift !== 'object') st.v18.gift = { t: 1, kind: 'unknown' };
+    if (st.v18.rare && typeof st.v18.rare !== 'object') delete st.v18.rare;
+    if (st.v18.rare) Object.keys(st.v18.rare).forEach((k) => { const r = st.v18.rare[k]; if (!D.V18.rare.of[k] || !r || typeof r !== 'object') delete st.v18.rare[k]; else r.n = Math.max(0, r.n | 0); });
     V.queueArrival(st);
     return st;
   };

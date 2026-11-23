@@ -166,10 +166,14 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   ok(Object.values(bgs).every((x) => x[0] !== x[1]), 'every boss room looks different from that dungeon’s normal battles');
 
   /* ---------- pixel bursts are cleaned up ---------- */
-  await ev(() => { for (let i = 0; i < 5; i++) A.UI.pixelBurst(300 + i * 20, 200, { n: 14 }); });
-  const n1 = await ev(() => document.querySelectorAll('.pxb-wrap').length); await sleep(1100);
-  const n2 = await ev(() => document.querySelectorAll('.pxb-wrap').length);
-  ok(n1 === 5 && n2 === 0, 'pixel bursts remove themselves (5 → 0 after a second)');
+  // Phase 18D: the page records when the last burst left (its own clock, from the moment they were made) and the test
+  // waits for that, rather than sleeping 1.1 s in the test process, which a busy machine could overrun. Same assertion.
+  await ev(() => { for (let i = 0; i < 5; i++) A.UI.pixelBurst(300 + i * 20, 200, { n: 14 }); const t0 = performance.now(); window.__pxb = null;
+    const mo = new MutationObserver(() => { if (!document.querySelector('.pxb-wrap')) { window.__pxb = Math.round(performance.now() - t0); mo.disconnect(); } }); mo.observe(document.getElementById('app'), { childList: true }); });
+  const n1 = await ev(() => document.querySelectorAll('.pxb-wrap').length);
+  await page.waitForFunction(() => window.__pxb != null, null, { timeout: 5000, polling: 50 }).catch(() => {});
+  const n2 = await ev(() => document.querySelectorAll('.pxb-wrap').length), pxbMs = await ev(() => window.__pxb);
+  ok(n1 === 5 && n2 === 0, 'pixel bursts remove themselves (5 → 0 after a second; the last left ' + pxbMs + ' ms after they appeared)');
 
   /* ---------- other phone sizes ---------- */
   for (const [w, h] of [[667, 375], [932, 430]]) {

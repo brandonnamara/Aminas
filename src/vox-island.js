@@ -35,7 +35,11 @@
     return out;
   }
   // Trees and bushes on hills, ledges and loose chunks (scenery only: those cells are never buildable).
-  function scenery(cols) {
+  // Phase 18D: the Verdant Wilds grows its own groves on the same layout (same count, same cells): willows instead of
+  // pines, glowcaps instead of blossom, ferns and mushrooms in the glades, moss-capped rocks instead of crystals
+  const SWAP = { verdant: { pine: 'willow', birch: 'oak', blossom: 'glowcap', flowerBush: 'fernLarge', tallGrass: 'fernLarge', flowerPatch: 'mushrooms', crystals: 'mossyRock', bush: 'roundBush' } };
+  function scenery(cols, iid) { const sw = SWAP[iid]; const out = scenery0(cols); if (sw) out.forEach((o) => { if (sw[o.kind]) { o.kind = sw[o.kind]; o.still = !!STILL[o.kind]; } }); return out; }
+  function scenery0(cols) {
     // Phase 1.1 composition: trees grow in groves (a slow noise field picks pine, oak or blossom stands), with
     // open glades between them, rather than an even scatter of mixed species.
     const out = [], HP = 39.1918, hash = (x, y, s) => { let h = (x * 374761393 + y * 668265263 + s * 2147483647) | 0; h = (h ^ (h >>> 13)) * 1274126177; return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
@@ -85,7 +89,7 @@
       const world = document.getElementById('world'); if (!world || !t || !t.cols) return;
       if (!ctrl) ctrl = m.createIsland();
       const cv = ctrl.canvas; if (cv.parentNode !== world) world.insertBefore(cv, document.getElementById('iso'));
-      if (lastTerrainKey !== key) { ctrl.setTerrain(iid, key, t.cols, extras(iid, t.cols)); sceneryCache = scenery(t.cols); lastTerrainKey = key; }
+      if (lastTerrainKey !== key) { ctrl.setTerrain(iid, key, t.cols, extras(iid, t.cols)); sceneryCache = scenery(t.cols, iid); lastTerrainKey = key; }
       V.on = true; IA.voxHas = voxHas;
       if (ctrl.occCanvas.parentNode !== world) world.insertBefore(ctrl.occCanvas, document.getElementById('iso').nextSibling);
       ctrl.setOverlay(overlay);
@@ -172,7 +176,7 @@
     W.obstaclesOn(s, iid).forEach((o) => { if (o.state === 'cleared') return; const ty = D.OBSTACLE_TYPES[o.type]; items.push({ k: 'o', id: o.id, type: o.type, name: ty.name, x: o.x, y: o.y, w: ty.w, h: ty.h, seed: Math.abs(String(o.id).split('').reduce((a, c) => a * 31 + c.charCodeAt(0), 7)) % 1000 }); });
     IA.landmark(iid, s).forEach((l) => items.push({ k: 'l', kind: l.kind, on: l.on != null ? !!l.on : l.kind === 'stones' ? !!(s.struct.tidegate && !s.flags.r1) : false, x: l.x, y: l.y, w: l.w, h: l.h }));
     const cols = t.cols.map((c) => ({ x: c.x, y: c.y, kind: c.kind, top: c.top, bot: c.bot }));
-    return { iid, cols, items, scenery: scenery(t.cols), extras: extras(iid, t.cols) };
+    return { iid, cols, items, scenery: scenery(t.cols, iid), extras: extras(iid, t.cols) };
   };
   // true when the 3D layer covers the overlay at this screen point (a tap there belongs to the building, not to
   // the creature hidden behind it)

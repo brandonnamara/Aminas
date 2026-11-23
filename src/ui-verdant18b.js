@@ -92,6 +92,25 @@
   const tr1 = UI.travelTo;
   if (tr1) UI.travelTo = function (iid) { const r = tr1.apply(this, arguments); const s = st(); if (r !== false && s.story && s.story.pendingScene === 'v_arrival' && !UI.sceneBox) setTimeout(() => { if (UI.screen === 'island' && s.story.pendingScene === 'v_arrival' && !UI.modalOpen()) { UI.queue.unshift({ type: 'fn', fn: (done) => UI.playScene('v_arrival', () => done()) }); UI.pump(); } }, 500); return r; };
 
+  // Phase 18D: the rare third-form encounter. The find card says it is rare (and once only); the Explore card of a
+  // Verdant area says whether its rare Kind Soul is still out there, without saying which day it will appear.
+  const find0 = UI.findModal;
+  UI.findModal = function () {
+    const r = find0.apply(this, arguments), f = st().pendingFind;
+    if (f && f.rare) { const ov = [...document.querySelectorAll('#modal-root .overlay')].pop(), h = ov && ov.querySelector('h1'); if (h) { h.textContent = 'Something rare stirs…'; h.insertAdjacentHTML('afterend', '<p class="v18-rare-tag">' + I('star') + ' A rare encounter: it will not come this way again.</p>'); } }
+    return r;
+  };
+  const explore1 = UI.explore;
+  UI.explore = function () {
+    const ov = explore1.apply(this, arguments), s = st(), area = UI.exArea, rs = V.rareState ? V.rareState(s, area) : null;
+    const card = ov && ov.querySelector('.areacard');
+    if (card && rs && rs.state !== 'none' && R.areaUnlocked(s, area)) {
+      const t = rs.state === 'met' ? 'You befriended this glade’s rare Kind Soul.' : rs.state === 'waiting' ? 'Something rarer lives here too. Meet the usual residents first.' : rs.today ? 'Something rarer lives here. It has not shown itself today; come back tomorrow.' : 'Something rarer lives here. It sometimes shows itself to the day’s first explorer.';
+      card.insertAdjacentHTML('beforeend', '<p class="v18-rare-note small-t">' + I('star') + ' ' + esc(t) + '</p>');
+    }
+    return ov;
+  };
+
   // taps on the island: "v18:<id>" hotspots (places and entrances)
   const hot0 = UI.hotspot;
   UI.hotspot = function (h) {

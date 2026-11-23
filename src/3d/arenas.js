@@ -376,6 +376,56 @@ const DRESS = {
   resonancescar:  { band: ['shard', 'rock', 'shard', 'shard', 'arch', 'shard', 'rock', 'shard'], a: '#4a3a6a', b: '#3c2e58', ground: ['#5a4a7a', '#8a5ab0', '#ff9ede'], glow: '#ff8ad8', banner: '#b84a9a', treasure: true },
   heartwood:      { band: ['root', 'tree', 'root', 'rock', 'root', 'tree', 'root', 'tree'], a: '#4a3626', b: '#3a2a1e', leaf: ['#2a5a34', '#3a7444', '#1e4428'], trunk: '#3a2a1e', ground: ['#4a3a2a', '#3a6a3a', '#fff4c0'], glow: '#ffe9a0', banner: '#5a9a4a', treasure: true },
 };
+/* ------------------------------------------------------------------ Phase 18D: Verdant Wilds arena variations
+   Each Verdant dungeon fights in its own variation of the Starter arena whose setting fits: the SAME geometry (the base
+   build, block for block, so the same merged meshes and draw calls), recoloured through the island's palette (jungle
+   greens, moss-grey stone, loam), with its own light rig, fog, particles, far backdrop colours and set dressing.
+   Battery saver and Reduce motion apply exactly as for the base arenas. */
+const hex2hsl = (h) => { const n = parseInt(h.slice(1), 16), r = (n >> 16) / 255, g = ((n >> 8) & 255) / 255, b = (n & 255) / 255, mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2; let hh = 0, ss = 0; if (mx !== mn) { const d = mx - mn; ss = l > 0.5 ? d / (2 - mx - mn) : d / (mx + mn); hh = mx === r ? (g - b) / d + (g < b ? 6 : 0) : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; hh /= 6; } return [hh * 360, ss, l]; };
+const hsl2hex = (h, s2, l) => { h = ((h % 360) + 360) % 360 / 360; const f = (p, q, t) => { t = (t + 1) % 1; return t < 1 / 6 ? p + (q - p) * 6 * t : t < 0.5 ? q : t < 2 / 3 ? p + (q - p) * (2 / 3 - t) * 6 : p; }; let r, g, b; if (!s2) r = g = b = l; else { const q = l < 0.5 ? l * (1 + s2) : l + s2 - l * s2, p = 2 * l - q; r = f(p, q, h + 1 / 3); g = f(p, q, h); b = f(p, q, h - 1 / 3); } return '#' + [r, g, b].map((v) => Math.round(Math.max(0, Math.min(1, v)) * 255).toString(16).padStart(2, '0')).join(''); };
+function verdantColour(c, tint, vivid) {
+  if (typeof c !== 'string' || c[0] !== '#' || c.length !== 7) return c;
+  let [h, s2, l] = hex2hsl(c);
+  if (s2 < 0.16) { h = 110; s2 = Math.max(s2, 0.1); l = l * 0.94; }                    // grey stone → moss-grey stone
+  else if (h >= 65 && h <= 165) { h = h + 14; s2 = Math.min(1, s2 * 1.05); l = l * 0.86; } // meadow green → deep jungle green
+  else if (h >= 15 && h < 65 && l < 0.55) { s2 = s2 * 0.85; l = l * 0.9; }                // wood and earth → darker loam
+  else if (vivid && s2 >= 0.35) { h = vivid.h; s2 = s2 * (vivid.s || 1); l = Math.min(0.92, l * (vivid.l || 1)); } // coral, crystal, banners → this place's own accent
+  const out = hsl2hex(h, s2, l);
+  if (!tint) return out;
+  const a = parseInt(out.slice(1), 16), b = parseInt(tint.slice(1), 16), k = 0.16, mix = (sh) => Math.round(((a >> sh) & 255) * (1 - k) + ((b >> sh) & 255) * k);
+  return '#' + [16, 8, 0].map((sh) => mix(sh).toString(16).padStart(2, '0')).join('');
+}
+function verdantKit(K, tint, vivid) {
+  const m = (c) => verdantColour(c, tint, vivid), K2 = Object.create(K);
+  K2.box = (c, ...a) => K.box(m(c), ...a);
+  K2.stack = (a, b, ...rest) => K.stack(m(a), m(b), ...rest);
+  K2.floor = (fn, ...rest) => K.floor((...q) => m(fn(...q)), ...rest);
+  if (K.tree) K2.tree = (x, z, sc, l1, l2, o) => K.tree(x, z, sc, m(l1), m(l2), Object.assign({}, o, { trunk: m((o && o.trunk) || '#6a4424') }));
+  if (K.tuft) K2.tuft = (x, z, c) => K.tuft(x, z, m(c));
+  return K2;
+}
+const VARENA = {
+  v_mossgate:   { base: 'forgottenroad', tint: '#3f9a4a', mood: 'day', fog: '#8cc4a0', motes: '#f4ffc0', light: { key: ['#f4ffe0', 2.3], rim: ['#d8ffd0', 1.5], hemi: ['#d0f0e0', '#4a6a3a', 1.25] }, particles: { kind: 'pollen', colors: ['#f4ffc0', '#d8ff9a', '#ffffff'], n: 30 }, backdrop: ['#2f7a44', '#6aa898'], dress: { a: '#8a9a88', b: '#76866f', leaf: ['#2f8f48', '#3fa858', '#26783c'], trunk: '#5a3c22' } },
+  v_aqueduct:   { vivid: { h: 128, s: 0.8 }, base: 'drownedsteps', tint: '#3db4c4', mood: 'day', fog: '#8ad0d8', motes: '#e8fdff', light: { key: ['#effcff', 2.2], rim: ['#9ff0ff', 1.7], hemi: ['#c0f0f0', '#2a5a5a', 1.3] }, particles: { kind: 'bubbles', colors: ['#e8fdff', '#bff4ff', '#ffffff'], n: 26 }, backdrop: ['#2a6a6a', '#7ac8c8'], dress: { a: '#8a9a88', b: '#6e7e70', coral: ['#4fbf63', '#3fa858', '#9ad85a'] } },
+  v_spore:      { vivid: { h: 48, s: 0.9 }, base: 'reliquary', tint: '#d8b860', mood: 'dusk', fog: '#3a4a2a', motes: '#ffe48a', light: { key: ['#fff0c0', 1.9], rim: ['#ffd86b', 1.8], hemi: ['#d8d0a0', '#2a3a1a', 1.1] }, particles: { kind: 'spores', colors: ['#ffe48a', '#ffd060', '#fff6c0'], n: 34 }, backdrop: ['#2a4a2a', '#8a8a4a'], dress: { leaf: ['#3f7a3a', '#5a8a3a', '#2a5a2a'] } },
+  v_archive:    { base: 'gatheringhall', tint: '#3f9a4a', mood: 'dusk', fog: '#2a3a30', motes: '#ffe9b0', light: { key: ['#ffe8c0', 2.0], rim: ['#c8ffb0', 1.5], hemi: ['#b8c8a8', '#1a241a', 1.05] }, particles: { kind: 'dust', colors: ['#ffe9b0', '#e8ffd0', '#fff6e0'], n: 24 }, backdrop: ['#2a3a2a', '#5a6a4a'], dress: { a: '#4a3c2a', b: '#3a2e20', glow: '#ffd890', banner: '#3f9a4a' } },
+  v_glow:       { base: 'coldkiln', tint: '#9ad85a', mood: 'dusk', fog: '#3a3020', motes: '#ffd25a', light: { key: ['#ffe0a0', 2.2], rim: ['#ffd25a', 1.9], hemi: ['#e8d0a0', '#2a2010', 1.1] }, particles: { kind: 'embers', colors: ['#ffd25a', '#d8ff7a', '#ffa43a'], n: 32 }, backdrop: ['#3a2a1a', '#6a5a2a'], dress: { a: '#6a5a3a', b: '#5a4a2e', glow: '#ffd25a' } },
+  v_twinshrine: { base: 'lanternorchard', tint: '#c9a8ff', mood: 'dusk', fog: '#3a3450', motes: '#fff6c0', light: { key: ['#fff3d8', 2.1], rim: ['#c9a8ff', 2.0], hemi: ['#e8dcff', '#1e1a30', 1.15] }, particles: { kind: 'fireflies', colors: ['#fff6c0', '#c9a8ff', '#ffffff'], n: 26 }, backdrop: ['#2e2848', '#ece6d6'], dress: { leaf: ['#3a7a5a', '#4a8a6a', '#2a5a44'] } },
+  v_canopy:     { base: 'windstair', tint: '#4fbf63', mood: 'day', fog: '#a8e0c8', motes: '#ffffff', light: { key: ['#ffffff', 2.4], rim: ['#d8ffe8', 1.5], hemi: ['#e0fff0', '#5a7a5a', 1.35] }, particles: { kind: 'leaves', colors: ['#7ad44a', '#4fbf63', '#d8ff9a'], n: 26 }, backdrop: ['#2f8f48', '#bfe8d0'], dress: { a: '#6a5a3a', b: '#5a4a2e' } },
+  v_moonwell:   { vivid: { h: 252, s: 0.75, l: 1.05 }, base: 'drownedsteps', tint: '#5a6ad8', mood: 'dark', fog: '#1a2040', motes: '#e2d4ff', light: { key: ['#dcd8ff', 1.8], rim: ['#b8a8ff', 1.9], hemi: ['#8a8ad8', '#0e1024', 1.0] }, particles: { kind: 'wisps', colors: ['#e2d4ff', '#bfe0ff', '#ffffff'], n: 22 }, backdrop: ['#141a30', '#3a4a8a'], dress: { a: '#3a4458', b: '#2c3446', coral: ['#9a8aff', '#7aa8ff', '#e2d4ff'], glow: '#c9b8ff' } },
+  v_choir:      { vivid: { h: 160, s: 0.45, l: 1.25 }, base: 'resonancescar', tint: '#e8fff0', mood: 'dusk', fog: '#4a4a6a', motes: '#e8fff0', light: { key: ['#f4f0ff', 2.0], rim: ['#e8fff0', 1.9], hemi: ['#d8d0f0', '#2a2440', 1.15] }, particles: { kind: 'glitter', colors: ['#e8fff0', '#cfe8ff', '#ffd0f0'], n: 26 }, backdrop: ['#3a3458', '#8a84a8'], dress: { a: '#dcd8e8', b: '#c4c0d4', glow: '#e8fff0' } },
+  v_elderroot:  { base: 'heartwood', tint: '#2f8f48', mood: 'dark', fog: '#10201a', motes: '#9af2ff', light: { key: ['#e0ffe8', 1.8], rim: ['#9af2ff', 1.9], hemi: ['#98d0b0', '#0a140e', 1.0] }, particles: { kind: 'fireflies', colors: ['#9af2ff', '#d8ffb0', '#bff7a8'], n: 28 }, backdrop: ['#10261a', '#2f6a44'], dress: { leaf: ['#1e5a30', '#2f7a44', '#164024'] } },
+};
+Object.keys(VARENA).forEach((id) => {
+  const v = VARENA[id], b = ARENAS[v.base];
+  ARENAS[id] = Object.assign({}, b, { mood: v.mood, fog: v.fog, motes: v.motes, verdant: true, build(add, T, r, K, o) { return b.build.call(this, add, T, r, verdantKit(K, v.tint, v.vivid), o); } });
+  const at = ATMOS[v.base] || {};
+  ATMOS[id] = Object.assign({}, at, { light: v.light, particles: v.particles, fog: at.fog, shafts: at.shafts ? Object.assign({}, at.shafts, { color: verdantColour(at.shafts.color, v.tint) }) : null, backdrop: at.backdrop ? Object.assign({}, at.backdrop, { colors: v.backdrop }) : null });
+  const dd = DRESS[v.base]; if (dd) DRESS[id] = Object.assign({}, dd, { ground: (dd.ground || []).map((c) => verdantColour(c, v.tint, v.vivid)), leaf: dd.leaf ? dd.leaf.map((c) => verdantColour(c, v.tint, v.vivid)) : dd.leaf }, v.dress);
+  delete ALIAS[id];
+});
+export const verdantArenas = () => Object.keys(VARENA).map((id) => ({ id, base: VARENA[id].base }));
+
 function dress(K, r, key, def, o) {
   const d = DRESS[key]; if (!d) return 0;
   const fog = new THREE.Color(def.fog || '#808080'), tmp = new THREE.Color(); let n = 0;

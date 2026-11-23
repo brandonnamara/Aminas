@@ -14,6 +14,14 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms)); const SHOTS = proce
   const tidy = () => ev(() => { A.UI.queue.length = 0; A.UI.busy = false; if (A.UI.B) A.UI.leaveBattle(() => {}); A.UI.closeAll(); document.querySelectorAll('.dlg,.toast,.reward-wrap,.scene').forEach((x) => x.remove()); if (!document.querySelector('#world')) A.UI.showIsland(); });
   const enter = async (d, from) => { await tidy(); const save0 = await ev(() => JSON.stringify(A.State.state.dungeon)); await ev(({ d, from }) => { const s = A.State.state; A.Rules.startRun(s, d, [0, 1, 2].map((i) => s.aminas[i].uid), { from }); A.UI.startBattle(); }, { d, from }); return save0; };
   const ids = await ev(() => A.Data.DUNGEON_ORDER);
+  // Phase 18D: the boss introduction is recorded in the page, frame by frame, from the moment the battle opens (when
+  // the card appeared, when the camera move began, whether the card was still up then, and when the card went), instead
+  // of being sampled from the test process at one instant, which could fall before the camera had started.
+  const watchIntro = () => ev(() => { const t0 = performance.now(), w = (window.__intro = { cardAt: null, camAt: null, camWithCard: false, goneAt: null });
+    const f = () => { const t = Math.round(performance.now() - t0), card = document.querySelector('.b-bossin:not(.out)'), st = A.UI.B && A.UI.B.stage;
+      if (card && w.cardAt == null) w.cardAt = t; if (st && st.introOn && st.introOn() && w.camAt == null) { w.camAt = t; w.camWithCard = !!card; }
+      if (!card && w.cardAt != null && w.goneAt == null) w.goneAt = t; if (w.goneAt == null || t < 12000) requestAnimationFrame(f); }; f(); });
+
 
   /* ---- an ordinary dungeon battle: the entry card ---- */
   await enter(ids[4], 3); await sleep(250);
@@ -24,15 +32,15 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms)); const SHOTS = proce
   ok(await ev(() => !document.querySelector('.b-entry')), 'the entry card is gone after about a second, and the battle is ready as before');
 
   /* ---- a Guardian ---- */
-  const t0 = Date.now(); await enter(ids[4], 9); await sleep(300);
+  const t0 = Date.now(); await enter(ids[4], 9); await watchIntro(); await sleep(300);
   const g = await ev(() => { const e = document.querySelector('.b-bossin'); return { txt: e ? e.textContent.replace(/\s+/g, ' ') : null, skip: !!document.querySelector('.b-skip') }; });
   ok(/Guardian of The Cold Kiln|Guardian of /.test(g.txt || '') && /Battle 10 of 10/.test(g.txt) && /Tap to begin/.test(g.txt) && g.skip, 'the boss card names it as the dungeon’s Guardian, its element, “Battle 10 of 10” and how to begin (“' + (g.txt || '').slice(0, 120) + '…”)');
   const mechOk = await ev((d) => { const sp = A.Data.DUNGEONS[d].battles[9], m = sp.mech && A.Data.BOSS_MECHS[sp.mech.type], txt = document.querySelector('.b-bossin').textContent; return m ? txt.includes(m.desc) : /Telegraphs a powerful move/.test(txt); }, ids[4]);
   ok(mechOk, 'its fighting trait is the game’s own description of it (the boss mechanic, or the Guardian trait)');
-  await page.waitForFunction(() => A.UI.B && A.UI.B.stage && A.UI.B.stage.is3d && A.UI.B.stage.introOn, null, { timeout: 40000 }).catch(() => {});
-  const cam = await ev(async () => { const st = A.UI.B.stage, on = st.introOn(); await new Promise((r) => setTimeout(r, 150)); return { on, is3d: st.is3d }; });
+  await page.waitForFunction(() => window.__intro.camAt != null || window.__intro.goneAt != null, null, { timeout: 40000 }).catch(() => {});
+  const cam = await ev(() => ({ on: window.__intro.camWithCard, at: window.__intro.camAt, is3d: !!(A.UI.B.stage && A.UI.B.stage.is3d) }));
   if (SHOTS) await page.screenshot({ path: path.join(SHOTS, 'boss-intro.png') });
-  ok(cam.is3d && cam.on, 'in the 3D arena the camera opens close on the boss while the card is up');
+  ok(cam.is3d && cam.on, 'in the 3D arena the camera opens close on the boss while the card is up (camera began ' + cam.at + ' ms after the battle opened)');
   // a tap ends it at once and does not count as a move
   const before = await ev(() => ({ turn: A.UI.B.b.turn, log: A.UI.B.b.log ? A.UI.B.b.log.length : 0, hp: A.UI.B.b.enemy.hp }));
   await page.mouse.click(420, 200); await sleep(400);
@@ -44,8 +52,13 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms)); const SHOTS = proce
   ok(fight.hp < fight.hp0, 'the boss battle then plays as before (the boss took ' + (fight.hp0 - fight.hp) + ' damage from one move)');
 
   /* ---- untouched: it ends by itself ---- */
-  await enter(ids[0], 9); await sleep(2900);
-  ok(await ev(() => !document.querySelector('.b-bossin') && !document.querySelector('.b-skip') && !(A.UI.B.stage.introOn && A.UI.B.stage.introOn())), 'left alone, the introduction ends by itself within about 2.5 seconds');
+  await enter(ids[0], 9); await watchIntro();
+  await page.waitForFunction(() => window.__intro.goneAt != null, null, { timeout: 40000 }).catch(() => {}); await sleep(400);
+  const alone = await ev(() => Object.assign({ left: !document.querySelector('.b-bossin') && !document.querySelector('.b-skip') && !(A.UI.B.stage.introOn && A.UI.B.stage.introOn()) }, window.__intro));
+  // the introduction itself lasts about 2.5 s at most: counted from the battle opening, or from the camera's start
+  // when the 3D stage took longer than that to mount (the card then covers the loading)
+  const span = alone.goneAt == null ? null : alone.camAt != null && alone.camAt > 800 ? alone.goneAt - alone.camAt : alone.goneAt;
+  ok(alone.left && span != null && span <= 2500, 'left alone, the introduction ends by itself within about 2.5 seconds (' + span + ' ms; card gone ' + alone.goneAt + ' ms after opening, camera began at ' + alone.camAt + ' ms)');
 
   /* ---- Island Boss ---- */
   const isl = ids.find((d) => 0) || null; const ib = await ev(() => A.Data.DUNGEON_ORDER.find((d) => A.Data.DUNGEONS[d].battles[9].islandBoss));

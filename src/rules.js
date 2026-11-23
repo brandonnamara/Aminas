@@ -69,7 +69,8 @@
   /* ---------- xp / feeding ---------- */
   R.addXp = function (st, inst, amt) {
     const out = { levels: [], evolved: null, evoReady: null, gained: 0 };
-    if (inst.lv >= D.MAX_LEVEL || amt <= 0) return out;
+    if (inst.lv >= D.MAX_LEVEL) { out.capped = true; return out; } // Phase 18D: say so (the victory screen shows “max level”)
+    if (amt <= 0) return out;
     inst.xp += amt; out.gained = amt;
     while (inst.lv < D.MAX_LEVEL && inst.xp >= R.xpNeed(inst.lv)) {
       inst.xp -= R.xpNeed(inst.lv);
@@ -77,7 +78,7 @@
       inst.lv++;
       R.emit('creatureLevel', { uid: inst.uid, sp: inst.sp, from: inst.lv - 1, to: inst.lv });
     }
-    if (inst.lv >= D.MAX_LEVEL) inst.xp = 0;
+    if (inst.lv >= D.MAX_LEVEL) { out.gained -= inst.xp; inst.xp = 0; out.capped = true; } // Phase 18D: XP past the cap is not kept, so it is not reported as gained
     // v0.7: evolution is never automatic. When the next form becomes available the player is told once, and it
     // only happens when they confirm (R.evolve). Level, XP, equipment and the uid are kept through it.
     const evo = sp(inst.sp).evo;
@@ -596,7 +597,12 @@
     const eId = B.enemyChoice(b);
     const order = [];
     if (action.t === 'ab') {
-      if (B.speed(p) >= B.speed(e)) order.push(['p', action.id], ['e', eId]); else order.push(['e', eId], ['p', action.id]);
+      // Phase 18D: a guard raised against a charged move goes first, whatever the speeds. The battle screen promises that
+      // guarding "blocks the charge", and the guardian challenge counts it; before this, a slower Amina was hit before
+      // its guard went up, and three Verdant guardians (and some Starter ones) are faster than every Amina at their
+      // recommended level, so the advertised answer could not work against them. Nothing else about turn order changes.
+      const guardFirst = !!(e.charging && D.ABILITIES[action.id] && D.ABILITIES[action.id].type === 'guard');
+      if (guardFirst || B.speed(p) >= B.speed(e)) order.push(['p', action.id], ['e', eId]); else order.push(['e', eId], ['p', action.id]);
     } else order.push(['e', eId]);
     p.first = order[0][0] === 'p'; e.first = order[0][0] === 'e';              // who acts first this turn (swift edge)
     for (const [who, id] of order) {
@@ -749,7 +755,7 @@
       const inst = R.inst(st, f.uid); if (!inst) return;
       const alive = f.hp > 0, k = R.xpScale(inst.lv, foeLv);
       const r = R.addXp(st, inst, Math.round((alive ? baseXp : Math.round(baseXp / 2)) * k));
-      xp.push({ uid: f.uid, sp: inst.sp, gained: r.gained, levels: r.levels, evolved: r.evolved, evoReady: r.evoReady, alive, scaled: k < 1 ? k : null, gap: k < 1 ? inst.lv - foeLv : 0 });
+      xp.push({ uid: f.uid, sp: inst.sp, gained: r.gained, capped: !!r.capped, levels: r.levels, evolved: r.evolved, evoReady: r.evoReady, alive, scaled: k < 1 ? k : null, gap: k < 1 ? inst.lv - foeLv : 0 });
       const hpMax = R.statsWithGear(st, inst).hp;
       const prev = alive ? f.hp : Math.round(hpMax * 0.2);
       hpStore[f.uid] = Math.max(1, Math.min(hpMax, prev + (alive ? Math.round(hpMax * heal) : 0)));

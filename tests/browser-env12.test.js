@@ -30,16 +30,19 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     const c = where === 'behind' ? [hb.x + sz.w * 0.3, hb.y + sz.h * 0.3] : [hb.x + sz.w + 0.8, hb.y + sz.h + 0.8], t = A.Iso.top(c[0], c[1]);
     el.setAttribute('transform', 'translate(' + t[0] + ' ' + t[1] + ') scale(0.9)'); const r = (mv || el).getBoundingClientRect();
     // this machine renders WebGL in software, where the 3D layer is flagged slow and refreshes occlusion with the next view change: nudge the view
-    setTimeout(() => A.UI.applyCam(), 1200); return [r.left + r.width / 2, r.top + r.height * 0.6];
+    window.__occ = null; setTimeout(() => { A.UI.applyCam(); const st = A.VoxIsland.stats(); window.__occ = { at: performance.now(), passes: st && st.occPace ? st.occPace.passes : 0 }; }, 1200); return [r.left + r.width / 2, r.top + r.height * 0.6];
   }, where);
-  const behind = await place('behind'); await sleep(3000);
+  // Phase 18D: wait for the occlusion pass that follows the view nudge (its pass counter moves on), instead of a fixed
+  // three seconds; the time it took is reported. The assertion that follows is unchanged.
+  const occPass = async () => { const t = Date.now(); const done = await page.waitForFunction(() => { const o = window.__occ, st = A.VoxIsland.stats(); return !!(o && st && st.occPace && st.occPace.passes > o.passes); }, null, { timeout: 15000, polling: 50 }).then(() => true).catch(() => false); await sleep(100); return { done, ms: Date.now() - t }; };
+  const behind = await place('behind'); const ob = await occPass(); console.log('      occlusion pass after ' + ob.ms + ' ms (' + (ob.done ? 'counted' : 'not seen within 15 s') + ')');
     ok(!!behind && await ev(([x, y]) => A.VoxIsland.occludedAt(x, y), behind), 'a creature standing behind the Hatchery is covered by it');
   await page.screenshot({ path: path.join(SHOTS, 'env12-behind.png') });
   if (behind) { await page.mouse.click(behind[0], behind[1]); await sleep(700); }
   const panel = await ev(() => ({ open: A.UI.modalOpen(), txt: (document.querySelector('#modal-root') || {}).textContent || '' }));
   ok(panel.open && /Hatchery/i.test(panel.txt), 'tapping the covered creature opens the building in front of it');
   await calm();
-  const front = await place('front'); await sleep(3000);
+  const front = await place('front'); const of = await occPass(); console.log('      occlusion pass after ' + of.ms + ' ms (' + (of.done ? 'counted' : 'not seen within 15 s') + ')');
   ok(!!front && !(await ev(([x, y]) => A.VoxIsland.occludedAt(x, y), front)), 'the same creature in front of the Hatchery is drawn over it');
   await page.screenshot({ path: path.join(SHOTS, 'env12-front.png') });
   // interface parts stay uncovered: every cut-out rectangle is transparent on the occlusion layer

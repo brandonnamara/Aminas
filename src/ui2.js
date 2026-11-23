@@ -253,10 +253,15 @@
     if (bin) { const catcher = document.createElement('button'); catcher.className = 'b-skip'; catcher.setAttribute('aria-label', 'Skip the introduction'); $('#battle').appendChild(catcher);
       introOver = () => { if (!bin.isConnected) return; bin.classList.add('out'); catcher.remove(); setTimeout(() => bin.remove(), 260); if (U.stage && U.stage.skipIntro) U.stage.skipIntro(); };
       catcher.addEventListener('click', (ev) => { ev.preventDefault(); ev.stopPropagation(); introOver(); });
-      setTimeout(introOver, calmNow() ? 1600 : 2200); U.introOver = introOver; }
+      // Phase 18D: the card's own clock. It ends 2.2 s after the battle opens (1.6 s with Reduce motion), but never before
+      // the boss camera has played: on a slow device the 3D stage can take longer than that to mount, and the card used
+      // to end (and skip the camera) before the camera had begun. Now the deadline moves to the camera's own end.
+      const t0 = performance.now(); let due = t0 + (calmNow() ? 1600 : 2200), timer = setTimeout(introOver, due - t0);
+      U.introLater = (ms) => { const at = performance.now() + ms; if (at <= due || !bin.isConnected) return; due = at; clearTimeout(timer); timer = setTimeout(introOver, ms); };
+      U.introOver = introOver; }
     bLog(ctx.intro || (e0.name !== D.SPECIES[e0.sp].name ? (/^The /.test(e0.name) ? '' : 'The ') + e0.name + (b.foes.length > 1 ? ' leads the other team!' : ' rises!') : 'A wild ' + e0.name + ' appears!'));
     bRender();
-    Promise.all([mountStage(U), sleep(700)]).then(() => { if (UI.B !== U || U.dead) return; U.busy = false; bRender(); if (isl) setTele({ t: 'intro' }); if (boss && bin && bin.isConnected && U.stage && U.stage.intro) U.stage.intro(); });
+    Promise.all([mountStage(U), sleep(700)]).then(() => { if (UI.B !== U || U.dead) return; U.busy = false; bRender(); if (isl) setTele({ t: 'intro' }); if (boss && bin && bin.isConnected && U.stage && U.stage.intro) { U.stage.intro(); if (U.stage.introOn && U.stage.introOn() && U.introLater) U.introLater(1700); } });
   };
   function bLog(t) { const l = $('#b-log'); if (l) { l.textContent = t; l.classList.toggle('empty', !t); } }
 
@@ -596,7 +601,7 @@
     const rows = out.xp.map((x, i) => {
       const lvl = x.levels.length ? '<div class="lvlup">' + I('xp') + ' Level up! Lv ' + x.levels[0].from + ' → ' + x.levels[x.levels.length - 1].to + '</div>' : '';
       const evo = x.evoReady ? '<div class="lvlup evo">' + I('spark') + ' Ready to evolve (you choose when)</div>' : '';
-      return '<div class="xprow' + (x.alive ? ' cheer' : ' down') + '" style="--i:' + i + '"><div class="art">' + Art.portrait(x.sp) + '</div><div class="grow"><b>' + esc(D.SPECIES[x.sp].name) + '</b> <span class="muted">+' + x.gained + ' xp' + (x.alive ? '' : ' (fainted: half)') + (x.scaled ? ' · ' + Math.round(x.scaled * 100) + '%: the foe was ' + x.gap + ' levels below' : '') + '</span>' + lvl + evo + '</div></div>';
+      return '<div class="xprow' + (x.alive ? ' cheer' : ' down') + '" style="--i:' + i + '"><div class="art">' + Art.portrait(x.sp) + '</div><div class="grow"><b>' + esc(D.SPECIES[x.sp].name) + '</b> <span class="muted">' + (x.capped && !x.gained ? 'Max level, no more XP' : '+' + x.gained + ' xp' + (x.capped ? ' (max level reached)' : '')) + (x.alive ? '' : ' (fainted: half)') + (x.scaled ? ' · ' + Math.round(x.scaled * 100) + '%: the foe was ' + x.gap + ' levels below' : '') + '</span>' + lvl + evo + '</div></div>';
     }).join('');
     const groups = [];
     const spoils = [{ k: 'gold', n: out.gold }, { k: 'food', n: out.food }];

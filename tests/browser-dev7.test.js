@@ -92,7 +92,14 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   // Phase 18A: diagnostics only (same click, same wait, same check): if the Forge is still open, print what was in the
   // modal layer just before and after the click, to find the cause of the intermittent failure.
   const dbg0 = await ev(() => ({ kids: [...document.querySelector('#modal-root').children].map((o) => o.className + '|' + ((o.querySelector('.sheet') || {}).className || '') + '|' + ((o.querySelector('h2,.sh-t,.title') || {}).textContent || '').slice(0, 40)), toasts: document.querySelector('#toast-root').textContent.slice(0, 120), t: performance.now() }));
-  await page.click('.overlay:last-child [data-act=close]'); await sleep(300);
+  // Phase 18D (approved test approach): the click goes to the Forge's own Close button, not to whatever overlay is last
+  // in the modal layer, and the test waits for the Forge to be detached instead of a fixed 300 ms. Playwright still
+  // refuses the click (and the test fails) if anything covers that button, so a real overlap is not hidden; the layer
+  // is still printed if the Forge stays open.
+  const forgeTop = await ev(() => { const o = [...document.querySelectorAll('#modal-root > .overlay')]; const f = o.findIndex((x) => x.querySelector('.sheet.forge')); return { last: f === o.length - 1, after: o.slice(f + 1).map((x) => x.className + '|' + x.textContent.replace(/\s+/g, ' ').slice(0, 60)) }; });
+  if (!forgeTop.last) console.log('      note: ' + forgeTop.after.length + ' overlay(s) above the Forge at the click: ' + JSON.stringify(forgeTop.after));
+  await page.click('.overlay:has(.sheet.forge) [data-act=close]', { timeout: 10000 }).catch((e) => console.log('      click refused: ' + e.message.split('\n')[0]));
+  await page.waitForFunction(() => !document.querySelector('.sheet.forge'), null, { timeout: 5000, polling: 50 }).catch(() => {});
   const dbg1 = await ev(() => ({ kids: [...document.querySelector('#modal-root').children].map((o) => o.className + '|' + ((o.querySelector('.sheet') || {}).className || '') + '|' + ((o.querySelector('h2,.sh-t,.title') || {}).textContent || '').slice(0, 40)), forgeIn: !!document.querySelector('.sheet.forge'), t: performance.now() }));
   const fc = !(await page.$('.sheet.forge')); if (!fc) console.log('DEBUG before ' + JSON.stringify(dbg0) + '\nDEBUG after ' + JSON.stringify(dbg1));
   ok(fc, 'the Forge closes');
@@ -110,7 +117,9 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   ok(iv1 <= iv0, 'no timers pile up across 6 screen changes (' + iv0 + ' → ' + iv1 + ' live intervals)');
   const hide = (h) => ev((h) => { Object.defineProperty(document, 'hidden', { configurable: true, get: () => h }); Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => (h ? 'hidden' : 'visible') }); document.dispatchEvent(new Event('visibilitychange')); }, h);
   await hide(true); await sleep(300);
-  const hid = await ev(() => ({ cls: document.body.classList.contains('perf-hidden'), running: document.getAnimations().filter((a) => a.playState === 'running').length }));
+  const hid = await ev(() => { const run = document.getAnimations().filter((a) => a.playState === 'running'); return { cls: document.body.classList.contains('perf-hidden'), running: run.length,
+    what: run.slice(0, 6).map((a) => (a.constructor.name) + ':' + (a.animationName || a.transitionProperty || a.id || '') + '@' + ((a.effect && a.effect.target && (a.effect.target.id || a.effect.target.className && String(a.effect.target.className.baseVal != null ? a.effect.target.className.baseVal : a.effect.target.className))) || '?').slice(0, 40) + ' t=' + Math.round(a.currentTime || 0)) }; });
+  if (hid.running) console.log('      running while hidden: ' + JSON.stringify(hid.what)); // Phase 18D diagnostics only: same wait, same check
   ok(hid.cls && hid.running === 0, 'hidden: every island animation is paused (' + hid.running + ' running)');
   await hide(false); await sleep(300);
   ok(await ev(() => !document.body.classList.contains('perf-hidden') && document.getAnimations().some((a) => a.playState === 'running')), 'back: the island animates again');

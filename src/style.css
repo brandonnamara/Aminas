@@ -876,6 +876,9 @@ img.portrait.vox { image-rendering: auto; }
 body.perf-rest #world *, body.perf-covered #world *, body.perf-hidden #world *,
 body.perf-rest .fest-layer *, body.perf-covered .fest-layer *, body.perf-hidden *,
 body.perf-rest .title-wrap *, body.perf-hidden .screen * { animation-play-state: paused !important; }
+/* Phase 18D: a companion's walking hop is a CSS transition, which animation-play-state does not pause; one that was in
+   flight when the app was hidden kept running. Hidden now ends it where it was heading. */
+body.perf-hidden #world .cr-mv { transition: none !important; }
 body.perf-rest #world .creature .cr-an.walk .cr-bob { animation-play-state: running !important; }
 /* battery saver: no butterflies / fireflies / embers / lanterns, slower cadence elsewhere */
 body.perf-saver #world .ambient, body.perf-saver .fest-layer { display: none; }
