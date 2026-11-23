@@ -112,7 +112,7 @@ particles, far backdrop colours and set dressing. Battery saver and Reduce motio
 Cost (`tools/p18d-arenas.js`, `docs/audit18d/arenas.json`): arena geometry alone has the same draw calls as its base in
 all 60 cases (10 arenas × normal/boss × three tiers) and at most 3.4% more triangles. In a live battle, draw calls are
 equal or one higher (the extra particle colour), and render time is within the run-to-run spread (balanced tier mean
-54.1 ms vs 55.3 ms for the Starter originals). The arenas were therefore kept.
+55.9 ms vs 57.0 ms for the Starter originals, final run). The arenas were therefore kept.
 
 ## 6. Rare third-form encounter (Explore)
 
