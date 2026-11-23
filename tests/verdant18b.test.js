@@ -7,7 +7,7 @@ const h = (str) => { let x = 2166136261; for (const ch of str) { x ^= ch.charCod
 const clone = (o) => JSON.parse(JSON.stringify(o));
 
 /* ---------- level cap 40 ---------- */
-ok(D.MAX_LEVEL === 40, 'the level cap is 40 (approved: raised from 30)');
+ok(R.levelCap(A.State.newGame()) === 40, 'the level cap is 40 (approved: raised from 30; Phase 19B: 40 until the Forest Crown)');
 ok([1, 10, 22, 29, 30, 35, 39].map(R.xpNeed).join() === '25,216,772,1257,1336,1766,2153', 'experience per level is the same formula, continued past 30 (16 + 8·lv + 1.2·lv²)');
 ok(JSON.stringify([[10, 10], [20, 15], [25, 20], [30, 26], [35, 30], [40, 33]].map(([a, b]) => R.xpScale(a, b))) === '[1,0.25,0.25,0.5,0.25,0.25]', 'battle XP scaling against weaker foes is unchanged');
 {
@@ -29,7 +29,7 @@ ok(JSON.stringify([[10, 10], [20, 15], [25, 20], [30, 26], [35, 30], [40, 33]].m
   const before = clone(s.aminas); const t = clone(s); delete t.v18; S.sanitize(t);
   ok(JSON.stringify(t.aminas.map((x) => [x.uid, x.lv, x.xp])) === JSON.stringify(before.map((x) => [x.uid, x.lv, x.xp])), 'loading an older save changes no level or XP (nothing retroactive)');
   const u = clone(s); u.aminas[0].lv = 35; u.aminas[1].lv = 57; S.sanitize(u);
-  ok(u.aminas[0].lv === 35 && u.aminas[1].lv === 40, 'a saved level between 31 and 40 loads as is; anything above 40 is clamped');
+  ok(u.aminas[0].lv === 35 && u.aminas[1].lv === 57, 'a saved level between 31 and 40 loads as is, and (Phase 19B, approved) no saved level is ever lowered');
 }
 
 /* ---------- the island is not rebuilt ---------- */

@@ -201,7 +201,7 @@
     return '<div class="comp panel sel7" id="comp" data-uid="' + a.uid + '">' +
       '<div class="art" data-act="selDetail" data-uid="' + a.uid + '" role="button" aria-label="Details for ' + esc(sp.name) + '">' + Art.portrait(a.sp) + (evo ? '<span class="evo-badge" title="Ready to evolve">' + I('spark') + '</span>' : '') + '</div>' +
       '<div class="nm"><span class="nmt">' + esc(sp.name) + '</span> ' + chip(sp.el) + (a.uid === s.active ? '<span class="chip light comp-tag">Companion</span>' : '') + '</div>' +
-      '<div><div class="bar xp"><i style="width:' + (a.lv >= D.MAX_LEVEL ? 100 : pct(a.xp, need)) + '%"></i></div><div class="xpl"><span>Lv ' + a.lv + '</span><span>' + (a.lv >= D.MAX_LEVEL ? 'MAX' : a.xp + ' / ' + need + ' xp') + '</span></div></div>' +
+      '<div><div class="bar xp"><i style="width:' + (a.lv >= R.levelCap(s) ? 100 : pct(a.xp, need)) + '%"></i></div><div class="xpl"><span>Lv ' + a.lv + '</span><span>' + (a.lv >= R.levelCap(s) ? 'Cap ' + R.levelCap(s) : a.xp + ' / ' + need + ' xp') + '</span></div></div>' +
       '<div class="row"><button class="btn small gold" data-act="feedSel" data-uid="' + a.uid + '" data-kind="snack" data-hl="feed">' + I('food') + 'Snack ' + D.SNACKS.snack.food + '</button><button class="btn small" data-act="feedSel" data-uid="' + a.uid + '" data-kind="feast" data-hl="feed">Feast ' + D.SNACKS.feast.food + '</button></div>' +
       (list.length > 1 ? '<div class="selnav"><button class="round xs" data-act="selPrev" aria-label="Previous Amina">' + I('back') + '</button><span class="seldots">' + (i + 1) + ' / ' + list.length + '</span><button class="round xs" data-act="selNext" aria-label="Next Amina">' + I('arrow') + '</button></div>' : '') +
       '</div>';

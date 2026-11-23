@@ -25,7 +25,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms)); const SHOTS = proce
 
   await page.goto(srv.url); await page.waitForFunction(() => window.A && A.UI && A.UI.showIsland && A.UI.P13 && A.Rules.Prog);
   const U = await ev(() => { A.Perf.reportSlow = () => {}; const s = A.State.newGame(), R = A.Rules; s.phase = 'play'; s.introDone = true; s.avatar.made = true; s.starter = 'lumifern';
-    const a = R.addAmina(s, 'lumifern', 11); a.xp = R.xpNeed(11) - 30; const b = R.addAmina(s, 'lumifern', 3), c = R.addAmina(s, 'pyrokai', A.Data.MAX_LEVEL) /* Phase 18B: the cap is 40 */, d = R.addAmina(s, 'aurelith', 24); s.res.food = 33; s.res.gold = 500; R.Essence.gain(s, 'light', 12); R.drain(); A.State.save(); A.UI.showIsland(); return { a: a.uid, b: b.uid, c: c.uid, d: d.uid }; });
+    const a = R.addAmina(s, 'lumifern', 11); a.xp = R.xpNeed(11) - 30; const b = R.addAmina(s, 'lumifern', 3), c = R.addAmina(s, 'pyrokai', R.levelCap(s)) /* Phase 18B: the cap is 40; Phase 19B: the current (staged) cap, still 40 in a new save */, d = R.addAmina(s, 'aurelith', 24); s.res.food = 33; s.res.gold = 500; R.Essence.gain(s, 'light', 12); R.drain(); A.State.save(); A.UI.showIsland(); return { a: a.uid, b: b.uid, c: c.uid, d: d.uid }; });
   await page.waitForSelector('#world'); await clean();
 
   /* ---- the progression strip ---- */
@@ -95,7 +95,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms)); const SHOTS = proce
   ok(JSON.stringify(a4) === JSON.stringify(b4) && /Not enough food: Honey Feast needs 10, you have 2 \(8 short\)/.test(v.status) && /bad/.test(v.statusCls) && v.overlays === 1, 'a feed without enough food spends nothing and says why, on the screen: “' + v.status + '”');
   await shot('08-not-enough-food');
   await ev((u) => { A.UI.closeAll(); A.State.state.res.food = 50; A.UI.detail('pyrokai', { uid: u }); }, U.c); await page.waitForSelector('.pg-head'); v = await view();
-  ok(v.lv === 40 && /Max level/.test(v.xpt) && v.bar === 100 && v.feeds.every((f) => f.off) && v.stats.hp.up === null && /Ready to evolve/.test(v.status) && (await ev(() => A.State.state.res.food)) === 50, 'at the highest level the strip says Max level, shows no further stat gain, and the feeds are switched off');
+  ok(v.lv === 40 && /Level cap 40/.test(v.xpt) && v.bar === 100 && v.feeds.every((f) => f.off) && v.stats.hp.up === null && /Ready to evolve/.test(v.status) && (await ev(() => A.State.state.res.food)) === 50, 'at the level cap the strip says “Level cap 40” (Phase 19B: the cap is staged, so not “Max level”), shows no further stat gain, and the feeds are switched off');
 
   /* ---- several of the same species ---- */
   await ev((u) => { A.UI.closeAll(); A.UI.detail('lumifern'); }, U.b); await page.waitForSelector('.pg-head'); v = await view();

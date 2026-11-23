@@ -67,18 +67,28 @@
   };
 
   /* ---------- xp / feeding ---------- */
+  // Phase 19B: the level cap that applies to a save (see data.js). It only ever rises with Island Bosses defeated, so a
+  // save never loses a level; the absolute ceiling is D.MAX_LEVEL. Without a save, the base cap.
+  R.levelCap = function (st) {
+    if (st === undefined && A.State) st = A.State.state;
+    let c = D.CAP_BASE || D.MAX_LEVEL;
+    if (st && R.islandBossDefeated) (D.CAP_STEPS || []).forEach((x) => { if (R.islandBossDefeated(st, x.boss)) c = Math.max(c, x.cap); });
+    return Math.min(c, D.MAX_LEVEL);
+  };
+  R.nextCap = function (st) { const c = R.levelCap(st), n = (D.CAP_STEPS || []).find((x) => x.cap > c); return n ? { cap: n.cap, boss: n.boss } : null; };
   R.addXp = function (st, inst, amt) {
     const out = { levels: [], evolved: null, evoReady: null, gained: 0 };
-    if (inst.lv >= D.MAX_LEVEL) { out.capped = true; return out; } // Phase 18D: say so (the victory screen shows “max level”)
+    const CAP = R.levelCap(st);
+    if (inst.lv >= CAP) { out.capped = true; return out; } // Phase 18D: say so (the victory screen shows “max level”)
     if (amt <= 0) return out;
     inst.xp += amt; out.gained = amt;
-    while (inst.lv < D.MAX_LEVEL && inst.xp >= R.xpNeed(inst.lv)) {
+    while (inst.lv < CAP && inst.xp >= R.xpNeed(inst.lv)) {
       inst.xp -= R.xpNeed(inst.lv);
       out.levels.push({ from: inst.lv, to: inst.lv + 1 });
       inst.lv++;
       R.emit('creatureLevel', { uid: inst.uid, sp: inst.sp, from: inst.lv - 1, to: inst.lv });
     }
-    if (inst.lv >= D.MAX_LEVEL) { out.gained -= inst.xp; inst.xp = 0; out.capped = true; } // Phase 18D: XP past the cap is not kept, so it is not reported as gained
+    if (inst.lv >= CAP) { out.gained -= inst.xp; inst.xp = 0; out.capped = true; } // Phase 18D: XP past the cap is not kept, so it is not reported as gained
     // v0.7: evolution is never automatic. When the next form becomes available the player is told once, and it
     // only happens when they confirm (R.evolve). Level, XP, equipment and the uid are kept through it.
     const evo = sp(inst.sp).evo;
@@ -120,7 +130,7 @@
   R.feed = function (st, uid, kind) {
     const k = D.SNACKS[kind]; const inst = R.inst(st, uid);
     if (!k || !inst) return { ok: false, reason: 'invalid' };
-    if (inst.lv >= D.MAX_LEVEL) return { ok: false, reason: 'max' };
+    if (inst.lv >= R.levelCap(st)) return { ok: false, reason: 'max' };
     if (st.res.food < k.food) { R.emit('feedEmpty', {}); return { ok: false, reason: 'food', need: k.food - st.res.food }; }
     st.res.food -= k.food;
     st.stats.fed++;
@@ -891,7 +901,7 @@
   SV.spec = function (st) {
     const run = svRec(st).run; if (!run) return null;
     const lvs = run.uids.map((u) => (R.inst(st, u) || { lv: 1 }).lv), avg = Math.round(lvs.reduce((a, b) => a + b, 0) / lvs.length);
-    const w = run.wave, lv = Math.max(2, Math.min(D.MAX_LEVEL, avg - 3 + Math.floor(w * 0.6)));
+    const w = run.wave, lv = Math.max(2, Math.min(R.levelCap(st), avg - 3 + Math.floor(w * 0.6)));
     const pick = (arr, k) => arr[(run.seed + k * 7919) % arr.length];
     if (w % 5 === 0) return { sp: pick(D.SURVIVAL.champions, w), lv: lv + 1, boss: true, title: 'Wave ' + w + ' Champion', hpMult: 1.15 + w * 0.01, move: pick(D.SURVIVAL.championMoves, w) };
     return { sp: pick(D.SURVIVAL.pool, w), lv };
@@ -978,7 +988,7 @@
   PV.aiTeam = function (lv, n, seed) {
     const pool = D.SURVIVAL.pool.concat(['lumifern', 'umbrit', 'aimza', 'igniflare', 'zeep']);
     const out = [];
-    for (let i = 0; i < n; i++) { const sp = pool[(seed + i * 104729) % pool.length]; out.push(B.fighter(sp, Math.max(1, Math.min(D.MAX_LEVEL, lv + ((seed >> i) % 3) - 1)), { name: 'Rival ' + D.SPECIES[sp].name })); }
+    for (let i = 0; i < n; i++) { const sp = pool[(seed + i * 104729) % pool.length]; out.push(B.fighter(sp, Math.max(1, Math.min(R.levelCap(), lv + ((seed >> i) % 3) - 1)), { name: 'Rival ' + D.SPECIES[sp].name })); }
     return out;
   };
   const avgLv = (st, uids) => Math.round(uids.reduce((a, u) => a + (R.inst(st, u) || { lv: 1 }).lv, 0) / Math.max(1, uids.length));
@@ -1056,7 +1066,7 @@
     for (const x of C.tiers) { if (pick < x.w) { tier = x; break; } pick -= x.w; }
     const m = tier.mult[0] + rnd() * (tier.mult[1] - tier.mult[0]);
     const loot = { gold: Math.max(5, Math.round(C.base.gold * m / 5) * 5), food: Math.max(1, Math.round(C.base.food * m * (0.85 + rnd() * 0.3))) };
-    const lv = Math.max(1, Math.min(D.MAX_LEVEL, attackLevel(st) + tier.lv));
+    const lv = Math.max(1, Math.min(R.levelCap(st), attackLevel(st) + tier.lv));
     const foes = PV.aiTeam(lv, D.PVP.defenceSize, Math.floor(rnd() * 1e6)).map((f) => ({ sp: f.sp, lv: f.lv }));
     const look = { skin: Math.floor(rnd() * 6), hair: Math.floor(rnd() * 6), hairCol: Math.floor(rnd() * 7), eyes: Math.floor(rnd() * 4), outfit: Math.floor(rnd() * 6), acc: Math.floor(rnd() * 4) };
     return { id: bot.id + '-' + (seed >>> 0).toString(36), bot: bot.id, name: bot.name, isle: bot.isle, biome: bot.biome, look, tier: tier.id, guard: tier.label, foes, loot, locked: false, t: R.now() };

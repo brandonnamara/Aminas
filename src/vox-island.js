@@ -12,7 +12,7 @@
   V.wanted = () => { const s = st(); return !!(s && s.settings && s.settings.voxIsland !== false) && !failed && !!(A.C3D && A.C3D.supported()); };
   V.failed = () => failed;
   V.ready = () => !!ctrl && !!document.querySelector('#world.vox');
-  V.ISLANDS = ['starter', 'verdant']; // Phase 18B: the Verdant Wilds joins the voxel island
+  V.ISLANDS = ['starter', 'verdant', 'obsidian']; // Phase 18B: the Verdant Wilds joins the voxel island; Phase 19B: Obsidian Reach
   function load() {
     if (mod) return Promise.resolve(mod);
     // Phase 3: load timings for the performance test (src/bench.js)
@@ -37,7 +37,10 @@
   // Trees and bushes on hills, ledges and loose chunks (scenery only: those cells are never buildable).
   // Phase 18D: the Verdant Wilds grows its own groves on the same layout (same count, same cells): willows instead of
   // pines, glowcaps instead of blossom, ferns and mushrooms in the glades, moss-capped rocks instead of crystals
-  const SWAP = { verdant: { pine: 'willow', birch: 'oak', blossom: 'glowcap', flowerBush: 'fernLarge', tallGrass: 'fernLarge', flowerPatch: 'mushrooms', crystals: 'mossyRock', bush: 'roundBush' } };
+  // Phase 19B: Obsidian Reach grows ash trees and crystal shoots, with ash rocks where the meadows had flowers
+  const SWAP = { verdant: { pine: 'willow', birch: 'oak', blossom: 'glowcap', flowerBush: 'fernLarge', tallGrass: 'fernLarge', flowerPatch: 'mushrooms', crystals: 'mossyRock', bush: 'roundBush' },
+    obsidian: { pine: 'ashtree', birch: 'ashtree', oak: 'ashtree', oakOld: 'ashtree', willow: 'ashtree', blossom: 'crystalshoot', flowerBush: 'ashrock', tallGrass: 'ashrock', fernLarge: 'ashrock', roundBush: 'ashrock',
+      flowerPatch: 'crystalshoot', mushrooms: 'crystalshoot', glowcap: 'crystalshoot', crystals: 'crystalshoot', bush: 'ashrock', mossyRock: 'ashrock', vines: 'ashvine', hangingMoss: 'ashvine' } };
   function scenery(cols, iid) { const sw = SWAP[iid]; const out = scenery0(cols); if (sw) out.forEach((o) => { if (sw[o.kind]) { o.kind = sw[o.kind]; o.still = !!STILL[o.kind]; } }); return out; }
   function scenery0(cols) {
     // Phase 1.1 composition: trees grow in groves (a slow noise field picks pine, oak or blossom stands), with
@@ -76,7 +79,7 @@
     return out;
   }
   const KNOWN = { columnRuin: 1, runeStone: 1, stonePillars: 1, willow: 1, glowcap: 1, roots: 1, logPile: 1, pots: 1, oak: 1, pine: 1, birch: 1, bush: 1, blossom: 1, fern: 1, oakOld: 1, roundBush: 1, flowerBush: 1, flowerPatch: 1, tallGrass: 1, fernLarge: 1, mushrooms: 1, mossyRock: 1, crystals: 1, vines: 1, hangingMoss: 1 };
-  const STILL = { columnRuin: true, runeStone: true, stonePillars: true, glowcap: true, roots: true, logPile: true, pots: true, mossyRock: true, crystals: true, mushrooms: true, flowerPatch: true, vines: true, hangingMoss: true }; // no sway
+  const STILL = { ashvine: true, ashtree: true, ashrock: true, crystalshoot: true, columnRuin: true, runeStone: true, stonePillars: true, glowcap: true, roots: true, logPile: true, pots: true, mossyRock: true, crystals: true, mushrooms: true, flowerPatch: true, vines: true, hangingMoss: true }; // no sway
   let sceneryCache = null;
 
   // Called by UI.renderWorld whenever the island's terrain is (re)drawn.

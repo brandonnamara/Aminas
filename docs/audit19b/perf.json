@@ -1,0 +1,170 @@
+{
+ "note": "Chromium + SwiftShader (software WebGL) at 844×390, DPR 2. Not an iPhone: compare the islands, not absolute speed.",
+ "firstVisitMs": 2303,
+ "secondVisitMs": 1552,
+ "tiers": [
+  {
+   "island": "starter",
+   "tier": "high",
+   "calls": 73,
+   "triangles": 133984,
+   "geometries": 164,
+   "textures": 2,
+   "avgDrawMs": 561.26,
+   "p50": 533.2,
+   "p95": 616.7
+  },
+  {
+   "island": "verdant",
+   "tier": "high",
+   "calls": 79,
+   "triangles": 152096,
+   "geometries": 168,
+   "textures": 2,
+   "avgDrawMs": 471.72,
+   "p50": 666.7,
+   "p95": 683.4
+  },
+  {
+   "island": "obsidian",
+   "tier": "high",
+   "calls": 58,
+   "triangles": 114892,
+   "geometries": 168,
+   "textures": 2,
+   "avgDrawMs": 413.83,
+   "p50": 500,
+   "p95": 666.7
+  },
+  {
+   "island": "starter",
+   "tier": "balanced",
+   "calls": 74,
+   "triangles": 131382,
+   "geometries": 164,
+   "textures": 2,
+   "avgDrawMs": 379.47,
+   "p50": 466.7,
+   "p95": 733.3
+  },
+  {
+   "island": "verdant",
+   "tier": "balanced",
+   "calls": 79,
+   "triangles": 149456,
+   "geometries": 168,
+   "textures": 2,
+   "avgDrawMs": 337.02,
+   "p50": 499.9,
+   "p95": 583.3
+  },
+  {
+   "island": "obsidian",
+   "tier": "balanced",
+   "calls": 58,
+   "triangles": 112384,
+   "geometries": 168,
+   "textures": 2,
+   "avgDrawMs": 303.34,
+   "p50": 433.3,
+   "p95": 500
+  },
+  {
+   "island": "starter",
+   "tier": "saver",
+   "calls": 75,
+   "triangles": 81060,
+   "geometries": 210,
+   "textures": 2,
+   "avgDrawMs": 269.53,
+   "p50": 300,
+   "p95": 333.4
+  },
+  {
+   "island": "verdant",
+   "tier": "saver",
+   "calls": 79,
+   "triangles": 83518,
+   "geometries": 261,
+   "textures": 2,
+   "avgDrawMs": 246.17,
+   "p50": 316.7,
+   "p95": 400
+  },
+  {
+   "island": "obsidian",
+   "tier": "saver",
+   "calls": 57,
+   "triangles": 68234,
+   "geometries": 289,
+   "textures": 2,
+   "avgDrawMs": 224.6,
+   "p50": 283.4,
+   "p95": 333.3
+  }
+ ],
+ "flat": [
+  {
+   "island": "starter",
+   "vox": false,
+   "nodes": 2739,
+   "svgNodes": 1239,
+   "p50": 16.7,
+   "p95": 16.7
+  },
+  {
+   "island": "verdant",
+   "vox": false,
+   "nodes": 2496,
+   "svgNodes": 996,
+   "p50": 16.7,
+   "p95": 16.7
+  },
+  {
+   "island": "obsidian",
+   "vox": false,
+   "nodes": 2376,
+   "svgNodes": 876,
+   "p50": 16.7,
+   "p95": 16.8
+  }
+ ],
+ "leak": {
+  "trips": 30,
+  "islandsPerTrip": 3,
+  "before": {
+   "geometries": 287,
+   "textures": 2,
+   "nodes": 2105,
+   "heapMB": 110.6
+  },
+  "at10_20_30": [
+   {
+    "geometries": 287,
+    "textures": 2,
+    "nodes": 2105,
+    "heapMB": 110.6
+   },
+   {
+    "geometries": 287,
+    "textures": 2,
+    "nodes": 2105,
+    "heapMB": 110.6
+   },
+   {
+    "geometries": 287,
+    "textures": 2,
+    "nodes": 2105,
+    "heapMB": 110.6
+   }
+  ],
+  "after": {
+   "geometries": 287,
+   "textures": 2,
+   "nodes": 2105,
+   "heapMB": 110.6
+  },
+  "avgTravelMs": 1969
+ },
+ "errors": []
+}

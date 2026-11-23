@@ -23,19 +23,19 @@
   P.statusText = function (s, inst) {
     const L = R.Prog.level(inst), e = R.Prog.evoPreview(s, inst);
     if (!e.final && e.levelOk) return { cls: 'ready', text: 'Ready to evolve. See Growth.' };
-    if (L.max) return { cls: '', text: 'Highest level reached.' + (e.final ? ' Final form.' : '') };
+    if (L.max) return { cls: '', text: (R.levelCap && R.levelCap(s) < D.MAX_LEVEL ? 'Level cap ' + R.levelCap(s) + ' reached.' : 'Highest level reached.') + (e.final ? ' Final form.' : '') };
     if (!e.final) return { cls: '', text: 'Evolves at Lv ' + e.lv + ' (' + e.levelsToGo + ' level' + (e.levelsToGo === 1 ? '' : 's') + ', ' + fmt(e.xpToGo) + ' XP to go).' };
     return { cls: '', text: 'Final form. Feeding still raises its level and stats.' };
   };
   P.feedBtn = function (f, uid, gold) {
-    const sub = f.reason === 'max' ? 'Max level' : I('food') + ' ' + f.food + (f.reason === 'food' ? ' · need ' + f.short + ' more' : ' <i class="pg-arrow">→</i> +' + f.xp + ' XP' + (f.levels ? ' · <b class="pg-up">Lv ' + f.lvAfter + '</b>' : ''));
+    const sub = f.reason === 'max' ? (R.levelCap && R.levelCap(S.state) < D.MAX_LEVEL ? 'Level cap' : 'Max level') : I('food') + ' ' + f.food + (f.reason === 'food' ? ' · need ' + f.short + ' more' : ' <i class="pg-arrow">→</i> +' + f.xp + ' XP' + (f.levels ? ' · <b class="pg-up">Lv ' + f.lvAfter + '</b>' : ''));
     return '<button class="btn small pg-feed ' + (gold ? 'gold' : '') + (f.reason === 'food' ? ' short' : '') + (f.reason === 'max' ? ' off' : '') + '" data-act="detailFeed" data-uid="' + uid + '" data-kind="' + f.kind + '" aria-label="' + esc(f.name + ': costs ' + f.food + ' food, gives ' + f.xp + ' experience' + (f.reason === 'food' ? ', not enough food' : '')) + '"><span>' + esc(f.name) + '</span><small>' + sub + '</small></button>';
   };
   P.head = function (s, inst) {
     const L = R.Prog.level(inst), feeds = R.Prog.feeds(s, inst), stt = P.statusText(s, inst);
     return '<div class="pg-head" data-uid="' + inst.uid + '">' +
       '<div class="pg-row"><span class="pg-lv" aria-label="Level ' + L.lv + '">Lv <b>' + L.lv + '</b></span><div class="pg-xp"><div class="bar xp" role="progressbar" aria-valuemin="0" aria-valuemax="' + (L.need || 1) + '" aria-valuenow="' + L.xp + '"><i style="width:' + L.pct + '%"></i></div>' +
-      '<small class="pg-xpt">' + (L.max ? 'Max level' : '<b>' + fmt(L.xp) + '</b> / ' + fmt(L.need) + ' XP · ' + fmt(L.left) + ' to Lv ' + (L.lv + 1)) + '</small></div></div>' +
+      '<small class="pg-xpt">' + (L.max ? (R.levelCap && R.levelCap(s) < D.MAX_LEVEL ? 'Level cap ' + R.levelCap(s) : 'Max level') : '<b>' + fmt(L.xp) + '</b> / ' + fmt(L.need) + ' XP · ' + fmt(L.left) + ' to Lv ' + (L.lv + 1)) + '</small></div></div>' +
       '<div class="pg-row pg-feeds">' + feeds.map((f, i) => P.feedBtn(f, inst.uid, i === 0)).join('') +
       '<div class="pg-status ' + stt.cls + '" role="status" aria-live="polite" data-idle="' + esc(stt.text) + '" data-idle-cls="' + stt.cls + '">' + esc(stt.text) + '</div>' +
       '<span class="pg-food" title="Food you have">' + I('food') + ' <b>' + fmt(s.res.food) + '</b></span></div></div>';

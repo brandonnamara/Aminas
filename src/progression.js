@@ -15,13 +15,13 @@
   const diff = (a, b) => { const o = {}; KEYS.forEach((k) => (o[k] = b[k] - a[k])); return o; };
 
   // Level and experience, as the screens show them.
-  P.level = function (inst) {
-    const max = inst.lv >= D.MAX_LEVEL, need = max ? 0 : R.xpNeed(inst.lv);
+  P.level = function (inst, st) {
+    const max = inst.lv >= R.levelCap(st), need = max ? 0 : R.xpNeed(inst.lv);
     return { lv: inst.lv, max, xp: max ? 0 : inst.xp, need, left: max ? 0 : Math.max(0, need - inst.xp), pct: max ? 100 : Math.max(0, Math.min(100, Math.round(inst.xp / need * 100))) };
   };
   // Stats now (with equipment), the part that comes from equipment, and what the next level adds.
   P.stats = function (st, inst) {
-    const base = R.statsAt(inst.sp, inst.lv), now = withGear(st, inst), max = inst.lv >= D.MAX_LEVEL;
+    const base = R.statsAt(inst.sp, inst.lv), now = withGear(st, inst), max = inst.lv >= R.levelCap(st);
     const next = max ? now : withGear(st, Object.assign({}, inst, { lv: inst.lv + 1 }));
     return { now, base, gear: diff(base, now), nextGain: diff(now, next), max, hasGear: KEYS.some((k) => now[k] !== base[k]) };
   };
@@ -29,19 +29,20 @@
   P.feedPreview = function (st, inst, kind) {
     const k = D.SNACKS[kind]; if (!k || !inst) return null;
     const out = { kind, name: k.name, food: k.food, xp: k.xp, have: st.res.food, ok: true, reason: null, short: 0 };
-    if (inst.lv >= D.MAX_LEVEL) return Object.assign(out, { ok: false, reason: 'max' });
+    const CAP = R.levelCap(st);
+    if (inst.lv >= CAP) return Object.assign(out, { ok: false, reason: 'max' });
     if (st.res.food < k.food) Object.assign(out, { ok: false, reason: 'food', short: k.food - st.res.food });
     // the same arithmetic as R.addXp, on numbers only (no events are raised for a preview)
     let lv = inst.lv, xp = inst.xp + k.xp;
-    while (lv < D.MAX_LEVEL && xp >= R.xpNeed(lv)) { xp -= R.xpNeed(lv); lv++; }
-    if (lv >= D.MAX_LEVEL) xp = 0;
+    while (lv < CAP && xp >= R.xpNeed(lv)) { xp -= R.xpNeed(lv); lv++; }
+    if (lv >= CAP) xp = 0;
     out.lvAfter = lv; out.xpAfter = xp; out.levels = lv - inst.lv;
     const evo = D.SPECIES[inst.sp].evo; out.evoReady = !!(evo && lv >= evo.lv && inst.evoNote !== evo.to); // as R.addXp reports it
     return out;
   };
   P.feeds = (st, inst) => Object.keys(D.SNACKS).map((k) => P.feedPreview(st, inst, k));
   // XP still needed to reach a level from where the Amina is now.
-  P.xpTo = function (inst, lv) { let n = 0; for (let l = inst.lv; l < Math.min(lv, D.MAX_LEVEL); l++) n += R.xpNeed(l) - (l === inst.lv ? inst.xp : 0); return Math.max(0, n); };
+  P.xpTo = function (inst, lv, st) { let n = 0; for (let l = inst.lv; l < Math.min(lv, R.levelCap(st)); l++) n += R.xpNeed(l) - (l === inst.lv ? inst.xp : 0); return Math.max(0, n); };
 
   // What evolving would change: requirements, stats at the same level (with the same equipment), and moves.
   P.evoPreview = function (st, inst) {

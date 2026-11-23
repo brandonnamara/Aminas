@@ -21,7 +21,7 @@ function clearDungeon(s, id, opts) { const r0 = R.startRun(s, id, party(s), opts
 ok(IDS.length === 10 && IDS.every((id) => D.DUNGEONS[id].battles.length === 10), 'ten Verdant dungeons of ten battles each: 100 battles');
 ok(IDS.every((id) => D.DUNGEONS[id].playable && D.DUNGEONS[id].island === 'verdant'), 'all ten are playable and belong to the Verdant Wilds');
 ok(IDS.map((id) => D.DUNGEONS[id].recommended).join() === '22,24,25,27,28,30,31,33,34,36', 'recommended levels 22 to 36 (approved Band C)');
-ok(D.MAX_LEVEL === 40 && IDS.every((id) => D.DUNGEONS[id].battles.every((b) => b.lv >= 19 && b.lv <= 39)), 'every foe is between level 19 and 39, under the cap of 40');
+ok(R.levelCap(A.State.newGame()) === 40 /* Phase 19B: staged caps; a new save's cap */ && IDS.every((id) => D.DUNGEONS[id].battles.every((b) => b.lv >= 19 && b.lv <= 39)), 'every foe is between level 19 and 39, under the cap of 40');
 ok(IDS.every((id) => D.DUNGEONS[id].battles.every((b) => D.SPECIES[b.sp])) && Object.keys(D.SPECIES).length === 63, 'every foe is an existing species (still 63)');
 ok(IDS.every((id) => D.DUNGEONS[id].battles.every((b) => { const sp = D.SPECIES[b.sp]; return sp.stage === (b.lv >= 22 ? 3 : 2) || !D.LINES[sp.line] || D.LINES[sp.line].ids.length < (b.lv >= 22 ? 3 : 2); })), 'foes take the form their level calls for (II below 22, III from 22)');
 ok(IDS.every((id) => { const b = D.DUNGEONS[id].battles; return b[9].boss && b[9].title && b[9].move && b.slice(0, 9).every((x) => !x.boss); }), 'battle 10 of each is its guardian, with a title and a charged move; 1–9 are not');

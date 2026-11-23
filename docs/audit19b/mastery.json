@@ -1,0 +1,1590 @@
+{
+ "note": "Sandbox only: the Obsidian dungeons and every Mastery variant exist only in this simulation. Automated play with a scripted tactical policy; not real gameplay, not an iPhone.",
+ "seeds": [
+  11,
+  22
+ ],
+ "farmReplays": 5,
+ "band": {
+  "cap": 50,
+  "label": "Level cap 50",
+  "rec": [
+   38,
+   39,
+   40,
+   41,
+   42,
+   43,
+   44,
+   45,
+   46,
+   47
+  ]
+ },
+ "thresholds": [
+  34,
+  36,
+  38,
+  41,
+  40,
+  42,
+  42,
+  42,
+  42,
+  44
+ ],
+ "variants": {
+  "none": {
+   "label": "No Mastery (Phase 19B as built: XP at the cap is not stored)"
+  },
+  "pct1": {
+   "label": "Mastery +1% per rank, 10 ranks (max +10%)",
+   "per": 0.01,
+   "ranks": 10
+  },
+  "pct05": {
+   "label": "Mastery +0.5% per rank, 10 ranks (max +5%)",
+   "per": 0.005,
+   "ranks": 10
+  },
+  "sparks": {
+   "label": "No stat change: XP at the cap becomes Forge Sparks (1 gold-equivalent per 4 XP)",
+   "spark": 0.25
+  }
+ },
+ "profiles": {
+  "rarelyFed": {
+   "feed": "none",
+   "label": "Rarely fed: balanced trio, no gear, moves Lv 1"
+  },
+  "fedRegularly": {
+   "feed": "half",
+   "label": "Fed regularly (half of food), no gear, moves Lv 1"
+  },
+  "balanced": {
+   "feed": "half",
+   "moves": 3,
+   "gear": true,
+   "label": "Balanced: fed regularly, moves Lv 3, best gear"
+  },
+  "upgraded": {
+   "feed": "all",
+   "moves": 5,
+   "gear": true,
+   "starterReplays": true,
+   "label": "Highly upgraded: all food, moves Lv 5, best gear, extra replays"
+  },
+  "verdantAll": {
+   "feed": "half",
+   "moves": 4,
+   "gear": true,
+   "verdantReplays": 2,
+   "label": "All optional Verdant content: two full replays of every Verdant dungeon"
+  }
+ },
+ "results": {
+  "rarelyFed": {
+   "label": "Rarely fed: balanced trio, no gear, moves Lv 1",
+   "arrive": 34.7,
+   "capOnArrival": 50,
+   "bossFlag": true,
+   "variants": {
+    "none": {
+     "losses": 4.5,
+     "grinds": 2,
+     "minutes": 73,
+     "endLv": 45,
+     "endRanks": 0,
+     "endCapXp": 0,
+     "endSparks": 0,
+     "islandGold": 87746,
+     "farmRanks": 0,
+     "farmSparks": 0,
+     "farmGold": 120941,
+     "arrive": [
+      34.7,
+      35.7,
+      36.3,
+      37.3,
+      40.3,
+      41,
+      42,
+      43,
+      43.3,
+      44.3
+     ],
+     "ranksIn": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "slack": [
+      0.7,
+      -0.3,
+      -1.7,
+      -3.7,
+      0.3,
+      -1,
+      0,
+      1,
+      1.3,
+      0.3
+     ],
+     "cleared": true
+    },
+    "pct1": {
+     "losses": 4.5,
+     "grinds": 2,
+     "minutes": 73,
+     "endLv": 45,
+     "endRanks": 0,
+     "endCapXp": 0,
+     "endSparks": 0,
+     "islandGold": 87746,
+     "farmRanks": 0,
+     "farmSparks": 0,
+     "farmGold": 120941,
+     "arrive": [
+      34.7,
+      35.7,
+      36.3,
+      37.3,
+      40.3,
+      41,
+      42,
+      43,
+      43.3,
+      44.3
+     ],
+     "ranksIn": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "slack": [
+      0.7,
+      -0.3,
+      -1.7,
+      -3.7,
+      0.3,
+      -1,
+      0,
+      1,
+      1.3,
+      0.3
+     ],
+     "cleared": true
+    },
+    "pct05": {
+     "losses": 4.5,
+     "grinds": 2,
+     "minutes": 73,
+     "endLv": 45,
+     "endRanks": 0,
+     "endCapXp": 0,
+     "endSparks": 0,
+     "islandGold": 87746,
+     "farmRanks": 0,
+     "farmSparks": 0,
+     "farmGold": 120941,
+     "arrive": [
+      34.7,
+      35.7,
+      36.3,
+      37.3,
+      40.3,
+      41,
+      42,
+      43,
+      43.3,
+      44.3
+     ],
+     "ranksIn": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "slack": [
+      0.7,
+      -0.3,
+      -1.7,
+      -3.7,
+      0.3,
+      -1,
+      0,
+      1,
+      1.3,
+      0.3
+     ],
+     "cleared": true
+    },
+    "sparks": {
+     "losses": 4.5,
+     "grinds": 2,
+     "minutes": 73,
+     "endLv": 45,
+     "endRanks": 0,
+     "endCapXp": 0,
+     "endSparks": 0,
+     "islandGold": 87746,
+     "farmRanks": 0,
+     "farmSparks": 0,
+     "farmGold": 120941,
+     "arrive": [
+      34.7,
+      35.7,
+      36.3,
+      37.3,
+      40.3,
+      41,
+      42,
+      43,
+      43.3,
+      44.3
+     ],
+     "ranksIn": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "slack": [
+      0.7,
+      -0.3,
+      -1.7,
+      -3.7,
+      0.3,
+      -1,
+      0,
+      1,
+      1.3,
+      0.3
+     ],
+     "cleared": true
+    }
+   }
+  },
+  "fedRegularly": {
+   "label": "Fed regularly (half of food), no gear, moves Lv 1",
+   "arrive": 39.3,
+   "capOnArrival": 50,
+   "bossFlag": true,
+   "variants": {
+    "none": {
+     "losses": 0,
+     "grinds": 0,
+     "minutes": 48.5,
+     "endLv": 50.7,
+     "endRanks": 0,
+     "endCapXp": 2122,
+     "endSparks": 0,
+     "islandGold": 83980,
+     "farmRanks": 0,
+     "farmSparks": 0,
+     "farmGold": 117175,
+     "arrive": [
+      39.3,
+      41,
+      42.3,
+      44,
+      45,
+      46.3,
+      47.5,
+      48.7,
+      49.7,
+      50
+     ],
+     "ranksIn": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "slack": [
+      5.3,
+      5,
+      4.3,
+      3,
+      5,
+      4.3,
+      5.5,
+      6.7,
+      7.7,
+      6
+     ],
+     "cleared": true
+    },
+    "pct1": {
+     "losses": 0,
+     "grinds": 0,
+     "minutes": 48.5,
+     "endLv": 50.7,
+     "endRanks": 0,
+     "endCapXp": 2122,
+     "endSparks": 0,
+     "islandGold": 83980,
+     "farmRanks": 0,
+     "farmSparks": 0,
+     "farmGold": 117175,
+     "arrive": [
+      39.3,
+      41,
+      42.3,
+      44,
+      45,
+      46.3,
+      47.5,
+      48.7,
+      49.7,
+      50
+     ],
+     "ranksIn": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "slack": [
+      5.3,
+      5,
+      4.3,
+      3,
+      5,
+      4.3,
+      5.5,
+      6.7,
+      7.7,
+      6
+     ],
+     "cleared": true
+    },
+    "pct05": {
+     "losses": 0,
+     "grinds": 0,
+     "minutes": 48.5,
+     "endLv": 50.7,
+     "endRanks": 0,
+     "endCapXp": 2122,
+     "endSparks": 0,
+     "islandGold": 83980,
+     "farmRanks": 0,
+     "farmSparks": 0,
+     "farmGold": 117175,
+     "arrive": [
+      39.3,
+      41,
+      42.3,
+      44,
+      45,
+      46.3,
+      47.5,
+      48.7,
+      49.7,
+      50
+     ],
+     "ranksIn": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "slack": [
+      5.3,
+      5,
+      4.3,
+      3,
+      5,
+      4.3,
+      5.5,
+      6.7,
+      7.7,
+      6
+     ],
+     "cleared": true
+    },
+    "sparks": {
+     "losses": 0,
+     "grinds": 0,
+     "minutes": 48.5,
+     "endLv": 50.7,
+     "endRanks": 0,
+     "endCapXp": 2122,
+     "endSparks": 531,
+     "islandGold": 83980,
+     "farmRanks": 0,
+     "farmSparks": 531,
+     "farmGold": 117175,
+     "arrive": [
+      39.3,
+      41,
+      42.3,
+      44,
+      45,
+      46.3,
+      47.5,
+      48.7,
+      49.7,
+      50
+     ],
+     "ranksIn": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "slack": [
+      5.3,
+      5,
+      4.3,
+      3,
+      5,
+      4.3,
+      5.5,
+      6.7,
+      7.7,
+      6
+     ],
+     "cleared": true
+    }
+   }
+  },
+  "balanced": {
+   "label": "Balanced: fed regularly, moves Lv 3, best gear",
+   "arrive": 39.3,
+   "capOnArrival": 50,
+   "bossFlag": true,
+   "variants": {
+    "none": {
+     "losses": 0,
+     "grinds": 0,
+     "minutes": 44,
+     "endLv": 50.7,
+     "endRanks": 0,
+     "endCapXp": 2173,
+     "endSparks": 0,
+     "islandGold": 83980,
+     "farmRanks": 0,
+     "farmSparks": 0,
+     "farmGold": 117125,
+     "arrive": [
+      39.3,
+      41,
+      42.3,
+      44,
+      45.1,
+      46.3,
+      47.7,
+      48.7,
+      49.7,
+      50
+     ],
+     "ranksIn": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "slack": [
+      5.3,
+      5,
+      4.3,
+      3,
+      5.1,
+      4.3,
+      5.7,
+      6.7,
+      7.7,
+      6
+     ],
+     "cleared": true
+    },
+    "pct1": {
+     "losses": 0,
+     "grinds": 0,
+     "minutes": 44,
+     "endLv": 50.7,
+     "endRanks": 0,
+     "endCapXp": 2173,
+     "endSparks": 0,
+     "islandGold": 83980,
+     "farmRanks": 0,
+     "farmSparks": 0,
+     "farmGold": 117125,
+     "arrive": [
+      39.3,
+      41,
+      42.3,
+      44,
+      45.1,
+      46.3,
+      47.7,
+      48.7,
+      49.7,
+      50
+     ],
+     "ranksIn": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "slack": [
+      5.3,
+      5,
+      4.3,
+      3,
+      5.1,
+      4.3,
+      5.7,
+      6.7,
+      7.7,
+      6
+     ],
+     "cleared": true
+    },
+    "pct05": {
+     "losses": 0,
+     "grinds": 0,
+     "minutes": 44,
+     "endLv": 50.7,
+     "endRanks": 0,
+     "endCapXp": 2173,
+     "endSparks": 0,
+     "islandGold": 83980,
+     "farmRanks": 0,
+     "farmSparks": 0,
+     "farmGold": 117125,
+     "arrive": [
+      39.3,
+      41,
+      42.3,
+      44,
+      45.1,
+      46.3,
+      47.7,
+      48.7,
+      49.7,
+      50
+     ],
+     "ranksIn": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "slack": [
+      5.3,
+      5,
+      4.3,
+      3,
+      5.1,
+      4.3,
+      5.7,
+      6.7,
+      7.7,
+      6
+     ],
+     "cleared": true
+    },
+    "sparks": {
+     "losses": 0,
+     "grinds": 0,
+     "minutes": 44,
+     "endLv": 50.7,
+     "endRanks": 0,
+     "endCapXp": 2173,
+     "endSparks": 543,
+     "islandGold": 83980,
+     "farmRanks": 0,
+     "farmSparks": 543,
+     "farmGold": 117125,
+     "arrive": [
+      39.3,
+      41,
+      42.3,
+      44,
+      45.1,
+      46.3,
+      47.7,
+      48.7,
+      49.7,
+      50
+     ],
+     "ranksIn": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "slack": [
+      5.3,
+      5,
+      4.3,
+      3,
+      5.1,
+      4.3,
+      5.7,
+      6.7,
+      7.7,
+      6
+     ],
+     "cleared": true
+    }
+   }
+  },
+  "upgraded": {
+   "label": "Highly upgraded: all food, moves Lv 5, best gear, extra replays",
+   "arrive": 40.3,
+   "capOnArrival": 50,
+   "bossFlag": true,
+   "variants": {
+    "none": {
+     "losses": 0,
+     "grinds": 0,
+     "minutes": 39,
+     "endLv": 51.3,
+     "endRanks": 0,
+     "endCapXp": 2739,
+     "endSparks": 0,
+     "islandGold": 83980,
+     "farmRanks": 0,
+     "farmSparks": 0,
+     "farmGold": 117175,
+     "arrive": [
+      40.3,
+      42,
+      43.3,
+      44.7,
+      45.9,
+      47,
+      48,
+      49,
+      50,
+      50
+     ],
+     "ranksIn": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "slack": [
+      6.3,
+      6,
+      5.3,
+      3.7,
+      5.9,
+      5,
+      6,
+      7,
+      8,
+      6
+     ],
+     "cleared": true
+    },
+    "pct1": {
+     "losses": 0,
+     "grinds": 0,
+     "minutes": 39,
+     "endLv": 51.3,
+     "endRanks": 0,
+     "endCapXp": 2739,
+     "endSparks": 0,
+     "islandGold": 83980,
+     "farmRanks": 0,
+     "farmSparks": 0,
+     "farmGold": 117175,
+     "arrive": [
+      40.3,
+      42,
+      43.3,
+      44.7,
+      45.9,
+      47,
+      48,
+      49,
+      50,
+      50
+     ],
+     "ranksIn": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "slack": [
+      6.3,
+      6,
+      5.3,
+      3.7,
+      5.9,
+      5,
+      6,
+      7,
+      8,
+      6
+     ],
+     "cleared": true
+    },
+    "pct05": {
+     "losses": 0,
+     "grinds": 0,
+     "minutes": 39,
+     "endLv": 51.3,
+     "endRanks": 0,
+     "endCapXp": 2739,
+     "endSparks": 0,
+     "islandGold": 83980,
+     "farmRanks": 0,
+     "farmSparks": 0,
+     "farmGold": 117175,
+     "arrive": [
+      40.3,
+      42,
+      43.3,
+      44.7,
+      45.9,
+      47,
+      48,
+      49,
+      50,
+      50
+     ],
+     "ranksIn": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "slack": [
+      6.3,
+      6,
+      5.3,
+      3.7,
+      5.9,
+      5,
+      6,
+      7,
+      8,
+      6
+     ],
+     "cleared": true
+    },
+    "sparks": {
+     "losses": 0,
+     "grinds": 0,
+     "minutes": 39,
+     "endLv": 51.3,
+     "endRanks": 0,
+     "endCapXp": 2739,
+     "endSparks": 672,
+     "islandGold": 83980,
+     "farmRanks": 0,
+     "farmSparks": 672,
+     "farmGold": 117175,
+     "arrive": [
+      40.3,
+      42,
+      43.3,
+      44.7,
+      45.9,
+      47,
+      48,
+      49,
+      50,
+      50
+     ],
+     "ranksIn": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "slack": [
+      6.3,
+      6,
+      5.3,
+      3.7,
+      5.9,
+      5,
+      6,
+      7,
+      8,
+      6
+     ],
+     "cleared": true
+    }
+   }
+  },
+  "verdantAll": {
+   "label": "All optional Verdant content: two full replays of every Verdant dungeon",
+   "arrive": 45.7,
+   "capOnArrival": 50,
+   "bossFlag": true,
+   "variants": {
+    "none": {
+     "losses": 0,
+     "grinds": 0,
+     "minutes": 38,
+     "endLv": 51.7,
+     "endRanks": 0,
+     "endCapXp": 5317,
+     "endSparks": 0,
+     "islandGold": 83980,
+     "farmRanks": 0,
+     "farmSparks": 0,
+     "farmGold": 117275,
+     "arrive": [
+      45.7,
+      46.7,
+      47.3,
+      48.3,
+      49,
+      50,
+      50,
+      50,
+      50,
+      50
+     ],
+     "ranksIn": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "slack": [
+      11.7,
+      10.7,
+      9.3,
+      7.3,
+      9,
+      8,
+      8,
+      8,
+      8,
+      6
+     ],
+     "cleared": true
+    },
+    "pct1": {
+     "losses": 0,
+     "grinds": 0,
+     "minutes": 38,
+     "endLv": 51.7,
+     "endRanks": 1,
+     "endCapXp": 5317,
+     "endSparks": 0,
+     "islandGold": 83980,
+     "farmRanks": 1,
+     "farmSparks": 0,
+     "farmGold": 117325,
+     "arrive": [
+      45.7,
+      46.7,
+      47.3,
+      48.3,
+      49,
+      50,
+      50,
+      50,
+      50,
+      50
+     ],
+     "ranksIn": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0.7
+     ],
+     "slack": [
+      11.7,
+      10.7,
+      9.3,
+      7.3,
+      9,
+      8,
+      8,
+      8,
+      8,
+      6
+     ],
+     "cleared": true
+    },
+    "pct05": {
+     "losses": 0,
+     "grinds": 0,
+     "minutes": 38,
+     "endLv": 51.7,
+     "endRanks": 1,
+     "endCapXp": 5317,
+     "endSparks": 0,
+     "islandGold": 83980,
+     "farmRanks": 1,
+     "farmSparks": 0,
+     "farmGold": 117325,
+     "arrive": [
+      45.7,
+      46.7,
+      47.3,
+      48.3,
+      49,
+      50,
+      50,
+      50,
+      50,
+      50
+     ],
+     "ranksIn": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0.7
+     ],
+     "slack": [
+      11.7,
+      10.7,
+      9.3,
+      7.3,
+      9,
+      8,
+      8,
+      8,
+      8,
+      6
+     ],
+     "cleared": true
+    },
+    "sparks": {
+     "losses": 0,
+     "grinds": 0,
+     "minutes": 38,
+     "endLv": 51.7,
+     "endRanks": 0,
+     "endCapXp": 5317,
+     "endSparks": 1330,
+     "islandGold": 83980,
+     "farmRanks": 0,
+     "farmSparks": 1330,
+     "farmGold": 117275,
+     "arrive": [
+      45.7,
+      46.7,
+      47.3,
+      48.3,
+      49,
+      50,
+      50,
+      50,
+      50,
+      50
+     ],
+     "ranksIn": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "slack": [
+      11.7,
+      10.7,
+      9.3,
+      7.3,
+      9,
+      8,
+      8,
+      8,
+      8,
+      6
+     ],
+     "cleared": true
+    }
+   }
+  }
+ },
+ "farmAtCap": {
+  "pct1": {
+   "cap": 60,
+   "rankCost": 4816,
+   "track": [
+    {
+     "round": 1,
+     "minutes": 12,
+     "ranks": 0,
+     "capXp": 2249,
+     "sparks": 0
+    },
+    {
+     "round": 2,
+     "minutes": 23,
+     "ranks": 0,
+     "capXp": 4505,
+     "sparks": 0
+    },
+    {
+     "round": 3,
+     "minutes": 35,
+     "ranks": 1,
+     "capXp": 6696,
+     "sparks": 0
+    },
+    {
+     "round": 4,
+     "minutes": 47,
+     "ranks": 1,
+     "capXp": 8913,
+     "sparks": 0
+    },
+    {
+     "round": 5,
+     "minutes": 59,
+     "ranks": 2,
+     "capXp": 11182,
+     "sparks": 0
+    },
+    {
+     "round": 6,
+     "minutes": 71,
+     "ranks": 2,
+     "capXp": 13398,
+     "sparks": 0
+    },
+    {
+     "round": 7,
+     "minutes": 83,
+     "ranks": 3,
+     "capXp": 15635,
+     "sparks": 0
+    },
+    {
+     "round": 8,
+     "minutes": 95,
+     "ranks": 3,
+     "capXp": 17904,
+     "sparks": 0
+    },
+    {
+     "round": 9,
+     "minutes": 106,
+     "ranks": 3.67,
+     "capXp": 20152,
+     "sparks": 0
+    },
+    {
+     "round": 10,
+     "minutes": 118,
+     "ranks": 4,
+     "capXp": 22401,
+     "sparks": 0
+    },
+    {
+     "round": 11,
+     "minutes": 129,
+     "ranks": 4.67,
+     "capXp": 24670,
+     "sparks": 0
+    },
+    {
+     "round": 12,
+     "minutes": 141,
+     "ranks": 5,
+     "capXp": 26926,
+     "sparks": 0
+    }
+   ]
+  },
+  "pct05": {
+   "cap": 60,
+   "rankCost": 4816,
+   "track": [
+    {
+     "round": 1,
+     "minutes": 12,
+     "ranks": 0,
+     "capXp": 2249,
+     "sparks": 0
+    },
+    {
+     "round": 2,
+     "minutes": 23,
+     "ranks": 0,
+     "capXp": 4505,
+     "sparks": 0
+    },
+    {
+     "round": 3,
+     "minutes": 35,
+     "ranks": 1,
+     "capXp": 6696,
+     "sparks": 0
+    },
+    {
+     "round": 4,
+     "minutes": 47,
+     "ranks": 1,
+     "capXp": 8913,
+     "sparks": 0
+    },
+    {
+     "round": 5,
+     "minutes": 59,
+     "ranks": 2,
+     "capXp": 11182,
+     "sparks": 0
+    },
+    {
+     "round": 6,
+     "minutes": 71,
+     "ranks": 2,
+     "capXp": 13400,
+     "sparks": 0
+    },
+    {
+     "round": 7,
+     "minutes": 83,
+     "ranks": 3,
+     "capXp": 15617,
+     "sparks": 0
+    },
+    {
+     "round": 8,
+     "minutes": 95,
+     "ranks": 3,
+     "capXp": 17853,
+     "sparks": 0
+    },
+    {
+     "round": 9,
+     "minutes": 107,
+     "ranks": 3.67,
+     "capXp": 20082,
+     "sparks": 0
+    },
+    {
+     "round": 10,
+     "minutes": 119,
+     "ranks": 4,
+     "capXp": 22318,
+     "sparks": 0
+    },
+    {
+     "round": 11,
+     "minutes": 131,
+     "ranks": 4.67,
+     "capXp": 24567,
+     "sparks": 0
+    },
+    {
+     "round": 12,
+     "minutes": 143,
+     "ranks": 5,
+     "capXp": 26816,
+     "sparks": 0
+    }
+   ]
+  },
+  "sparks": {
+   "cap": 60,
+   "rankCost": 4816,
+   "track": [
+    {
+     "round": 1,
+     "minutes": 12,
+     "ranks": 0,
+     "capXp": 2249,
+     "sparks": 562
+    },
+    {
+     "round": 2,
+     "minutes": 23,
+     "ranks": 0,
+     "capXp": 4505,
+     "sparks": 1126
+    },
+    {
+     "round": 3,
+     "minutes": 35,
+     "ranks": 0,
+     "capXp": 6716,
+     "sparks": 1679
+    },
+    {
+     "round": 4,
+     "minutes": 47,
+     "ranks": 0,
+     "capXp": 8952,
+     "sparks": 2238
+    },
+    {
+     "round": 5,
+     "minutes": 59,
+     "ranks": 0,
+     "capXp": 11144,
+     "sparks": 2786
+    },
+    {
+     "round": 6,
+     "minutes": 71,
+     "ranks": 0,
+     "capXp": 13380,
+     "sparks": 3345
+    },
+    {
+     "round": 7,
+     "minutes": 83,
+     "ranks": 0,
+     "capXp": 15603,
+     "sparks": 3901
+    },
+    {
+     "round": 8,
+     "minutes": 95,
+     "ranks": 0,
+     "capXp": 17840,
+     "sparks": 4460
+    },
+    {
+     "round": 9,
+     "minutes": 107,
+     "ranks": 0,
+     "capXp": 20089,
+     "sparks": 5022
+    },
+    {
+     "round": 10,
+     "minutes": 118,
+     "ranks": 0,
+     "capXp": 22325,
+     "sparks": 5581
+    },
+    {
+     "round": 11,
+     "minutes": 130,
+     "ranks": 0,
+     "capXp": 24574,
+     "sparks": 6144
+    },
+    {
+     "round": 12,
+     "minutes": 142,
+     "ranks": 0,
+     "capXp": 26791,
+     "sparks": 6698
+    }
+   ]
+  }
+ },
+ "boss": [
+  {
+   "variant": "pct1",
+   "lv": 41,
+   "ranks": 0,
+   "bossWinPct": 35,
+   "dungeonFirstTryPct": 0
+  },
+  {
+   "variant": "pct1",
+   "lv": 41,
+   "ranks": 5,
+   "bossWinPct": 65,
+   "dungeonFirstTryPct": 18
+  },
+  {
+   "variant": "pct1",
+   "lv": 41,
+   "ranks": 10,
+   "bossWinPct": 85,
+   "dungeonFirstTryPct": 98
+  },
+  {
+   "variant": "pct1",
+   "lv": 43,
+   "ranks": 0,
+   "bossWinPct": 75,
+   "dungeonFirstTryPct": 25
+  },
+  {
+   "variant": "pct1",
+   "lv": 43,
+   "ranks": 5,
+   "bossWinPct": 90,
+   "dungeonFirstTryPct": 95
+  },
+  {
+   "variant": "pct1",
+   "lv": 43,
+   "ranks": 10,
+   "bossWinPct": 100,
+   "dungeonFirstTryPct": 100
+  },
+  {
+   "variant": "pct1",
+   "lv": 45,
+   "ranks": 0,
+   "bossWinPct": 93,
+   "dungeonFirstTryPct": 80
+  },
+  {
+   "variant": "pct1",
+   "lv": 45,
+   "ranks": 5,
+   "bossWinPct": 100,
+   "dungeonFirstTryPct": 100
+  },
+  {
+   "variant": "pct1",
+   "lv": 45,
+   "ranks": 10,
+   "bossWinPct": 100,
+   "dungeonFirstTryPct": 100
+  },
+  {
+   "variant": "pct1",
+   "lv": 47,
+   "ranks": 0,
+   "bossWinPct": 100,
+   "dungeonFirstTryPct": 100
+  },
+  {
+   "variant": "pct1",
+   "lv": 47,
+   "ranks": 5,
+   "bossWinPct": 100,
+   "dungeonFirstTryPct": 100
+  },
+  {
+   "variant": "pct1",
+   "lv": 47,
+   "ranks": 10,
+   "bossWinPct": 100,
+   "dungeonFirstTryPct": 100
+  },
+  {
+   "variant": "pct05",
+   "lv": 41,
+   "ranks": 0,
+   "bossWinPct": 35,
+   "dungeonFirstTryPct": 0
+  },
+  {
+   "variant": "pct05",
+   "lv": 41,
+   "ranks": 5,
+   "bossWinPct": 40,
+   "dungeonFirstTryPct": 15
+  },
+  {
+   "variant": "pct05",
+   "lv": 41,
+   "ranks": 10,
+   "bossWinPct": 65,
+   "dungeonFirstTryPct": 18
+  },
+  {
+   "variant": "pct05",
+   "lv": 43,
+   "ranks": 0,
+   "bossWinPct": 75,
+   "dungeonFirstTryPct": 25
+  },
+  {
+   "variant": "pct05",
+   "lv": 43,
+   "ranks": 5,
+   "bossWinPct": 80,
+   "dungeonFirstTryPct": 73
+  },
+  {
+   "variant": "pct05",
+   "lv": 43,
+   "ranks": 10,
+   "bossWinPct": 90,
+   "dungeonFirstTryPct": 95
+  },
+  {
+   "variant": "pct05",
+   "lv": 45,
+   "ranks": 0,
+   "bossWinPct": 93,
+   "dungeonFirstTryPct": 80
+  },
+  {
+   "variant": "pct05",
+   "lv": 45,
+   "ranks": 5,
+   "bossWinPct": 100,
+   "dungeonFirstTryPct": 98
+  },
+  {
+   "variant": "pct05",
+   "lv": 45,
+   "ranks": 10,
+   "bossWinPct": 100,
+   "dungeonFirstTryPct": 100
+  },
+  {
+   "variant": "pct05",
+   "lv": 47,
+   "ranks": 0,
+   "bossWinPct": 100,
+   "dungeonFirstTryPct": 100
+  },
+  {
+   "variant": "pct05",
+   "lv": 47,
+   "ranks": 5,
+   "bossWinPct": 100,
+   "dungeonFirstTryPct": 100
+  },
+  {
+   "variant": "pct05",
+   "lv": 47,
+   "ranks": 10,
+   "bossWinPct": 100,
+   "dungeonFirstTryPct": 100
+  }
+ ],
+ "levelEquivalents": [
+  {
+   "lv": 40,
+   "plus5pct": 2.4,
+   "plus10pct": 4.8,
+   "oneLevelPct": 2.08
+  },
+  {
+   "lv": 50,
+   "plus5pct": 2.9,
+   "plus10pct": 5.8,
+   "oneLevelPct": 1.72
+  },
+  {
+   "lv": 60,
+   "plus5pct": 3.4,
+   "plus10pct": 6.8,
+   "oneLevelPct": 1.47
+  }
+ ],
+ "saveBytesFor60Aminas": 1260
+}

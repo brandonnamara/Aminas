@@ -8,7 +8,7 @@ const G = load(), A = G.A, D = A.Data, R = A.Rules, S = A.State, W = A.World, F 
 const mk = () => { const st = S.fresh(); st.phase = 'play'; st.starter = 'lumifern'; W.validate(st); return st; };
 
 /* ---- the values are what they were (no balance change in Phase 13) ---- */
-ok(D.SNACKS.snack.food === 3 && D.SNACKS.snack.xp === 18 && D.SNACKS.feast.food === 10 && D.SNACKS.feast.xp === 70 && D.MAX_LEVEL === 40 /* Phase 18B: cap raised from 30 (approved) */ && R.xpNeed(1) === 25 && R.xpNeed(10) === 216 && R.xpNeed(29) === 1257, 'feeding and the XP table are unchanged');
+ok(D.SNACKS.snack.food === 3 && D.SNACKS.snack.xp === 18 && D.SNACKS.feast.food === 10 && D.SNACKS.feast.xp === 70 && R.levelCap(A.State.newGame()) === 40 /* Phase 18B: cap raised from 30; Phase 19B: staged, 40 until the Forest Crown (approved) */ && R.xpNeed(1) === 25 && R.xpNeed(10) === 216 && R.xpNeed(29) === 1257, 'feeding and the XP table are unchanged');
 ok(JSON.stringify(D.EVO_REQ) === JSON.stringify({ 2: { lv: 12, cost: { gold: 60, food: 15 } }, 3: { lv: 22, cost: { gold: 160, food: 40 } } }) && D.MOVE_LEVELS.cost.join() === '0,0,10,25,50,90', 'evolution requirements and move-upgrade costs are unchanged');
 ok(JSON.stringify(D.BREED_COST) === '{"gold":40,"food":25}' && D.BREED_MIN_LEVEL === 5 && D.BUILDINGS.hatchery.levels.map((l) => l.slots).join() === '1,2,3,4,5', 'breeding cost and the Hatchery’s slots (one more per level) are unchanged');
 ok(D.PVP.practiceDailyRewards === 5 && JSON.stringify(D.PVP.practiceReward) === '{"gold":60,"food":10}' && JSON.stringify(D.PVP.raid.base) === '{"gold":60,"food":10}' && D.SURVIVAL.perWave.gold === 12 && D.SURVIVAL.perWave.food === 3, 'the five shared daily rewarded wins, raid and practice rewards and survival pay are unchanged');

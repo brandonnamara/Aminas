@@ -1,6 +1,8 @@
 /* Aminas — UI part 2: dungeons (island campaign), the battle screen (shared by every mode), hatchery. */
 (function (root) {
   'use strict';
+  // Phase 19B: the level cap is staged (40 → 50 → 60), so a capped Amina reads "Level cap 40" until the last step
+  const capTxt = () => { const R = root.A.Rules, D = root.A.Data, c = R.levelCap ? R.levelCap() : D.MAX_LEVEL; return c < D.MAX_LEVEL ? 'Level cap ' + c : 'Max level'; };
   const A = root.A, D = A.Data, R = A.Rules, S = A.State, Art = A.Art, T = A.Story, Au = A.Audio, UI = A.UI;
   const { esc, pct, chip, artBox, silBox } = UI.h, I = Art.icon;
   const $ = (s, r) => (r || document).querySelector(s);
@@ -601,7 +603,7 @@
     const rows = out.xp.map((x, i) => {
       const lvl = x.levels.length ? '<div class="lvlup">' + I('xp') + ' Level up! Lv ' + x.levels[0].from + ' → ' + x.levels[x.levels.length - 1].to + '</div>' : '';
       const evo = x.evoReady ? '<div class="lvlup evo">' + I('spark') + ' Ready to evolve (you choose when)</div>' : '';
-      return '<div class="xprow' + (x.alive ? ' cheer' : ' down') + '" style="--i:' + i + '"><div class="art">' + Art.portrait(x.sp) + '</div><div class="grow"><b>' + esc(D.SPECIES[x.sp].name) + '</b> <span class="muted">' + (x.capped && !x.gained ? 'Max level, no more XP' : '+' + x.gained + ' xp' + (x.capped ? ' (max level reached)' : '')) + (x.alive ? '' : ' (fainted: half)') + (x.scaled && !(x.capped && !x.gained) ? ' · ' + Math.round(x.scaled * 100) + '%: the foe was ' + x.gap + ' levels below' : '') + '</span>' + lvl + evo + '</div></div>';
+      return '<div class="xprow' + (x.alive ? ' cheer' : ' down') + '" style="--i:' + i + '"><div class="art">' + Art.portrait(x.sp) + '</div><div class="grow"><b>' + esc(D.SPECIES[x.sp].name) + '</b> <span class="muted">' + (x.capped && !x.gained ? (capTxt() + ', no more XP') : '+' + x.gained + ' xp' + (x.capped ? ' (' + capTxt().toLowerCase() + ' reached)' : '')) + (x.alive ? '' : ' (fainted: half)') + (x.scaled && !(x.capped && !x.gained) ? ' · ' + Math.round(x.scaled * 100) + '%: the foe was ' + x.gap + ' levels below' : '') + '</span>' + lvl + evo + '</div></div>';
     }).join('');
     const groups = [];
     const spoils = [{ k: 'gold', n: out.gold }, { k: 'food', n: out.food }];

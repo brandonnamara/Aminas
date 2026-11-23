@@ -66,9 +66,9 @@ ok(Object.keys(D.SPECIES).length === 63, 'no new species');
   R.startRun(s, 'v_mossgate', [a.uid]); const b = R.createBattle(s, seeded(2)); b.foes.forEach((x) => (x.hp = 0)); b.enemy.hp = 0; b.over = true; b.result = 'win'; const g0 = s.res.gold, out = R.resolveBattle(s, b);
   ok(out.win && s.res.gold > g0 && out.xp[0].capped && out.xp[0].gained === 0 && a.lv === 40, 'a battle won at 40 still pays gold and food; its XP row is marked max level');
   const rt = F.parse(F.exportFile(s).text); ok(rt.ok && rt.st.aminas[0].lv === 40 && rt.st.aminas[0].xp === 0, 'a level-40 Amina saves and loads as is');
-  const bad = JSON.parse(JSON.stringify(s)); bad.aminas[0].lv = 44; S.sanitize(bad); ok(bad.aminas[0].lv === 40, 'a damaged save above 40 is clamped to 40');
+  const bad = JSON.parse(JSON.stringify(s)); bad.aminas[0].lv = 44; S.sanitize(bad); ok(bad.aminas[0].lv === 44, 'Phase 19B (approved): a saved level is never lowered on load (44 stays 44)'); bad.aminas[0].lv = 99; S.sanitize(bad); ok(bad.aminas[0].lv === D.MAX_LEVEL, 'a level above the absolute ceiling (' + D.MAX_LEVEL + ') is clamped to it');
   // future expansion: raising the cap later continues from 40 with nothing lost or invented
-  D.MAX_LEVEL = 45; const r3 = R.addXp(s, a, R.xpNeed(40) + 7); ok(a.lv === 41 && a.xp === 7, 'if the cap is raised later, a level-40 Amina simply carries on (41, 7 XP)'); D.MAX_LEVEL = 40; a.lv = 40; a.xp = 0;
+  s.campaign = s.campaign || {}; s.campaign.bosses = Object.assign({}, s.campaign.bosses, { verdant: true }); const r3 = R.addXp(s, a, R.xpNeed(40) + 7); ok(a.lv === 41 && a.xp === 7, 'when the cap is raised (Phase 19B: the Forest Crown defeated), a level-40 Amina simply carries on (41, 7 XP)'); delete s.campaign.bosses.verdant; a.lv = 40; a.xp = 0;
   ok(R.xpNeed(40) === Math.floor(16 + 40 * 8 + 40 * 40 * 1.2), 'the XP formula already defines levels past 40');
   ok(D.SPECIES.solarbloom.evo.lv === 22 && D.SPECIES.lumifern.evo.lv === 12, 'evolution levels unchanged');
 }

@@ -337,8 +337,8 @@ B.mine = (m, lv) => {
 B.habitat = (m, lv, ruined, b) => {
   const el = (b.type || '').replace('hab_', ''), ec = EL[el] || EL.nature;
   foundation(m, -11, -11, 11, 11, 1, PAL.stone); skirt(m, -11, -11, 11, 11, 1, 2);
-  const roofs = { nature: PAL.roof.green, water: PAL.roof.blue, earth: ['#b0824a', '#a07440', '#c0925a'], fire: PAL.roof.red, light: PAL.roof.gold.concat(['#f0c850']), dark: PAL.roof.purple, wind: ['#6ac8b8', '#5ab8a8', '#7ad8c8'] };
-  const walls = el === 'dark' ? stoneWork(['#6a6488', '#5e587a']) : el === 'fire' ? stoneWork(PAL.brick, '#7a3a28') : el === 'earth' ? stoneWork(['#c9a878', '#b89868', '#d4b688']) : el === 'water' ? (x, y, z) => ((x + z) % 6 === 0 || y === 1 ? '#3f6f9a' : PAL.plaster[(y >> 2) % 2]) : (x, y, z) => ((x + z) % 6 === 0 || y === 1 ? PAL.woodDark[0] : PAL.plaster[(y >> 2) % 2]);
+  const roofs = { metal: PAL.roof.slate, nature: PAL.roof.green, water: PAL.roof.blue, earth: ['#b0824a', '#a07440', '#c0925a'], fire: PAL.roof.red, light: PAL.roof.gold.concat(['#f0c850']), dark: PAL.roof.purple, wind: ['#6ac8b8', '#5ab8a8', '#7ad8c8'] };
+  const walls = el === 'metal' ? stoneWork(['#8a8490', '#7a7480', '#948e9a'], '#3a3440') : el === 'dark' ? stoneWork(['#6a6488', '#5e587a']) : el === 'fire' ? stoneWork(PAL.brick, '#7a3a28') : el === 'earth' ? stoneWork(['#c9a878', '#b89868', '#d4b688']) : el === 'water' ? (x, y, z) => ((x + z) % 6 === 0 || y === 1 ? '#3f6f9a' : PAL.plaster[(y >> 2) % 2]) : (x, y, z) => ((x + z) % 6 === 0 || y === 1 ? PAL.woodDark[0] : PAL.plaster[(y >> 2) % 2]);
   const sh = ec[1];
   m.box(-7, 1, -8, 6, 10, 4, walls); m.box(-6, 1, -7, 5, 10, 3, null);
   m.clear(-2, 1, 3, 1, 7, 4); m.box(-2, 1, 3, 1, 7, 4, PAL.woodDark); m.glow(-1, 2, 3, 0, 6, 4, PAL.glowWarm);
@@ -355,6 +355,7 @@ B.habitat = (m, lv, ruined, b) => {
   else if (el === 'earth') { m.box(6, 1, 5, 10, 3, 9, PAL.rock); m.box(7, 3, 6, 9, 4, 8, '#ffd86b'); m.put(9, 3, 5, '#ffd86b', true); m.box(-11, 1, 6, -8, 2, 9, PAL.dirt); flower(m, -10, 7, 2, PAL.flowers[4]); }
   else if (el === 'fire') { m.box(2, 10, -7, 5, 20, -4, stoneWork(PAL.brick, '#7a3a28')); m.box(1, 20, -8, 6, 21, -3, '#5a2a1e'); m.glow(3, 21, -6, 4, 22, -5, '#ff7a2a'); m.box(6, 1, 5, 9, 3, 8, PAL.stoneDark); m.glow(7, 3, 6, 8, 5, 7, '#ff7a2a'); m.glow(7, 5, 6, 8, 6, 7, '#ffd86b'); }
   else if (el === 'light') { m.box(6, 1, -10, 10, 18, -6, stoneWork(['#efe4c8', '#e2d4b2'])); m.box(5, 18, -11, 11, 19, -5, PAL.gold); m.glow(7, 19, -9, 9, 22, -7, '#fff3b0'); m.hip(5, -11, 11, -5, 22, PAL.roof.gold, PAL.gold); windowX(m, 10, 12, -9, 2, 3, true); m.box(7, 1, 6, 8, 3, 7, PAL.stone); m.glow(7, 3, 6, 8, 4, 7, '#ffd86b'); }
+  else if (el === 'metal') { m.box(2, 10, -7, 5, 22, -4, stoneWork(['#5a4e56', '#4e444c'], '#2a2428')); m.box(1, 22, -8, 6, 23, -3, '#2a2428'); m.glow(3, 23, -6, 4, 24, -5, '#ffb05a'); m.box(6, 1, 5, 10, 4, 7, '#4e444c'); m.box(5, 4, 5, 11, 5, 7, PAL.metal); m.box(-11, 1, 6, -8, 3, 9, '#2a4a6a'); m.glow(-10, 2, 7, -9, 3, 8, '#ff8a3a'); } // Phase 19B: Forge Habitat: chimney, anvil, quench tub
   else if (el === 'dark') { m.box(7, 1, 5, 9, 3, 7, PAL.stoneDark); m.glow(7, 3, 5, 8, 9, 6, '#b48cff'); m.glow(8, 3, 6, 9, 6, 7, '#9a78e6'); m.glow(6, 3, 6, 7, 5, 7, '#c9b0ff'); }
   else if (el === 'wind') { m.box(-1, t, 5, 0, t + 1, 7, PAL.woodDark); for (let i = -7; i <= 7; i++) { if (!i) continue; const a = Math.abs(i); m.box(-1 + (i > 0 ? 0 : 0), t + i, 7, 0, t + i + 1, 8, a > 2 ? (a % 2 ? '#f2e6c4' : ec[0]) : PAL.woodDark); m.box(-1 + i, t, 7, i, t + 1, 8, a > 2 ? (a % 2 ? '#f2e6c4' : ec[0]) : PAL.woodDark); } m.box(-1, t, 7, 0, t + 1, 8, PAL.gold); }
   if (lv >= 3) { m.box(-8, 1, 5, -7, 7, 6, PAL.woodDark); m.box(-8, 7, 5, -4, 10, 6, ec[0]); }
@@ -447,7 +448,7 @@ export function buildingModel(b, size, opts) {
   const out = m.build(); cache.set(k, out); return out;
 }
 export const hasBuilding = (art, cat) => !!(B[art] || cat === 'habitat');
-const HANG = { vines: 1, hangingMoss: 1 }; // kinds that hang below their anchor
+const HANG = { vines: 1, hangingMoss: 1, ashvine: 1 }; // kinds that hang below their anchor
 export function natureModel(kind, seed, w, h) {
   const k = 'n|' + kind + '|' + (seed % 3); if (cache.has(k)) return cache.get(k);
   const fn = N[kind]; if (!fn) return null;

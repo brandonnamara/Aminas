@@ -8,7 +8,7 @@ const snap = (st) => JSON.stringify(st);
 R.rng = seeded(13);
 
 /* ---- the balance is what it was ---- */
-ok([1, 5, 10, 20, 29].map(R.xpNeed).join() === '25,86,216,656,1257' && D.MAX_LEVEL === 40, 'experience needed per level is unchanged; the level cap is 40 (raised from 30 in Phase 18B, approved)');
+ok([1, 5, 10, 20, 29].map(R.xpNeed).join() === '25,86,216,656,1257' && R.levelCap(A.State.newGame()) === 40, 'experience needed per level is unchanged; the level cap is 40 (raised from 30 in Phase 18B; Phase 19B: 40 until the Forest Crown, approved)');
 ok(JSON.stringify(D.SNACKS.snack) === JSON.stringify({ name: 'Berry Snack', food: 3, xp: 18, desc: 'A small, cheerful snack.' }) && D.SNACKS.feast.food === 10 && D.SNACKS.feast.xp === 70 && Object.keys(D.SNACKS).length === 2, 'the two feeds cost and give what they did (3 food → 18 XP, 10 food → 70 XP)');
 ok(JSON.stringify(R.statsAt('lumifern', 1)) === '{"hp":46,"atk":11,"def":10,"spd":10}' && JSON.stringify(R.statsAt('lumifern', 11)) === '{"hp":96,"atk":23,"def":21,"spd":21}', 'stat growth per level is unchanged (Lumifern Lv 1 and Lv 11)');
 const evos = D.ROSTER.filter((s) => s.evo); ok(D.ROSTER.length === 63 && evos.length === 42 && evos.every((s) => (D.SPECIES[s.id].stage === 1 ? s.evo.lv === 12 && s.evo.cost.gold === 60 && s.evo.cost.food === 15 : s.evo.lv === 22 && s.evo.cost.gold === 160 && s.evo.cost.food === 40)), 'all 63 forms and 42 evolutions keep their requirements (Lv 12 for 60 gold and 15 food; Lv 22 for 160 gold and 40 food)');
@@ -23,10 +23,10 @@ r = R.feed(st, a.uid, 'feast');
 ok(r.ok && st.res.food === 20 && a.lv === 12 && a.xp === 237 + 70 - 249 && r.levels.length === 1 && r.evoReady && r.evoReady.to === 'solarbloom', 'a Honey Feast takes 10 food, gives 70 XP, carries the extra XP over the level-up and reports that evolution is now possible');
 st.res.food = 2; let before = snap(st); r = R.feed(st, a.uid, 'snack');
 ok(!r.ok && r.reason === 'food' && r.need === 1 && snap(st) === before, 'without enough food nothing is spent and nothing changes (1 food short)');
-({ st, a } = mk('lumifern', D.MAX_LEVEL, 0)); st.res.food = 50; before = snap(st); r = R.feed(st, a.uid, 'feast'); // Phase 18B: the cap is 40
+({ st, a } = mk('lumifern', R.levelCap(st), 0)); st.res.food = 50; before = snap(st); r = R.feed(st, a.uid, 'feast'); // Phase 18B: the cap is 40
 ok(!r.ok && r.reason === 'max' && snap(st) === before, 'at the highest level feeding is refused and costs nothing');
-({ st, a } = mk('lumifern', D.MAX_LEVEL - 1, R.xpNeed(D.MAX_LEVEL - 1) - 5)); st.res.food = 50; r = R.feed(st, a.uid, 'feast');
-ok(a.lv === D.MAX_LEVEL && a.xp === 0 && st.res.food === 40, 'reaching the highest level stops at Lv ' + D.MAX_LEVEL + ' with no stray experience');
+({ st, a } = mk('lumifern', R.levelCap(st) - 1, R.xpNeed(R.levelCap(st) - 1) - 5)); st.res.food = 50; r = R.feed(st, a.uid, 'feast');
+ok(a.lv === R.levelCap(st) && a.xp === 0 && st.res.food === 40, 'reaching the highest level stops at Lv ' + R.levelCap(st) + ' with no stray experience');
 ({ st, a } = mk('lumifern', 1, 0)); st.res.food = 1000; let n = 0; while (a.lv < 12 && n++ < 500) R.feed(st, a.uid, 'feast');
 let need = 0; for (let l = 1; l < 12; l++) need += R.xpNeed(l);
 ok(a.lv === 12 && n === Math.ceil(need / 70) && st.res.food === 1000 - n * 10, 'levelling 1 → 12 by feasts costs what the XP table says (' + n + ' feasts, ' + n * 10 + ' food)');

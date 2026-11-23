@@ -831,6 +831,7 @@
     light: { roof: '#f0c040', roof2: '#ffe27a', wall: '#fffbec', accent: '#ffffff', emblem: 'sun' },
     dark: { roof: '#5a4a9a', roof2: '#8a78d0', wall: '#e8e0f8', accent: '#ffe9a0', emblem: 'moon' },
     wind: { roof: '#5ac0b0', roof2: '#9aeee0', wall: '#f4fffc', accent: '#ffffff', emblem: 'feather' },
+    metal: { roof: '#5a6478', roof2: '#8a94a8', wall: '#d8d4dc', accent: '#ffb05a', emblem: 'gear' }, // Phase 19B: the Forge Habitat
   };
   // emblems as small block glyphs on a face (pixel shapes: [a, z] offsets in px-ish units)
   const GLYPH = {
@@ -841,6 +842,7 @@
     sun: [[0, 2], [-2, 0], [2, 0], [0, -2], [-1, 1], [0, 1], [1, 1], [-1, 0], [0, 0], [1, 0], [-1, -1], [0, -1], [1, -1]],
     moon: [[-1, 2], [0, 2], [-2, 1], [-2, 0], [-2, -1], [-1, -2], [0, -2], [-1, 1], [-1, 0], [-1, -1]],
     feather: [[1, 2], [0, 1], [1, 1], [-1, 0], [0, 0], [-1, -1], [-2, -2]],
+    gear: [[0, 2], [-2, 0], [2, 0], [0, -2], [-1, 1], [1, 1], [-1, -1], [1, -1], [-1, 0], [1, 0], [0, 1], [0, -1]],
   };
   const glyph = (f, at, a, z, kind, col, px) => { px = px || 0.035; const on = f === 'v' ? (p) => onV(at, p) : (p) => onU(at, p); return '<path d="' + GLYPH[kind].map(([x, y]) => dq(on([[a + x * px, z + y * 3.4], [a + (x + 1) * px, z + y * 3.4], [a + (x + 1) * px, z + y * 3.4 - 3.4], [a + x * px, z + y * 3.4 - 3.4]]))).join('') + '" fill="' + col + '"/>'; };
   B.habitat = function (lv, ruined, b) {
@@ -850,6 +852,7 @@
     if (el === 'wind') g += vc(-0.95, -0.95, 8, 0.1, 0.1, 74, '#8a7a6a') + poly(onV(-0.95, [[-0.95, 82], [-0.2, 76], [-0.95, 70]]), '#ffffff') + poly(onV(-0.95, [[-0.95, 70], [-1.5, 62], [-0.95, 60]]), '#e8fbf6');
     if (el === 'dark') g += sbox(-1.25, -1.25, 8, 0.6, 0.6, 70, '#6a5aa8', 'brick', 102) + vstack(-0.95, -0.95, 78, 0.6, 0.6, [[0, 4, '#5a4a9a'], [0.1, 6, '#8a78d0'], [0.2, 6, '#5a4a9a']]) + vc(-0.95, -0.95, 94, 0.08, 0.08, 6, '#ffe9a0');
     if (el === 'fire') g += sbox(-1.0, 0.45, 8, 0.36, 0.36, 84, '#b8a898', 'brick', 103);
+    if (el === 'metal') g += sbox(-1.1, 0.4, 8, 0.4, 0.4, 70, '#6a6070', 'brick', 104) + vc(-0.9, 0.6, 78, 0.5, 0.5, 4, '#3a3440') + vc(-0.9, 0.6, 82, 0.2, 0.2, 4, '#ffb05a') + vc(1.0, 0.9, 8, 0.5, 0.3, 10, '#5a4e56') + vc(1.0, 0.9, 18, 0.7, 0.3, 3, '#8a94a8'); // chimney, glowing top and an anvil
     if (el === 'light') g += sbox(-1.22, -1.22, 8, 0.4, 0.4, 88, '#fffbec', 'brick', 110) + vc(-1.02, -1.02, 96, 0.5, 0.5, 4, M.gd) + vstack(-1.02, -1.02, 100, 0.36, 0.36, [[0, 6, '#ffe27a'], [0.06, 5, '#fff3b0']]);
     // walls (cream), base course and corner posts
     g += sbox(-1.0, -1.0, 8, 2.0, 2.0, 34, s.wall, 'brick', 104) + vbox(-1.04, -1.04, 8, 2.08, 2.08, 5, M.st2);
@@ -1045,6 +1048,39 @@
     g += ell(0, 0, hw, hw / 2, 'transparent') + '<rect x="' + f1(-hw * 0.7) + '" y="' + f1(-z) + '" width="' + f1(hw * 1.4) + '" height="' + f1(z) + '" fill="transparent"/>';
     return '<g class="v18s" data-hit="v18:' + site.id + '" data-hl="v18:' + site.id + '">' + g + (fresh ? v18tag(z, '?', '#bff7a8', '#e8ffd8') : '') + '</g>';
   };
+  /* Phase 19B: Obsidian Reach (the Cooling Forge): its places and entrances in 2D (the fallback, and the tags and tap
+     areas over the 3D models). Basalt, cooled ash, rust iron and magenta crystal; warm light only where a fire lives. */
+  const O19C = { basalt: '#3e3446', basaltD: '#2a2232', ash: '#8a8090', iron: '#5a4a4e', rust: '#a8603a', ember: '#ff8a3a', glow: '#ffb05a', crystal: '#e64ab8', glass: '#9fd8e8' };
+  const o19wall = (u, v, du, dv, h, seed) => sbox(u, v, 0, du, dv, h, O19C.basalt, 'brick', seed) + vbox(u, v, h, du, dv, 2, O19C.basaltD);
+  L.o19pic = function (kind) {
+    let g = '';
+    switch (kind) {
+      case 'o_landing': g = vbox(-0.45, -0.45, 0, 0.9, 0.9, 4, O19C.basaltD) + vc(0.25, -0.25, 4, 0.1, 0.1, 26, O19C.iron) + vc(0.25, -0.25, 30, 0.22, 0.22, 7, O19C.glow, { x: ' opacity=".9"' }); break;
+      case 'o_glasswick': g = o19wall(-2.2, -0.3, 0.8, 0.25, 30, 500) + vc(-1.0, 0, 0, 0.5, 0.5, 8, O19C.ash) + vc(-1.0, 0, 8, 0.6, 0.6, 3, O19C.iron) +
+          vc(0.2, 0.05, 0, 0.7, 0.4, 6, O19C.glass, { x: ' opacity=".75"' }) + o19wall(1.0, -0.3, 1.0, 0.25, 22, 501) + vc(1.5, -0.2, 22, 0.25, 0.25, 26, O19C.iron) + vc(1.5, -0.2, 48, 0.3, 0.3, 4, O19C.ember); break;
+      case 'o_workshops': g = o19wall(-1.7, -0.3, 0.7, 0.25, 18, 510) + o19wall(-0.6, -0.3, 0.5, 0.25, 9, 511) + vc(0.4, 0, 0, 0.8, 0.3, 7, O19C.iron) + [0.1, 0.4, 0.7].map((u, i) => vc(u, 0, 7, 0.14, 0.14, 6 + i * 2, O19C.glass, { x: ' opacity=".8"' })).join('') + o19wall(1.0, -0.3, 0.6, 0.25, 14, 512); break;
+      case 'o_gallery': g = sbox(-1.9, -0.35, 0, 3.8, 0.7, 34, O19C.basalt, 'brick', 520) + vbox(-2.0, -0.45, 34, 4.0, 0.9, 4, O19C.basaltD) + [-1.4, -0.6, 0.2, 1.0].map((u) => vbox(u, 0.36, 8, 0.5, 0.04, 20, O19C.glass, { x: ' opacity=".7"' })).join(''); break;
+      case 'o_bellows': g = [-1.5, -0.5, 0.5].map((u, i) => vbox(u, -0.3, 0, 0.8, 0.6, 22 + (i % 2) * 6, '#6a4a3a') + vbox(u, -0.3, 22 + (i % 2) * 6, 0.8, 0.6, 2, O19C.iron)).join('') + vbox(1.4, -0.1, 0, 0.3, 0.3, 30, O19C.rust); break;
+      case 'o_greatforge': g = L.forge(); break;
+      default: g = vc(0, 0, 0, 0.6, 0.6, 16, O19C.basalt);
+    }
+    return g;
+  };
+  L.o19gate = function (gate, state) {
+    const lit = state !== 'locked', done = state === 'done', open = state === 'open', col = { fire: '#ff9a4a', water: '#5ab8e8', nature: '#6ad06a', metal: '#b8c4d4', earth: '#c49a5a', light: '#ffe58a', wind: '#bfe8ff', dark: '#b89aff', resonance: '#ff9ee0' }[gate.el] || O19C.glow;
+    let g = '';
+    if (!(Art.voxHas && Art.voxHas('l', 'o_gate_' + gate.id))) g += vc(-0.32, 0, 0, 0.14, 0.16, 30, O19C.basaltD) + vc(0.32, 0, 0, 0.14, 0.16, 30, O19C.basaltD) + vbox(-0.44, -0.1, 30, 0.88, 0.2, 6, O19C.iron) + vbox(-0.26, -0.03, 0, 0.52, 0.06, 28, lit ? col : '#2a2232', lit ? { x: ' opacity=".55"' } : undefined);
+    if (open) g = ell(0, 0, 30, 15, col, ' opacity=".35" class="glow-soft v18-open-ring"') + g;
+    g += ell(0, 0, 26, 13, 'transparent') + '<rect x="-18" y="-52" width="36" height="52" fill="transparent"/>';
+    return '<g class="v18g o19g ' + state + '" data-hit="o19:' + gate.id + '" data-hl="o19:' + gate.id + '">' + g + v18tag(58, done ? '✓' : String(gate.n), done ? '#8cffa0' : lit ? col : '#8a7a90', done ? '#d8ffe0' : lit ? '#fff' : '#c4b8cc', open) + '</g>';
+  };
+  L.o19site = function (site, fresh) {
+    const big = site.w * site.h > 2, has = Art.voxHas && Art.voxHas('l', site.kind);
+    const g0 = has ? '' : L.o19pic(site.kind);
+    const z = site.kind === 'o_greatforge' ? 130 : big ? 66 : 50, hw = 14 + 15 * (site.w + site.h);
+    const g = g0 + ell(0, 0, hw, hw / 2, 'transparent') + '<rect x="' + f1(-hw * 0.7) + '" y="' + f1(-z) + '" width="' + f1(hw * 1.4) + '" height="' + f1(z) + '" fill="transparent"/>';
+    return '<g class="v18s o19s" data-hit="o19:' + site.id + '" data-hl="o19:' + site.id + '">' + g + (fresh ? v18tag(z, '?', '#ffb05a', '#fff0dc') : '') + '</g>';
+  };
   L.forge = () => {
     let g = ell(0, 8, 76, 28, '#000', ' opacity=".28"') + sbox(-1.3, -1.1, 0, 2.6, 2.2, 22, '#5a4a62', 'stone', 250);
     g += sbox(-0.9, -0.9, 22, 0.9, 0.9, 64, '#4a3e5a', 'brick', 251) + vbox(-0.95, -0.95, 86, 1.0, 1.0, 5, '#3a3048');
@@ -1106,7 +1142,7 @@
       if (iid === 'starter' && r.w === 4) { kind = 'plaza'; svg = L.plaza(st) + (st.flags.r2 ? L.silent(!st.flags.stone) : ''); }
       else if (iid === 'starter') { kind = 'stones'; svg = st.struct.tidegate ? L.stones(!st.flags.r1) : L.stones(false).replace('data-hit="stones"', 'data-hit="stones-dormant"'); }
       else if (iid === 'verdant') { kind = 'elderroot'; const site = V18 && V18.site('elderroot'); svg = site ? L.v18site(site, !V18.seen(st, 'elderroot')) : L.elderroot(); if (site) r.v18 = true; }
-      else if (iid === 'obsidian') { kind = 'forge'; svg = L.forge(); }
+      else if (iid === 'obsidian') { const O19 = A.Rules && A.Rules.O19, site = O19 && O19.site('forge'); kind = site ? 'o_greatforge' : 'forge'; svg = site ? L.o19site(site, !O19.seen(st, 'forge')) : L.forge(); if (site) r.v18 = true; }
       else { kind = 'observatory'; svg = L.observatory(); }
       return Object.assign(r, { svg, kind, flat: kind === 'plaza' });
     });
@@ -1114,6 +1150,12 @@
     if (iid === 'verdant' && V18 && D.V18) {
       D.V18.sites.forEach((site) => { if (site.slot) return; lm.push({ x: site.x, y: site.y, w: site.w, h: site.h, v18: true, kind: site.kind, site: site.id, svg: L.v18site(site, !V18.seen(st, site.part || site.id)) }); });
       D.V18.gates.forEach((gate) => { if (gate.site) return; const state = V18.cleared(st, gate.id) ? 'done' : V18.gateState(st, gate.id).state; lm.push({ x: gate.x, y: gate.y, w: 1, h: 1, top: true, v18: true, kind: 'v_gate_' + gate.id, gate: gate.id, on: state !== 'locked', svg: L.v18gate(gate, state) }); });
+    }
+    // Phase 19B: Obsidian Reach's places and its ten entrances (none of them changes a map cell)
+    const O19 = A.Rules && A.Rules.O19;
+    if (iid === 'obsidian' && O19 && D.O19) {
+      D.O19.sites.forEach((site) => { if (site.slot) return; lm.push({ x: site.x, y: site.y, w: site.w, h: site.h, v18: true, kind: site.kind, site: site.id, svg: L.o19site(site, !O19.seen(st, site.part || site.id)) }); });
+      D.O19.gates.forEach((gate) => { if (gate.site) return; const state = O19.cleared(st, gate.id) ? 'done' : O19.gateState(st, gate.id).state; lm.push({ x: gate.x, y: gate.y, w: 1, h: 1, top: true, v18: true, kind: 'o_gate_' + gate.id, gate: gate.id, on: state !== 'locked', svg: L.o19gate(gate, state) }); });
     }
     return lm;
   };

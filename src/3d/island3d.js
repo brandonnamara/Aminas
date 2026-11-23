@@ -16,7 +16,7 @@ import { VoxGrid, meshGrid, mergeGeo, hash, pick } from './voxmesh.js';
 import { PAL, TV, DV, UNIT_PX, HEIGHT_PX, MAGIC, LIGHT } from './voxstyle.js';
 import * as VB from './voxbuild.js';
 import * as MS from './modelslots.js'; // Phase 14: imported building models (empty slots load nothing)
-import './library/vegetation.js'; import './library/terrain.js'; import './library/decor.js'; import './library/verdant.js'; // Phase 18B: the Verdant Wilds' landmarks and dungeon entrances // Phase 2: library kinds used by the island
+import './library/vegetation.js'; import './library/terrain.js'; import './library/decor.js'; import './library/verdant.js'; import './library/obsidian.js'; // Phase 19B: Obsidian Reach // Phase 18B: the Verdant Wilds' landmarks and dungeon entrances // Phase 2: library kinds used by the island
 
 const A = window.A;
 const COARSE = !!(window.matchMedia && matchMedia('(pointer: coarse)').matches);
@@ -100,6 +100,16 @@ export const ISLAND_PAL = {
     path: ['#b89a6e', '#a88b62', '#c4a87c', '#9a7e58'], pathStone: ['#9aa898', '#8a9a88'], sand: ['#ddd4a4', '#d2c896', '#e6dfb6'],
     dirt: ['#7a5232', '#6e4a2c', '#86603a'], clay: ['#a86842', '#9a5e3a', '#b4744c'], stone: ['#8a9a88', '#7e8e7c', '#96a694', '#84947f'], stoneDark: ['#5e6e5c', '#66765f'],
     water: '#3db4c4',
+  },
+  // Phase 19B: Obsidian Reach, the Cooling Forge (BIOMES.obsidian): grey-violet ash over the ground, black basalt, rust
+  // cinder paths, black sand, and a dark ink-blue sea
+  obsidian: {
+    grass: ['#6e6478', '#665c70', '#766c80', '#5e5468', '#7e7488'], grassDark: ['#544a5e', '#4c4256'], grassSide: ['#4a4054', '#42384c', '#524860'],
+    path: ['#8a5a44', '#7e503c', '#96644c', '#6e4634'], pathStone: ['#5a4a52', '#4e4048'], sand: ['#3a3440', '#332e3a', '#443e4c'],
+    dirt: ['#3a2e34', '#33282e', '#42363c'], clay: ['#6a4038', '#5e3a32', '#76483e'], stone: ['#3e3446', '#352c3e', '#463c50', '#2f2838'], stoneDark: ['#262030', '#2a2232'],
+    moss: ['#5a5066', '#625870', '#544a60'], pine: ['#3a3244', '#42384c', '#342c3e'], plaza: ['#8a7e8e', '#7e7286'], leaf: ['#4a4054', '#544a5e'], leafDark: ['#3a3244', '#342c3e'], rock: ['#4a4054', '#42384c', '#544a5e'], rockDark: ['#2e2838'],
+    deep: ['#3a3246', '#342c40', '#40384c'], deepLow: ['#2a2438', '#262032', '#302a3e'], flowers: ['#e64ab8', '#ff8a3a', '#9a8aa8', '#ffb05a', '#c83aa0'],
+    water: '#2a3a6a',
   },
 };
 export function withIslandPal(iid, fn) {
@@ -295,7 +305,7 @@ export function createIsland() {
     // standing proud along the strata, darker pebbles set in the earth, moss clumps and roots under the grass lip,
     // and, deep in the stone, a rare cold glint of crystal. Instanced like the meadow detail (only the three faces
     // the camera sees), no shadows, and the same aerial haze as the rock it sits on.
-    { const sk = cliffSkin(t, TV, DV); if (sk.list.length) { const im = new THREE.InstancedMesh(skinBox, matSkin, sk.list.length), mm = new THREE.Matrix4(), cc = new THREE.Color();
+    { const sk = curIid === 'obsidian' ? withIslandPal(curIid, () => cliffSkin(t, TV, DV)) : cliffSkin(t, TV, DV); /* Phase 19B: the Reach's cliff faces in its own colours (other islands unchanged) */ if (sk.list.length) { const im = new THREE.InstancedMesh(skinBox, matSkin, sk.list.length), mm = new THREE.Matrix4(), cc = new THREE.Color();
       sk.list.forEach(([x, y, z, sx, sy, sz, col], i) => { mm.makeScale(sx, sy, sz).setPosition(x, y, z); im.setMatrixAt(i, mm); im.setColorAt(i, cc.set(col)); }); im.instanceMatrix.needsUpdate = true; im.instanceColor.needsUpdate = true; im.receiveShadow = true; im.computeBoundingSphere(); im.userData.skin = sk.list.length; groups.terrain.add(im); skinMesh = im;
       if (sk.glow.length) { const ig = new THREE.InstancedMesh(skinBox, matSkinGlow, sk.glow.length); sk.glow.forEach(([x, y, z, sx, sy, sz, col], i) => { mm.makeScale(sx, sy, sz).setPosition(x, y, z); ig.setMatrixAt(i, mm); ig.setColorAt(i, cc.set(col)); }); ig.instanceMatrix.needsUpdate = true; ig.instanceColor.needsUpdate = true; ig.computeBoundingSphere(); groups.terrain.add(ig); } } }
     // water: subdivided quads that ripple (vertex shader) with a sheen
@@ -390,7 +400,7 @@ export function createIsland() {
   // Phase 18D: obstacle kinds listed in MERGE_O are few per island but come in three variants each, which as instanced
   // batches cost a draw call per variant. They are baked into one static mesh instead (same triangles, one draw call,
   // each specimen keeps its own small tint), rebuilt with the layout like every batch.
-  const MERGE_O = { elderroot: 1, vinetree: 1, mossruin: 1, mossrock: 1 }, mergedGeos = [];
+  const MERGE_O = { elderroot: 1, vinetree: 1, mossruin: 1, mossrock: 1, basalt: 1, crystal: 1, embervent: 1, charred: 1, obsidianshard: 1, slagheap: 1 }, mergedGeos = []; // Phase 19B: Obsidian's six
   function sync(items, scenery) { const c0 = performance.now(); try { return sync0(items, scenery); } finally { cost.syncMs = +(performance.now() - c0).toFixed(1); } }
   function sync0(items, scenery) {
     const sig = JSON.stringify(items) + '|' + state.key + '|' + MS.signature();
@@ -466,7 +476,7 @@ export function createIsland() {
   // magic: slow motes of light that spiral up around the island's enchanted places (the Hatchery's egg, the
   // Tidegate, the Moonshrine, the Reliquary Gate, the glowing standing stones). One Points object, ~10 per place.
   // Phase 18D: the Verdant Wilds' places drift with light too (one shared points mesh: no extra draw calls per place)
-  const SPARK_L = { elderroot: ['#9af2ff', 5.5, 2.4], v_choir: ['#e8fff0', 1.6, 1.2], v_shrine: ['#fff3c8', 1.8, 1.0], v_archive: ['#ffe9b0', 2.2, 1.4], v_aqueduct: ['#d8fbff', 2.6, 0.8] };
+  const SPARK_L = { o_greatforge: ['#ffb05a', 6.5, 2.0], o_glasswick: ['#ffc880', 2.6, 2.2], o_bellows: ['#ff9a4a', 1.8, 1.6], elderroot: ['#9af2ff', 5.5, 2.4], v_choir: ['#e8fff0', 1.6, 1.2], v_shrine: ['#fff3c8', 1.8, 1.0], v_archive: ['#ffe9b0', 2.2, 1.4], v_aqueduct: ['#d8fbff', 2.6, 0.8] };
   const SPARK = { hatchery: [MAGIC.egg, 2.6, 1.4], tidegate: [MAGIC.water, 1.8, 1.6], moonshrine: [MAGIC.moon, 2.2, 1.2], reliquarygate: [MAGIC.life, 1.4, 1.4] };
   function buildSparks(items) {
     if (sparks) { groups.fx.remove(sparks); sparks.geometry.dispose(); sparks.material.dispose(); sparks = null; }

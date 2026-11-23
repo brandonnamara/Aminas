@@ -187,8 +187,8 @@
   UI.selectorHtml = function (s) {
     const a = UI.selCurrent(s); if (!a) return '';
     if (UI.selPicked && !R.inst(s, UI.selPicked)) UI.selPicked = null;
-    const picked = UI.selPicked === a.uid, sp = D.SPECIES[a.sp], need = R.xpNeed(a.lv), list = UI.selOrder(s), i = list.findIndex((x) => x.uid === a.uid), evo = sp.evo && a.lv >= sp.evo.lv, max = a.lv >= D.MAX_LEVEL;
-    const xp = '<div class="bar xp"><i style="width:' + (max ? 100 : pct(a.xp, need)) + '%"></i></div><div class="xpl"><span>Lv ' + a.lv + '</span><span>' + (max ? 'MAX' : a.xp + ' / ' + need + ' xp') + '</span></div>';
+    const picked = UI.selPicked === a.uid, sp = D.SPECIES[a.sp], need = R.xpNeed(a.lv), list = UI.selOrder(s), i = list.findIndex((x) => x.uid === a.uid), evo = sp.evo && a.lv >= sp.evo.lv, max = a.lv >= R.levelCap(s);
+    const xp = '<div class="bar xp"><i style="width:' + (max ? 100 : pct(a.xp, need)) + '%"></i></div><div class="xpl"><span>Lv ' + a.lv + '</span><span>' + (max ? (R.levelCap(s) < D.MAX_LEVEL ? 'Cap ' + R.levelCap(s) : 'MAX') : a.xp + ' / ' + need + ' xp') + '</span></div>';
     let h = '<div class="comp panel sel7 sel8' + (picked ? ' picked' : '') + '" id="comp" data-uid="' + a.uid + '">' +
       '<div class="art" data-act="' + (picked ? 'selDetail' : 'selPick') + '" data-uid="' + a.uid + '" role="button" aria-label="' + (picked ? 'Details for ' : 'Pick ') + esc(sp.name) + '"' + (picked ? '' : ' data-hl="feed"') + '>' + Art.portrait(a.sp) + (evo ? '<span class="evo-badge" title="Ready to evolve">' + I('spark') + '</span>' : '') + '</div>' +
       '<div class="nm"><span class="nmt">' + esc(sp.name) + '</span> ' + chip(sp.el) + (a.uid === s.active ? '<span class="chip light comp-tag">Companion</span>' : '') + '</div>' + xp;

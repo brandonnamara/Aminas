@@ -8,7 +8,12 @@
   // Hidden testing panel (Settings > tap the version line 7 times). MUST be false for an App Store / public release build.
   D.DEV_TOOLS = true;
   D.SAVE_KEY = 'aminas-light-shadow-save-v1';
-  D.MAX_LEVEL = 40; // Phase 18B: raised from 30 (approved). xpNeed continues the same formula; no save is changed.
+  // Phase 19B: staged level caps (approved). D.MAX_LEVEL is now only the absolute ceiling; the cap that applies to a save
+  // is R.levelCap(st): 40, then 50 once the Forest Crown (Verdant Island Boss) is defeated, then 60 once the Forge Heart
+  // (Obsidian Island Boss) is. xpNeed continues the same formula. No saved level is ever lowered.
+  D.MAX_LEVEL = 60;
+  D.CAP_BASE = 40;
+  D.CAP_STEPS = [{ boss: 'verdant', cap: 50 }, { boss: 'obsidian', cap: 60 }];
   D.MAX_INSTANCES = 60;
 
   /* ---------- Elements ---------- */
