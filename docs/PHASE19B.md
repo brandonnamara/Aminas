@@ -56,8 +56,9 @@ The approved staged-cap rule replaced older suite assertions:
 
 - five that expected `D.MAX_LEVEL === 40` (`campaign18c`, `economy13d`, `progression13a`, `verdant18b`, `polish18d`);
 - the "Max level" wording checks in `browser-progress13a` and `browser-polish18d`, which now expect "Level cap 40" / "Level cap N, no more XP";
-- `browser-env1`'s voxel-island list, which now includes Obsidian (drawn only when live or previewed). The new assertions are no weaker: the start
-cap is still 40, and no saved level is lowered.
+- `browser-env1`'s voxel-island list, which now includes Obsidian (drawn only when live or previewed).
+
+The new assertions are no weaker: the start cap is still 40, and no saved level is lowered.
 
 ## Mastery research (simulation only — `tools/p19b-mastery.js`, `docs/audit19b/mastery.json`)
 
