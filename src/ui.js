@@ -443,7 +443,7 @@
   UI.exArea = 'meadow';
   UI.explore = function (ovEx) {
     const s = st(), a = D.AREAS[UI.exArea], unlocked = R.areaUnlocked(s, UI.exArea);
-    const tabs = D.AREA_ORDER.map((id) => { const u = R.areaUnlocked(s, id); return '<button class="tab ' + (id === UI.exArea ? 'on' : '') + (u ? '' : ' lock') + '" data-act="exTab" data-id="' + id + '" data-hl="area:' + id + '">' + (u ? I('compass') : I('lock')) + esc(D.AREAS[id].name) + '</button>'; }).join('');
+    const tabs = D.AREA_ORDER.filter((id) => !R.areaListed || R.areaListed(s, id) || id === UI.exArea).map((id) => { const u = R.areaUnlocked(s, id); return '<button class="tab ' + (id === UI.exArea ? 'on' : '') + (u ? '' : ' lock') + '" data-act="exTab" data-id="' + id + '" data-hl="area:' + id + '">' + (u ? I('compass') : I('lock')) + esc(D.AREAS[id].name) + '</button>'; }).join('');
     const finds = a.steps.filter((x) => x[0] === 'find').map((x) => x[1]);
     const resid = finds.map((id) => '<div class="mini">' + (s.owned[id] ? artBox(id) : s.seen[id] ? silBox(id) : silBox(id)) + (s.owned[id] ? esc(D.SPECIES[id].name) : s.seen[id] ? esc(D.SPECIES[id].name) + '?' : '???') + '</div>').join('');
     let main;

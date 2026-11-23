@@ -16,7 +16,7 @@ import { VoxGrid, meshGrid, mergeGeo, hash, pick } from './voxmesh.js';
 import { PAL, TV, DV, UNIT_PX, HEIGHT_PX, MAGIC, LIGHT } from './voxstyle.js';
 import * as VB from './voxbuild.js';
 import * as MS from './modelslots.js'; // Phase 14: imported building models (empty slots load nothing)
-import './library/vegetation.js'; import './library/terrain.js'; import './library/decor.js'; // Phase 2: library kinds used by the island
+import './library/vegetation.js'; import './library/terrain.js'; import './library/decor.js'; import './library/verdant.js'; // Phase 18B: the Verdant Wilds' landmarks and dungeon entrances // Phase 2: library kinds used by the island
 
 const A = window.A;
 const COARSE = !!(window.matchMedia && matchMedia('(pointer: coarse)').matches);
@@ -376,7 +376,7 @@ export function createIsland() {
     if (sig === state.sig) return;
     state.sig = sig; lastSync = [items, scenery]; glbGroups = [];
     groups.things.children.slice().forEach((c) => { groups.things.remove(c); if (c.isInstancedMesh) c.dispose(); });
-    if (detail) detail = null;
+    if (detail) { detail.geometry.dispose(); detail.material.dispose(); detail = null; } // Phase 18B: the meadow detail owns its box and material (found leaking 2 per island switch)
     const batches = new Map(); // geometry -> { mat, list: [matrix] , sway }
     const push = (geo, mat, x, y, z, ry, sway, s, lgeo, nature) => { if (!geo) return; const k = geo.uuid + mat.uuid; let bt = batches.get(k); if (!bt) batches.set(k, (bt = { geo, mat, list: [], qs: [], sway, lgeo, nature })); bt.qs.push(quarter(ry)); bt.list.push(new THREE.Matrix4().compose(new THREE.Vector3(x, y, z), new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), ry || 0), new THREE.Vector3(s || 1, s || 1, s || 1))); };
     const occupied = new Set();
@@ -443,7 +443,7 @@ export function createIsland() {
   let detailArgs = null, detailDens = null;
   function buildDetail(occupied, trees) {
     detailArgs = [occupied, trees]; const dens = tier().detail == null ? 1 : tier().detail; detailDens = dens;
-    if (detail) { groups.things.remove(detail); detail.dispose(); detail = null; }
+    if (detail) { groups.things.remove(detail); detail.dispose(); detail.geometry.dispose(); detail.material.dispose(); detail = null; }
     if (!terr) return;
     const list = [], tip = PAL.grass[4];
     const tuft = (bx, y0, bz, n, hi, s0) => { for (let i = 0; i < n; i++) { const hgt = 1 + Math.floor(hash(s0 + i, bx * 97, 95) * 2) + hi, x = bx + (i % 2) * DV + (i > 1 ? DV * 0.5 : 0), z = bz + (i >> 1) * DV; const col = pick([PAL.grass[3], PAL.grassDark[0], PAL.grass[1]], hash(i, s0, 96));

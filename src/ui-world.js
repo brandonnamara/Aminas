@@ -256,7 +256,7 @@
   function tap(target, px, py) {
     if (UI.screen !== 'island' || UI.busy || UI.modalOpen()) return;
     // voxel island: a creature or marker hidden behind a 3D building does not take the tap; the building does
-    if (target && target.closest && (target.closest('[data-cr]') || target.closest('.lm')) && A.VoxIsland && A.VoxIsland.occludedAt(px, py)) {
+    if (target && target.closest && (target.closest('[data-cr]') || (target.closest('.lm') && !target.closest('[data-hit^="v18:"]'))) && A.VoxIsland && A.VoxIsland.occludedAt(px, py)) { // Phase 18B: a Verdant place's tap area covers its own 3D model, so its own pixels never hide it
       target = document.elementsFromPoint(px, py).find((e) => e.closest && e.closest('#objs') && !e.closest('[data-cr]') && !e.closest('.lm')) || null;
     }
     const s = st(), el = target && target.closest ? target : null;
@@ -823,6 +823,7 @@
       let pos = null;
       if (t.indexOf('bld:') === 0) { const b = s.buildings[t.slice(4)]; if (b && b.island === s.currentIsland && b.x != null) { const sz = W.size(b.type, b.rot), c = Iso.center(b.x, b.y, sz.w, sz.h); pos = [c[0], c[1] - IA.heightOf(b) - 30]; } }
       else if (t.indexOf('obs:') === 0) { const o = D.obstacleById[t.slice(4)]; if (o && o.island === s.currentIsland) { const ty = D.OBSTACLE_TYPES[o.type], c = Iso.center(o.x, o.y, ty.w, ty.h); pos = [c[0], c[1] - IA.obstacleHeight(o.type) - 22]; } }
+      else if (t.indexOf('v18:') === 0) { const id = t.slice(4), lm = IA.landmark(s.currentIsland, s).find((l) => l.site === id || l.gate === id || (id === 'elderroot' && l.kind === 'elderroot')); if (lm) { const c = Iso.center(lm.x, lm.y, lm.w, lm.h); pos = [c[0], c[1] - (lm.kind === 'elderroot' ? 210 : lm.gate ? 80 : 90)]; } }
       else if (t.indexOf('hit:') === 0) { const lm = IA.landmark(s.currentIsland, s).find((l) => (t === 'hit:stone' ? l.kind === 'plaza' : l.kind === 'stones')); if (lm) { const c = Iso.center(lm.x, lm.y, lm.w, lm.h); pos = [c[0], c[1] - (t === 'hit:stone' ? 110 : 80)]; } }
       if (pos) out += '<g class="hl-arrow" transform="translate(' + pos[0].toFixed(1) + ' ' + pos[1].toFixed(1) + ')"><g class="bob"><path d="M-14 -26h28v16h12L0 10 -26 -10h12z" fill="#ffd86b" stroke="#5a2a10" stroke-width="3" stroke-linejoin="round"/></g></g>';
     });

@@ -8,7 +8,7 @@
   // Hidden testing panel (Settings > tap the version line 7 times). MUST be false for an App Store / public release build.
   D.DEV_TOOLS = true;
   D.SAVE_KEY = 'aminas-light-shadow-save-v1';
-  D.MAX_LEVEL = 30;
+  D.MAX_LEVEL = 40; // Phase 18B: raised from 30 (approved). xpNeed continues the same formula; no save is changed.
   D.MAX_INSTANCES = 60;
 
   /* ---------- Elements ---------- */

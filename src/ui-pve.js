@@ -46,22 +46,24 @@
   UI.act('pvpMenu', (el) => UI.pvpMenu(el.closest('.overlay')));
 
   /* ---------- Island Map: fragments of the sanctuary ---------- */
-  const isleState = (s, iid) => !W.islandUnlocked(s, iid) ? 'locked' : R.islandBossDefeated(s, iid) ? 'completed' : 'unlocked';
+  const isleState = (s, iid) => (W.islandLive && !W.islandLive(iid)) ? 'notready' : !W.islandUnlocked(s, iid) ? 'locked' : R.islandBossDefeated(s, iid) ? 'completed' : 'unlocked';
   UI.islandMap = function (ovEx) {
     const s = st();
     const cards = D.ISLAND_ORDER.map((iid, n) => {
       const isl = D.ISLANDS[iid], c = D.CAMPAIGN[iid], k = isleState(s, iid), here = s.currentIsland === iid, p = R.islandProgress(s, iid);
       const by = W.islandUnlockedBy(iid);
       let status, act = '';
-      if (k === 'locked') status = by ? (c.dungeons.length || D.CAMPAIGN[by].dungeons.length ? 'Defeat the Island Boss of ' + esc(D.ISLANDS[by].name) + ' to reach it.' : 'Not reachable yet.') : 'Locked.';
-      else if (!c.dungeons.length) status = 'Its dungeons have not opened yet. You can build and explore here.';
+      if (k === 'notready') status = 'Still drifting out of reach. It is not ready to visit yet.';
+      else if (k === 'locked') status = by ? (c.dungeons.length || D.CAMPAIGN[by].dungeons.length ? 'Defeat the Island Boss of ' + esc(D.ISLANDS[by].name) + ' to reach it.' : 'Not reachable yet.') : 'Locked.';
+      else if (!c.dungeons.length) status = iid === 'verdant' ? 'Its old places can be visited; its ten dungeons have not opened yet. You can build here.' : 'Its dungeons have not opened yet. You can build and explore here.';
       else status = p.cleared + ' of ' + p.total + ' dungeons · ' + (p.boss ? 'Island Boss defeated' : 'Island Boss waiting in Dungeon 10');
       if (here) act = '<span class="tagp play">You are here</span>';
+      else if (k === 'notready') act = '<span class="tagp sealed">' + I('lock') + ' Not ready</span>';
       else if (k !== 'locked') act = '<button class="btn gold small" data-act="travel" data-id="' + iid + '" data-hl="travel:' + iid + '">' + I('arrow') + 'Travel</button>';
       else act = '<button class="btn small ghost" data-act="isleWhy" data-id="' + iid + '" data-hl="unlock:' + iid + '">' + I('lock') + ' How to reach it</button>';
       const tag = k === 'completed' ? '<span class="tagp done">' + I('check') + ' Island Boss defeated</span>' : k === 'unlocked' ? '<span class="tagp play">Unlocked</span>' : '<span class="tagp sealed">' + I('lock') + ' Locked</span>';
-      return '<div class="frag ' + k + (here ? ' here' : '') + ' el-' + isl.el + '" style="--tilt:' + [-2, 3, -3, 2][n % 4] + 'deg" data-hl="island:' + iid + '" data-island="' + iid + '"><div class="frag-art">' + UI.isleThumb(iid) + '<i class="seam"></i></div><div class="frag-b"><h3>' + esc(k === 'locked' ? '???' : isl.name) + ' ' + tag + '</h3>' +
-        '<p class="blurb">' + esc(k === 'locked' ? c.hint : isl.blurb) + '</p>' + (c.dungeons.length && k !== 'locked' ? '<div class="bar xp"><i style="width:' + pct(p.battles, p.battlesTotal) + '%"></i></div>' : '') + '<p class="muted small-t">' + status + '</p></div><div class="frag-a">' + act + '</div></div>';
+      return '<div class="frag ' + (k === 'notready' ? 'locked notready' : k) + (here ? ' here' : '') + ' el-' + isl.el + '" style="--tilt:' + [-2, 3, -3, 2][n % 4] + 'deg" data-hl="island:' + iid + '" data-island="' + iid + '"><div class="frag-art">' + UI.isleThumb(iid) + '<i class="seam"></i></div><div class="frag-b"><h3>' + esc(k === 'locked' || (k === 'notready' && !W.islandUnlocked(s, iid)) ? '???' : isl.name) + ' ' + tag + '</h3>' +
+        '<p class="blurb">' + esc(k === 'locked' || (k === 'notready' && !W.islandUnlocked(s, iid)) ? c.hint : isl.blurb) + '</p>' + (c.dungeons.length && k !== 'locked' && k !== 'notready' ? '<div class="bar xp"><i style="width:' + pct(p.battles, p.battlesTotal) + '%"></i></div>' : '') + '<p class="muted small-t">' + status + '</p></div><div class="frag-a">' + act + '</div></div>';
     }).join('<div class="frag-gap"></div>');
     const ov = open(ovEx, UI.sheet(I('map') + ' Island Map', '<p class="muted sanct">Every island in the sanctuary is a piece of somewhere else.</p><div class="frags">' + cards + '</div>', '<span class="muted sp" style="font-size:.78rem">Defeating an island’s Island Boss, at the end of its tenth dungeon, brings the next island within reach.</span><button class="btn gold" data-act="close">Close</button>', 'wide'));
     UI.applyHl(); const t = $('.hl', ov); if (t && t.scrollIntoView) t.scrollIntoView({ block: 'nearest' });

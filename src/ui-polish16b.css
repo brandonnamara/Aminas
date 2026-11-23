@@ -78,3 +78,32 @@ body.calm .ov-ghost16 { display: none; }
 .pp-ch17{display:block;font-size:.78rem;text-align:left}.pp-ch17>*{display:inline}
 .badge17{display:inline-block;min-width:1.2em;padding:0 .3em;margin-left:.25em;border-radius:99px;background:#ff5d7a;color:#fff;font-size:.72em;line-height:1.35;text-align:center}
 .m17 .mrow.bonus h3{font-size:.92rem}
+
+/* =====================================================================================================
+   Phase 18B — the Verdant Wilds' places and dungeon entrances (src/ui-verdant18b.js)
+   ===================================================================================================== */
+.v18-sheet .v18 { display: flex; flex-direction: column; gap: .5rem; }
+.v18-sheet .v18 > p { margin: 0; line-height: 1.4; }
+.v18-ent { font-style: italic; color: var(--muted); }
+.v18-ent b { font-style: normal; color: inherit; }
+.v18-gate { border: 1px solid rgba(191, 247, 168, .28); border-radius: .7rem; padding: .5rem .6rem; background: rgba(40, 70, 40, .22); display: flex; flex-direction: column; gap: .3rem; }
+.v18-gate p { margin: 0; }
+.v18-gh { display: flex; align-items: center; justify-content: space-between; gap: .5rem; flex-wrap: wrap; }
+.tagp.v18-sealed { background: rgba(120, 150, 100, .35); color: #e6f4d8; }
+.v18-order { display: flex; gap: .25rem; flex-wrap: wrap; }
+.v18-dot { width: 1.7rem; height: 1.7rem; border-radius: 50%; border: 2px solid rgba(255, 255, 255, .2); background: rgba(20, 30, 20, .5); color: #9aa894; font-weight: 800; font-size: .74rem; padding: 0; }
+.v18-dot.sealed { border-color: #bff7a8; color: #e8ffd8; }
+.v18-dot.open { border-color: #ffd86b; color: #fff; background: rgba(120, 90, 20, .5); }
+.v18-dot.done { border-color: #8cffa0; background: #3f7a3a; color: #fff; }
+.v18-dot.cur { box-shadow: 0 0 0 2px #fff6c0; }
+.v18-way { display: flex; flex-wrap: wrap; gap: .3rem; align-items: center; }
+.v18-way .chip { font-size: .72rem; padding: .2rem .5rem; border-radius: 999px; border: 1px solid rgba(255, 255, 255, .22); background: rgba(255, 255, 255, .06); color: inherit; }
+.v18-way .chip.seen { border-color: rgba(191, 247, 168, .5); }
+.v18-way .chip.on { background: rgba(191, 247, 168, .25); }
+.v18-dev { color: #ffd0f0; border-top: 1px dashed rgba(255, 158, 224, .4); padding-top: .3rem; }
+.lm .v18g.locked .tagq { opacity: .7; }
+/* the Choir's third light: a slow, irregular glimmer (still under reduced motion) */
+.lm .v18hum { animation: v18hum 11s ease-in-out infinite; }
+@keyframes v18hum { 0%, 100% { opacity: 0; } 18% { opacity: .1; } 23% { opacity: 0; } 61% { opacity: .16; } 70% { opacity: .02; } 74% { opacity: .08; } 80% { opacity: 0; } }
+body.calm .lm .v18hum { animation: none; opacity: .08; }
+@media (prefers-reduced-motion: reduce) { .lm .v18hum { animation: none; opacity: .08; } }

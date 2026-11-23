@@ -57,8 +57,9 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   ok(await ev(() => A.VoxIsland.items.includes('b:hatchery')), 'leaving build mode puts it back');
 
   /* ---------- other islands keep their 2D art ---------- */
-  const other = await ev(() => { const s = A.State.state; s.unlocked = s.unlocked || {}; const iid = Object.keys(A.Data.ISLANDS).find((k) => k !== 'starter'); if (!iid) return null; const prev = s.currentIsland; s.currentIsland = iid; A.UI.renderWorld(true); const r = { iid, vox: !!document.querySelector('#world.vox'), cv: !!document.querySelector('#world > canvas.vox3d'), terr: getComputedStyle(document.getElementById('terrain')).display }; s.currentIsland = prev; A.UI.renderWorld(true); return r; });
+  const other = await ev(() => { const s = A.State.state; s.unlocked = s.unlocked || {}; const iid = Object.keys(A.Data.ISLANDS).find((k) => A.VoxIsland.ISLANDS.indexOf(k) < 0); /* Phase 18B: the Verdant Wilds joined the voxel island; the islands not yet built for it keep 2D art */ if (!iid) return null; const prev = s.currentIsland; s.currentIsland = iid; A.UI.renderWorld(true); const r = { iid, vox: !!document.querySelector('#world.vox'), cv: !!document.querySelector('#world > canvas.vox3d'), terr: getComputedStyle(document.getElementById('terrain')).display }; s.currentIsland = prev; A.UI.renderWorld(true); return r; });
   ok(other && !other.vox && !other.cv && other.terr !== 'none', 'other islands (' + (other && other.iid) + ') keep the 2D island art');
+  ok(await ev(() => A.VoxIsland.ISLANDS.join() === 'starter,verdant'), 'Starter Island and the Verdant Wilds (Phase 18B) are the voxel islands');
   await sleep(1500);
   ok(await ev(() => !!document.querySelector('#world.vox')), 'returning to the Starter Island brings the voxel island back');
 

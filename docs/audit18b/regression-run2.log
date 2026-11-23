@@ -1,0 +1,114 @@
+baseline: 5 passed, 0 failed
+campaign: 60 passed, 0 failed
+migration v0.6: 22 passed, 0 failed
+modes: 41 passed, 0 failed
+forge: 53 passed, 0 failed
+dev8: 49 passed, 0 failed
+browser v0.6: 48 passed, 0 failed
+browser dev7: 30 passed, 0 failed
+browser dev8: 42 passed, 0 failed
+browser env1: 21 passed, 0 failed
+browser-env12.test.js: FAILED
+  ok  the occlusion layer sits directly above the interactive SVG
+FAIL  a creature standing behind the Hatchery is covered by it
+  ok  tapping the covered creature opens the building in front of it
+  ok  the same creature in front of the Hatchery is drawn over it
+  ok  interface parts are listed for cut-out (2)
+  ok  the island still renders in a bounded number of draw calls (40)
+  ok  with the voxel island off there is no occlusion layer
+  ok  turning it back on restores the occlusion layer
+  ok  the painted far islands give way to the voxel ones
+  ok  no script errors
+
+browser env1.2: 9 passed, 1 failed
+
+browser library: 11 passed, 0 failed
+PASSED: 19 passed, 0 failed (browser-env3)
+PASSED: 10 passed, 0 failed (browser-env4)
+PASSED: 12 passed, 0 failed (browser-ui5)
+PASSED: 45 passed, 0 failed (browser-ui6)
+PASSED: 30 passed, 0 failed (browser-arena7)
+PASSED: 31 passed, 0 failed (browser-bench-battle)
+browser-perf-fix.test.js: FAILED
+  ok  with no evidence the page is assumed to get 60 fps (exactly the earlier rule)
+  ok  a steady 60 fps page is read as 60 fps
+  ok  a steady 30 fps page is read as 30 fps
+  ok  a 30 fps page with the odd late frame is still read as 30 fps
+  ok  a 120 Hz screen changes nothing (budgets never go below a 60 fps frame)
+  ok  irregular, janky frames are not mistaken for a capped page
+  ok  the estimate follows the page back to 60 fps (e.g. Low Power Mode turned off)
+       60 fps page, light frames: {"prStart":2,"prEnd":2,"display":{"fps":60,"steady":true,"samples":40},"saverWouldStart":0,"firstWhy":null,"lowered":0,"judged":3,"slowPct":0,"fps":60,"saverNow":false}
+  ok  a healthy 60 fps 3D view stays at full resolution (2x) with no Battery saver (as before)
+       30 fps page, light frames: {"prStart":2,"prEnd":2,"display":{"fps":30,"steady":true,"samples":40},"saverWouldStart":0,"firstWhy":null,"lowered":0,"judged":3,"slowPct":0,"fps":30,"saverNow":false}
+  ok  a 3D view on a page capped at 30 fps reads the page as 30 fps
+  ok  and draws a steady ~30 fps (30)
+  ok  steady 30 fps frames are not counted as slow during moves (0% slow; the old rule counted ~88% on the iPhone)
+  ok  stable 30 fps does not lower the resolution (stays at 2x)
+  ok  stable 30 fps does not switch Battery saver on
+       60 fps page, struggling  : {"prStart":2,"prEnd":1.75,"display":{"fps":20,"steady":true,"samples":40},"saverWouldStart":0,"firstWhy":null,"lowered":1,"judged":7,"slowPct":15,"fps":19.5,"saverNow":false}
+FAIL  a device that is really struggling at 60 fps first steps its resolution down (2x → 1x, 1 steps)
+FAIL  and, still slow at 1x, switches Battery saver on
+FAIL  its heavy frames do not talk the estimate down to a lower frame rate
+FAIL  the reason is recorded (view, slow frames, the page frame rate it judged against)
+       30 fps page, struggling  : {"prStart":2,"prEnd":1,"display":{"fps":30,"steady":true,"samples":38},"saverWouldStart":2,"firstWhy":{"at":36589,"view":"viewer:lumifern","windowMs":1600,"frames":15,"slowFrames":15,"quickFrames":0,"pixelRatio":1,"cap":2,"targetFps":60,"displayFps":30,"boosting":true,"result":"battery-saver"},"lowered":4,"judged":6,"slowPct":100,"fps":9.4,"saverNow":false}
+  ok  on a 30 fps page, frames slower than 30 fps still lower the resolution and trigger Battery saver
+       30 fps, GPU always behind: {"prStart":2,"prEnd":1,"display":{"fps":60,"steady":false,"samples":0},"saverWouldStart":3,"firstWhy":{"at":48539,"view":"viewer:lumifern","windowMs":1533,"frames":46,"slowFrames":46,"quickFrames":0,"pixelRatio":1,"cap":2,"targetFps":60,"displayFps":60,"boosting":true,"result":"battery-saver"},"lowered":4,"judged":7,"slowPct":100,"fps":30,"saverNow":false}
+  ok  frames that come at 30 fps because the GPU cannot keep up are still caught (no evidence of a capped page)
+  ok  island Auto quality: a steady 30 fps page stays on High; frames slower than that still step down to Balanced
+  ok  island Auto quality on a 60 fps page works exactly as before
+  ok  returning to the app starts a fresh estimate
+  ok  no script errors
+FAILED: 19 passed, 4 failed (browser-perf-fix)
+
+PASSED: 38 passed, 0 failed (browser-showcase8)
+PASSED: 38 passed, 0 failed (browser-p8fix)
+PASSED: 47 passed, 0 failed (browser-roster8b)
+raid12a: 31 passed, 0 failed
+PASSED: 18 passed, 0 failed (browser-raid12a)
+hideseek: 60 passed, 0 failed
+PASSED: 41 passed, 0 failed (browser-hideseek)
+hideseek12c: 30 passed, 0 failed
+PASSED: 58 passed, 0 failed (browser-hideseek12c)
+progression13a: 40 passed, 0 failed
+PASSED: 41 passed, 0 failed (browser-progress13a)
+hatchery13b: 41 passed, 0 failed
+PASSED: 35 passed, 0 failed (browser-hatchery13b)
+gear13c: 46 passed, 0 failed
+PASSED: 39 passed, 0 failed (browser-gear13c)
+economy13d: 14 passed, 0 failed
+PASSED: 5 passed, 0 failed (browser-rewards13d)
+PASSED: 31 passed, 0 failed (browser-models14)
+PASSED: 16 passed, 0 failed (browser-world14)
+40 passed, 0 failed
+browser-roster15b: 37 passed, 0 failed
+browser-combat15c: 33 passed, 0 failed
+browser-final15d: 37 passed, 0 failed
+browser-intro14.test.js: FAILED
+  ok  an ordinary dungeon battle opens with its place and number (“The Cold KilnBattle 4 of 10”), no boss card and nothing to tap through
+  ok  the entry card is gone after about a second, and the battle is ready as before
+  ok  the boss card names it as the dungeon’s Guardian, its element, “Battle 10 of 10” and how to begin (“Guardian of The Cold KilnThe Kiln MotherEarth · Battle 10 of 10Telegraphs a powerful move one turn ahead and cannot be s…”)
+  ok  its fighting trait is the game’s own description of it (the boss mechanic, or the Guardian trait)
+FAIL  in the 3D arena the camera opens close on the boss while the card is up
+  ok  one tap ends the introduction (card, camera) and changes nothing in the battle
+  ok  the boss battle then plays as before (the boss took 18 damage from one move)
+  ok  left alone, the introduction ends by itself within about 2.5 seconds
+  ok  the Island Boss card keeps its own title and states its mechanic (“The Island BossThe Heartwood StagNature · Battle 10 of 10Prism Shift: Its element keeps shifting. Watch the co…”)
+  ok  with Reduce Motion: no entry card or wipe; the boss card still names the boss, with no camera move and no animation
+  ok  dungeon records are unchanged by entering and leaving battles (clears still 1)
+  ok  no script errors
+FAILED: 11 passed, 1 failed (browser-intro14)
+
+onboard16: 37 passed, 0 failed
+69 passed, 0 failed (browser-onboard16)
+savefile16b: 47 passed, 0 failed
+34 passed, 0 failed (browser-polish16b)
+20 passed, 0 failed (browser-stability16c)
+combat17b: 31 passed, 0 failed
+rewards17b: 40 passed, 0 failed
+10 passed, 0 failed (browser-combat17b)
+progression17c: 48 passed, 0 failed
+14 passed, 0 failed (browser-progression17c)
+replay17d: 70 passed, 0 failed
+15 passed, 0 failed (browser-replay17d)
+verdant18b: 56 passed, 0 failed
+browser-verdant18b: 22 passed, 0 failed

@@ -79,7 +79,10 @@ ok(Q.status(st, Q.get('s_reach')) === 'locked' && Q.status(st, Q.get('s_crown'))
 ok(Q.status(st, Q.get('s_wilds_farm')) !== 'locked' && Q.status(st, Q.get('s_wilds_clear')) !== 'locked', 'quests on the Verdant Wilds (which can be opened) are unaffected');
 ok(!Q.visible(st).some((q) => q.id === 's_reach' || q.id === 's_crown'), 'neither appears in the quest list');
 st.missions.s_reach = 'claimed'; ok(Q.status(st, Q.get('s_reach')) === 'claimed', 'a quest already claimed keeps its state');
-st.missions.s_reach = undefined; st.islands.obsidian = { unlocked: true, obstacles: {} }; ok(Q.status(st, Q.get('s_reach')) !== 'locked', 'a save where Obsidian Reach is already open (bought in an older version) still shows it');
+// Phase 18B (brief: hide quests whose destination cannot be visited): Obsidian Reach is not ready, so even a save that
+// opened it in an older version keeps the quest hidden, with its record untouched, until the island is marked ready.
+st.missions.s_reach = undefined; st.islands.obsidian = { unlocked: true, obstacles: {} }; ok(Q.status(st, Q.get('s_reach')) === 'locked', 'a save where Obsidian Reach is already open (bought in an older version) keeps the quest hidden while the island is not ready (Phase 18B)');
+D.ISLAND_LIVE.obsidian = true; ok(Q.status(st, Q.get('s_reach')) !== 'locked', 'and shows it again once Obsidian Reach is marked ready'); D.ISLAND_LIVE.obsidian = false;
 ok(D.QUESTS.some((q) => q.id === 's_reach') && D.QUESTS.some((q) => q.id === 's_crown'), 'the quest data itself is untouched');
 
 /* ---------- the guardian brief ---------- */

@@ -12,7 +12,7 @@
   V.wanted = () => { const s = st(); return !!(s && s.settings && s.settings.voxIsland !== false) && !failed && !!(A.C3D && A.C3D.supported()); };
   V.failed = () => failed;
   V.ready = () => !!ctrl && !!document.querySelector('#world.vox');
-  V.ISLANDS = ['starter'];
+  V.ISLANDS = ['starter', 'verdant']; // Phase 18B: the Verdant Wilds joins the voxel island
   function load() {
     if (mod) return Promise.resolve(mod);
     // Phase 3: load timings for the performance test (src/bench.js)
@@ -79,7 +79,7 @@
   V.terrain = function (iid, key, t) {
     V.on = false; const w = document.getElementById('world'); if (w) w.classList.remove('vox');
     // Phase 1 covers the Starter Island; the other islands keep their 2D art until their own phase
-    if (!V.wanted() || iid !== 'starter') { IA.voxHas = null; if (ctrl && ctrl.canvas.parentNode) ctrl.canvas.parentNode.removeChild(ctrl.canvas); if (ctrl && ctrl.occCanvas.parentNode) ctrl.occCanvas.parentNode.removeChild(ctrl.occCanvas); return; }
+    if (!V.wanted() || V.ISLANDS.indexOf(iid) < 0) { IA.voxHas = null; if (ctrl && ctrl.canvas.parentNode) ctrl.canvas.parentNode.removeChild(ctrl.canvas); if (ctrl && ctrl.occCanvas.parentNode) ctrl.occCanvas.parentNode.removeChild(ctrl.occCanvas); return; }
     load().then((m) => {
       if (!m || !V.wanted()) return;
       const world = document.getElementById('world'); if (!world || !t || !t.cols) return;
@@ -105,7 +105,7 @@
       items.push({ k: 'b', id: b.id, type: b.type, art: d.art || d.id, cat: d.cat, level: b.level, state: b.state, rot: b.rot ? 1 : 0, x: b.x, y: b.y, w: sz.w, h: sz.h, w0: d.w, h0: d.h, draw: ctrl.has('b', d.art || d.id, d.cat, b.state) });
     });
     W.obstaclesOn(s, iid).forEach((o) => { if (o.state === 'cleared') return; const t = D.OBSTACLE_TYPES[o.type]; items.push({ k: 'o', id: o.id, type: o.type, x: o.x, y: o.y, w: t.w, h: t.h, seed: Math.abs(String(o.id).split('').reduce((a, c) => a * 31 + c.charCodeAt(0), 7)) % 1000 }); });
-    IA.landmark(iid, s).forEach((l) => items.push({ k: 'l', kind: l.kind, on: l.kind === 'stones' ? !!(s.struct.tidegate && !s.flags.r1) : false, x: l.x, y: l.y, w: l.w, h: l.h }));
+    IA.landmark(iid, s).forEach((l) => items.push({ k: 'l', kind: l.kind, on: l.on != null ? !!l.on : l.kind === 'stones' ? !!(s.struct.tidegate && !s.flags.r1) : false, x: l.x, y: l.y, w: l.w, h: l.h }));
     V.items = items.map((i) => i.k + ":" + (i.id || i.kind));
     ctrl.sync(items.map((i) => (i.k === 'b' && !i.draw ? Object.assign({}, i, { k: 'l' }) : i)), sceneryCache);
   };
@@ -116,7 +116,9 @@
      glows). The 3D layer then repaints, on a thin canvas above the SVG, exactly the pixels of 3D objects that are in
      front of those proxies. Interface parts (bubbles, timers, tags, the ghost, quest highlights) are cut out of that
      canvas so they always stay on top. Taps are unchanged: everything interactive is still the SVG. */
-  const occludable = () => [...document.querySelectorAll('#objs .creature, #objs .lm, #objs .bld > ellipse.pulse')];
+  // Phase 18B: the Verdant Wilds' places stand in their own 3D models and carry only interface markers (a number or a
+  // question mark), which, like building markers, are never covered; leaving them out keeps panning as cheap as on Starter Island
+  const occludable = () => [...document.querySelectorAll('#objs .creature, #objs .lm:not(.lm-v18), #objs .bld > ellipse.pulse')];
   function worldRect(el) { const r = el.getBoundingClientRect(); if (!r.width || !r.height) return null; const a = A.UI.toWorld(r.left, r.top), b = A.UI.toWorld(r.right, r.bottom); return { r, x0: a[0], y0: a[1], x1: b[0], y1: b[1] }; }
   const visibleFill = (e) => { const f = (e.getAttribute('fill') || '').toLowerCase(); return f !== 'transparent' && f !== 'none' || !!e.getAttribute('stroke'); };
   function overlay() {
@@ -168,7 +170,7 @@
       items.push({ k: 'b', id: b.id, type: b.type, name: d.name, art: d.art || d.id, cat: d.cat, level: b.level, state: b.state, rot: b.rot ? 1 : 0, x: b.x, y: b.y, w: sz.w, h: sz.h, w0: d.w, h0: d.h });
     });
     W.obstaclesOn(s, iid).forEach((o) => { if (o.state === 'cleared') return; const ty = D.OBSTACLE_TYPES[o.type]; items.push({ k: 'o', id: o.id, type: o.type, name: ty.name, x: o.x, y: o.y, w: ty.w, h: ty.h, seed: Math.abs(String(o.id).split('').reduce((a, c) => a * 31 + c.charCodeAt(0), 7)) % 1000 }); });
-    IA.landmark(iid, s).forEach((l) => items.push({ k: 'l', kind: l.kind, on: l.kind === 'stones' ? !!(s.struct.tidegate && !s.flags.r1) : false, x: l.x, y: l.y, w: l.w, h: l.h }));
+    IA.landmark(iid, s).forEach((l) => items.push({ k: 'l', kind: l.kind, on: l.on != null ? !!l.on : l.kind === 'stones' ? !!(s.struct.tidegate && !s.flags.r1) : false, x: l.x, y: l.y, w: l.w, h: l.h }));
     const cols = t.cols.map((c) => ({ x: c.x, y: c.y, kind: c.kind, top: c.top, bot: c.bot }));
     return { iid, cols, items, scenery: scenery(t.cols), extras: extras(iid, t.cols) };
   };

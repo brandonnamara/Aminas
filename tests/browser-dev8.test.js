@@ -99,7 +99,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   ok(f1.food === f0.food - 3 && f1.xp > f0.xp && f1.others === f0.others, 'a Snack costs 3 food and feeds only the picked monster');
   await ev(() => { A.UI.queue.length = 0; A.UI.closeAll(); }); await page.click('#comp [data-act=selUnpick]'); await sleep(200);
   ok(await ev(() => !A.UI.selPicked && !document.querySelector('#comp [data-act=feedSel]')), 'closing the pick hides the feed buttons again');
-  await ev(() => { const a = A.State.state.aminas[0]; a.lv = 30; A.UI.selUid = a.uid; A.UI.selPicked = a.uid; A.UI.selRender(); });
+  await ev(() => { const a = A.State.state.aminas[0]; a.lv = A.Data.MAX_LEVEL; /* Phase 18B: the cap is 40 */ A.UI.selUid = a.uid; A.UI.selPicked = a.uid; A.UI.selRender(); });
   ok(await ev(() => !document.querySelector('#comp [data-act=feedSel]') && /no more food/.test(document.querySelector('#comp').innerText)), 'at the level cap the feed buttons are hidden');
   await ev(() => { A.State.state.aminas[0].lv = 10; A.UI.selPicked = null; A.UI.selRender(); });
 

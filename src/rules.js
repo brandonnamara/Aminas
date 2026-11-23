@@ -159,7 +159,7 @@
 
   /* ---------- exploration ---------- */
   R.areaUnlocked = (st, id) => R.reqMet(st, D.AREAS[id].unlock);
-  const AREA_LV = { meadow: 2, tidepools: 3, emberridge: 4, duskgrove: 4, windbluff: 6, driftisle: 6 };
+  const AREA_LV = R.AREA_LV = { meadow: 2, tidepools: 3, emberridge: 4, duskgrove: 4, windbluff: 6, driftisle: 6 };
   R.explore = function (st, id) {
     const a = D.AREAS[id];
     if (!a) return { ok: false, reason: 'invalid' };

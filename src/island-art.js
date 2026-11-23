@@ -1000,6 +1000,49 @@
     g += leaves(0, 0, 100, 1.9, ['#2f8f48', '#26783c', '#4fbf63'], 241, 7) + leaves(0.1, -0.1, 150, 1.2, ['#3fa858', '#2f8f48', '#5fd070'], 242, 4);
     return g + [[-1.0, 1.0, 110], [1.1, -0.6, 120], [-0.6, -1.0, 140], [0.8, 0.8, 96]].map(([u, v, z]) => { const p = pj(u, v, z); return '<rect x="' + f1(p[0] - 2) + '" y="' + f1(p[1] - 2) + '" width="4" height="4" fill="#9af2ff" class="twk"/>'; }).join('');
   };
+  /* Phase 18B: the Verdant Wilds' places (src/verdant18b.js). Simple voxel pictures for the 2D island; on the voxel
+     island the 3D models replace the pictures and only the tap area and the floating marker stay. */
+  const V18C = { moss: '#5fa34e', mossD: '#3f7a3a', stone: '#b8b0a0', stoneD: '#8f8878', ivy: '#3f9a4a', water: '#5ab8e8', glow: '#bff7a8' };
+  const v18tag = (z, ch, ring, fill) => '<g transform="translate(0 ' + (-z) + ')"><g class="tagq">' + circ(0, 0, 12, '#1f2a1c', ' stroke="' + ring + '" stroke-width="2"') + '<text y="5" text-anchor="middle" font-size="' + (ch.length > 1 ? 12 : 16) + '" font-weight="800" fill="' + fill + '">' + ch + '</text></g></g>';
+  const v18wall = (u, v, du, dv, h, seed) => sbox(u, v, 0, du, dv, h, V18C.stone, 'stone', seed) + vbox(u, v, h, du, dv, 3, V18C.moss);
+  L.v18pic = function (kind) {
+    let g = '';
+    switch (kind) {
+      case 'v_landing': g = vbox(-0.4, -0.4, 0, 0.8, 0.8, 4, V18C.stoneD) + vc(0.25, -0.25, 4, 0.1, 0.1, 30, '#6a4a2c') + vc(0.25, -0.25, 34, 0.2, 0.2, 8, '#ffd86b', { x: ' class="glow-soft"' }); break;
+      case 'v_settle': g = v18wall(-1.9, -0.3, 0.8, 0.2, 26, 300) + v18wall(-0.9, -0.3, 0.6, 0.2, 14, 301) + v18wall(0.2, -0.3, 0.9, 0.2, 34, 302) + v18wall(1.3, -0.3, 0.5, 0.2, 18, 303) +
+        poly(onV(-0.1, archPts(0.45, 0.85, 0, 26)), '#2a2018') + vbox(0.05, -0.05, 0, 0.3, 0.3, 4, V18C.stoneD) + vbox(0.12, -0.05, 4, 0.18, 0.3, 4, V18C.stoneD) + vbox(-1.6, 0.1, 0, 0.5, 0.4, 3, V18C.mossD); break;
+      case 'v_settle2': g = v18wall(-1.4, -0.3, 0.7, 0.2, 22, 310) + v18wall(0.6, -0.3, 0.8, 0.2, 12, 311) + vc(0, 0.1, 0, 0.6, 0.6, 5, V18C.stoneD) + vc(0, 0.1, 5, 0.3, 0.3, 3, '#ff9a4a', { x: ' class="glow-soft"' }) + vc(-0.5, 0.35, 0, 0.18, 0.18, 6, '#c4703a') + vc(0.45, 0.35, 0, 0.26, 0.2, 4, '#a8603a'); break;
+      case 'v_aqueduct': case 'v_aqueductw': {
+        const along = kind === 'v_aqueduct', n = along ? 4 : 5, half = n / 2;
+        for (let i = 0; i <= n; i++) { const t = -half + i; g += along ? sbox(-0.2, t - 0.12, 0, 0.4, 0.24, 46, V18C.stone, 'stone', 320 + i) : sbox(t - 0.12, -0.2, 0, 0.24, 0.4, 46, V18C.stone, 'stone', 320 + i); }
+        g += along ? vbox(-0.26, -half, 46, 0.52, n, 8, V18C.stoneD) + vbox(-0.16, -half, 54, 0.32, n, 1, V18C.water) : vbox(-half, -0.26, 46, n, 0.52, 8, V18C.stoneD) + vbox(-half, -0.16, 54, n, 0.32, 1, V18C.water);
+        break;
+      }
+      case 'v_archive': g = sbox(-1.3, -0.4, 0, 2.6, 0.8, 44, V18C.stone, 'brick', 330) + vbox(-1.4, -0.5, 44, 2.8, 1.0, 6, V18C.stoneD) + poly(onV(0.4, archPts(-0.25, 0.25, 0, 30)), '#20180f') +
+        [[-1.1, 8, 0.5, 30], [0.6, 14, 0.6, 26], [-0.4, 30, 0.9, 16]].map(([u, z, du, h]) => vbox(u, 0.38, z, du, 0.06, h, V18C.ivy)).join('') + vbox(-1.4, -0.5, 50, 1.2, 1.0, 3, V18C.ivy); break;
+      case 'v_shrine': g = sbox(-0.4, -1.45, 0, 0.8, 0.9, 30, '#ece6d6', 'stone', 340) + vbox(-0.45, -1.5, 30, 0.9, 1.0, 5, '#fff3c8') + sbox(-0.4, 0.55, 0, 0.8, 0.9, 30, '#3a3450', 'stone', 341) + vbox(-0.45, 0.5, 30, 0.9, 1.0, 5, '#5b4f86') +
+        vbox(-0.3, -0.5, 4, 0.6, 1.0, 2, '#8a6a4a') + vc(0, -1.0, 38, 0.14, 0.14, 6, '#fff6c0', { x: ' class="glow-soft"' }) + vc(0, 1.0, 38, 0.14, 0.14, 6, '#c9a8ff', { x: ' class="glow-soft"' }); break;
+      case 'v_choir': g = ell(0, 0, 40, 20, '#cfe8ff', ' opacity=".14" class="glow-soft"') + [-1.2, -0.6, 0, 0.6, 1.2].map((v, i) => vc(0.05 * (i % 2), v, 0, 0.22, 0.2, 22 + (i % 3) * 7, '#d8d4e4', { t: '#f2efff' })).join(''); break;
+      case 'elderroot': g = L.elderroot(); break;
+    }
+    return g;
+  };
+  L.v18gate = function (gate, state) {
+    const lit = state !== 'locked', col = { earth: '#c49a5a', water: '#5ab8e8', nature: '#6ad06a', metal: '#b8c4d4', fire: '#ff9a4a', light: '#ffe58a', wind: '#bfe8ff', resonance: '#ff9ee0' }[gate.el] || '#bff7a8';
+    let g = '';
+    if (!(Art.voxHas && Art.voxHas('l', 'v_gate_' + gate.id))) g += vc(-0.32, 0, 0, 0.12, 0.16, 30, V18C.stoneD) + vc(0.32, 0, 0, 0.12, 0.16, 30, V18C.stoneD) + vbox(-0.42, -0.1, 30, 0.84, 0.2, 6, V18C.stone) + vbox(-0.42, -0.1, 36, 0.84, 0.2, 2, V18C.moss) + vbox(-0.26, -0.03, 0, 0.52, 0.06, 28, lit ? col : '#2a3326', lit ? { x: ' opacity=".55"' } : undefined);
+    g += ell(0, 0, 26, 13, 'transparent') + '<rect x="-18" y="-52" width="36" height="52" fill="transparent"/>';
+    return '<g class="v18g ' + state + '" data-hit="v18:' + gate.id + '" data-hl="v18:' + gate.id + '">' + g + v18tag(58, String(gate.n), lit ? col : '#7a8a70', lit ? '#fff' : '#b8c4b0') + '</g>';
+  };
+  L.v18site = function (site, fresh) {
+    const big = site.w * site.h > 2, has = Art.voxHas && Art.voxHas('l', site.kind);
+    let g = has ? '' : L.v18pic(site.kind);
+    if (site.kind === 'v_choir') g = ell(0, 0, 46, 23, '#e8fff0', ' opacity=".0" class="glow-soft v18hum"') + g; // the Choir's faint, irregular third light
+    const z = site.kind === 'elderroot' ? 190 : site.kind.indexOf('aqueduct') === 0 ? 76 : big ? 70 : 52, hw = 14 + 15 * (site.w + site.h);
+    // the tap area covers the place's whole picture (ground to top), so a tap on the 3D model itself opens it
+    g += ell(0, 0, hw, hw / 2, 'transparent') + '<rect x="' + f1(-hw * 0.7) + '" y="' + f1(-z) + '" width="' + f1(hw * 1.4) + '" height="' + f1(z) + '" fill="transparent"/>';
+    return '<g class="v18s" data-hit="v18:' + site.id + '" data-hl="v18:' + site.id + '">' + g + (fresh ? v18tag(z, '?', '#bff7a8', '#e8ffd8') : '') + '</g>';
+  };
   L.forge = () => {
     let g = ell(0, 8, 76, 28, '#000', ' opacity=".28"') + sbox(-1.3, -1.1, 0, 2.6, 2.2, 22, '#5a4a62', 'stone', 250);
     g += sbox(-0.9, -0.9, 22, 0.9, 0.9, 64, '#4a3e5a', 'brick', 251) + vbox(-0.95, -0.95, 86, 1.0, 1.0, 5, '#3a3048');
@@ -1055,15 +1098,22 @@
       for (let yy = y; yy < y + h; yy++) for (let xx = x; xx < x + w; xx++) seen[xx + ',' + yy] = 1;
       out.push({ x, y, w, h });
     });
-    return out.map((r) => {
+    const V18 = A.Rules && A.Rules.V18;
+    const lm = out.map((r) => {
       let svg = '', kind = '';
       if (iid === 'starter' && r.w === 4) { kind = 'plaza'; svg = L.plaza(st) + (st.flags.r2 ? L.silent(!st.flags.stone) : ''); }
       else if (iid === 'starter') { kind = 'stones'; svg = st.struct.tidegate ? L.stones(!st.flags.r1) : L.stones(false).replace('data-hit="stones"', 'data-hit="stones-dormant"'); }
-      else if (iid === 'verdant') { kind = 'elderroot'; svg = L.elderroot(); }
+      else if (iid === 'verdant') { kind = 'elderroot'; const site = V18 && V18.site('elderroot'); svg = site ? L.v18site(site, !V18.seen(st, 'elderroot')) : L.elderroot(); if (site) r.v18 = true; }
       else if (iid === 'obsidian') { kind = 'forge'; svg = L.forge(); }
       else { kind = 'observatory'; svg = L.observatory(); }
       return Object.assign(r, { svg, kind, flat: kind === 'plaza' });
     });
+    // Phase 18B: the Verdant Wilds' other places and the ten dungeon entrances (none of them changes a map cell)
+    if (iid === 'verdant' && V18 && D.V18) {
+      D.V18.sites.forEach((site) => { if (site.slot) return; lm.push({ x: site.x, y: site.y, w: site.w, h: site.h, v18: true, kind: site.kind, site: site.id, svg: L.v18site(site, !V18.seen(st, site.part || site.id)) }); });
+      D.V18.gates.forEach((gate) => { if (gate.site) return; const state = V18.gateState(st, gate.id).state; lm.push({ x: gate.x, y: gate.y, w: 1, h: 1, top: true, v18: true, kind: 'v_gate_' + gate.id, gate: gate.id, on: state !== 'locked', svg: L.v18gate(gate, state) }); });
+    }
+    return lm;
   };
 
   // A creature standing on the island at the local origin (feet at 0,0): baked 3D portrait, or classic SVG art.
@@ -1131,7 +1181,7 @@
     opts = opts || {};
     const W = A.World, R = A.Rules, now = opts.now || Date.now(), items = [];
     const at = (x, y, w, h) => Iso.center(x, y, w, h);
-    Art.landmark(iid, st).forEach((l) => { const [cx, cy] = at(l.x, l.y, l.w, l.h); items.push({ id: 'l' + l.x + ',' + l.y, k: l.flat ? -1 : l.x + l.y + l.w + l.h, svg: '<g class="lm lm-' + l.kind + '" transform="translate(' + f1(cx) + ' ' + f1(cy) + ')">' + Art.landmarkSprite(l) + '</g>' }); });
+    Art.landmark(iid, st).forEach((l) => { const [cx, cy] = at(l.x, l.y, l.w, l.h); items.push({ id: 'l' + l.x + ',' + l.y, k: l.flat ? -1 : l.top && Art.voxHas && Art.voxHas('l', l.kind) ? 1e4 : l.x + l.y + l.w + l.h, svg: '<g class="lm lm-' + l.kind + (l.v18 && Art.voxHas && Art.voxHas('l', l.kind) ? ' lm-v18' : '') + '" transform="translate(' + f1(cx) + ' ' + f1(cy) + ')">' + Art.landmarkSprite(l) + '</g>' }); });
     W.obstaclesOn(st, iid).forEach((o) => {
       if (o.state === 'cleared') return;
       const t = D.OBSTACLE_TYPES[o.type], [cx, cy] = at(o.x, o.y, t.w, t.h), removing = o.state === 'removing';

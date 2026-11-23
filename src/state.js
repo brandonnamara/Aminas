@@ -26,6 +26,7 @@
       seen: {},                  // species encountered in battle
       owned: {},                 // species ever owned
       d17: { c: {} },            // Phase 17D: daily tasks, Codex milestones and challenge records (src/replay17d.js)
+      v18: { seen: {} },         // Phase 18B: Verdant Wilds places visited (src/verdant18b.js)
       struct: {},                // restored story buildings {id:true} (kept in sync with building levels)
       flags: {},                 // r1, r2, stone, arcDone, ...
       missions: {},              // quest id -> 'claimed'

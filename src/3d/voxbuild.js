@@ -456,7 +456,9 @@ export function natureModel(kind, seed, w, h) {
 }
 export const hasNature = (kind) => !!N[kind];
 const XSIZE = { skiff: [3, 2], lighthouse: [2.5, 2.5], jetty: [1, 4.5], plaza: [4, 4], stones: [3, 3] };
-export function extraModel(kind, variant) { const k = 'x|' + kind + '|' + (variant ? 1 : 0); if (cache.has(k)) return cache.get(k); if (!X[kind]) return null; const sz = XSIZE[kind] || [2, 2]; const m = new Model(sz[0], sz[1], 40, 0, 3, -18); X[kind](m, variant); const out = m.build(); cache.set(k, out); return out; }
+// Phase 18B: the library can give an extra its own footprint and height (the Elder Root is far taller than 40)
+export function extraSize(kind, w, h, maxY) { XSIZE[kind] = [w, h, maxY || 40]; }
+export function extraModel(kind, variant) { const k = 'x|' + kind + '|' + (variant ? 1 : 0); if (cache.has(k)) return cache.get(k); if (!X[kind]) return null; const sz = XSIZE[kind] || [2, 2]; const m = new Model(sz[0], sz[1], sz[2] || 40, 0, 3, -18); X[kind](m, variant); const out = m.build(); cache.set(k, out); return out; }
 export const hasExtra = (kind) => !!X[kind];
 export function disposeCache() { cache.forEach((v) => { [v.geo, v.glow, v.lod && v.lod.geo, v.lod && v.lod.glow].forEach((g) => g && g.dispose()); }); cache.clear(); }
 export { keyOf };
