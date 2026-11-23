@@ -1,0 +1,88 @@
+{
+ "note": "Chromium + SwiftShader (software WebGL) at 844×390, DPR 2. Not an iPhone: compare the islands, not absolute speed.",
+ "firstVisitMs": 3033,
+ "secondVisitMs": 1993,
+ "tiers": [
+  {
+   "island": "starter",
+   "tier": "high",
+   "calls": 76,
+   "triangles": 135070,
+   "geometries": 143,
+   "textures": 2,
+   "avgDrawMs": 501.27,
+   "p50": 550,
+   "p95": 733.2
+  },
+  {
+   "island": "verdant",
+   "tier": "high",
+   "calls": 90,
+   "triangles": 167184,
+   "geometries": 146,
+   "textures": 2,
+   "avgDrawMs": 423.06,
+   "p50": 649.9,
+   "p95": 699.9
+  },
+  {
+   "island": "starter",
+   "tier": "balanced",
+   "calls": 76,
+   "triangles": 132272,
+   "geometries": 143,
+   "textures": 2,
+   "avgDrawMs": 368.58,
+   "p50": 516.6,
+   "p95": 583.3
+  },
+  {
+   "island": "verdant",
+   "tier": "balanced",
+   "calls": 90,
+   "triangles": 164544,
+   "geometries": 146,
+   "textures": 2,
+   "avgDrawMs": 323.96,
+   "p50": 583.4,
+   "p95": 633.2
+  },
+  {
+   "island": "starter",
+   "tier": "saver",
+   "calls": 76,
+   "triangles": 81112,
+   "geometries": 189,
+   "textures": 2,
+   "avgDrawMs": 273.36,
+   "p50": 316.6,
+   "p95": 366.7
+  },
+  {
+   "island": "verdant",
+   "tier": "saver",
+   "calls": 90,
+   "triangles": 88086,
+   "geometries": 251,
+   "textures": 2,
+   "avgDrawMs": 240.29,
+   "p50": 316.6,
+   "p95": 350
+  }
+ ],
+ "leak": {
+  "before": {
+   "geometries": 251,
+   "textures": 2,
+   "nodes": 2002,
+   "heapMB": 61
+  },
+  "after": {
+   "geometries": 248,
+   "textures": 2,
+   "nodes": 2002,
+   "heapMB": 61
+  }
+ },
+ "errors": []
+}

@@ -168,18 +168,18 @@ const LEAFV = ['#2f8f48', '#26783c', '#3a9a50', '#358a40'], LEAFL = ['#4fbf63', 
 const barkV = (x, y, z) => pick(H(x, y, z, 470) > 0.8 ? PAL.woodDark : ['#7a5636', '#6a4a2c', '#86603e'], H(x, z, y, 471));
 // ELDER ROOT (a younger cousin of the great tree): a squat gnarled trunk on spreading roots, a dark heavy canopy, moss
 N.elderroot = (m, v) => {
-  for (let y = 0; y < 16; y++) m.disc(0, 0, 3.2 - y * 0.08 + (y < 3 ? (3 - y) * 0.7 : 0), y, y + 1, barkV);
-  for (let i = 0; i < 5; i++) { const a = i / 5 * Math.PI * 2 + v; for (let t = 0; t < 7; t++) { const x = Math.round(Math.cos(a) * (3 + t)), z = Math.round(Math.sin(a) * (3 + t)); m.box(x, 0, z, x + 1, Math.max(1, 4 - (t >> 1)), z + 1, barkV); } }
-  m.ball(0, 21, 0, 8 + (v % 2), 5, 8, (x, y, z) => pick(y > 22 ? LEAFL : LEAFV, H(x, y, z, 472 + v)));
-  m.ball(-4 + v, 17, 3, 4, 3, 4, (x, y, z) => pick(LEAFV, H(x, y, z, 475)));
-  for (let k = 0; k < 6; k++) { const x = Math.round((hash(k, v, 476) - 0.5) * 14), z = Math.round((hash(v, k, 477) - 0.5) * 14); for (let j = 0; j < 3 + (k % 3); j++) m.put(x, 16 - j, z, pick(MOSS, j)); }
+  for (let y = 0; y < 14; y++) m.disc(0, 0, 2.5 - y * 0.06 + (y < 3 ? (3 - y) * 0.6 : 0), y, y + 1, barkV);
+  for (let i = 0; i < 5; i++) { const a = i / 5 * Math.PI * 2 + v; for (let t = 0; t < 5; t++) { const x = Math.round(Math.cos(a) * (2.5 + t)), z = Math.round(Math.sin(a) * (2.5 + t)); m.box(x, 0, z, x + 1, Math.max(1, 3 - (t >> 1)), z + 1, barkV); } }
+  m.ball(0, 18, 0, 6.5 + (v % 2) * 0.5, 4, 6.5, (x, y, z) => pick(y > 19 ? LEAFL : LEAFV, H(x, y, z, 472 + v)));
+  m.ball(-3 + v, 15, 3, 3, 2.5, 3, (x, y, z) => pick(LEAFV, H(x, y, z, 475)));
+  for (let k = 0; k < 4; k++) { const x = Math.round((hash(k, v, 476) - 0.5) * 11), z = Math.round((hash(v, k, 477) - 0.5) * 11); for (let j = 0; j < 3 + (k % 3); j++) m.put(x, 14 - j, z, pick(MOSS, j)); }
 };
 // VINE TREE: a slender trunk under a light canopy, curtains of ivy hanging to the ground, a few flowers in the vines
 N.vinetree = (m, v) => {
   for (let y = 0; y < 20; y++) m.box(0, y, 0, 2, y + 1, 2, barkV);
-  m.ball(1, 23, 1, 6.5, 4, 6.5, (x, y, z) => pick(LEAFV.concat(LEAFL), H(x, y, z, 480 + v)));
-  for (let k = 0; k < 14; k++) { const a = k / 14 * Math.PI * 2, x = Math.round(1 + Math.cos(a) * 6), z = Math.round(1 + Math.sin(a) * 6), len = 6 + Math.floor(hash(k, v, 481) * 12);
-    for (let j = 0; j < len; j++) m.put(x, 21 - j, z, j === len - 1 && k % 4 === 0 ? ['#ff8fb8', '#ffe066', '#b48cff'][k % 3] : pick(IVY, H(k, j, v))); }
+  m.ball(1, 22, 1, 5.5, 3.5, 5.5, (x, y, z) => pick(LEAFV.concat(LEAFL), H(x, y, z, 480 + v)));
+  for (let k = 0; k < 9; k++) { const a = k / 9 * Math.PI * 2 + v * 0.3, x = Math.round(1 + Math.cos(a) * 5), z = Math.round(1 + Math.sin(a) * 5), len = 5 + Math.floor(hash(k, v, 481) * 9);
+    for (let j = 0; j < len; j++) m.put(x, 20 - j, z, j === len - 1 && k % 3 === 0 ? ['#ff8fb8', '#ffe066', '#b48cff'][k % 3] : pick(IVY, H(k, j, v))); }
 };
 // MOSSY RUIN: a broken corner of fitted pale stone, thick moss, a fallen block and a small doorway (two heights again)
 N.mossruin = (m, v) => {

@@ -1,0 +1,211 @@
+{
+ "root": "aminas18c",
+ "note": "Chromium + SwiftShader at 844x390 @2x; NOT an iPhone. Relative numbers only.",
+ "steps": [
+  {
+   "label": "start",
+   "heapMB": 28.5,
+   "nodes": 3100,
+   "island": {
+    "geometries": 73,
+    "textures": 1,
+    "programs": 16,
+    "calls": 74
+   },
+   "battle": null
+  },
+  {
+   "label": "after 12 round trips",
+   "heapMB": 43.8,
+   "nodes": 2685,
+   "island": {
+    "geometries": 131,
+    "textures": 1,
+    "programs": 16,
+    "calls": 74
+   },
+   "battle": null
+  },
+  {
+   "label": "after 10 battles",
+   "heapMB": 63.9,
+   "nodes": 2012,
+   "island": {
+    "geometries": 134,
+    "textures": 1,
+    "programs": 17,
+    "calls": 83
+   },
+   "battle": {
+    "geometries": 22,
+    "textures": 2,
+    "programs": 0,
+    "templates": 11,
+    "live": false
+   }
+  },
+  {
+   "label": "after 24 round trips and 10 battles",
+   "heapMB": 68.2,
+   "nodes": 2012,
+   "island": {
+    "geometries": 134,
+    "textures": 1,
+    "programs": 17,
+    "calls": 83
+   },
+   "battle": {
+    "geometries": 22,
+    "textures": 2,
+    "programs": 0,
+    "templates": 11,
+    "live": false
+   }
+  }
+ ],
+ "travelMs": [
+  2213,
+  1137,
+  1002,
+  1087,
+  1024,
+  135,
+  1755,
+  1105,
+  977,
+  1015,
+  130,
+  1740,
+  1022,
+  104,
+  1728,
+  1099,
+  917,
+  911,
+  955,
+  891,
+  946,
+  1053,
+  943,
+  1048,
+  1112,
+  1020,
+  1034,
+  938,
+  997,
+  931,
+  1052,
+  952,
+  916,
+  921,
+  921,
+  984,
+  1011,
+  901,
+  938,
+  1005,
+  934,
+  989,
+  908,
+  908,
+  902,
+  947,
+  947,
+  973
+ ],
+ "battles": [
+  {
+   "id": "v_mossgate",
+   "openMs": 1351,
+   "frames": 37,
+   "renderMs": 1.49,
+   "updateMs": 0.31,
+   "worstCpuMs": 16.3,
+   "missed": 0
+  },
+  {
+   "id": "v_aqueduct",
+   "openMs": 745,
+   "frames": 58,
+   "renderMs": 1.2,
+   "updateMs": 0.23,
+   "worstCpuMs": 3.2,
+   "missed": 0
+  },
+  {
+   "id": "v_spore",
+   "openMs": 801,
+   "frames": 56,
+   "renderMs": 1,
+   "updateMs": 0.19,
+   "worstCpuMs": 2.2,
+   "missed": 0
+  },
+  {
+   "id": "v_archive",
+   "openMs": 720,
+   "frames": 44,
+   "renderMs": 1.23,
+   "updateMs": 0.23,
+   "worstCpuMs": 4.9,
+   "missed": 0
+  },
+  {
+   "id": "v_glow",
+   "openMs": 801,
+   "frames": 45,
+   "renderMs": 0.91,
+   "updateMs": 0.22,
+   "worstCpuMs": 2.1,
+   "missed": 0
+  },
+  {
+   "id": "v_twinshrine",
+   "openMs": 785,
+   "frames": 47,
+   "renderMs": 0.96,
+   "updateMs": 0.45,
+   "worstCpuMs": 12.9,
+   "missed": 0
+  },
+  {
+   "id": "v_canopy",
+   "openMs": 776,
+   "frames": 47,
+   "renderMs": 0.98,
+   "updateMs": 0.23,
+   "worstCpuMs": 2.6,
+   "missed": 0
+  },
+  {
+   "id": "v_moonwell",
+   "openMs": 812,
+   "frames": 54,
+   "renderMs": 0.98,
+   "updateMs": 0.18,
+   "worstCpuMs": 2.3,
+   "missed": 0
+  },
+  {
+   "id": "v_choir",
+   "openMs": 1219,
+   "frames": 57,
+   "renderMs": 0.9,
+   "updateMs": 0.21,
+   "worstCpuMs": 4.1,
+   "missed": 0
+  },
+  {
+   "id": "v_elderroot",
+   "openMs": 732,
+   "frames": 49,
+   "renderMs": 0.86,
+   "updateMs": 0.2,
+   "worstCpuMs": 2.4,
+   "missed": 0
+  }
+ ],
+ "errors": [],
+ "travelP50": 977,
+ "travelP95": 1740
+}

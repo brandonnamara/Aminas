@@ -118,7 +118,7 @@
      always cover the buildings. For each of them we hand the 3D layer a proxy in world space: an upright card
      standing at the sprite's feet (creatures, pillars, floating markers) or a flat card on the ground (rings and
      glows). The 3D layer then repaints, on a thin canvas above the SVG, exactly the pixels of 3D objects that are in
-     front of those proxies. Interface parts (bubbles, timers, tags, the ghost, quest highlights) are cut out of that
+     front of those proxies. Interface parts (bubbles, timers, tags, the ghost, quest highlights; Phase 18D: landmark and entrance number tags) are cut out of that
      canvas so they always stay on top. Taps are unchanged: everything interactive is still the SVG. */
   // Phase 18B: the Verdant Wilds' places stand in their own 3D models and carry only interface markers (a number or a
   // question mark), which, like building markers, are never covered; leaving them out keeps panning as cheap as on Starter Island
@@ -157,7 +157,7 @@
     });
     if (!up.length && !flat.length) return { sig: '', up, flat, cut, rect: null };
     // interface parts that must never be covered
-    document.querySelectorAll('#objs .bld > g:not(.artg), #objs .obs > g:not(.artg), #ghost > *, #hlx > *, #objs .creature .zz, #objs .creature .cr-heart').forEach((e) => { const r = e.getBoundingClientRect(); if (r.width && r.height && onScreen(r)) cut.push([r.left - wr.left, r.top - wr.top, r.width, r.height]); });
+    document.querySelectorAll('#objs .bld > g:not(.artg), #objs .obs > g:not(.artg), #ghost > *, #hlx > *, #objs .creature .zz, #objs .creature .cr-heart, #objs .lm .tagq').forEach((e) => { const r = e.getBoundingClientRect(); if (r.width && r.height && onScreen(r)) cut.push([r.left - wr.left, r.top - wr.top, r.width, r.height]); });
     const pad = 10, rect = [Math.max(0, Math.floor(ux0 - pad)), Math.max(0, Math.floor(uy0 - pad)), 0, 0]; rect[2] = Math.min(Math.ceil(ux1 + pad), Math.round(wr.width)) - rect[0]; rect[3] = Math.min(Math.ceil(uy1 + pad), Math.round(wr.height)) - rect[1];
     // the signature ignores small wobbles (bobbing markers, pulsing rings, floating z's): creatures are measured
     // exactly, everything else to the nearest 8 px, interface cut-outs to 16 px
