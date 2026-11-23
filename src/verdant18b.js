@@ -26,7 +26,7 @@
   // Every cell listed here is sand, path, water, bridge or the old landmark slot: never buildable grass ('g'), so no
   // player building can stand on one. Tests check this against the map.
   D.V18 = {
-    live: false, // the campaign switch: Phase 18C turns it on together with playable dungeon data
+    live: true, // the campaign switch: on since Phase 18C, with the ten playable dungeons in campaign-data.js
     island: 'verdant',
     sites: [
       { id: 'landing', kind: 'v_landing', name: 'Landing Cove', x: 16, y: 28, w: 1, h: 1, role: 'arrival',
@@ -76,7 +76,7 @@
 
   /* ---------- explore areas (existing species only; opened by their dungeon) ---------- */
   Object.assign(D.AREAS, {
-    glowcap: { name: 'Glowcap Glade', island: 'verdant', blurb: 'Mushroom light under old trees. Something in the moss is watching, politely.', unlock: { v18: 'v_mossgate' },
+    glowcap: { name: 'Glowcap Glade', island: 'verdant', blurb: 'Mushroom light under old trees. Something in the moss is watching, politely.', unlock: { island: 'verdant' }, // Phase 18C: open on arrival (approved)
       steps: [['res', 30, 7], ['find', 'terraflora2'], ['res', 32, 7], ['find', 'sylvaneer2'], ['res', 34, 8], ['find', 'berrant']] },
     streamside: { name: 'Streamside', island: 'verdant', blurb: 'Where the aqueduct spills into the wild streams. Mind the slippery stones.', unlock: { v18: 'v_aqueduct' },
       steps: [['res', 32, 7], ['find', 'aquaflora2'], ['res', 34, 8], ['find', 'tidalong'], ['res', 36, 8], ['find', 'reefback']] },
@@ -140,6 +140,46 @@
   V.seen = (st, id) => !!(st.v18 && st.v18.seen && st.v18.seen[id]);
   V.progress = (st) => { const ids = D.V18.sites.filter((s) => !s.part).map((s) => s.id); return { seen: ids.filter((id) => V.seen(st, id)).length, total: ids.length }; };
 
+  /* ---------- Phase 18C: the Twin Shrine's gift (optional, once) ----------
+     After the Twin Shrine is first cleared, the shrine offers the second form of the starter you did not choose
+     (Solarbloom or Duskmantle). Your own starter is never touched. If you already have that form, the shrine offers its
+     element's essence and gems instead. Claiming is never needed to finish the campaign. Older saves without a recorded
+     starter are judged by the line they own. Recorded in st.v18.gift so it can never be claimed twice. */
+  D.V18.gift = { lv: 26, of: { lumifern: 'duskmantle', umbrit: 'solarbloom' }, alt: { essence: 40, gems: 8 } };
+  V.starterOf = function (st) {
+    if (st.starter === 'lumifern' || st.starter === 'umbrit') return st.starter;
+    const own = (line) => (D.LINES[line] ? D.LINES[line].ids : []).some((id) => st.owned && st.owned[id]);
+    const L = own(D.SPECIES.lumifern.line), U = own(D.SPECIES.umbrit.line);
+    return L && !U ? 'lumifern' : U && !L ? 'umbrit' : 'lumifern';
+  };
+  V.giftOffer = function (st) {
+    if (!D.DUNGEONS.v_twinshrine || !R.dungeonCleared(st, 'v_twinshrine')) return { state: 'locked' };
+    if (st.v18 && st.v18.gift) return { state: 'claimed', got: st.v18.gift };
+    const sp = D.V18.gift.of[V.starterOf(st)], owned = !!(st.owned && st.owned[sp]);
+    return { state: 'ready', sp, kind: owned ? 'alt' : 'amina', el: D.SPECIES[sp].el, essence: D.V18.gift.alt.essence, gems: D.V18.gift.alt.gems, lv: D.V18.gift.lv };
+  };
+  V.claimGift = function (st) {
+    const o = V.giftOffer(st); if (o.state !== 'ready') return { ok: false, reason: o.state };
+    st.v18 = st.v18 || { seen: {} };
+    if (o.kind === 'amina') {
+      const inst = R.addAmina(st, o.sp, o.lv); if (!inst) return { ok: false, reason: 'full' };
+      st.v18.gift = { t: now() || 1, kind: 'amina', sp: o.sp, uid: inst.uid };
+      if (R.emit) R.emit('v18gift', { sp: o.sp }); return { ok: true, kind: 'amina', sp: o.sp, inst };
+    }
+    if (R.Essence && R.Essence.gain) R.Essence.gain(st, o.el, o.essence, 'shrine'); R.addRes(st, { gems: o.gems });
+    st.v18.gift = { t: now() || 1, kind: 'alt', sp: o.sp, el: o.el, essence: o.essence, gems: o.gems };
+    if (R.emit) R.emit('v18gift', { alt: true }); return { ok: true, kind: 'alt', el: o.el, essence: o.essence, gems: o.gems };
+  };
+
+  /* ---------- Phase 18C: the arrival scene, once (also for saves that reached the island before 18C) ---------- */
+  V.arrivalDue = (st) => !!(D.V18.live && st && W.islandUnlocked(st, D.V18.island) && st.currentIsland === D.V18.island && !(st.story && st.story.scenes && st.story.scenes.v_arrival) && !(st.story && st.story.pendingScene));
+  V.queueArrival = function (st) { if (!V.arrivalDue(st)) return false; st.story = st.story || {}; st.story.pendingScene = 'v_arrival'; return true; };
+  if (R.on) R.on((ev) => { if (ev.name === 'traveled' && ev.data && ev.data.island === D.V18.island) { const st = A.State && A.State.state; if (st) V.queueArrival(st); } });
+
+  /* ---------- Phase 18C: each Verdant dungeon's first-clear item (existing items that had no source yet) ---------- */
+  if (D.DUNGEON_GEAR) Object.assign(D.DUNGEON_GEAR, { v_mossgate: 'ironbark', v_aqueduct: 'tideplate', v_spore: 'heartmail', v_archive: 'stoneclub', v_glow: 'blazefang',
+    v_twinshrine: 'eclipseorb', v_canopy: 'galeplume', v_moonwell: 'moonpearl', v_choir: 'chorusshell', v_elderroot: 'elderguard' });
+
   /* ---------- island readiness: travel, unlocks and quest pointers ---------- */
   const travel0 = W.travel;
   W.travel = function (st, id) {
@@ -166,6 +206,10 @@
     if (!st.v18.seen || typeof st.v18.seen !== 'object') st.v18.seen = {};
     Object.keys(st.v18.seen).forEach((k) => { if (!SITE[k] && !G[k]) delete st.v18.seen[k]; else st.v18.seen[k] = +st.v18.seen[k] || 1; });
     if (st.currentIsland && !W.islandLive(st.currentIsland)) st.currentIsland = W.islandUnlocked(st, 'verdant') ? 'verdant' : 'starter';
+    // a save whose Island Boss fell while the next island was not ready gets that island once it is marked ready
+    D.ISLAND_ORDER.forEach((iid) => { const c = D.CAMPAIGN[iid]; if (c && c.next && W.islandLive(c.next) && !W.islandUnlocked(st, c.next) && R.islandBossDefeated(st, iid)) W.unlockByBoss(st, c.next); });
+    if (st.v18.gift && typeof st.v18.gift !== 'object') st.v18.gift = { t: 1, kind: 'unknown' };
+    V.queueArrival(st);
     return st;
   };
   if (A.State && A.State.sanitize) { const san0 = A.State.sanitize; A.State.sanitize = function (st) { const r = san0.apply(this, arguments); V.settle(st); return r; }; }

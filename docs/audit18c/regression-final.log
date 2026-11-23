@@ -1,0 +1,105 @@
+baseline: 5 passed, 0 failed
+campaign: 60 passed, 0 failed
+migration v0.6: 22 passed, 0 failed
+modes: 41 passed, 0 failed
+forge: 53 passed, 0 failed
+dev8: 49 passed, 0 failed
+browser v0.6: 48 passed, 0 failed
+browser dev7: 30 passed, 0 failed
+browser-dev8.test.js: FAILED
+  ok  New Game opens the avatar creator before the story starts
+  ok  the first-time creator cannot be dismissed without confirming
+  ok  tapping outside does not skip it
+  ok  the chosen look and a cleaned-up name are saved
+  ok  confirming continues into the story
+  ok  a returning player loads straight into the island (no creator)
+  ok  the avatar survives a reload
+  ok  an existing save loads into the island without forcing the creator
+  ok  it migrated to schema 6 with progress intact
+  ok  the player’s avatar head sits in the top-left corner
+  ok  the HUD says Player Rank (no Caretaker Rank)
+  ok  gold, food and gems use the new pixel sprites
+  ok  a not-yet-customised avatar shows a gentle hint, not a forced screen
+  ok  tapping it opens the profile: Player Stats, Achievements, Customisation
+  ok  Player Stats shows rank and real statistics
+  ok  Achievements lists progress
+  ok  Customisation reopens the creator and saves the change
+  ok  the monster preview is smaller (212px wide, was 354px)
+  ok  no feed buttons until a monster is picked
+  ok  tapping it picks that monster and shows who will be fed, then Snack and Feast
+  ok  the card holds still while a monster is picked
+  ok  a Snack costs 3 food and feeds only the picked monster
+  ok  closing the pick hides the feed buttons again
+  ok  at the level cap the feed buttons are hidden
+  ok  upgrading from the preview spends 10 Light Essence once (double tap) and shows Lv 2
+  ok  the Creatures detail (Moves and Battle tabs) shows the same Lv 2
+  ok  and can upgrade there too (Lv 3, 25 more essence)
+  ok  moving a placed building has no Done button
+  ok  dropping it on a valid spot moves it for real, straight away
+  ok  an invalid drop is refused and it snaps back, with a reason
+  ok  the new position survives a reload
+  ok  Undo puts it back where this move started
+  ok  a Water Habitat offers Gold or Water Essence
+  ok  switching asks first, collects the 25 stored gold, then makes Water Essence
+  ok  the choice persists after a reload
+  ok  the wallet lists gold, food, gems and nine essences
+  ok  every dungeon has its own battle backdrop (20 different)
+  ok  every boss room looks different from that dungeon’s normal battles
+FAIL  pixel bursts remove themselves (5 → 0 after a second)
+  ok  667×375: avatar, preview and buttons fit without overlapping
+  ok  932×430: avatar, preview and buttons fit without overlapping
+  ok  no console errors
+
+browser dev8: 41 passed, 1 failed
+
+browser env1: 21 passed, 0 failed
+browser env1.2: 10 passed, 0 failed
+browser library: 11 passed, 0 failed
+PASSED: 19 passed, 0 failed (browser-env3)
+PASSED: 10 passed, 0 failed (browser-env4)
+PASSED: 12 passed, 0 failed (browser-ui5)
+PASSED: 45 passed, 0 failed (browser-ui6)
+PASSED: 30 passed, 0 failed (browser-arena7)
+PASSED: 31 passed, 0 failed (browser-bench-battle)
+PASSED: 23 passed, 0 failed (browser-perf-fix)
+PASSED: 38 passed, 0 failed (browser-showcase8)
+PASSED: 38 passed, 0 failed (browser-p8fix)
+PASSED: 47 passed, 0 failed (browser-roster8b)
+raid12a: 31 passed, 0 failed
+PASSED: 18 passed, 0 failed (browser-raid12a)
+hideseek: 60 passed, 0 failed
+PASSED: 41 passed, 0 failed (browser-hideseek)
+hideseek12c: 30 passed, 0 failed
+PASSED: 58 passed, 0 failed (browser-hideseek12c)
+progression13a: 40 passed, 0 failed
+PASSED: 41 passed, 0 failed (browser-progress13a)
+hatchery13b: 41 passed, 0 failed
+PASSED: 35 passed, 0 failed (browser-hatchery13b)
+gear13c: 46 passed, 0 failed
+PASSED: 39 passed, 0 failed (browser-gear13c)
+economy13d: 14 passed, 0 failed
+PASSED: 5 passed, 0 failed (browser-rewards13d)
+PASSED: 31 passed, 0 failed (browser-models14)
+PASSED: 16 passed, 0 failed (browser-world14)
+40 passed, 0 failed
+browser-roster15b: 37 passed, 0 failed
+browser-combat15c: 33 passed, 0 failed
+browser-final15d: 37 passed, 0 failed
+PASSED: 12 passed, 0 failed (browser-intro14)
+onboard16: 37 passed, 0 failed
+69 passed, 0 failed (browser-onboard16)
+savefile16b: 47 passed, 0 failed
+34 passed, 0 failed (browser-polish16b)
+20 passed, 0 failed (browser-stability16c)
+combat17b: 31 passed, 0 failed
+rewards17b: 40 passed, 0 failed
+10 passed, 0 failed (browser-combat17b)
+progression17c: 48 passed, 0 failed
+14 passed, 0 failed (browser-progression17c)
+replay17d: 70 passed, 0 failed
+15 passed, 0 failed (browser-replay17d)
+verdant18b: 53 passed, 0 failed
+browser-verdant18b: 22 passed, 0 failed
+campaign18c: 98 passed, 0 failed
+browser-campaign18c: 18 passed, 0 failed
+stability18c: 5 passed, 0 failed

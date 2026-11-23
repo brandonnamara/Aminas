@@ -107,3 +107,7 @@ body.calm .ov-ghost16 { display: none; }
 @keyframes v18hum { 0%, 100% { opacity: 0; } 18% { opacity: .1; } 23% { opacity: 0; } 61% { opacity: .16; } 70% { opacity: .02; } 74% { opacity: .08; } 80% { opacity: 0; } }
 body.calm .lm .v18hum { animation: none; opacity: .08; }
 @media (prefers-reduced-motion: reduce) { .lm .v18hum { animation: none; opacity: .08; } }
+/* Phase 18C: the Twin Shrine's gift */
+.v18-gift { border: 1px solid rgba(255, 230, 160, .4); border-radius: .7rem; padding: .5rem .6rem; background: linear-gradient(90deg, rgba(255, 246, 192, .14), rgba(120, 100, 200, .14)); display: flex; flex-direction: column; gap: .3rem; }
+.v18-gift p { margin: 0; }
+.v18-gift.done { opacity: .8; }

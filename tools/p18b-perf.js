@@ -11,7 +11,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   const ev = (fn, a) => page.evaluate(fn, a);
   await page.goto(srv.url); await page.waitForFunction(() => window.A && A.UI && A.UI.screen === 'title');
   await ev(() => { const s = A.State.newGame(), R = A.Rules; s.phase = 'play'; s.introDone = true; s.avatar = { made: true, name: 'R', look: null }; s.starter = 'lumifern'; s.settings.sfx = false; s.settings.music = false; A.Perf.reportSlow = () => {}; A.Perf.autoSaver = false;
-    R.addAmina(s, 'lumifern', 30); R.addAmina(s, 'kairyu', 24); s.islands.verdant = { unlocked: true, obstacles: {} }; s.currentIsland = 'starter'; A.State.state = s; R.drain(); A.UI.showIsland(true); });
+    R.addAmina(s, 'lumifern', 30); R.addAmina(s, 'kairyu', 24); s.islands.verdant = { unlocked: true, obstacles: {} }; s.currentIsland = 'starter'; s.story.scenes = Object.assign(s.story.scenes || {}, { v_arrival: 'seen' }); A.State.state = s; R.drain(); A.UI.showIsland(true); });
   await page.waitForFunction(() => A.VoxIsland.ready(), null, { timeout: 60000 }); await sleep(2000);
   const out = { note: 'Chromium + SwiftShader (software WebGL) at 844×390, DPR 2. Not an iPhone: compare the islands, not absolute speed.' };
   // first visit: time from the travel call to the island drawn (models built and merged)
@@ -30,5 +30,5 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   for (let k = 0; k < 10; k++) await ev(async () => { A.UI.travelTo('starter'); await new Promise((r) => setTimeout(r, 700)); A.UI.travelTo('verdant'); await new Promise((r) => setTimeout(r, 700)); });
   await sleep(1500); const after = await snap(); out.leak = { before, after };
   out.errors = errors; console.log(JSON.stringify(out, null, 1));
-  fs.writeFileSync(path.join(__dirname, '../docs/audit18b/perf.json'), JSON.stringify(out, null, 1)); await browser.close(); srv.close();
+  fs.writeFileSync(path.join(__dirname, process.env.PERF_OUT || '../docs/audit18b/perf.json'), JSON.stringify(out, null, 1)); await browser.close(); srv.close();
 })().catch((e) => { console.error(e); process.exit(1); });

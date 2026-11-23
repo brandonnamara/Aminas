@@ -51,12 +51,12 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms)); const SHOTS = proce
   await shot('sheet-archive');
   await tidy();
   await tapAt('v_mossgate'); console.log('  sheet: ' + await ev(() => (document.querySelector('.v18-sheet h2') || {}).textContent));
-  ok(await ev(() => !!document.querySelector('.v18-gate')) && await ev(() => /Dungeon 1 of 10/.test(document.querySelector('.v18-gate').textContent) && /Sealed/.test(document.querySelector('.v18-gate').textContent) && !document.querySelector('[data-act="v18Enter"]')), 'the first entrance (Mossgate Steps) is sealed, not open: its turn has come, its battles are not built');
+  ok(await ev(() => !!document.querySelector('.v18-gate')) && await ev(() => /Dungeon 1 of 10/.test(document.querySelector('.v18-gate').textContent) && /Open/.test(document.querySelector('.v18-gate').textContent) && !!document.querySelector('[data-act="v18Enter"]')), 'Phase 18C: the first entrance (Mossgate Steps) is open, with an Enter button');
   await shot('sheet-mossgate'); await tidy();
   for (const id of ['shrine', 'choir', 'elderroot', 'settle', 'aqueduct', 'landing']) { await ev((i) => A.UI.v18Open(i), id); await sleep(250); if (SHOTS && (id === 'shrine' || id === 'elderroot' || id === 'choir')) await shot('sheet-' + id); await tidy(); }
-  const all = await ev(() => { const s = A.State.state, V = A.Rules.V18; return { prog: V.progress(s), anyOpen: A.Data.V18.gates.some((g) => V.canEnter(s, g.id)), run: A.Rules.startRun(s, 'v_mossgate', s.aminas.slice(0, 3).map((a) => a.uid)) }; });
+  const all = await ev(() => { const s = A.State.state, V = A.Rules.V18; return { prog: V.progress(s), anyOpen: A.Data.V18.gates.some((g) => V.canEnter(s, g.id)), run: A.Rules.startRun(s, 'v_aqueduct', s.aminas.slice(0, 3).map((a) => a.uid)), open: A.Data.V18.gates.filter((g) => V.canEnter(s, g.id)).map((g) => g.id).join() }; });
   ok(all.prog.seen === all.prog.total && all.prog.total === 7, 'all seven places can be visited (' + all.prog.seen + ' of ' + all.prog.total + ')');
-  ok(!all.anyOpen && all.run.ok === false, 'no entrance is open, and starting a Verdant run directly is refused (' + all.run.reason + ')');
+  ok(all.open === 'v_mossgate' && all.run.ok === false, 'Phase 18C: only the first entrance is open, and starting a locked Verdant dungeon directly is refused (' + all.run.reason + ')');
   const dd = await ev(() => { A.UI.dungeons(); return [...document.querySelectorAll('.overlay [data-act="dIsle"], .overlay .isle-tab')].map((e) => e.textContent).join('|') + '#' + !!document.querySelector('.overlay'); });
   ok(!/Verdant/.test(dd), 'the Dungeons screen is unchanged: no Verdant tab while it has no playable dungeons');
   await tidy();
@@ -80,6 +80,10 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms)); const SHOTS = proce
   ok(tr.every((t, k) => t.i === ['starter', 'verdant', 'starter', 'verdant'][k] && t.vox && (t.i === 'verdant' ? t.n >= 16 : t.n === 0)), 'travelling to Starter Island and back twice keeps both islands whole (places only on the Verdant Wilds; voxel island on both)');
   await shot('verdant-after-travel');
   // no GPU geometry, texture or DOM growth across island switches (a pre-existing meadow-detail leak, found here, is fixed)
+  // warm-up: Starter Island's imported Hatchery model (and its two textures) loads once, the first time it is drawn; the
+  // check below is about growth across trips, so it starts after that one-time load (Phase 18C: an arrival scene now
+  // plays on the first trip and moved that load into the measured window)
+  await ev(async () => { A.UI.travelTo('starter'); for (let i = 0; i < 100 && !A.VoxIsland.models().some((m) => m.type === 'hatchery'); i++) await new Promise((r) => setTimeout(r, 200)); A.UI.travelTo('verdant'); await new Promise((r) => setTimeout(r, 800)); }); await tidy();
   const lk0 = await ev(() => ({ g: A.VoxIsland.stats().geometries, t: A.VoxIsland.stats().textures, n: document.getElementsByTagName('*').length }));
   for (let k = 0; k < 6; k++) await ev(async () => { A.UI.travelTo('starter'); await new Promise((r) => setTimeout(r, 600)); A.UI.travelTo('verdant'); await new Promise((r) => setTimeout(r, 600)); });
   await sleep(800); await tidy(); const lk1 = await ev(() => ({ g: A.VoxIsland.stats().geometries, t: A.VoxIsland.stats().textures, n: document.getElementsByTagName('*').length }));

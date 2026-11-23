@@ -717,6 +717,8 @@
   // Builds an enemy fighter from a battle spec (dungeons, survival champions).
   R.enemyFromSpec = function (spec) {
     const e = B.fighter(spec.sp, spec.lv, { name: spec.title || null, hpMult: spec.hpMult });
+    // Phase 18C: an island foe tier (D.CAMPAIGN[iid].foeTier, stamped per battle in campaign-data.js)
+    if (spec.tier) { e.hpMax = Math.round(e.hpMax * (spec.tier.hp || 1)); e.hp = e.hpMax; e.atk = Math.round(e.atk * (spec.tier.atk || 1)); }
     if (spec.boss) e.boss = true;
     if (spec.islandBoss) e.islandBoss = true;
     if (spec.move) { e.move = spec.move; e.chargeIn = 1; }

@@ -51,27 +51,23 @@ ok(D.V18.gates.filter((g) => g.site).every((g) => { const s = V.site(g.site); re
 ok(D.V18.sites.find((s) => s.slot).x === 21 && D.V18.sites.find((s) => s.slot).kind === 'elderroot' && isl.map[20].slice(21, 24) === 'xxx', 'the Elder Root is the island’s existing landmark slot (21–23, 20–22)');
 ok(D.V18.gates.length === 10 && D.V18.gates.map((g) => g.n).join() === '1,2,3,4,5,6,7,8,9,10' && new Set(D.V18.gates.map((g) => g.id)).size === 10, 'ten entrances, numbered in the Phase 18A order, each with its own id');
 ok(D.V18.gates.map((g) => g.rec).join() === '22,24,25,27,28,30,31,33,34,36', 'recommended levels follow Band C (22 to 36)');
-ok(D.V18.gates.every((g) => !D.DUNGEONS[g.id]) && D.CAMPAIGN.verdant.dungeons.length === 0, 'no Verdant dungeon data exists yet (the campaign is not implemented)');
+// Phase 18C: the campaign now exists. Every entrance has playable dungeon data with its own id, in order.
+ok(D.V18.gates.every((g, i) => D.DUNGEONS[g.id] && D.DUNGEONS[g.id].playable && D.CAMPAIGN.verdant.dungeons[i] === g.id), 'Phase 18C: each entrance has its playable dungeon, in the same order as the island campaign');
 
-/* ---------- gate states: locked, sealed, never open in this build ---------- */
+/* ---------- gate states (Phase 18C: open, in order) ---------- */
 {
   const s = fresh();
   ok(V.gates(s).every((g) => g.state === 'locked'), 'before the Verdant Wilds is reached every entrance is locked');
   s.islands.verdant = { unlocked: true, obstacles: {} };
   const gs = V.gates(s);
-  ok(gs[0].state === 'sealed' && gs.slice(1).every((g) => g.state === 'locked'), 'once there, Dungeon 1 is sealed (its turn has come) and 2–10 are locked behind the one before');
+  ok(gs[0].state === 'open' && gs.slice(1).every((g) => g.state === 'locked'), 'once there, Dungeon 1 is open and 2–10 are locked behind the one before');
   ok(/Opens after the Mossgate Steps/.test(gs[1].text) && /Opens after the Choir of Roots/.test(gs[9].text), 'a locked entrance names the dungeon that opens it');
-  ok(D.V18.gates.every((g) => !V.canEnter(s, g.id)), 'no entrance can be entered');
-  const run = R.startRun(s, 'v_mossgate', []), run2 = R.startRun(s, 'v_elderroot', []);
-  ok(run.ok === false && run2.ok === false && !s.run, 'starting a Verdant run directly is refused, and no run starts');
-  // even with the campaign switch on, an entrance needs real, playable dungeon data before it opens
+  const run2 = R.startRun(s, 'v_elderroot', s.aminas.map((a) => a.uid));
+  ok(run2.ok === false && !s.run, 'a locked Verdant dungeon cannot be started directly');
+  // the campaign switch still closes everything (a safety valve for later islands' patterns)
+  D.V18.live = false;
+  ok(V.gateState(s, 'v_mossgate').state === 'sealed' && R.startRun(s, 'v_mossgate', []).ok === false, 'with the campaign switch off, the open entrance goes back to sealed and cannot be entered');
   D.V18.live = true;
-  ok(V.gateState(s, 'v_mossgate').state === 'sealed', 'turning the campaign switch on without dungeon data still opens nothing');
-  // the activation path (Phase 18C): a playable dungeon with the gate's id, on this island
-  D.DUNGEONS.v_mossgate = { id: 'v_mossgate', name: 'Mossgate Steps', island: 'verdant', playable: true };
-  ok(V.gateState(s, 'v_mossgate').state === 'open' && V.gateState(s, 'v_aqueduct').state === 'locked', 'with playable data the first entrance opens and the second still waits for it');
-  delete D.DUNGEONS.v_mossgate; D.V18.live = false;
-  ok(V.gateState(s, 'v_mossgate').state === 'sealed', 'and closes again when that data is removed (test restored)');
 }
 
 /* ---------- navigation: everything is reachable on foot from the landing ---------- */
@@ -105,9 +101,9 @@ ok(D.V18.gates.every((g) => !D.DUNGEONS[g.id]) && D.CAMPAIGN.verdant.dungeons.le
   const s = fresh();
   ok(ids.every((id) => !R.areaListed(s, id)) && ['meadow', 'tidepools'].every((id) => R.areaListed(s, id)), 'they are not listed on the Explore screen before the island is reached');
   s.islands.verdant = { unlocked: true, obstacles: {} };
-  ok(ids.every((id) => R.areaListed(s, id) && !R.areaUnlocked(s, id)), 'once it is reached they are listed, locked');
-  ok(/Mossgate Steps \(Dungeon 1\)/.test(W.reqText(D.AREAS.glowcap.unlock)) && /Canopy Walk/.test(W.reqText(D.AREAS.canopyedge.unlock)), 'each says which dungeon opens it');
-  const e = R.explore(s, 'glowcap'); ok(e.ok === false && e.reason === 'locked' && !(s.stats.explores || {}).glowcap, 'exploring one is refused and counts nothing');
+  ok(ids.every((id) => R.areaListed(s, id)) && R.areaUnlocked(s, 'glowcap') && !R.areaUnlocked(s, 'streamside') && !R.areaUnlocked(s, 'canopyedge'), 'once it is reached they are listed: Glowcap Glade open on arrival (Phase 18C), the other two locked');
+  ok(/Drowned Aqueduct/.test(W.reqText(D.AREAS.streamside.unlock)) && /Canopy Walk/.test(W.reqText(D.AREAS.canopyedge.unlock)), 'the locked two say which dungeon opens them');
+  const e = R.explore(s, 'streamside'); ok(e.ok === false && e.reason === 'locked' && !(s.stats.explores || {}).streamside, 'exploring a locked one is refused and counts nothing');
   ok(R.AREA_LV.glowcap === 18 && R.AREA_LV.canopyedge === 24 && R.AREA_LV.meadow === 2, 'befriend levels are set for later (18, 20, 24); the old areas keep theirs');
   ok(R.reqMet(s, { struct: 'hollow' }) === R.reqMet(s, { struct: 'hollow', island: 'verdant' }) && R.reqMet(fresh(), { island: 'verdant' }) === false, 'requirements gain an island condition without changing the others');
 }

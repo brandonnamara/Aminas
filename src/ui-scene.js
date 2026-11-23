@@ -29,6 +29,7 @@
     const finish = (how) => {
       if (finished) return; finished = true; clearTimeout(tm); clearTimeout(autoTm);
       box.classList.add('out'); setTimeout(() => box.remove(), calm ? 0 : 350);
+      if (UI.sceneBox === box) UI.sceneBox = null; // Phase 18C fix: a finished scene no longer blocks the next pending one this session
       if (!opts.replay) { R.sceneDone(st(), id, how); S.save(); R.drain(); }
       UI.busy = false;
       if (done) done(how);

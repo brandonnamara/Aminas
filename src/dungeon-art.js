@@ -120,6 +120,45 @@
     [...Array(10)].map((_, i) => blk(i * 104, 260 - (i % 4) * 30, 104, i % 2 ? '#98a0aa' : '#a8b0b8', 260)).join('') + [...Array(6)].map((_, i) => blk(80 + i * 60, 330 - i * 26, 60, '#8e96a0', 24)).join('') +
     (o.boss ? blk(560, 60, 90, '#a0a8b0', 300) + blk(580, 20, 50, '#8e96a0', 44) + '<rect x="603" y="-10" width="4" height="34" fill="#6a5a4a"/><path d="M560 -6h90l-14 10 14 10h-90z" fill="#ffd86b"/>' + glowE(605, 200, 120, 220, '#8fe6d6', 0.15) : '') +
     '<rect y="400" width="1000" height="100" fill="#8e96a0"/>' + motes('#ffffff');
+  /* ---- Phase 18C: the Verdant Wilds' ten dungeons, each with its own backdrop (normal and boss room), in the
+     island's jungle palette: mossy green-grey stone, deep greens, teal water, gold spores. Same flat voxel style. ---- */
+  const VS = { moss: '#5fa34e', mossD: '#3f7a3a', stone: '#8a9a88', stoneD: '#5e6e5c', leaf: '#2f8f48', leafL: '#4fbf63', water: '#3db4c4', bark: '#6a4a2c' };
+  // flat blocks for wide pieces (blk's top light grows with width, which suits columns but not long slabs)
+  const fr = (x, y, w, h, c) => '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" fill="' + c + '"/><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + Math.min(4, h) + '" fill="' + shade(c, 0.22) + '"/><rect x="' + (x + w - Math.min(6, w * 0.1)) + '" y="' + y + '" width="' + Math.min(6, w * 0.1) + '" height="' + h + '" fill="' + shade(c, -0.25) + '"/>';
+  const vstone = (x, y, w, h) => fr(x, y, w, h, VS.stone) + fr(x, y, w, Math.max(5, Math.round(h * 0.15)), VS.moss);
+  const vfloor = (c) => '<rect y="390" width="1000" height="110" fill="' + c + '"/>';
+  SCENES.v_mossgate = (o) => sky('vm', o.boss ? '#1f4a3a' : '#7ec8a8', o.boss ? '#3f7a5a' : '#c8ecd0', '#9ad0a0') + hills(31, VS.leafL, VS.leaf, '#2a6a38', 250, 14) +
+    [...Array(7)].map((_, i) => vstone(330 + i * 10, 380 - i * 34, 340 - i * 20, 34)).join('') + [0, 1].map((i) => vstone(260 + i * 440, 180, 40, 210)).join('') + (o.boss ? vstone(250, 150, 500, 40) + glowE(500, 200, 120, 60, '#bff7a8', 0.3) : '') + vfloor('#3f6a3a') + motes('#fff4c0');
+  SCENES.v_aqueduct = (o) => sky('va', o.boss ? '#0f2a3a' : '#5ab0c8', o.boss ? '#1f5a6a' : '#a8e0e8', '#6ab8c8') +
+    [...Array(6)].map((_, i) => vstone(40 + i * 170, 120, 40, 270)).join('') + vstone(20, 100, 960, 36) + '<rect x="20" y="96" width="960" height="8" fill="' + VS.water + '"/>' +
+    '<rect y="330" width="1000" height="170" fill="' + VS.water + '" opacity=".85"/>' + [0, 1, 2, 3].map((i) => '<rect x="' + (90 + i * 230) + '" y="' + (350 + (i % 2) * 18) + '" width="120" height="6" fill="#d8fbff" opacity=".6"/>').join('') +
+    (o.boss ? vstone(420, 190, 160, 140) + fr(450, 220, 100, 110, '#1a3a4a') + glowE(500, 280, 90, 40, '#8fe4ff', 0.35) : '') + motes('#d8fbff');
+  SCENES.v_spore = (o) => sky('vsp', '#1a2a1e', o.boss ? '#3a4a20' : '#2f5a32', '#3a6a3a') + stars(o.boss ? 26 : 14, 61, '#ffe9a0') +
+    [...Array(8)].map((_, i) => { const x = 60 + i * 120, h = 90 + (i % 3) * 40; return blk(x + 20, 390 - h, 16, '#e8e0c8', h) + fr(x - 10, 390 - h - 30, 76, 34, i % 2 ? '#c8a050' : '#d8b860'); }).join('') +
+    (o.boss ? blk(420, 160, 30, '#e8e0c8', 230) + fr(330, 110, 210, 60, '#e0b04a') + glowE(435, 140, 160, 70, '#ffe48a', 0.4) : '') + vfloor('#2a4a2a') + motes('#ffe48a');
+  SCENES.v_archive = (o) => sky('var', o.boss ? '#14181c' : '#2a3430', '#3a4a40', '#4a5a4a') +
+    [...Array(5)].map((_, i) => { const x = 40 + i * 200; return fr(x, 70, 160, 300, '#5a4a3a') + [...Array(5)].map((__, j) => fr(x + 10, 86 + j * 56, 140, 18, j % 2 ? '#d8cfa8' : '#c4b88e')).join('') + fr(x, 70, 160, 14, '#3f9a4a'); }).join('') +
+    (o.boss ? fr(380, 220, 240, 150, '#4a5a6a') + glowE(500, 250, 140, 50, '#bfe0ff', 0.3) : '') + vfloor('#3a3a34') + motes('#ffe9b0');
+  SCENES.v_glow = (o) => sky('vg', o.boss ? '#2a0e08' : '#4a2a1a', o.boss ? '#7a3a18' : '#8a4a2a', '#5a3a28') +
+    [0, 1, 2, 3].map((i) => vstone(0, 200 + i * 50, 1000, 50 - i * 4)).join('') + [...Array(10)].map((_, i) => blk(40 + i * 100, 186 + (i % 4) * 50, 14, i % 2 ? '#2a2236' : '#ffd25a', 18)).join('') +
+    (o.boss ? glowE(500, 200, 220, 90, '#ff9a4a', 0.35) + fr(440, 120, 120, 40, '#ff9a4a') : '') + vfloor('#4a3020') + motes('#ffb070');
+  SCENES.v_twinshrine = (o) => '<rect width="500" height="500" fill="' + (o.boss ? '#e8dcb0' : '#f2ead0') + '"/><rect x="500" width="500" height="500" fill="' + (o.boss ? '#1a1630' : '#2e2848') + '"/>' +
+    [0, 1, 2].map((i) => blk(80 + i * 130, 120, 40, '#e4dccb', 270) + blk(560 + i * 130, 120, 40, '#423a62', 270)).join('') + '<rect x="480" y="0" width="40" height="500" fill="' + VS.water + '" opacity=".8"/>' +
+    fr(420, 330, 160, 14, '#8a6a4a') + (o.boss ? glowE(300, 180, 100, 50, '#fff6c0', 0.45) + glowE(700, 180, 100, 50, '#c9a8ff', 0.45) : '') + vfloor('#6a6a5a') + motes('#ffffff');
+  SCENES.v_canopy = (o) => sky('vc', o.boss ? '#3a6a8a' : '#8ad0f0', '#cfeef8', '#e8f8f4') +
+    [...Array(6)].map((_, i) => blk(40 + i * 180, 0, 50, VS.bark, 500) + fr(i * 180, 40 + (i % 2) * 30, 140, 70, i % 2 ? VS.leaf : VS.leafL)).join('') +
+    [0, 1].map((r) => [...Array(20)].map((_, i) => fr(i * 50, 260 + r * 90 + Math.round(Math.abs(i - 10) * 2), 48, 8, '#c8a46a')).join('')).join('') +
+    (o.boss ? fr(380, 200, 240, 20, '#a08060') + glowE(500, 160, 160, 60, '#ffffff', 0.4) : '') + motes('#ffffff');
+  SCENES.v_moonwell = (o) => sky('vmw', '#0a0e24', o.boss ? '#1a2050' : '#222a5a', '#2a3a6a') + stars(30, 81, '#e2d4ff') +
+    '<path d="M0 0H1000V160Q800 80 500 130T0 120z" fill="#141a30"/>' + [...Array(9)].map((_, i) => blk(i * 115, 120, 22, VS.bark, 120 + (i % 3) * 30)).join('') +
+    '<rect y="300" width="1000" height="200" fill="#1a3a6a"/><ellipse cx="500" cy="360" rx="300" ry="40" fill="#e2d4ff" opacity="' + (o.boss ? 0.35 : 0.18) + '"/>' + motes('#e2d4ff');
+  SCENES.v_choir = (o) => sky('vch', o.boss ? '#2a1a3a' : '#4a3a6a', '#7a6a9a', '#8a7aa0') +
+    [...Array(7)].map((_, i) => { const x = 60 + i * 140, h = 140 + (i % 3) * 40; return fr(x, 390 - h, 54, h, '#dcd8e8') + fr(x, 390 - h, 54, 10, '#f2efff') + blk(x + 20, 390 - h + 40, 14, i === 3 ? '#e8fff0' : '#a8e4ff', 14); }).join('') +
+    '<path d="M0 390Q250 340 500 380T1000 370V400H0z" fill="' + VS.bark + '"/>' + (o.boss ? glowE(500, 220, 260, 110, '#e8fff0', 0.25) : '') + vfloor('#3a3048') + motes('#ffd0f0');
+  SCENES.v_elderroot = (o) => sky('ver', '#0a140e', o.boss ? '#1a3a20' : '#22422a', '#2c4a30') +
+    fr(380, 0, 240, 420, VS.bark) + [...Array(8)].map((_, i) => '<path d="M' + (500 + (i - 3.5) * 40) + ' 380Q' + (500 + (i - 3.5) * 120) + ' 300 ' + (500 + (i - 3.5) * 150) + ' 420" stroke="' + VS.bark + '" stroke-width="26" fill="none"/>').join('') +
+    fr(440, 260, 120, 160, '#1a0e08') + [...Array(6)].map((_, i) => fr(80 + i * 160, 60 + (i % 2) * 40, 120, 60, i % 2 ? VS.leaf : '#26783c')).join('') +
+    (o.boss ? glowE(500, 300, 180, 90, '#9af2ff', 0.3) : '') + vfloor('#1f3326') + motes('#9af2ff');
   // the Hollow Veil and the Resonance Scar keep their v0.4 skies; their boss rooms get set dressing in front of them
   function hallRoom(stage) {
     let out = '';

@@ -18,6 +18,15 @@
     lampglare: { name: 'Lamp Glare', el: 'light', type: 'dmg', power: 80, cd: 0, boss: true, tell: 'Every lantern in the orchard turns to face you. Lamp Glare is coming!', desc: 'A blinding flash. May stun.', fx: { k: 'stun', p: 0.4, n: 1 } },
     galeforce: { name: 'Gale Force', el: 'wind', type: 'weaken', power: 80, cd: 0, boss: true, tell: 'The weathervane stops spinning and points straight at you. Gale Force is coming!', desc: 'A wall of wind that lowers your attack.' },
     prismfall: { name: 'Prismfall', el: 'resonance', type: 'dmg', power: 86, cd: 0, boss: true, neutral: true, tell: 'Every colour in the air folds towards the stag. Prismfall is coming!', desc: 'Light from every colour at once. Never resisted, but a guard blocks most of it.' },
+    /* Phase 18C: the Verdant Wilds guardians' charged moves. Every one is telegraphed a turn ahead (tell), three-quarters
+       blocked by a guard, broken by a stun while charging, and held back a turn by soak, like every guardian move. */
+    floodgate:     { name: 'Floodgate', el: 'water', type: 'dmg', power: 74, cd: 0, boss: true, tell: 'The aqueduct groans as every sluice opens at once. Floodgate is coming!', desc: 'A wall of released water. Soaks the target.', fx: { k: 'soak', p: 1, n: 2 } },
+    sporebloom:    { name: 'Spore Bloom', el: 'nature', type: 'weaken', power: 70, cd: 0, boss: true, tell: 'The hollow fills with drifting gold dust. Spore Bloom is coming!', desc: 'A cloud of spores that lowers your attack. A heal clears it.' },
+    archiveseal:   { name: 'Archive Seal', el: 'metal', type: 'dmg', power: 70, cd: 0, boss: true, tell: 'Every shelf in the Archive slides shut. Archive Seal is coming!', desc: 'Files you away: silences special abilities for two turns.', fx: { k: 'silence', p: 1, n: 2 } },
+    embercanopy:   { name: 'Ember Canopy', el: 'fire', type: 'dmg', power: 72, cd: 0, boss: true, tell: 'The terraces glow orange from below. Ember Canopy is coming!', desc: 'Burning glowworm light rains down. Burns the target.', fx: { k: 'burn', p: 1, n: 3 } },
+    twineclipse:   { name: 'Twin Eclipse', el: 'light', type: 'dmg', power: 84, cd: 0, boss: true, neutral: true, tell: 'Light and shadow fold together over the shrine. Twin Eclipse is coming!', desc: 'Light and shadow at once. Never resisted, but a guard blocks most of it.' },
+    tidalhymn:     { name: 'Tidal Hymn', el: 'water', type: 'dmg', power: 74, cd: 0, boss: true, tell: 'The Moonwell rises without a ripple. Tidal Hymn is coming!', desc: 'A slow, enormous wave that sings as it breaks.' },
+    crownofthorns: { name: 'Crown of Thorns', el: 'nature', type: 'dmg', power: 90, cd: 0, boss: true, tell: 'Every root on the island lifts at once. Crown of Thorns is coming!', desc: 'The Elder Root closes around the field.' },
   });
 
   /* ---------- boss mechanics (read by the battle engine) ----------
@@ -43,6 +52,17 @@
   const sec = (a, b, c, d) => [
     Object.assign({ from: 0, to: 2 }, a), Object.assign({ from: 3, to: 5 }, b), Object.assign({ from: 6, to: 8 }, c), Object.assign({ from: 9, to: 9 }, d),
   ];
+
+  /* Phase 18C: a Verdant dungeon's nine ordinary battles. Levels follow Starter Island's pattern around the recommended
+     level: rec-3, rec-3, rec-2 | rec-2, rec-1, rec-1 | rec, rec, rec. Foes take the form their level calls for (second
+     form from 12, third from 22), as your own Aminas do. env: backdrops per section; clues: a line on battles 1, 4, 7. */
+  const vform = (spId, lv) => { const sp = D.SPECIES[spId], L = sp && D.LINES && D.LINES[sp.line]; if (!L) return spId; const want = lv >= 22 ? 3 : lv >= 12 ? 2 : 1; return want > sp.stage ? L.ids[want - 1] : spId; };
+  function vnine(foes, rec, envs, clues) {
+    const lvs = [rec - 3, rec - 3, rec - 2, rec - 2, rec - 1, rec - 1, rec, rec, rec];
+    return foes.map((f, i) => { const o = typeof f === 'string' ? { sp: f } : Object.assign({}, f); o.lv = lvs[i] + (o.dl || 0); delete o.dl; o.sp = vform(o.sp, o.lv); o.env = envs[Math.min(2, Math.floor(i / 3))];
+      if (clues && clues[Math.floor(i / 3)] && i % 3 === 0) o.clue = clues[Math.floor(i / 3)]; return o; });
+  }
+  const vboss = (o, rec) => Object.assign({ lv: rec + 3, boss: true, scale: 1.5 }, o, { sp: vform(o.sp, rec + 3) });
 
   /* ---------- dungeons ---------- */
   D.DUNGEONS = {
@@ -167,6 +187,121 @@
       first: { gold: 2000, food: 400, gems: 30 }, repeat: { gold: 300, food: 60 },
       rewardText: 'Island Boss. First clear: 2,000 gold, 400 food, 30 gems and the next island. Replays: 300 gold, 60 food.',
     },
+
+    /* ======================= Phase 18C: the Verdant Wilds (Overgrown Commonwealth) =======================
+       Ten dungeons, recommended levels 22 to 36 (Band C, level cap 40). Each opens when the one before is cleared; the
+       first opens when the island is reached. The island's foes carry a tier (D.CAMPAIGN.verdant.foeTier), tuned per
+       battle with `tune` after simulation (tools/p18c-sim.js). */
+    v_mossgate: {
+      name: 'The Mossgate Steps', island: 'verdant', el: 'earth', playable: true, tune: {hp: 0.95}, recommended: 22, env: 'v_mossgate',
+      theme: 'Overgrown stone stairs from the landing to the first terrace. Roots have lifted every step, and nobody has put them back.',
+      unlock: {}, unlockText: 'Reach the Verdant Wilds.',
+      battles: vnine(['gaiaroki', 'terraflora', 'acinus', 'gaiaroki', 'pyrocell', 'terraflora', 'gaiaroki', 'pyrocell', 'terraflora'], 22, ['v_mossgate', 'v_mossgate', 'v_mossgate'],
+        ['The steps are cut in two sizes: tall ones, and small ones beside them, worn smooth by small feet.', 'A root has lifted a whole flight of steps and set it down again, slightly to the left.', 'At the top, a gate of moss. It opens for you. It does not seem pleased about it.'])
+        .concat([vboss({ sp: 'gaiaroki', title: 'The Moss Bastion', hpMult: 1.6, move: 'rootcrush', tune: { atk: 0.85 } }, 22)]),
+      sections: sec({ name: 'The Landing Stair', first: { gold: 140, food: 30 } }, { name: 'The Lifted Flight', first: { gold: 150, food: 32 } }, { name: 'The First Terrace', first: { gold: 160, food: 34 } }, { name: 'The Moss Gate', first: { gems: 4 } }),
+      first: { gold: 900, food: 200, gems: 6 }, repeat: { gold: 220, food: 50 },
+      rewardText: 'First clear: 900 gold, 200 food, 6 gems. Replays: 220 gold, 50 food.',
+    },
+    v_aqueduct: {
+      name: 'The Drowned Aqueduct', island: 'verdant', el: 'water', playable: true, recommended: 24, env: 'v_aqueduct',
+      theme: 'Sluices and channels under the great arches. Half of the aqueduct runs under water, and all of it still works.',
+      unlock: {}, unlockText: 'Clear the Mossgate Steps.',
+      battles: vnine(['kairyu', 'cannonis', 'aquaflora', 'sylvaneer', 'kairyu', 'cannonis', 'kairyu', 'aquaflora', 'cannonis'], 24, ['v_aqueduct', 'v_aqueduct', 'v_aqueduct'],
+        ['Three streams run side by side in stone channels, each at its own speed. Somebody measured them.', 'The water carries a sound like voices. Two names, worn down until only their shapes are left.', 'Every sluice gate has two handles: one high, one low.'])
+        .concat([vboss({ sp: 'kairyu', title: 'The Sluice Warden', hpMult: 1.65, move: 'floodgate' }, 24)]),
+      sections: sec({ name: 'The Dry Channel', first: { gold: 150, food: 34 } }, { name: 'The Singing Streams', first: { gold: 160, food: 36 } }, { name: 'Under the Arches', first: { gold: 170, food: 38 } }, { name: 'The Great Sluice', first: { gems: 4 } }),
+      first: { gold: 1000, food: 220, gems: 6 }, repeat: { gold: 240, food: 55 },
+      rewardText: 'First clear: 1,000 gold, 220 food, 6 gems. Replays: 240 gold, 55 food.',
+    },
+    v_spore: {
+      name: 'Spore Hollow', island: 'verdant', el: 'nature', playable: true, recommended: 25, env: 'v_spore',
+      theme: 'A sunken glade under the western canopy. Giant glowcaps breathe out gold spores that glow after dusk.',
+      unlock: {}, unlockText: 'Clear the Drowned Aqueduct.',
+      battles: vnine(['acinus', 'sylvaneer', 'terraflora', 'acinus', 'voltar', 'terraflora', 'acinus', 'sylvaneer', 'terraflora'], 25, ['v_spore', 'v_spore', 'v_spore'],
+        ['The spores settle on your sleeve and glow there, like they have found somewhere to sit.', 'A Kind Soul hums as you pass. It sounds like a lullaby, sung in two different keys.', 'Old baskets under the glowcaps, the kind used for gathering. Some are very small.'])
+        .concat([vboss({ sp: 'acinus', title: 'The Spore Mother', hpMult: 1.65, move: 'sporebloom' }, 25)]),
+      sections: sec({ name: 'The Glowcap Rim', first: { gold: 160, food: 36 } }, { name: 'The Drifts', first: { gold: 170, food: 38 } }, { name: 'The Deep Glade', first: { gold: 180, food: 40 } }, { name: 'The Mother Cap', first: { gems: 5 } }),
+      first: { gold: 1100, food: 240, gems: 8 }, repeat: { gold: 260, food: 55 },
+      rewardText: 'First clear: 1,100 gold, 240 food, 8 gems. Replays: 260 gold, 55 food.',
+    },
+    v_archive: {
+      name: 'The Ivy Archive', island: 'verdant', el: 'metal', playable: true, tune: {hp: 1.15}, recommended: 27, env: 'v_archive', scene: 'v_keepers',
+      theme: 'The vaults beneath the shelves on the north shore. A mechanical archivist is still filing the tablets, very slowly.',
+      unlock: {}, unlockText: 'Clear Spore Hollow.',
+      battles: vnine(['zeep', 'voltar', 'umbrit', 'zeep', 'voltar', 'zeep', 'umbrit', 'zeep', 'voltar'], 27, ['v_archive', 'v_archive', 'v_archive'],
+        ['Tablets in rows, each with a tag of woven ivy. The knots are a filing system.', 'One shelf is labelled in two hands: one neat, one with paw-prints for punctuation.', 'A tablet lies face-down on the floor. It is the only thing in the Archive that has not been filed.'])
+        .concat([vboss({ sp: 'zeep', title: 'The Archivist', hpMult: 1.7, move: 'archiveseal' }, 27)]),
+      sections: sec({ name: 'The Reading Room', first: { gold: 170, food: 38 } }, { name: 'The Stacks', first: { gold: 180, food: 40 } }, { name: 'The Sealed Vault', first: { gold: 190, food: 42 } }, { name: 'The Archivist’s Desk', first: { gems: 5 } }),
+      first: { gold: 1250, food: 260, gems: 8 }, repeat: { gold: 280, food: 60 },
+      rewardText: 'First clear: 1,250 gold, 260 food, 8 gems. Replays: 280 gold, 60 food.',
+    },
+    v_glow: {
+      name: 'The Glowworm Terraces', island: 'verdant', el: 'fire', playable: true, tune: {hp: 1.15}, recommended: 28, env: 'v_glow',
+      theme: 'South-facing terraced gardens lit by glowworm fire. Warm and orange at night, and quietly on fire most of the day.',
+      unlock: {}, unlockText: 'Clear the Ivy Archive.',
+      battles: vnine(['igniflare', 'pyrokai', 'emberix', 'pyrospark', 'igniflare', 'emberix', 'pyrokai', 'igniflare', 'pyrospark'], 28, ['v_glow', 'v_glow', 'v_glow'],
+        ['Lanterns line every terrace, two kinds side by side: clear glass and dark glass.', 'The glowworms keep the terraces warm. Somebody built little roofs for them.', 'Halfway up, the dark-glass lanterns stop. Only the clear ones go on.'])
+        .concat([vboss({ sp: 'igniflare', title: 'The Lantern Wyrm', hpMult: 1.7, move: 'embercanopy' }, 28)]),
+      sections: sec({ name: 'The Lower Terrace', first: { gold: 180, food: 40 } }, { name: 'The Lantern Rows', first: { gold: 190, food: 42 } }, { name: 'The Upper Terrace', first: { gold: 200, food: 44 } }, { name: 'The Wyrm’s Lamp', first: { gems: 5 } }),
+      first: { gold: 1400, food: 280, gems: 10 }, repeat: { gold: 300, food: 65 },
+      rewardText: 'First clear: 1,400 gold, 280 food, 10 gems. Replays: 300 gold, 65 food.',
+    },
+    v_twinshrine: {
+      name: 'The Twin Shrine', island: 'verdant', el: 'light', playable: true, recommended: 30, env: 'v_twinshrine', scene: 'v_shrine',
+      theme: 'The halls under the split temple. Half of every room is pale stone, half is dark glass, and the stream runs between.',
+      unlock: {}, unlockText: 'Clear the Glowworm Terraces.',
+      battles: vnine(['lumifern', 'umbrit', 'lumi', 'voltar', 'lumifern', 'umbrit', 'lumi', 'umbrit', 'umbrit'], 30, ['v_twinshrine', 'v_twinshrine', 'v_twinshrine'],
+        ['The light half and the dark half meet in a perfectly straight line. Nobody built it crooked, not even a little.', 'In the dark half, the glass shows your reflection a moment too late.', 'Footbridges cross the stream every few steps. Somebody wanted it to be easy to cross.'])
+        .concat([vboss({ sp: 'lumifern', title: 'The Dawn Warden', hpMult: 1.8, move: 'twineclipse', mech: { type: 'prism', every: 2, els: ['light', 'dark'] } }, 30)]),
+      sections: sec({ name: 'The Pale Hall', first: { gold: 190, food: 42 } }, { name: 'The Glass Hall', first: { gold: 200, food: 44 } }, { name: 'The Bridges', first: { gold: 210, food: 46 } }, { name: 'The Broken Panel', first: { gems: 6 } }),
+      first: { gold: 1600, food: 300, gems: 12 }, repeat: { gold: 320, food: 70 },
+      rewardText: 'First clear: 1,600 gold, 300 food, 12 gems. Replays: 320 gold, 70 food.',
+    },
+    v_canopy: {
+      name: 'The Canopy Walk', island: 'verdant', el: 'wind', playable: true, tune: {hp: 1.12, atk: 1.04}, recommended: 31, env: 'v_canopy', scene: 'v_spire',
+      theme: 'Rope bridges between the tallest trees of the north. The wind lives up here, and does not get many visitors.',
+      unlock: {}, unlockText: 'Clear the Twin Shrine.',
+      battles: vnine(['zephyr', 'pyrospark', 'zephyr', 'lumi', 'zephyr', 'pyrospark', 'zephyr', 'pyrospark', 'zephyr'], 31, ['v_canopy', 'v_canopy', 'v_canopy'],
+        ['The bridges sway. The knots holding them are the same knots as the Archive’s tags.', 'A platform with two seats: one for sitting, one for perching.', 'From here you can see the sea on every side. And something across it, glowing.'])
+        .concat([vboss({ sp: 'zephyr', title: 'The Canopy Squall', hpMult: 1.8, move: 'galeforce' }, 31)]),
+      sections: sec({ name: 'The Low Bridges', first: { gold: 200, food: 44 } }, { name: 'The Swaying Platforms', first: { gold: 210, food: 46 } }, { name: 'The Crown of the Trees', first: { gold: 220, food: 48 } }, { name: 'The Squall’s Perch', first: { gems: 6 } }),
+      first: { gold: 1800, food: 330, gems: 10 }, repeat: { gold: 340, food: 75 },
+      rewardText: 'First clear: 1,800 gold, 330 food, 10 gems. Replays: 340 gold, 75 food.',
+    },
+    v_moonwell: {
+      name: 'The Moonwell', island: 'verdant', el: 'water', playable: true, tune: {hp: 0.88}, recommended: 33, env: 'v_moonwell',
+      theme: 'A flooded grotto under the western lake. The pool is perfectly still, and its reflections show the wrong sky.',
+      unlock: {}, unlockText: 'Clear the Canopy Walk.',
+      battles: vnine(['aquaflora', 'voltar', 'kairyu', 'umbrit', 'aquaflora', 'voltar', 'aquaflora', 'umbrit', 'aquaflora'], 33, ['v_moonwell', 'v_moonwell', 'v_moonwell'],
+        ['The water is so still it looks solid. It is not. You check.', 'In the reflection, the cave has a different ceiling. It has stars.', 'Down here, even the Kind Souls whisper.'])
+        .concat([vboss({ sp: 'aquaflora', title: 'The Moonwell Serpent', hpMult: 1.6, move: 'tidalhymn' }, 33)]),
+      sections: sec({ name: 'The Lake Stair', first: { gold: 210, food: 46 } }, { name: 'The Reflections', first: { gold: 220, food: 48 } }, { name: 'The Still Pool', first: { gold: 230, food: 50 } }, { name: 'The Well’s Heart', first: { gems: 7 } }),
+      first: { gold: 2000, food: 360, gems: 12 }, repeat: { gold: 360, food: 80 },
+      rewardText: 'First clear: 2,000 gold, 360 food, 12 gems. Replays: 360 gold, 80 food.',
+    },
+    v_choir: {
+      name: 'The Choir of Roots', island: 'verdant', el: 'resonance', playable: true, tune: {hp: 1.0}, recommended: 34, env: 'v_choir', scene: 'v_voice',
+      theme: 'Down among the roots of the singing stones. Every root on the island seems to grow towards them.',
+      unlock: {}, unlockText: 'Clear the Moonwell.',
+      battles: vnine(['aimza', 'sylvaneer', 'aimza', 'terraflora', 'aimza', 'zeep', 'aimza', 'sylvaneer', 'aimza'], 34, ['v_choir', 'v_choir', 'v_choir'],
+        ['The stones hum in a chord. You find yourself humming along, slightly flat.', 'Roots wrap the stones gently, the way you would hold something you were afraid to drop.', 'The chord is louder here. It has more notes than it should.'])
+        .concat([vboss({ sp: 'aimza', title: 'The Third Voice', hpMult: 1.9, move: 'resonantcollapse' }, 34)]),
+      sections: sec({ name: 'The Outer Ring', first: { gold: 220, food: 48 } }, { name: 'The Root Chamber', first: { gold: 230, food: 50 } }, { name: 'The Chord', first: { gold: 240, food: 52 } }, { name: 'The Gap in the Song', first: { gems: 8 } }),
+      first: { gold: 2300, food: 400, gems: 15 }, repeat: { gold: 380, food: 85 },
+      rewardText: 'First clear: 2,300 gold, 400 food, 15 gems. Replays: 380 gold, 85 food.',
+    },
+    v_elderroot: {
+      name: 'The Elder Root', island: 'verdant', el: 'nature', playable: true, tune: {hp: 1.12, atk: 1.06}, recommended: 36, env: 'v_elderroot', scene: 'v_crown',
+      theme: 'Inside the oldest tree on the island, where every stream ends. The door between its roots was shut from the inside.',
+      unlock: {}, unlockText: 'Clear the Choir of Roots.',
+      battles: vnine(['sylvaneer', 'terraflora', 'acinus', 'aimza', 'sylvaneer', 'acinus', 'terraflora', 'sylvaneer', 'terraflora'], 36, ['v_elderroot', 'v_elderroot', 'v_elderroot'],
+        ['Inside, the tree is bigger than outside. You decide not to think about that.', 'The roots carry water upward, every stream on the island, all of it arriving here.', 'Ahead, antlers. Very large ones.'])
+        .concat([vboss({ sp: 'sylvaneer', title: 'The Forest Crown', hpMult: 2.25, scale: 1.75, islandBoss: true, move: 'crownofthorns', mech: { type: 'barrier', at: [0.66, 0.33], amt: 0.18 } }, 36)]),
+      sections: sec({ name: 'The Root Door', first: { gold: 260, food: 55 } }, { name: 'The Rising Water', first: { gold: 280, food: 60 } }, { name: 'The Inner Ring', first: { gold: 300, food: 65 } }, { name: 'The Crown', first: { gems: 15 } }),
+      first: { gold: 4000, food: 600, gems: 30 }, repeat: { gold: 450, food: 90 },
+      rewardText: 'Island Boss. First clear: 4,000 gold, 600 food, 30 gems. Replays: 450 gold, 90 food.',
+    },
   };
 
   /* ---------- islands (world fragments) ---------- */
@@ -175,7 +310,11 @@
   D.CAMPAIGN = {
     starter: { dungeons: ['forgottenroad', 'gatheringhall', 'reliquary', 'drownedsteps', 'coldkiln', 'hollowveil', 'lanternorchard', 'windstair', 'resonancescar', 'heartwood'],
       islandBoss: 'heartwood', next: 'verdant', hint: 'Warm stone, old roads, and buildings that were here before anyone remembers.' },
-    verdant: { dungeons: [], islandBoss: null, next: 'obsidian', hint: 'Something green and very old, pressing at the edge of the sanctuary.' },
+    // Phase 18C: the Verdant Wilds campaign. foeTier: the island's foes are a little tougher than their level alone
+    // (Phase 18A recommendation, tuned per battle with `tune`). Its Island Boss would open Obsidian Reach, which stays
+    // closed until that island is marked ready (D.ISLAND_LIVE, src/verdant18b.js).
+    verdant: { dungeons: ['v_mossgate', 'v_aqueduct', 'v_spore', 'v_archive', 'v_glow', 'v_twinshrine', 'v_canopy', 'v_moonwell', 'v_choir', 'v_elderroot'],
+      islandBoss: 'v_elderroot', next: 'obsidian', foeTier: { hp: 1.2, atk: 1.12 }, hint: 'Something green and very old, pressing at the edge of the sanctuary.' },
     obsidian: { dungeons: [], islandBoss: null, next: 'celestial', hint: 'Dark stone, and a warmth that does not come from any sun.' },
     celestial: { dungeons: [], islandBoss: null, next: null, hint: 'High up. Higher than an island has any right to be.' },
   };
@@ -204,6 +343,11 @@
   D.ISLAND_ORDER.forEach((iid) => {
     const c = D.CAMPAIGN[iid]; if (!c) return;
     c.dungeons.forEach((id, i) => { const d = D.DUNGEONS[id]; d.id = id; d.island = iid; d.index = i + 1; d.prev = i ? c.dungeons[i - 1] : null; D.DUNGEON_ORDER.push(id); });
+  });
+  // Phase 18C: an island's foe tier, stamped on each of its battles (with that battle's own tuning) for R.enemyFromSpec
+  D.ISLAND_ORDER.forEach((iid) => {
+    const c = D.CAMPAIGN[iid], T = c && c.foeTier; if (!T) return;
+    c.dungeons.forEach((id) => { const d = D.DUNGEONS[id]; d.battles.forEach((b) => { const dt = d.tune || {}, t = b.tune || {}; b.tier = { hp: +(T.hp * (dt.hp || 1) * (t.hp || 1)).toFixed(3), atk: +(T.atk * (dt.atk || 1) * (t.atk || 1)).toFixed(3) }; }); });
   });
   // Islands no longer cost gold: the Island Boss of the island before opens each one. (Earlier builds sold them for
   // 100k/200k/400k gold; islands bought that way stay unlocked.)

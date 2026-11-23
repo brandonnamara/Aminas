@@ -225,7 +225,10 @@ export const ARENAS = {
   } },
 };
 // battles outside the dungeons use the arena that fits them best
-const ALIAS = { survival: 'resonancescar', pvp: 'hollowveil', raid: 'reliquary', practice: 'windstair' };
+const ALIAS = { survival: 'resonancescar', pvp: 'hollowveil', raid: 'reliquary', practice: 'windstair',
+  // Phase 18C: the Verdant dungeons reuse the arena whose setting fits them (no new arena geometry)
+  v_mossgate: 'forgottenroad', v_aqueduct: 'drownedsteps', v_spore: 'reliquary', v_archive: 'gatheringhall', v_glow: 'coldkiln',
+  v_twinshrine: 'lanternorchard', v_canopy: 'windstair', v_moonwell: 'drownedsteps', v_choir: 'resonancescar', v_elderroot: 'heartwood' };
 export const arenaFor = (id) => (ARENAS[id] ? id : ARENAS[ALIAS[id]] ? ALIAS[id] : 'reliquary');
 
 // Static props that share a material become one mesh (one draw call per material instead of one per prop).

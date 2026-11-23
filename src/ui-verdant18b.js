@@ -36,6 +36,20 @@
     }).join('') + '</div>';
   }
 
+  // Phase 18C: the Twin Shrine's optional gift (rules in src/verdant18b.js)
+  function giftCard(s) {
+    const o = V.giftOffer(s); if (o.state === 'locked') return '';
+    if (o.state === 'claimed') { const g = o.got || {}; return '<div class="v18-gift done"><b>The shrine’s gift</b><p class="small-t muted">' + (g.kind === 'amina' ? esc(D.SPECIES[g.sp].name) + ' joined you here.' : 'You received its blessing.') + '</p></div>'; }
+    const name = esc(D.SPECIES[o.sp].name);
+    return '<div class="v18-gift"><b>The shrine’s gift</b><p class="small-t">' + (o.kind === 'amina' ? 'The other half of the shrine offers ' + name + ', the second form of the starter you did not choose, at level ' + o.lv + '. Your own starter stays as it is.' :
+      'You already have ' + name + '. The shrine offers its blessing instead: ' + o.essence + ' ' + esc(D.ELEMENTS[o.el].name) + ' Essence and ' + o.gems + ' gems.') + ' Optional, and only once.</p><div class="row-actions"><button class="btn gold small" data-act="v18Gift">' + I('spark') + ' Accept</button></div></div>';
+  }
+  UI.act('v18Gift', (el) => {
+    const s = st(), r = V.claimGift(s);
+    if (!r.ok) { Au && Au.play && Au.play('no'); if (r.reason === 'full') UI.toast('You have no room for another Amina. Make room, then come back: the gift will wait.', 't'); return; }
+    S.save(); Au && Au.play && Au.play('discover'); UI.closeAll();
+    if (r.kind === 'amina' && UI.detail) UI.detail(r.sp, { uid: r.inst.uid }); else UI.toast('The shrine’s blessing: ' + r.essence + ' Essence and ' + r.gems + ' gems.', 'w');
+  });
   UI.v18Open = function (id) {
     const s = st(); const site = V.site(id), gate = V.gate(id);
     if (!site && !gate) return null;
@@ -46,7 +60,11 @@
     const pr = V.progress(s);
     let body = '';
     if (site) body += '<p>' + esc(site.text) + '</p><p class="v18-ent"><b>The Entity:</b> “' + esc(site.entity) + '”</p>';
+    // the Twin Shrine's gift, when it is waiting, comes first (this sheet opens by itself after the shrine's scene)
+    const gift = main && main.id === 'shrine' ? giftCard(s) : '', giftFirst = gift && V.giftOffer(s).state === 'ready';
+    if (giftFirst) body += gift;
     if (g) body += gateCard(s, g);
+    if (gift && !giftFirst) body += gift;
     body += wayfinder(s, main ? main.id : null);
     const title = I(gate && !site ? 'gate' : 'compass') + ' ' + esc(site ? site.name : gate.name);
     const foot = '<span class="muted small-t" style="margin-right:auto">Places visited ' + pr.seen + ' of ' + pr.total + '</span><button class="btn gold" data-act="close">Close</button>';
@@ -57,6 +75,22 @@
     ov.addEventListener('click', (e) => { if (e.target === ov) UI.close(ov); });
     return ov;
   };
+
+  // Phase 18C: story hooks. The Twin Shrine scene ends with its gift; the Elder Root's first entry plays the
+  // confrontation; travelling to the Verdant Wilds for the first time since 18C plays the arrival.
+  const play0 = UI.playScene;
+  UI.playScene = function (id, done, opts) {
+    if (id === 'v_shrine' && !(opts && opts.replay)) { const d0 = done; done = function () { if (d0) d0.apply(this, arguments); let n = 0; const tryOpen = () => { if (V.giftOffer(st()).state !== 'ready') return; if (UI.screen === 'island' && !UI.modalOpen() && !UI.busy && !document.querySelector('.scene')) { UI.v18Open('shrine'); return; } if (n++ < 20) setTimeout(tryOpen, 250); }; setTimeout(tryOpen, 400); }; }
+    return play0.call(this, id, done, opts);
+  };
+  const enter0 = UI.acts && UI.acts.enterDungeon;
+  if (enter0) UI.acts.enterDungeon = function (el) {
+    const s = st(), id = el && el.dataset && el.dataset.id;
+    if (id === 'v_elderroot' && !(s.story && s.story.scenes && s.story.scenes.v_confront) && A.Scenes.get('v_confront')) { UI.playScene('v_confront', () => enter0.call(this, el)); return; }
+    return enter0.apply(this, arguments);
+  };
+  const tr1 = UI.travelTo;
+  if (tr1) UI.travelTo = function (iid) { const r = tr1.apply(this, arguments); const s = st(); if (r !== false && s.story && s.story.pendingScene === 'v_arrival' && !UI.sceneBox) setTimeout(() => { if (UI.screen === 'island' && s.story.pendingScene === 'v_arrival' && !UI.modalOpen()) { UI.queue.unshift({ type: 'fn', fn: (done) => UI.playScene('v_arrival', () => done()) }); UI.pump(); } }, 500); return r; };
 
   // taps on the island: "v18:<id>" hotspots (places and entrances)
   const hot0 = UI.hotspot;

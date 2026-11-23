@@ -62,7 +62,12 @@
      15% of it); otherwise, or with too few samples, the screen is assumed to give 60 fps, as before. A device that is
      really struggling produces heavy or irregular frames, so it keeps the 60 fps assumption and is still caught. */
   const display = { s: [], ms: 1000 / 60, steady: false };
-  const SNAP = [1000 / 120, 1000 / 60, 1000 / 40, 1000 / 30, 1000 / 24, 1000 / 20];
+  // Phase 18C fix: no 24 or 20 fps snap. Heavy work elsewhere on the page (or a struggling device) can make even the
+  // light frames arrive every ~50 ms; snapped to 20 fps and "steady", that read as a screen limit and let a struggling
+  // device off (the intermittent browser-perf-fix failure: display read as 20 fps, one resolution step instead of four).
+  // The slowest cap a browser applies in practice is 30 fps (Low Power Mode, in-app browsers); anything slower is
+  // treated as the device, so it is still caught.
+  const SNAP = [1000 / 120, 1000 / 60, 1000 / 40, 1000 / 30];
   P.noteFrame = function (ms) {
     if (!(ms > 4 && ms < 120)) return;
     const s = display.s; s.push(ms); if (s.length > 40) s.shift(); if (s.length < 20) return;

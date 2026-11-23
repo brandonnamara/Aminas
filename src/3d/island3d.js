@@ -90,6 +90,23 @@ function cliffSkin(t, TVs, DVs) {
   });
   return { list: list.concat(glow), glow: [] }; // Phase 14: the glints are drawn in the same mesh (one draw call), bright enough to read as crystal
 }
+/* Phase 18C: an island's own ground colours. The terrain and the meadow detail are built with these swapped into PAL
+   for the duration of the build only, so models (cached per kind across islands) and Hide and Seek are unaffected.
+   The Verdant Wilds: deeper jungle greens, dark loam paths, moss-grey stone, pale shell sand and green-teal water,
+   after BIOMES.verdant (src/3d/library/biomes.js). Colours only: no extra geometry, materials or effects. */
+export const ISLAND_PAL = {
+  verdant: {
+    grass: ['#5cbf4c', '#52b445', '#66c957', '#4aa840', '#7ad466'], grassDark: ['#3f9a3c', '#378f36'], grassSide: ['#4aa43f', '#419a39', '#52ae46'],
+    path: ['#b89a6e', '#a88b62', '#c4a87c', '#9a7e58'], pathStone: ['#9aa898', '#8a9a88'], sand: ['#ddd4a4', '#d2c896', '#e6dfb6'],
+    dirt: ['#7a5232', '#6e4a2c', '#86603a'], clay: ['#a86842', '#9a5e3a', '#b4744c'], stone: ['#8a9a88', '#7e8e7c', '#96a694', '#84947f'], stoneDark: ['#5e6e5c', '#66765f'],
+    water: '#3db4c4',
+  },
+};
+export function withIslandPal(iid, fn) {
+  const o = ISLAND_PAL[iid]; if (!o) return fn();
+  const keep = {}; Object.keys(o).forEach((k) => { keep[k] = PAL[k]; PAL[k] = o[k]; });
+  try { return fn(); } finally { Object.keys(keep).forEach((k) => { PAL[k] = keep[k]; }); }
+}
 export function buildTerrain(cols, avoid) { // exported for Hide and Seek (src/3d/hideseek3d.js); unchanged
   const V = 1 / TV; // voxels per cell (2)
   let minX = 1e9, maxX = -1e9, minZ = 1e9, maxZ = -1e9, maxY = 0;
@@ -261,7 +278,7 @@ export function createIsland() {
   const matSway = new THREE.MeshLambertMaterial({ vertexColors: true });
   matSway.onBeforeCompile = (sh) => { sh.uniforms.uTime = uni.uTime; sh.vertexShader = 'uniform float uTime;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n#ifdef USE_INSTANCING\nfloat ph = instanceMatrix[3].x * 1.7 + instanceMatrix[3].z * 2.3;\n#else\nfloat ph = 0.0;\n#endif\nfloat k = max(0.0, position.y - 0.6) * 0.035;\ntransformed.x += sin(uTime * 1.3 + ph) * k;\ntransformed.z += cos(uTime * 1.1 + ph) * k * 0.6;'); };
   let state = { iid: null, key: null, built: false, view: null, dirty: true, shadowDirty: true, things: new Map(), sig: '' };
-  let terr = null, waterMesh = null, detail = null, motes = null, sparks = null, clouds = [];
+  let terr = null, waterMesh = null, detail = null, motes = null, sparks = null, clouds = []; let curIid = null; // Phase 18C: the island whose ground is built (its colours, ISLAND_PAL)
   const disposables = [];
 
   const cost = { terrainMs: 0, syncMs: 0 };
@@ -269,7 +286,7 @@ export function createIsland() {
   function setTerrain0(iid, key, cols, extras) {
     if (state.key === key && terr) return;
     clearGroup(groups.terrain); clouds = [];
-    const t = buildTerrain(cols, (extras || []).filter((e) => e.kind === 'jetty' || e.kind === 'skiff').map((e) => [e.x, e.z])); terr = t;
+    curIid = iid; const t = withIslandPal(iid, () => buildTerrain(cols, (extras || []).filter((e) => e.kind === 'jetty' || e.kind === 'skiff').map((e) => [e.x, e.z]))); terr = t;
     const geo = meshGrid(t.g, { size: TV, shadeFaces: false }); disposables.push(geo);
     const m = new THREE.Mesh(facing(geo, BACK, 'terrain|' + key), matTerrain); m.receiveShadow = true; groups.terrain.add(m); disposables.push(m.geometry);
     const ms = new THREE.Mesh(geo, matTerrain); ms.castShadow = true; ms.layers.set(SHADOW_LAYER); ms.userData.shadowOnly = true; groups.terrain.add(ms);
@@ -286,7 +303,7 @@ export function createIsland() {
       const pos = [], idx = []; let n = 0;
       t.water.forEach(([X, Z]) => { for (let i = 0; i < 2; i++) for (let j = 0; j < 2; j++) { const x = X * TV + i * TV / 2, z = Z * TV + j * TV / 2, s = TV / 2; pos.push(x, -0.12, z, x + s, -0.12, z, x + s, -0.12, z + s, x, -0.12, z + s); idx.push(n, n + 2, n + 1, n, n + 3, n + 2); n += 4; } });
       const wg = new THREE.BufferGeometry(); wg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); wg.setIndex(idx); wg.computeVertexNormals(); disposables.push(wg);
-      const wm = new THREE.MeshLambertMaterial({ color: PAL.water, transparent: true, opacity: 0.86, emissive: '#1a5a8a', emissiveIntensity: 0.25 });
+      const wm = new THREE.MeshLambertMaterial({ color: (ISLAND_PAL[curIid] && ISLAND_PAL[curIid].water) || PAL.water, transparent: true, opacity: 0.86, emissive: '#1a5a8a', emissiveIntensity: 0.25 });
       wm.onBeforeCompile = (sh) => { sh.uniforms.uTime = uni.uTime; sh.vertexShader = 'uniform float uTime;\nvarying vec3 vW;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\ntransformed.y += sin(uTime * 1.6 + position.x * 5.0 + position.z * 3.0) * 0.025;\nvW = position;'); sh.fragmentShader = 'uniform float uTime;\nvarying vec3 vW;\n' + sh.fragmentShader.replace('#include <dithering_fragment>', '#include <dithering_fragment>\nfloat sp = step(0.93, fract(sin(floor(vW.x * 8.0) * 12.9898 + floor(vW.z * 8.0) * 78.233 + floor(uTime * 2.0)) * 43758.5453));\ngl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(0.92, 0.98, 1.0), sp * 0.55);'); };
       disposables.push(wm); waterMesh = new THREE.Mesh(wg, wm); waterMesh.receiveShadow = true; groups.terrain.add(waterMesh);
     } else waterMesh = null;
@@ -441,7 +458,8 @@ export function createIsland() {
   // under lush ground, daisies in the open, tall wildflowers in long grass, and a skirt of undergrowth, fallen leaves
   // and pebbles around every tree, so groves sit in the ground instead of on it. Density follows the quality tier.
   let detailArgs = null, detailDens = null;
-  function buildDetail(occupied, trees) {
+  function buildDetail(occupied, trees) { return withIslandPal(curIid, () => buildDetail0(occupied, trees)); }
+  function buildDetail0(occupied, trees) {
     detailArgs = [occupied, trees]; const dens = tier().detail == null ? 1 : tier().detail; detailDens = dens;
     if (detail) { groups.things.remove(detail); detail.dispose(); detail.geometry.dispose(); detail.material.dispose(); detail = null; }
     if (!terr) return;
