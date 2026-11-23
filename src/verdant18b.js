@@ -179,7 +179,9 @@
      Once met and befriended it never appears again. Befriending costs the usual food; it joins at level 26 (third
      forms otherwise come from evolving at 22), so one Amina is offered per area: breeding and evolution stay the way to
      get the rest. The finds are existing species already in the collection rules; nothing else is paid. */
-  D.V18.rare = { rate: 0.2, pity: 8, lv: 26, of: { glowcap: 'terraflora3', streamside: 'aquaflora3', canopyedge: 'pyrophoenix' } };
+  // Phase 18D review: the level is never above the recommended level of the dungeon a player faces when the area opens
+  // (Glowcap on arrival → Mossgate 22; Streamside after Dungeon 2 → Spore Hollow 25; Canopy Edge after Dungeon 7 → Moonwell 33)
+  D.V18.rare = { rate: 0.2, pity: 8, lvOf: { glowcap: 22, streamside: 25, canopyedge: 32 }, of: { glowcap: 'terraflora3', streamside: 'aquaflora3', canopyedge: 'pyrophoenix' } };
   V.rareState = function (st, area) {
     const sp = D.V18.rare.of[area]; if (!sp || !D.SPECIES[sp]) return { state: 'none' };
     const r = (st.v18 && st.v18.rare && st.v18.rare[area]) || {};
@@ -206,7 +208,7 @@
   const befriend0 = R.befriend;
   R.befriend = function (st) {
     const f = st.pendingFind, rare = !!(f && f.rare), r = befriend0.apply(this, arguments);
-    if (rare && r && r.ok && r.inst) { r.inst.lv = D.V18.rare.lv; r.inst.xp = 0; st.v18.rare[f.area].met = now() || 1; r.rare = true; }
+    if (rare && r && r.ok && r.inst) { r.inst.lv = D.V18.rare.lvOf[f.area] || 22; r.inst.xp = 0; st.v18.rare[f.area].met = now() || 1; r.rare = true; }
     return r;
   };
 

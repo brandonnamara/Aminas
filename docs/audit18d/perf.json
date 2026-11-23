@@ -1,87 +1,87 @@
 {
  "note": "Chromium + SwiftShader (software WebGL) at 844×390, DPR 2. Not an iPhone: compare the islands, not absolute speed.",
- "firstVisitMs": 3033,
- "secondVisitMs": 1993,
+ "firstVisitMs": 3172,
+ "secondVisitMs": 2181,
  "tiers": [
   {
    "island": "starter",
    "tier": "high",
-   "calls": 76,
-   "triangles": 135070,
-   "geometries": 143,
+   "calls": 73,
+   "triangles": 133984,
+   "geometries": 131,
    "textures": 2,
-   "avgDrawMs": 501.27,
-   "p50": 550,
-   "p95": 733.2
+   "avgDrawMs": 548.51,
+   "p50": 650,
+   "p95": 700.1
   },
   {
    "island": "verdant",
    "tier": "high",
-   "calls": 90,
-   "triangles": 167184,
-   "geometries": 146,
+   "calls": 79,
+   "triangles": 152096,
+   "geometries": 134,
    "textures": 2,
-   "avgDrawMs": 423.06,
-   "p50": 649.9,
-   "p95": 699.9
+   "avgDrawMs": 446.77,
+   "p50": 633.2,
+   "p95": 750
   },
   {
    "island": "starter",
    "tier": "balanced",
-   "calls": 76,
-   "triangles": 132272,
-   "geometries": 143,
+   "calls": 73,
+   "triangles": 131194,
+   "geometries": 131,
    "textures": 2,
-   "avgDrawMs": 368.58,
+   "avgDrawMs": 390.6,
    "p50": 516.6,
-   "p95": 583.3
+   "p95": 633.3
   },
   {
    "island": "verdant",
    "tier": "balanced",
-   "calls": 90,
-   "triangles": 164544,
-   "geometries": 146,
+   "calls": 79,
+   "triangles": 149456,
+   "geometries": 134,
    "textures": 2,
-   "avgDrawMs": 323.96,
-   "p50": 583.4,
-   "p95": 633.2
+   "avgDrawMs": 342.25,
+   "p50": 600,
+   "p95": 650
   },
   {
    "island": "starter",
    "tier": "saver",
    "calls": 76,
    "triangles": 81112,
-   "geometries": 189,
+   "geometries": 177,
    "textures": 2,
-   "avgDrawMs": 273.36,
-   "p50": 316.6,
-   "p95": 366.7
+   "avgDrawMs": 280.45,
+   "p50": 283.4,
+   "p95": 316.7
   },
   {
    "island": "verdant",
    "tier": "saver",
-   "calls": 90,
-   "triangles": 88086,
-   "geometries": 251,
+   "calls": 80,
+   "triangles": 84454,
+   "geometries": 228,
    "textures": 2,
-   "avgDrawMs": 240.29,
-   "p50": 316.6,
+   "avgDrawMs": 243.86,
+   "p50": 283.4,
    "p95": 350
   }
  ],
  "leak": {
   "before": {
-   "geometries": 251,
+   "geometries": 228,
    "textures": 2,
-   "nodes": 2002,
-   "heapMB": 61
+   "nodes": 2034,
+   "heapMB": 87.5
   },
   "after": {
-   "geometries": 248,
+   "geometries": 225,
    "textures": 2,
-   "nodes": 2002,
-   "heapMB": 61
+   "nodes": 2034,
+   "heapMB": 87.5
   }
  },
  "errors": []

@@ -7,19 +7,19 @@
     "base": "forgottenroad",
     "verdant": {
      "arena": "v_mossgate",
-     "ms": 96.03,
+     "ms": 63.02,
      "calls": 21,
      "triangles": 15504,
-     "geometries": 18,
+     "geometries": 19,
      "textures": 5,
      "programs": 15
     },
     "before": {
      "arena": "forgottenroad",
-     "ms": 62.07,
+     "ms": 59.3,
      "calls": 21,
      "triangles": 14120,
-     "geometries": 20,
+     "geometries": 21,
      "textures": 5,
      "programs": 15
     }
@@ -29,19 +29,19 @@
     "base": "drownedsteps",
     "verdant": {
      "arena": "v_aqueduct",
-     "ms": 51.66,
+     "ms": 52.72,
      "calls": 22,
      "triangles": 14296,
-     "geometries": 23,
+     "geometries": 24,
      "textures": 5,
      "programs": 16
     },
     "before": {
      "arena": "drownedsteps",
-     "ms": 57.71,
+     "ms": 55.62,
      "calls": 21,
      "triangles": 22310,
-     "geometries": 24,
+     "geometries": 25,
      "textures": 5,
      "programs": 16
     }
@@ -51,16 +51,16 @@
     "base": "reliquary",
     "verdant": {
      "arena": "v_spore",
-     "ms": 54.59,
+     "ms": 50.57,
      "calls": 23,
      "triangles": 17578,
-     "geometries": 28,
+     "geometries": 29,
      "textures": 6,
      "programs": 16
     },
     "before": {
      "arena": "reliquary",
-     "ms": 49.11,
+     "ms": 54.23,
      "calls": 23,
      "triangles": 12902,
      "geometries": 29,
@@ -73,7 +73,7 @@
     "base": "gatheringhall",
     "verdant": {
      "arena": "v_archive",
-     "ms": 64.76,
+     "ms": 65.58,
      "calls": 25,
      "triangles": 14592,
      "geometries": 29,
@@ -82,7 +82,7 @@
     },
     "before": {
      "arena": "gatheringhall",
-     "ms": 58.21,
+     "ms": 61.15,
      "calls": 24,
      "triangles": 13002,
      "geometries": 29,
@@ -95,7 +95,7 @@
     "base": "coldkiln",
     "verdant": {
      "arena": "v_glow",
-     "ms": 61.07,
+     "ms": 71.3,
      "calls": 20,
      "triangles": 17532,
      "geometries": 30,
@@ -104,7 +104,7 @@
     },
     "before": {
      "arena": "coldkiln",
-     "ms": 63.34,
+     "ms": 55.21,
      "calls": 20,
      "triangles": 13818,
      "geometries": 32,
@@ -117,7 +117,7 @@
     "base": "lanternorchard",
     "verdant": {
      "arena": "v_twinshrine",
-     "ms": 63.11,
+     "ms": 62.88,
      "calls": 29,
      "triangles": 15842,
      "geometries": 36,
@@ -126,7 +126,7 @@
     },
     "before": {
      "arena": "lanternorchard",
-     "ms": 63.28,
+     "ms": 67.28,
      "calls": 29,
      "triangles": 12974,
      "geometries": 38,
@@ -139,7 +139,7 @@
     "base": "windstair",
     "verdant": {
      "arena": "v_canopy",
-     "ms": 62.91,
+     "ms": 74.84,
      "calls": 27,
      "triangles": 17042,
      "geometries": 38,
@@ -148,7 +148,7 @@
     },
     "before": {
      "arena": "windstair",
-     "ms": 59.23,
+     "ms": 58.72,
      "calls": 28,
      "triangles": 12658,
      "geometries": 40,
@@ -161,7 +161,7 @@
     "base": "drownedsteps",
     "verdant": {
      "arena": "v_moonwell",
-     "ms": 53.36,
+     "ms": 58.09,
      "calls": 22,
      "triangles": 15698,
      "geometries": 19,
@@ -170,7 +170,7 @@
     },
     "before": {
      "arena": "drownedsteps",
-     "ms": 54.75,
+     "ms": 55.15,
      "calls": 21,
      "triangles": 22310,
      "geometries": 20,
@@ -183,7 +183,7 @@
     "base": "resonancescar",
     "verdant": {
      "arena": "v_choir",
-     "ms": 52.5,
+     "ms": 55.36,
      "calls": 29,
      "triangles": 24682,
      "geometries": 31,
@@ -192,7 +192,7 @@
     },
     "before": {
      "arena": "resonancescar",
-     "ms": 51.25,
+     "ms": 51.57,
      "calls": 29,
      "triangles": 11064,
      "geometries": 34,
@@ -205,7 +205,7 @@
     "base": "heartwood",
     "verdant": {
      "arena": "v_elderroot",
-     "ms": 62.32,
+     "ms": 65.62,
      "calls": 23,
      "triangles": 15250,
      "geometries": 28,
@@ -214,7 +214,7 @@
     },
     "before": {
      "arena": "heartwood",
-     "ms": 63,
+     "ms": 66.98,
      "calls": 23,
      "triangles": 14082,
      "geometries": 30,
@@ -229,7 +229,7 @@
     "base": "forgottenroad",
     "verdant": {
      "arena": "v_mossgate",
-     "ms": 59.73,
+     "ms": 58.93,
      "calls": 20,
      "triangles": 14780,
      "geometries": 30,
@@ -238,7 +238,7 @@
     },
     "before": {
      "arena": "forgottenroad",
-     "ms": 58.8,
+     "ms": 59.99,
      "calls": 20,
      "triangles": 13396,
      "geometries": 32,
@@ -251,7 +251,7 @@
     "base": "drownedsteps",
     "verdant": {
      "arena": "v_aqueduct",
-     "ms": 47.32,
+     "ms": 51.36,
      "calls": 21,
      "triangles": 13812,
      "geometries": 35,
@@ -260,7 +260,7 @@
     },
     "before": {
      "arena": "drownedsteps",
-     "ms": 63.28,
+     "ms": 57.32,
      "calls": 20,
      "triangles": 21802,
      "geometries": 34,
@@ -273,7 +273,7 @@
     "base": "reliquary",
     "verdant": {
      "arena": "v_spore",
-     "ms": 50.14,
+     "ms": 50.88,
      "calls": 22,
      "triangles": 17334,
      "geometries": 38,
@@ -282,7 +282,7 @@
     },
     "before": {
      "arena": "reliquary",
-     "ms": 46.38,
+     "ms": 45.83,
      "calls": 22,
      "triangles": 12670,
      "geometries": 39,
@@ -295,7 +295,7 @@
     "base": "gatheringhall",
     "verdant": {
      "arena": "v_archive",
-     "ms": 57.86,
+     "ms": 58.92,
      "calls": 24,
      "triangles": 14364,
      "geometries": 39,
@@ -304,7 +304,7 @@
     },
     "before": {
      "arena": "gatheringhall",
-     "ms": 55.34,
+     "ms": 66.43,
      "calls": 23,
      "triangles": 12774,
      "geometries": 39,
@@ -317,7 +317,7 @@
     "base": "coldkiln",
     "verdant": {
      "arena": "v_glow",
-     "ms": 57.97,
+     "ms": 65.54,
      "calls": 19,
      "triangles": 17196,
      "geometries": 40,
@@ -326,7 +326,7 @@
     },
     "before": {
      "arena": "coldkiln",
-     "ms": 56.9,
+     "ms": 61.23,
      "calls": 19,
      "triangles": 13518,
      "geometries": 42,
@@ -339,7 +339,7 @@
     "base": "lanternorchard",
     "verdant": {
      "arena": "v_twinshrine",
-     "ms": 54.11,
+     "ms": 59.17,
      "calls": 28,
      "triangles": 14966,
      "geometries": 22,
@@ -348,7 +348,7 @@
     },
     "before": {
      "arena": "lanternorchard",
-     "ms": 56.44,
+     "ms": 58.58,
      "calls": 28,
      "triangles": 12134,
      "geometries": 24,
@@ -361,7 +361,7 @@
     "base": "windstair",
     "verdant": {
      "arena": "v_canopy",
-     "ms": 60.25,
+     "ms": 59.66,
      "calls": 26,
      "triangles": 16538,
      "geometries": 24,
@@ -370,7 +370,7 @@
     },
     "before": {
      "arena": "windstair",
-     "ms": 57.65,
+     "ms": 58.58,
      "calls": 27,
      "triangles": 12154,
      "geometries": 26,
@@ -383,7 +383,7 @@
     "base": "drownedsteps",
     "verdant": {
      "arena": "v_moonwell",
-     "ms": 47.88,
+     "ms": 49.14,
      "calls": 21,
      "triangles": 15214,
      "geometries": 29,
@@ -392,7 +392,7 @@
     },
     "before": {
      "arena": "drownedsteps",
-     "ms": 50.74,
+     "ms": 54.27,
      "calls": 20,
      "triangles": 21802,
      "geometries": 30,
@@ -405,7 +405,7 @@
     "base": "resonancescar",
     "verdant": {
      "arena": "v_choir",
-     "ms": 49.92,
+     "ms": 50.26,
      "calls": 28,
      "triangles": 24438,
      "geometries": 41,
@@ -414,7 +414,7 @@
     },
     "before": {
      "arena": "resonancescar",
-     "ms": 47.12,
+     "ms": 48.01,
      "calls": 28,
      "triangles": 10808,
      "geometries": 44,
@@ -427,7 +427,7 @@
     "base": "heartwood",
     "verdant": {
      "arena": "v_elderroot",
-     "ms": 56.31,
+     "ms": 55.41,
      "calls": 22,
      "triangles": 14838,
      "geometries": 38,
@@ -436,7 +436,7 @@
     },
     "before": {
      "arena": "heartwood",
-     "ms": 60.4,
+     "ms": 60.12,
      "calls": 22,
      "triangles": 13706,
      "geometries": 40,

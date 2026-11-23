@@ -17,7 +17,7 @@ const { chromium } = require('playwright'); const serve = require(path.join(ROOT
     Object.keys(D.DUNGEONS).forEach((id) => { const r = R.dungeonRec(s, id); r.clears = 1; r.next = 0; });
     s.story = s.story || {}; s.story.scenes = Object.assign({}, s.story.scenes, { v_arrival: 'seen' }); A.State.state = s; R.drain(); A.State.save(); A.UI.showIsland(true); });
   await page.waitForSelector('#world'); await sleep(1500);
-  const snap = (label) => ev(async (label) => { if (window.gc) window.gc(); await new Promise((r) => setTimeout(r, 100)); const v = A.VoxIsland && A.VoxIsland.stats ? A.VoxIsland.stats() : null, c = A.C3D && A.C3D.stats ? A.C3D.stats() : null;
+  const snap = (label) => ev(async (label) => { if (window.gc) { window.gc(); await new Promise((r) => setTimeout(r, 300)); window.gc(); } await new Promise((r) => setTimeout(r, 100)); const v = A.VoxIsland && A.VoxIsland.stats ? A.VoxIsland.stats() : null, c = A.C3D && A.C3D.stats ? A.C3D.stats() : null;
     return { label, heapMB: performance.memory ? +(performance.memory.usedJSHeapSize / 1048576).toFixed(1) : null, nodes: document.getElementsByTagName('*').length,
       island: v ? { geometries: v.geometries, textures: v.textures, programs: v.programs, calls: v.calls } : null, battle: c ? { geometries: c.geometries, textures: c.textures, programs: c.programs, templates: c.templates, live: c.live } : null }; }, label);
   const travel = async (to) => { const t = Date.now(); await ev((to) => { A.UI.queue.length = 0; A.UI.busy = false; A.UI.closeAll(); document.querySelectorAll('.dlg,.toast,.scene').forEach((e) => e.remove()); A.UI.travelTo(to); }, to);

@@ -1,0 +1,104 @@
+baseline: 5 passed, 0 failed
+campaign: 60 passed, 0 failed
+migration v0.6: 22 passed, 0 failed
+modes: 41 passed, 0 failed
+forge: 53 passed, 0 failed
+dev8: 49 passed, 0 failed
+browser v0.6: 48 passed, 0 failed
+browser dev7: 30 passed, 0 failed
+browser dev8: 42 passed, 0 failed
+browser env1: 21 passed, 0 failed
+browser env1.2: 10 passed, 0 failed
+browser library: 11 passed, 0 failed
+PASSED: 19 passed, 0 failed (browser-env3)
+PASSED: 10 passed, 0 failed (browser-env4)
+browser-ui5.test.js: FAILED
+  ok  every text/surface pair meets WCAG AA 4.5:1 (primary button 7.6, secondary button 4.9, panel text 11.0, muted text 7.1, unselected tab 8.1, selected tab 12.7, nav label 6.2, gold label 8.4, toggle choice 8.7)
+  ok  the design system is loaded and applied to the HUD (faceted corners, spectral rims, glass navigation)
+  ok  tap targets stay comfortable on an iPhone SE in landscape (20 checked, smallest 32 px)
+  ok  panels fit inside the iPhone SE landscape screen
+  ok  the navigation button stays lit while its screen is open and clears when it closes
+  ok  a common find gets a calm card with no burst
+  ok  a unique mythic find gets the spectrum card and the full burst (34 sparks)
+FAIL  reward cards leave by themselves
+  ok  a dungeon equipment drop shows the reward card instead of a plain toast
+  ok  a legendary creature’s reveal gets the spectrum card and a Legendary tag; an ordinary one does not
+  ok  decorative UI motion runs normally (4) and stops completely in Battery saver (0) and with Reduce motion (0)
+  ok  no script errors
+FAILED: 11 passed, 1 failed (browser-ui5)
+
+PASSED: 45 passed, 0 failed (browser-ui6)
+PASSED: 30 passed, 0 failed (browser-arena7)
+PASSED: 31 passed, 0 failed (browser-bench-battle)
+PASSED: 23 passed, 0 failed (browser-perf-fix)
+PASSED: 38 passed, 0 failed (browser-showcase8)
+PASSED: 38 passed, 0 failed (browser-p8fix)
+PASSED: 47 passed, 0 failed (browser-roster8b)
+raid12a: 31 passed, 0 failed
+PASSED: 18 passed, 0 failed (browser-raid12a)
+hideseek: 60 passed, 0 failed
+PASSED: 41 passed, 0 failed (browser-hideseek)
+hideseek12c: 30 passed, 0 failed
+PASSED: 58 passed, 0 failed (browser-hideseek12c)
+progression13a: 40 passed, 0 failed
+PASSED: 41 passed, 0 failed (browser-progress13a)
+hatchery13b: 41 passed, 0 failed
+PASSED: 35 passed, 0 failed (browser-hatchery13b)
+gear13c: 46 passed, 0 failed
+PASSED: 39 passed, 0 failed (browser-gear13c)
+economy13d: 14 passed, 0 failed
+PASSED: 5 passed, 0 failed (browser-rewards13d)
+PASSED: 31 passed, 0 failed (browser-models14)
+PASSED: 16 passed, 0 failed (browser-world14)
+40 passed, 0 failed
+browser-roster15b: 37 passed, 0 failed
+browser-combat15c: 33 passed, 0 failed
+browser-final15d: 37 passed, 0 failed
+PASSED: 12 passed, 0 failed (browser-intro14)
+onboard16: 37 passed, 0 failed
+69 passed, 0 failed (browser-onboard16)
+savefile16b: 47 passed, 0 failed
+34 passed, 0 failed (browser-polish16b)
+20 passed, 0 failed (browser-stability16c)
+combat17b: 31 passed, 0 failed
+rewards17b: 40 passed, 0 failed
+10 passed, 0 failed (browser-combat17b)
+progression17c: 48 passed, 0 failed
+14 passed, 0 failed (browser-progression17c)
+replay17d: 70 passed, 0 failed
+15 passed, 0 failed (browser-replay17d)
+verdant18b: 53 passed, 0 failed
+browser-verdant18b.test.js: FAILED
+  ok  the Verdant Wilds draws on the voxel island (it was 2D before Phase 18B)
+  ok  the island has 16 placed features: the Elder Root, eight other place parts and seven free-standing entrances (16)
+  ok  every place and every entrance has its own 3D model (19 of 19)
+  ok  every place part and entrance has a tap area on the island (16)
+  ok  tapping the Ivy Archive on the island opens its sheet
+  ok  it carries the Entity’s line and its entrance: Dungeon 4 of 10, locked until the Spore Hollow, with the ten in order
+  ok  there is no Enter button, and the visit is recorded
+  sheet:  Mossgate Steps
+  ok  Phase 18C: the first entrance (Mossgate Steps) is open, with an Enter button
+  ok  all seven places can be visited (7 of 7)
+  ok  Phase 18C: only the first entrance is open, and starting a locked Verdant dungeon directly is refused (locked)
+  ok  the Dungeons screen is unchanged: no Verdant tab while it has no playable dungeons
+  ok  the Wayfinder closes the sheet, moves the camera to the Choir and points at it
+  ok  after a reload the save is still on the Verdant Wilds, with its seven visits and every tap area
+  ok  travelling to Starter Island and back twice keeps both islands whole (places only on the Verdant Wilds; voxel island on both)
+  ok  six more round trips leave GPU geometries, textures and page nodes where they were ({"g":145,"t":4,"n":2205} → {"g":145,"t":4,"n":2205})
+  ok  an Obsidian Reach unlocked by an older build shows “Not ready” on the map, with no Travel button
+  ok  travel there is refused, and the save keeps its unlock record
+  ok  an Amina at level 30 levels to 31 and the detail shows Lv 31, not MAX
+  ok  with the voxel island off, the places draw as 2D pictures with the same 16 tap areas
+  perf [{"iid":"starter","calls":76,"tris":143871,"geos":142,"p50":16.7,"p95":16.7},{"iid":"verdant","calls":88,"tris":165548,"geos":143,"p50":16.7,"p95":16.8}]
+FAIL  the Verdant Wilds draws in about as many calls as Starter Island (88 vs 76): its models merge into the shared meshes
+  ok  with reduced motion the Choir’s glimmer is still
+  ok  no page errors
+
+browser-verdant18b: 21 passed, 1 failed
+
+campaign18c: 98 passed, 0 failed
+browser-campaign18c: 18 passed, 0 failed
+stability18c: 5 passed, 0 failed
+journey18d: 57 passed, 0 failed
+polish18d: 46 passed, 0 failed
+PASSED: 17 passed, 0 failed (browser-polish18d)

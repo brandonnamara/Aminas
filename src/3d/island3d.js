@@ -387,16 +387,21 @@ export function createIsland() {
   function clearGroup(g) { while (g.children.length) { const c = g.children.pop(); c.traverse && c.traverse((o) => { if (o.isInstancedMesh) o.dispose(); }); } disposables.splice(0).forEach((d) => d.dispose && d.dispose()); }
 
   /* ---- buildings, obstacles and scenery: rebuilt as instanced batches whenever the layout changes */
+  // Phase 18D: obstacle kinds listed in MERGE_O are few per island but come in three variants each, which as instanced
+  // batches cost a draw call per variant. They are baked into one static mesh instead (same triangles, one draw call,
+  // each specimen keeps its own small tint), rebuilt with the layout like every batch.
+  const MERGE_O = { elderroot: 1, vinetree: 1, mossruin: 1, mossrock: 1 }, mergedGeos = [];
   function sync(items, scenery) { const c0 = performance.now(); try { return sync0(items, scenery); } finally { cost.syncMs = +(performance.now() - c0).toFixed(1); } }
   function sync0(items, scenery) {
     const sig = JSON.stringify(items) + '|' + state.key + '|' + MS.signature();
     if (sig === state.sig) return;
     state.sig = sig; lastSync = [items, scenery]; glbGroups = [];
     groups.things.children.slice().forEach((c) => { groups.things.remove(c); if (c.isInstancedMesh) c.dispose(); });
+    mergedGeos.splice(0).forEach((g) => g.dispose());
     if (detail) { detail.geometry.dispose(); detail.material.dispose(); detail = null; } // Phase 18B: the meadow detail owns its box and material (found leaking 2 per island switch)
     const batches = new Map(); // geometry -> { mat, list: [matrix] , sway }
     const push = (geo, mat, x, y, z, ry, sway, s, lgeo, nature) => { if (!geo) return; const k = geo.uuid + mat.uuid; let bt = batches.get(k); if (!bt) batches.set(k, (bt = { geo, mat, list: [], qs: [], sway, lgeo, nature })); bt.qs.push(quarter(ry)); bt.list.push(new THREE.Matrix4().compose(new THREE.Vector3(x, y, z), new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), ry || 0), new THREE.Vector3(s || 1, s || 1, s || 1))); };
-    const occupied = new Set();
+    const occupied = new Set(), mergeList = [];
     items.forEach((it) => {
       for (let y = it.y; y < it.y + it.h; y++) for (let x = it.x; x < it.x + it.w; x++) occupied.add(x + ',' + y);
       const cx = it.x + it.w / 2, cz = it.y + it.h / 2;
@@ -412,8 +417,26 @@ export function createIsland() {
         groups.things.add(twin); }
       else if (it.k === 'b') { const md = VB.buildingModel({ type: it.type, level: it.level, state: it.state, rot: it.rot }, { w0: it.w0, h0: it.h0 }, { art: it.art, cat: it.cat }); if (md) { push(md.geo, matSolid, cx, 0, cz, 0, false, 1, md.lod && md.lod.geo); push(md.glow, matGlow, cx, 0, cz, 0, false, 1, md.lod && md.lod.glow); } }
       else if (it.k === 'l' && it.kind && VB.hasExtra(it.kind)) { const md = VB.extraModel(it.kind, it.on); if (md) { push(md.geo, matSolid, cx, 0, cz, 0, false, 1, md.lod && md.lod.geo); push(md.glow, matGlow, cx, 0, cz, 0, false, 1, md.lod && md.lod.glow); } }
+      else if (it.k === 'o' && MERGE_O[it.type]) { const md = VB.natureModel(it.type, it.seed, it.w, it.h); if (md) mergeList.push([md, cx, cz, (it.seed % 4) * Math.PI / 2]); }
       else if (it.k === 'o') { const md = VB.natureModel(it.type, it.seed, it.w, it.h); if (md) { const ry = (it.seed % 4) * Math.PI / 2, sway = it.type === 'oak' || it.type === 'pine' || it.type === 'bush'; push(md.geo, sway ? matSway : matSolid, cx, 0, cz, ry, sway, 1, md.lod && md.lod.geo, true); push(md.glow, matGlow, cx, 0, cz, ry, false, 1, md.lod && md.lod.glow, true); } }
     });
+    if (mergeList.length) {
+      const bake = (pick) => { const parts = []; const mm = new THREE.Matrix4(), q = new THREE.Quaternion(), up = new THREE.Vector3(0, 1, 0), col = new THREE.Color();
+        mergeList.forEach(([md, x, z, ry]) => { const src = pick(md); if (!src || !src.index) return; const g = src.clone(); g.applyMatrix4(mm.compose(new THREE.Vector3(x, 0, z), q.setFromAxisAngle(up, ry), new THREE.Vector3(1, 1, 1)));
+          const a = hash(Math.round(x * 16), Math.round(z * 16), 131), w = hash(Math.round(z * 16), Math.round(x * 16), 132) - 0.5, l = 0.9 + a * 0.16, c = g.attributes.color;
+          if (c && pick !== glowOf) for (let i = 0; i < c.count; i++) { col.fromBufferAttribute(c, i); c.setXYZ(i, col.r * l * (1 + w * 0.08), col.g * l, col.b * l * (1 - w * 0.1)); }
+          parts.push(g); });
+        // one pass (merging pairwise would copy the growing mesh 40-odd times)
+        if (!parts.length) return null; let nv = 0, ni = 0; parts.forEach((g) => { nv += g.attributes.position.count; ni += g.index.count; });
+        const out = new THREE.BufferGeometry(), idx = nv > 65535 ? new Uint32Array(ni) : new Uint16Array(ni); let vo = 0, io = 0;
+        ['position', 'normal', 'color'].forEach((k) => { if (!parts[0].attributes[k]) return; const arr = new Float32Array(nv * 3); let o = 0; parts.forEach((g) => { arr.set(g.attributes[k].array, o); o += g.attributes[k].array.length; }); out.setAttribute(k, new THREE.BufferAttribute(arr, 3)); });
+        parts.forEach((g) => { const a = g.index.array; for (let i = 0; i < a.length; i++) idx[io + i] = a[i] + vo; io += a.length; vo += g.attributes.position.count; g.dispose(); });
+        out.setIndex(new THREE.BufferAttribute(idx, 1)); out.computeBoundingSphere(); out.computeBoundingBox(); mergedGeos.push(out); return out; };
+      const glowOf = (md) => md.glow;
+      const geo = bake((md) => md.geo), lgeo = bake((md) => md.lod && md.lod.geo), glow = bake(glowOf);
+      if (geo) { const bt = { geo, mat: matSolid, list: [new THREE.Matrix4()], qs: [0], sway: false, lgeo, nature: true, merged: true }; batches.set('merged|' + geo.uuid, bt); }
+      if (glow) batches.set('merged|g|' + glow.uuid, { geo: glow, mat: matGlow, list: [new THREE.Matrix4()], qs: [0], sway: false, merged: true });
+    }
     // scenery trees on hills, ledges and loose chunks, and meadow details, skipping anything occupied
     (scenery || []).forEach((sc) => { if (occupied.has(sc.cx + ',' + sc.cz)) return; const md = VB.natureModel(sc.kind, sc.seed); if (md) { push(md.geo, sc.still ? matSolid : matSway, sc.x, sc.y, sc.z, sc.ry, !sc.still, sc.s, md.lod && md.lod.geo, true); push(md.glow, matGlow, sc.x, sc.y, sc.z, sc.ry, false, sc.s, md.lod && md.lod.glow, true); } });
     lodPairs = [];
@@ -426,11 +449,11 @@ export function createIsland() {
     split.forEach((bt) => {
       // Phase 4: every tree, bush and rock gets its own small shift in brightness and warmth (a sunnier or a shadier
       // specimen), so a grove of the same species reads as individuals rather than copies
-      const tint = bt.nature && bt.mat !== matGlow ? bt.list.map((m) => { const e = m.elements, a = hash(Math.round(e[12] * 16), Math.round(e[14] * 16), 131), w = hash(Math.round(e[14] * 16), Math.round(e[12] * 16), 132) - 0.5, l = 0.9 + a * 0.16; return new THREE.Color(l * (1 + w * 0.08), l, l * (1 - w * 0.1)); }) : null;
+      const tint = bt.nature && bt.mat !== matGlow && !bt.merged ? bt.list.map((m) => { const e = m.elements, a = hash(Math.round(e[12] * 16), Math.round(e[14] * 16), 131), w = hash(Math.round(e[14] * 16), Math.round(e[12] * 16), 132) - 0.5, l = 0.9 + a * 0.16; return new THREE.Color(l * (1 + w * 0.08), l, l * (1 - w * 0.1)); }) : null;
       // the view copy (faces the camera can see, for this quarter turn) is drawn; the full model only casts shadows
       const dir = bt.q == null ? DOWN_ONLY : backFor(bt.q * Math.PI / 2);
       const inst = (geo) => { const im = new THREE.InstancedMesh(geo, bt.mat, bt.list.length); bt.list.forEach((m, i) => { im.setMatrixAt(i, m); if (tint) im.setColorAt(i, tint[i]); }); im.instanceMatrix.needsUpdate = true; if (tint) im.instanceColor.needsUpdate = true; im.computeBoundingSphere(); groups.things.add(im); return im; };
-      const make = (geo) => { const im = inst(facing(geo, dir)); if (bt.mat !== matGlow) { im.receiveShadow = true; const sh = inst(geo); sh.castShadow = true; sh.layers.set(SHADOW_LAYER); sh.userData.shadowOnly = true; im.userData.twin = sh; } return im; };
+      const make = (geo) => { const v = bt.merged ? facing(geo, dir, 'terrain|merged|' + geo.uuid) : facing(geo, dir); if (bt.merged && v !== geo) mergedGeos.push(v); const im = inst(v); if (bt.mat !== matGlow) { im.receiveShadow = true; const sh = inst(geo); sh.castShadow = true; sh.layers.set(SHADOW_LAYER); sh.userData.shadowOnly = true; im.userData.twin = sh; } return im; };
       const full = make(bt.geo); full.userData.nature = !!bt.nature; if (bt.lgeo) { const lo = make(bt.lgeo); lo.userData.nature = !!bt.nature; lodPairs.push([full, lo, !!bt.nature]); }
     });
     applyLod(true);

@@ -24,7 +24,7 @@ ok(Object.keys(D.SPECIES).length === 63, 'no new species');
   nextDay(); R.rng = () => 0.05; const hit = R.explore(s, 'glowcap');
   ok(hit.ok && hit.rare && hit.find.sp === 'terraflora3' && s.pendingFind.rare, 'a successful roll (under 20%) offers Terraflora III, marked rare');
   const food0 = s.res.food, n0 = s.aminas.length, b = R.befriend(s);
-  ok(b.ok && b.rare && b.inst.sp === 'terraflora3' && b.inst.lv === 26 && s.res.food === food0 - D.BEFRIEND_COST && s.aminas.length === n0 + 1, 'befriending it costs the usual food and it joins at level 26');
+  ok(b.ok && b.rare && b.inst.sp === 'terraflora3' && b.inst.lv === 22 && s.res.food === food0 - D.BEFRIEND_COST && s.aminas.length === n0 + 1, 'befriending it costs the usual food and it joins at level 22 (Glowcap Glade)');
   ok(s.owned.terraflora3 && s.seen.terraflora3 && V.rareState(s, 'glowcap').state === 'met', 'it enters the collection and Codex records; the area marks it met');
   for (let d = 0; d < 10; d++) { nextDay(); R.rng = () => 0; const r = R.explore(s, 'glowcap'); ok(d > 0 || !r.rare, 'once met it never appears again (day ' + (d + 1) + ')'); if (r.type === 'find') R.befriend(s); }
   const g0 = s.res.gold; nextDay(); R.explore(s, 'glowcap'); ok(s.res.gold - g0 <= 9 + 15, 'and exploring there still gives only the usual small amounts');
@@ -72,6 +72,8 @@ ok(Object.keys(D.SPECIES).length === 63, 'no new species');
   ok(R.xpNeed(40) === Math.floor(16 + 40 * 8 + 40 * 40 * 1.2), 'the XP formula already defines levels past 40');
   ok(D.SPECIES.solarbloom.evo.lv === 22 && D.SPECIES.lumifern.evo.lv === 12, 'evolution levels unchanged');
 }
+{ const L = D.V18.rare.lvOf, rec = (id) => D.DUNGEONS[id].recommended;
+  ok(L.glowcap <= rec('v_mossgate') && L.streamside <= rec('v_spore') && L.canopyedge <= rec('v_moonwell'), 'each rare Amina joins no higher than the recommended level of the dungeon ahead when its area opens (' + L.glowcap + ', ' + L.streamside + ', ' + L.canopyedge + ')'); }
 /* ---------- guardian: a guard raised against a charge goes first (Phase 18D fix) ---------- */
 {
   const e = R.enemyFromSpec(D.DUNGEONS.v_elderroot.battles[9]), slow = B.fighter('terraflora', 36);

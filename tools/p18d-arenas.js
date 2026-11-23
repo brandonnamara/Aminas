@@ -28,6 +28,7 @@ const PAIRS = [['v_mossgate', 'forgottenroad'], ['v_aqueduct', 'drownedsteps'], 
     return ev(async () => { const M = await import('/src/3d/runtime.js'), d = A.UI.B.stage.debug(), b = M.bench(40), st = M.stats(); return { arena: d.arena, ms: b && b.ms, calls: b && b.calls, triangles: b && b.triangles, geometries: st.geometries, textures: st.textures, programs: st.programs }; });
   };
   const out = { note: 'Chromium + SwiftShader software WebGL at 844x390 @2x; NOT an iPhone. ms = mean CPU+GPU cost of 40 back-to-back renders of the battle view.', tiers: {}, pairs: [] };
+  if (!process.env.ONLY_ARENA) await open('reliquary', 'high'); // warm-up battle (shader compilation), not recorded
   for (const q of ['high', 'balanced']) {
     out.tiers[q] = [];
     for (const [v, base] of PAIRS) {

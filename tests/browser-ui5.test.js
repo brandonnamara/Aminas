@@ -54,8 +54,12 @@ const ratio = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) +
   const rw = await page.evaluate(() => { const common = Object.keys(A.Data.ITEMS).find((k) => A.Data.ITEMS[k].rarity === 'common'); const c1 = A.UI.itemFound(common); const r1 = c1.className, sp1 = document.querySelectorAll('.spark, .pxb-wrap i').length; const c2 = A.UI.itemFound('coralaegis'); return { r1, sp1, r2: c2.className, sp2: document.querySelectorAll('.spark, .pxb-wrap i').length, txt: c2.textContent }; });
   ok(/r-common/.test(rw.r1) && rw.sp1 === 0, 'a common find gets a calm card with no burst');
   ok(/r-mythic/.test(rw.r2) && rw.sp2 >= 25 && /Mythic find/.test(rw.txt), 'a unique mythic find gets the spectrum card and the full burst (' + rw.sp2 + ' sparks)');
-  await page.waitForTimeout(7000);
-  ok(await page.evaluate(() => !document.querySelector('.reward-card')), 'reward cards leave by themselves');
+  // Phase 18D: wait for the cards to go (the page notes when the last one left, on its own clock) instead of a fixed
+  // 7 s, which a loaded machine overran once in the 18D regression (the mythic card stays 6.4 s plus a 0.32 s exit).
+  await page.evaluate(() => { const t0 = performance.now(); window.__rc = null; const mo = new MutationObserver(() => { if (!document.querySelector('.reward-card')) { window.__rc = Math.round(performance.now() - t0); mo.disconnect(); } }); mo.observe(document.body, { childList: true, subtree: true }); });
+  await page.waitForFunction(() => window.__rc != null || !document.querySelector('.reward-card'), null, { timeout: 15000, polling: 100 }).catch(() => {});
+  const rcMs = await page.evaluate(() => window.__rc);
+  ok(await page.evaluate(() => !document.querySelector('.reward-card')), 'reward cards leave by themselves' + (rcMs != null ? ' (the last left ' + rcMs + ' ms after the check began)' : ''));
   // the game's own discovery path now uses the card (equipment from a dungeon, not from the Forge)
   await page.evaluate(() => { A.Rules.grantItem(A.State.state, 'coralaegis', 'dungeon:forgottenroad'); }); await page.waitForTimeout(900);
   ok(await page.evaluate(() => !!document.querySelector('.reward-card.r-mythic')), 'a dungeon equipment drop shows the reward card instead of a plain toast');

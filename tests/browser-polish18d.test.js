@@ -87,7 +87,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms)); const SHOTS = proce
   ok(rare.f && rare.f.rare && rare.f.sp === 'terraflora3' && /Something rare stirs/.test(rare.h) && /will not come this way again/.test(rare.tag), 'on the pity day the rare Terraflora III appears with its own heading (“' + rare.h + '”)');
   await shot('rare-find');
   const bf = await ev(() => { const s = A.State.state, n0 = s.aminas.length, r = A.Rules.befriend(s); A.UI.closeAll(); const k = s.aminas[s.aminas.length - 1]; return { ok: r && r.ok, n: s.aminas.length - n0, sp: k.sp, lv: k.lv, met: !!s.v18.rare.glowcap.met }; });
-  ok(bf.ok && bf.n === 1 && bf.sp === 'terraflora3' && bf.lv === 26 && bf.met, 'befriending it adds one Terraflora III at level 26 and records it as met');
+  ok(bf.ok && bf.n === 1 && bf.sp === 'terraflora3' && bf.lv === 22 && bf.met, 'befriending it adds one Terraflora III at level 22 and records it as met');
   await ev(() => { A.UI.exArea = 'glowcap'; A.UI.explore(); }); await sleep(200);
   ok(/befriended this glade/.test(await ev(() => (document.querySelector('.v18-rare-note') || {}).textContent || '')), 'afterwards the card says it was befriended');
 
