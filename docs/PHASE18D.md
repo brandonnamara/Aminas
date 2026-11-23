@@ -76,7 +76,7 @@ because its scripted teams carry no guard move.
 
 - **Verdant obstacles in 3D.** The four Verdant obstacle kinds had no voxel models and drew as flat 2D pictures over
   the 3D ground. New models: Elder Root sapling, vine tree, mossy ruin, mossy rock (`src/3d/library/verdant.js`). Ids
-  and positions unchanged. The two tree models were then lightened (section 7).
+  and positions unchanged. The two tree models were then lightened, and all 44 are baked into one mesh (section 9).
 - **Groves.** The same scenery layout (same count, same cells) grows Verdant kinds: willows for pines, oaks for birches,
   glowcaps for blossom, ferns and mushrooms in the glades, moss-capped rocks for crystals.
 - **Landmarks.** Aqueduct: water glints and a spill waterfall. Ivy Archive: door lanterns and glowing tablets. Twin
@@ -122,13 +122,14 @@ equal or one higher (the extra particle colour), and render time is within the r
 | Eligible | The area is unlocked and its three usual Aminas have been found |
 | Rate | The first exploration of each calendar day rolls once: 20%. Later explorations that day roll nothing (no farming); a clock set back gives no extra roll |
 | Pity | If every roll fails, it arrives on the 8th eligible day. 400 simulated players: everyone within 8 days, median day 4, 20% on day 1 |
-| Once | Befriended at the usual food cost, it joins at **level 26** and is recorded as met; it never appears again |
+| Level | Glowcap 22, Streamside 25, Canopy Edge 32: never above the recommended level of the dungeon ahead when the area opens (Mossgate 22, Spore Hollow 25, Moonwell 33) |
+| Once | Befriended at the usual food cost and recorded as met; it never appears again |
 | Codex | It enters the collection and Codex like any find; an unanswered find waits like any other |
 | UI | “Something rare stirs…” with “A rare encounter: it will not come this way again.” The area card says something rarer lives there, never which day or which species |
 
-Why it does not replace breeding or evolution: three Aminas in total, one per area, each once; it arrives at level 26,
-below the Verdant party level by the time those areas open (about 27–33); the other 54 species and every other third form
-still come from evolution. Saves: `st.v18.rare`, cleaned on load, round-trips through export/import.
+Why it does not replace breeding or evolution: three Aminas in total, one per area, each once; it joins at or below the
+level of the dungeon ahead (a first draft used level 26 everywhere, which on arrival was above a typical level-22–25
+party, so it was lowered); the other 54 species and every other third form still come from evolution. Saves: `st.v18.rare`, cleaned on load, round-trips through export/import.
 
 ## 7. Level cap at 40
 
@@ -169,33 +170,55 @@ Chromium + SwiftShader, 844×390 @2×. Relative only. Files in `docs/audit18d/`.
 
 **Island** (`tools/p18b-perf.js` → `perf.json`, same tool as the 18B and 18C baselines):
 
-| | 18B | 18C | 18D |
-|---|---|---|---|
-| Verdant draw calls (high) | 77 | 77 | 90 |
-| Verdant triangles (high) | 124k | 124k | 167k |
-| Verdant CPU per draw, high / balanced / saver (ms) | — | 398 / 317 / 233 | 423 / 324 / 240 |
-| Starter CPU per draw, high (ms) | — | 482 | 501 |
-| First visit / second visit (ms) | 2,696 / 1,990 | 2,747 / 1,834 | 3,033 / 1,993 |
-| GPU geometries after 10 round trips | stable | stable | stable (251 → 248) |
+| | 18C | 18D |
+|---|---|---|
+| Verdant draw calls, high / balanced / saver | 77 / 77 / 77 | 79 / 79 / 80 |
+| Verdant triangles, high / balanced / saver | 124k / 121k / 75k | 152k / 149k / 84k |
+| Verdant CPU per draw as a share of Starter's, high | 83% | 81% |
+| First visit / second visit (ms) | 2,747 / 1,834 | 2,858–3,172 / 2,181–2,201 |
+| GPU geometries over 10 round trips | 226 → 223 | 228 → 225 |
 
-The increase is the 44 obstacles now in 3D (12 draw calls, 38k triangles after lightening the two tree models from
-54k). The Verdant island is still cheaper to draw than Starter Island in every tier, and the cost falls as obstacles are
-cleared.
+The machine ran slower during the final 18D run (Starter Island, unchanged, also measured 14% slower), so the CPU cost
+is given relative to Starter in the same run. The 44 Verdant obstacles now in 3D first cost 13 draw calls and 54k
+triangles; lightening the two tree models and baking all four kinds into one mesh (with each specimen's own tint, and
+back faces dropped) brought that to +2 draw calls and +28k triangles. A browser-verdant18b check that Verdant stays
+within four draw calls of Starter caught the first version (88 vs 76) and passes now. Island switching is about 10–20%
+slower on a Verdant visit (more models to place); the bake itself adds nothing measurable (sync 459 vs 454 ms).
 
-**Long session** (`tools/p18d-session.js`, 18C and 18D run back to back): 24 island round trips and 10 Verdant battles.
-Island switch p50 / p95: 18C 977 / 1,740 ms, 18D 1,036 / 1,823 ms. Battle open: 720–1,350 ms (both). Battle render cost
-per frame: 18D 0.7–1.2 ms, 18C 0.9–1.5 ms. GPU geometries and textures flat after the first visits; DOM nodes flat;
-battle 3D cleans up (no live stage after leaving, templates cached at 11). JS heap after forced GC over 40 more round
-trips: 18D 40.2 → 40.6 MB, 18C 36.8 → 37.1 MB, so no leak; 18D holds about 3.5 MB more (the new models and arenas).
+**Battle arenas**: see section 5 (balanced mean 55.9 ms vs 57.0 ms for the Starter originals, final run).
+
+**Long session** (`tools/p18d-session.js`, 18C and 18D run back to back, heap after a double forced GC): 24 island round
+trips and 10 Verdant battles.
+
+| | 18C | 18D |
+|---|---|---|
+| Heap: start → after 12 trips → after 10 battles → after 24 more trips (MB) | 24.8 → 37.1 → 62.8 → 63.4 | 24.4 → 39.7 → 70.3 → 70.9 |
+| Island geometries at the same points | 73 → 131 → 134 → 134 | 73 → 129 → 134 → 134 |
+| Island switch p50 / p95 (ms) | 1,054 / 1,662 | 1,122 / 1,917 |
+| Battle open (ms) | 744–1,427 | 734–1,404 |
+| Battle render per frame (ms) | 0.93–1.70 | 0.66–1.46 |
+
+No leak: heap, geometries and DOM nodes are flat over the last 24 trips; the battle stage is gone after each battle
+(templates cached at 11). A separate 40-trip run: 18D 39.4 → 39.8 MB, 18C 36.8 → 37.1 MB. 18D holds 3–8 MB more (new
+models, arena variations). An early reading of 98–281 MB came from a single GC with too short a pause; with a double GC
+it does not reproduce.
 
 ## 10. Regression
 
-REGRESSION_PLACEHOLDER
+**Final run: 63 suites, 2,142 passed, 0 failed** (`docs/audit18d/regression-run2.log`).
+
+The first run had 2,139 passed and 2 failed (`regression-run1.log`), both resolved before the final run:
+- `browser-verdant18b` (Verdant within four draw calls of Starter: 88 vs 76): a genuine 18D regression from the new
+  obstacle models. Fixed in the game by baking them into one mesh (79 vs 76). Assertion unchanged.
+- `browser-ui5` (reward cards leave): a fixed 7 s wait for a 6.72 s card, overrun under load. Now a condition wait.
+
+New suites: `journey18d` (57), `polish18d` (47), `browser-polish18d` (17). Details: `docs/audit18d/regression.md`.
 
 ## 11. Known limitations
 
 - No physical iPhone testing; frame times are software-renderer comparisons.
-- The Verdant island draws 13 more calls and about 35% more triangles than in 18C while its obstacles stand.
+- The Verdant island draws 2 more calls and about 23% more triangles than in 18C while its obstacles stand, and a
+  Verdant visit loads 10–20% slower.
 - The rare encounter's day is the device's calendar day; moving the clock forward brings the next roll early (one roll
   per day still, and the pity count only rises once per day).
 - Arena variations recolour existing arenas; their layouts match the Starter originals.
