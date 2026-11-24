@@ -20,6 +20,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms)); const SHOTS = proce
     ['lumifern', 'acinus', 'kairyu'].forEach((sp, i) => R.addAmina(s, sp, i ? 22 : 30));
     s.islands.verdant = { unlocked: true, obstacles: {}, unlockedAt: Date.now(), by: 'boss' }; s.currentIsland = o.isle || 'verdant';
     if (o.obsidian) s.islands.obsidian = { unlocked: true, obstacles: {}, unlockedAt: Date.now() - 1e7 };
+    if (o.celestial) s.islands.celestial = { unlocked: true, obstacles: {}, unlockedAt: Date.now() - 1e7 };
     // the opening tour and the arrival notes are not what this test is about
     s.story = s.story || {}; s.notified = s.notified || {};
     s.res.gold = 3000; s.res.food = 4000; s.res.gems = 20; A.State.state = s; R.drain(); A.State.save(); A.UI.showIsland(true);
@@ -89,13 +90,13 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms)); const SHOTS = proce
   await sleep(800); await tidy(); const lk1 = await ev(() => ({ g: A.VoxIsland.stats().geometries, t: A.VoxIsland.stats().textures, n: document.getElementsByTagName('*').length }));
   ok(lk1.g === lk0.g && lk1.t === lk0.t && lk1.n === lk0.n, 'six more round trips leave GPU geometries, textures and page nodes where they were (' + JSON.stringify(lk0) + ' → ' + JSON.stringify(lk1) + ')');
 
-  /* ---------- a future island that is not ready ---------- */
-  await setup({ obsidian: true, isle: 'verdant' }); await sleep(700); await tidy();
+  /* ---------- a future island that is not ready (Phase 19C: Obsidian Reach is ready, so the Celestial Crown) ---------- */
+  await setup({ celestial: true, isle: 'verdant' }); await sleep(700); await tidy();
   await ev(() => A.UI.islandMap()); await sleep(400);
-  const ob = await ev(() => { const c = document.querySelector('.frag[data-island="obsidian"]'); return { txt: c ? c.textContent : '', travel: !!(c && c.querySelector('[data-act="travel"]')) }; });
-  ok(/Not ready/.test(ob.txt) && !ob.travel, 'an Obsidian Reach unlocked by an older build shows “Not ready” on the map, with no Travel button');
+  const ob = await ev(() => { const c = document.querySelector('.frag[data-island="celestial"]'); return { txt: c ? c.textContent : '', travel: !!(c && c.querySelector('[data-act="travel"]')) }; });
+  ok(/Not ready/.test(ob.txt) && !ob.travel, 'a Celestial Crown unlocked by an older build shows “Not ready” on the map, with no Travel button');
   await shot('map-notready');
-  const ob2 = await ev(() => { const r = A.UI.travelTo('obsidian'); return { r, isle: A.State.state.currentIsland, kept: !!A.State.state.islands.obsidian.unlocked }; });
+  const ob2 = await ev(() => { const r = A.UI.travelTo('celestial'); return { r, isle: A.State.state.currentIsland, kept: !!A.State.state.islands.celestial.unlocked }; });
   ok(ob2.r === false && ob2.isle === 'verdant' && ob2.kept, 'travel there is refused, and the save keeps its unlock record');
   await tidy();
 

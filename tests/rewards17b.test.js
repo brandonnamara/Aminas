@@ -75,14 +75,15 @@ ok(D.DUNGEONS.coldkiln.battles[9].lv === 11 && D.DUNGEONS.coldkiln.battles[9].sp
 /* ---------- quests that point at islands nobody can open yet ---------- */
 st = fresh(); ['m_wilds', 'm_stone'].forEach(() => {}); D.QUESTS.forEach((q) => { if (!q.side && q.id !== 'm_wilds') st.missions[q.id] = 'claimed'; });
 st.missions.m_wilds = 'claimed';
-ok(Q.status(st, Q.get('s_reach')) === 'locked' && Q.status(st, Q.get('s_crown')) === 'locked', 'The Dark Shore and Above the Clouds stay hidden: no island can open Obsidian Reach yet');
+// Phase 19C: Obsidian Reach is ready, so The Dark Shore is listed once Beyond the Shallows is done (the Forest Crown,
+// which opens it, can be fought); Above the Clouds stays hidden while the Celestial Crown is not ready.
+ok(Q.status(st, Q.get('s_reach')) !== 'locked' && Q.status(st, Q.get('s_crown')) === 'locked', 'The Dark Shore is listed (Phase 19C: Obsidian Reach is ready); Above the Clouds stays hidden: nothing can open the Celestial Crown yet');
 ok(Q.status(st, Q.get('s_wilds_farm')) !== 'locked' && Q.status(st, Q.get('s_wilds_clear')) !== 'locked', 'quests on the Verdant Wilds (which can be opened) are unaffected');
-ok(!Q.visible(st).some((q) => q.id === 's_reach' || q.id === 's_crown'), 'neither appears in the quest list');
-st.missions.s_reach = 'claimed'; ok(Q.status(st, Q.get('s_reach')) === 'claimed', 'a quest already claimed keeps its state');
-// Phase 18B (brief: hide quests whose destination cannot be visited): Obsidian Reach is not ready, so even a save that
-// opened it in an older version keeps the quest hidden, with its record untouched, until the island is marked ready.
-st.missions.s_reach = undefined; st.islands.obsidian = { unlocked: true, obstacles: {} }; ok(Q.status(st, Q.get('s_reach')) === 'locked', 'a save where Obsidian Reach is already open (bought in an older version) keeps the quest hidden while the island is not ready (Phase 18B)');
-D.ISLAND_LIVE.obsidian = true; ok(Q.status(st, Q.get('s_reach')) !== 'locked', 'and shows it again once Obsidian Reach is marked ready'); D.ISLAND_LIVE.obsidian = false;
+ok(Q.visible(st).some((q) => q.id === 's_reach') && !Q.visible(st).some((q) => q.id === 's_crown'), 'only The Dark Shore appears in the quest list');
+st.missions.s_crown = 'claimed'; ok(Q.status(st, Q.get('s_crown')) === 'claimed', 'a quest already claimed keeps its state'); st.missions.s_crown = undefined;
+// Phase 18B: a save that opened the Celestial Crown in an older version keeps its quest hidden, record untouched, until it is ready.
+st.missions.s_reach = 'claimed'; st.islands.celestial = { unlocked: true, obstacles: {} }; ok(Q.status(st, Q.get('s_crown')) === 'locked', 'a save where the Celestial Crown is already open (bought in an older version) keeps the quest hidden while the island is not ready (Phase 18B)');
+D.ISLAND_LIVE.celestial = true; ok(Q.status(st, Q.get('s_crown')) !== 'locked', 'and would show it once the Celestial Crown is marked ready (after The Dark Shore)'); D.ISLAND_LIVE.celestial = false; delete st.islands.celestial; st.missions.s_reach = undefined;
 ok(D.QUESTS.some((q) => q.id === 's_reach') && D.QUESTS.some((q) => q.id === 's_crown'), 'the quest data itself is untouched');
 
 /* ---------- the guardian brief ---------- */

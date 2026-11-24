@@ -108,26 +108,29 @@ ok(D.V18.gates.every((g, i) => D.DUNGEONS[g.id] && D.DUNGEONS[g.id].playable && 
   ok(R.reqMet(s, { struct: 'hollow' }) === R.reqMet(s, { struct: 'hollow', island: 'verdant' }) && R.reqMet(fresh(), { island: 'verdant' }) === false, 'requirements gain an island condition without changing the others');
 }
 
-/* ---------- future islands are not ready: travel, unlock, quests ---------- */
+/* ---------- future islands are not ready: travel, unlock, quests ----------
+   Phase 19C made Obsidian Reach ready (its campaign is built); the Celestial Crown is still not. The same rules are
+   checked on the Celestial Crown, and Obsidian Reach's activation on the old-save case this block used to cover. */
 {
-  ok(W.islandLive('starter') && W.islandLive('verdant') && !W.islandLive('obsidian') && !W.islandLive('celestial'), 'Obsidian Reach and the Celestial Crown are marked not ready; the first two islands are');
+  ok(W.islandLive('starter') && W.islandLive('verdant') && W.islandLive('obsidian') && !W.islandLive('celestial'), 'the Celestial Crown is marked not ready; the first three islands are (Obsidian Reach since Phase 19C)');
   const s = fresh(); s.islands.verdant = { unlocked: true, obstacles: {} };
-  ok(W.unlockByBoss(s, 'obsidian').ok === false && W.unlockIsland(s, 'obsidian').ok === false && !s.islands.obsidian, 'they cannot be unlocked in a new save');
+  ok(W.unlockByBoss(s, 'obsidian').ok === false && W.unlockIsland(s, 'obsidian').ok === false && !s.islands.obsidian, 'Obsidian Reach cannot be unlocked in a new save without the Forest Crown');
+  ok(W.unlockByBoss(s, 'celestial').ok === false && W.unlockIsland(s, 'celestial').ok === false && !s.islands.celestial, 'nor can the Celestial Crown');
   const vq = (st) => Q.visible(st).map((q) => q.id);
-  ok(vq(s).indexOf('s_reach') < 0 && vq(s).indexOf('s_crown') < 0, 'their quests stay hidden');
-  // an older save that unlocked Obsidian Reach (bought with gold in an early build), quest progress recorded
-  const L = fresh(); L.islands.verdant = { unlocked: true, obstacles: {} }; L.islands.obsidian = { unlocked: true, obstacles: {}, unlockedAt: 1 };
+  ok(vq(s).indexOf('s_crown') < 0, 'the Celestial quest stays hidden');
+  // an older save that unlocked the Celestial Crown (bought with gold in an early build), quest progress recorded
+  const L = fresh(); L.islands.verdant = { unlocked: true, obstacles: {} }; L.islands.celestial = { unlocked: true, obstacles: {}, unlockedAt: 1 };
   S.sanitize(L); const keep = clone({ islands: L.islands, missions: L.missions, buildings: L.buildings }); // as an older build saved it
-  L.currentIsland = 'obsidian'; S.sanitize(L);
-  ok(L.currentIsland === 'verdant' && L.islands.obsidian.unlocked && JSON.stringify(L.islands.obsidian) === JSON.stringify(keep.islands.obsidian), 'a save standing on Obsidian Reach loads on the Verdant Wilds; its Obsidian unlock and obstacle records are kept as they were');
-  const tr = W.travel(L, 'obsidian'); ok(tr.ok === false && tr.reason === 'notready' && L.currentIsland === 'verdant', 'travel to Obsidian Reach is refused with a reason');
+  L.currentIsland = 'celestial'; S.sanitize(L);
+  ok(L.currentIsland === 'verdant' && L.islands.celestial.unlocked && JSON.stringify(L.islands.celestial) === JSON.stringify(keep.islands.celestial), 'a save standing on the Celestial Crown loads on the Verdant Wilds; its unlock and obstacle records are kept as they were');
+  const tr = W.travel(L, 'celestial'); ok(tr.ok === false && tr.reason === 'notready' && L.currentIsland === 'verdant', 'travel to the Celestial Crown is refused with a reason');
   ok(W.travel(L, 'starter').ok && W.travel(L, 'verdant').ok, 'travel between Starter Island and the Verdant Wilds still works');
-  ok(vq(L).indexOf('s_reach') < 0, 'its Obsidian quest is hidden rather than pointing at an island that cannot be visited');
+  ok(vq(L).indexOf('s_crown') < 0, 'its Celestial quest is hidden rather than pointing at an island that cannot be visited');
   ok(JSON.stringify(L.missions) === JSON.stringify(keep.missions), 'quest records are untouched');
-  // activation later: one flag, no migration
-  D.ISLAND_LIVE.obsidian = true;
-  ok(W.travel(L, 'obsidian').ok && L.currentIsland === 'obsidian' && Q.islandReachable(L, 'obsidian'), 'marking Obsidian Reach ready is the whole activation: the same save travels there');
-  D.ISLAND_LIVE.obsidian = false; W.travel(L, 'verdant');
+  // Obsidian Reach, bought in an early build: since Phase 19C the same save simply travels there (the flag was the whole activation)
+  const O2 = fresh(); O2.islands.verdant = { unlocked: true, obstacles: {} }; O2.islands.obsidian = { unlocked: true, obstacles: {}, unlockedAt: 1 }; S.sanitize(O2);
+  ok(W.travel(O2, 'obsidian').ok && O2.currentIsland === 'obsidian' && Q.islandReachable(O2, 'obsidian'), 'marking Obsidian Reach ready was the whole activation: an old save that opened it travels there');
+  W.travel(O2, 'verdant');
 }
 
 /* ---------- saves ---------- */

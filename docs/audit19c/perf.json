@@ -1,0 +1,316 @@
+{
+ "note": "Chromium + SwiftShader (software WebGL) at 844×390, DPR 2. Not an iPhone: compare the islands, not absolute speed.",
+ "firstVisitMs": 2609,
+ "secondVisitMs": 1501,
+ "tiers": [
+  {
+   "island": "starter",
+   "tier": "high",
+   "calls": 76,
+   "triangles": 135070,
+   "geometries": 176,
+   "textures": 2,
+   "avgDrawMs": 579.5,
+   "p50": 583.2,
+   "p95": 666.7
+  },
+  {
+   "island": "verdant",
+   "tier": "high",
+   "calls": 85,
+   "triangles": 152204,
+   "geometries": 180,
+   "textures": 2,
+   "avgDrawMs": 493.59,
+   "p50": 666.6,
+   "p95": 799.9
+  },
+  {
+   "island": "obsidian",
+   "tier": "high",
+   "calls": 64,
+   "triangles": 115074,
+   "geometries": 180,
+   "textures": 2,
+   "avgDrawMs": 439.82,
+   "p50": 600,
+   "p95": 666.6
+  },
+  {
+   "island": "starter",
+   "tier": "balanced",
+   "calls": 76,
+   "triangles": 132272,
+   "geometries": 176,
+   "textures": 2,
+   "avgDrawMs": 390.58,
+   "p50": 466.7,
+   "p95": 666.6
+  },
+  {
+   "island": "verdant",
+   "tier": "balanced",
+   "calls": 85,
+   "triangles": 149564,
+   "geometries": 180,
+   "textures": 2,
+   "avgDrawMs": 346.03,
+   "p50": 466.7,
+   "p95": 533.3
+  },
+  {
+   "island": "obsidian",
+   "tier": "balanced",
+   "calls": 64,
+   "triangles": 112566,
+   "geometries": 180,
+   "textures": 2,
+   "avgDrawMs": 309.18,
+   "p50": 416.7,
+   "p95": 466.6
+  },
+  {
+   "island": "starter",
+   "tier": "saver",
+   "calls": 76,
+   "triangles": 81996,
+   "geometries": 222,
+   "textures": 2,
+   "avgDrawMs": 276.6,
+   "p50": 316.8,
+   "p95": 383.2
+  },
+  {
+   "island": "verdant",
+   "tier": "saver",
+   "calls": 86,
+   "triangles": 84470,
+   "geometries": 279,
+   "textures": 2,
+   "avgDrawMs": 251.43,
+   "p50": 316.6,
+   "p95": 350
+  },
+  {
+   "island": "obsidian",
+   "tier": "saver",
+   "calls": 64,
+   "triangles": 69238,
+   "geometries": 314,
+   "textures": 2,
+   "avgDrawMs": 229.19,
+   "p50": 283.3,
+   "p95": 350
+  }
+ ],
+ "flat": [
+  {
+   "island": "starter",
+   "vox": false,
+   "nodes": 2739,
+   "svgNodes": 1239,
+   "p50": 16.7,
+   "p95": 16.7
+  },
+  {
+   "island": "verdant",
+   "vox": false,
+   "nodes": 2495,
+   "svgNodes": 995,
+   "p50": 16.7,
+   "p95": 16.7
+  },
+  {
+   "island": "obsidian",
+   "vox": false,
+   "nodes": 2376,
+   "svgNodes": 876,
+   "p50": 16.7,
+   "p95": 16.8
+  }
+ ],
+ "leak": {
+  "trips": 30,
+  "islandsPerTrip": 3,
+  "before": {
+   "geometries": 312,
+   "textures": 2,
+   "nodes": 2105,
+   "heapMB": 124.9
+  },
+  "at10_20_30": [
+   {
+    "geometries": 312,
+    "textures": 2,
+    "nodes": 2105,
+    "heapMB": 124.9
+   },
+   {
+    "geometries": 312,
+    "textures": 2,
+    "nodes": 2105,
+    "heapMB": 124.9
+   },
+   {
+    "geometries": 312,
+    "textures": 2,
+    "nodes": 2105,
+    "heapMB": 124.9
+   }
+  ],
+  "after": {
+   "geometries": 312,
+   "textures": 2,
+   "nodes": 2105,
+   "heapMB": 124.9
+  },
+  "avgTravelMs": 1944
+ },
+ "battles": [
+  {
+   "id": "v_mossgate",
+   "readyMs": 1752,
+   "drawCalls": 21,
+   "triangles": 15504,
+   "geometries": 18,
+   "textures": 5,
+   "fps": 10.2,
+   "heapMB": 124.9
+  },
+  {
+   "id": "v_twinshrine",
+   "readyMs": 964,
+   "drawCalls": 29,
+   "triangles": 15842,
+   "geometries": 22,
+   "textures": 4,
+   "fps": 13.8,
+   "heapMB": 124.9
+  },
+  {
+   "id": "v_elderroot",
+   "readyMs": 965,
+   "drawCalls": 23,
+   "triangles": 15250,
+   "geometries": 24,
+   "textures": 5,
+   "fps": 14.5,
+   "heapMB": 124.9
+  },
+  {
+   "id": "o_cinder",
+   "readyMs": 908,
+   "drawCalls": 21,
+   "triangles": 17026,
+   "geometries": 24,
+   "textures": 5,
+   "fps": 12.8,
+   "heapMB": 124.9
+  },
+  {
+   "id": "o_kilns",
+   "readyMs": 892,
+   "drawCalls": 20,
+   "triangles": 15564,
+   "geometries": 26,
+   "textures": 4,
+   "fps": 15,
+   "heapMB": 124.9
+  },
+  {
+   "id": "o_rookery",
+   "readyMs": 1067,
+   "drawCalls": 28,
+   "triangles": 14516,
+   "geometries": 28,
+   "textures": 5,
+   "fps": 13.8,
+   "heapMB": 124.9
+  },
+  {
+   "id": "o_quench",
+   "readyMs": 1124,
+   "drawCalls": 21,
+   "triangles": 19556,
+   "geometries": 30,
+   "textures": 5,
+   "fps": 16.2,
+   "heapMB": 124.9
+  },
+  {
+   "id": "o_seams",
+   "readyMs": 1040,
+   "drawCalls": 37,
+   "triangles": 12666,
+   "geometries": 48,
+   "textures": 6,
+   "fps": 19.7,
+   "heapMB": 124.9
+  },
+  {
+   "id": "o_gallery",
+   "readyMs": 825,
+   "drawCalls": 25,
+   "triangles": 16262,
+   "geometries": 35,
+   "textures": 5,
+   "fps": 14.8,
+   "heapMB": 124.9
+  },
+  {
+   "id": "o_hollows",
+   "readyMs": 1227,
+   "drawCalls": 30,
+   "triangles": 24706,
+   "geometries": 46,
+   "textures": 6,
+   "fps": 14.8,
+   "heapMB": 124.9
+  },
+  {
+   "id": "o_orchard",
+   "readyMs": 887,
+   "drawCalls": 29,
+   "triangles": 15548,
+   "geometries": 40,
+   "textures": 4,
+   "fps": 15.2,
+   "heapMB": 124.9
+  },
+  {
+   "id": "o_bellows",
+   "readyMs": 944,
+   "drawCalls": 24,
+   "triangles": 16918,
+   "geometries": 43,
+   "textures": 6,
+   "fps": 16.5,
+   "heapMB": 124.9
+  },
+  {
+   "id": "o_forge",
+   "readyMs": 865,
+   "drawCalls": 23,
+   "triangles": 14318,
+   "geometries": 44,
+   "textures": 5,
+   "fps": 13.5,
+   "heapMB": 124.9
+  }
+ ],
+ "battleRounds": [
+  {
+   "geometries": 29,
+   "textures": 2,
+   "nodes": 2106,
+   "heapMB": 124.9
+  },
+  {
+   "geometries": 29,
+   "textures": 2,
+   "nodes": 2106,
+   "heapMB": 124.9
+  }
+ ],
+ "errors": []
+}

@@ -27,6 +27,20 @@
     twineclipse:   { name: 'Twin Eclipse', el: 'light', type: 'dmg', power: 84, cd: 0, boss: true, neutral: true, tell: 'Light and shadow fold together over the shrine. Twin Eclipse is coming!', desc: 'Light and shadow at once. Never resisted, but a guard blocks most of it.' },
     tidalhymn:     { name: 'Tidal Hymn', el: 'water', type: 'dmg', power: 74, cd: 0, boss: true, tell: 'The Moonwell rises without a ripple. Tidal Hymn is coming!', desc: 'A slow, enormous wave that sings as it breaks.' },
     crownofthorns: { name: 'Crown of Thorns', el: 'nature', type: 'dmg', power: 90, cd: 0, boss: true, tell: 'Every root on the island lifts at once. Crown of Thorns is coming!', desc: 'The Elder Root closes around the field.' },
+    /* Phase 19C: Obsidian Reach guardians' charged moves (approved in Phase 19A). Existing effects only: burn, soak
+       (chilled: slower), silence, lowered attack, never resisted. Telegraphed a turn ahead; a guard blocks three-quarters
+       and, since Phase 18D, always goes up before the blow lands, whatever the speeds; a stun while charging staggers;
+       a soaked guardian holds its charge a turn. Cold Quench chills (soak) and never stuns: the stunning draft was rejected. */
+    ashfall:        { name: 'Ashfall', el: 'fire', type: 'dmg', power: 76, cd: 0, boss: true, tell: 'The sky goes grey and starts to fall. Ashfall is coming!', desc: 'Hot ash settles on everything. Burns the target. Guard it; a heal clears the burn.', fx: { k: 'burn', p: 1, n: 2 } },
+    moltenglaze:    { name: 'Molten Glaze', el: 'fire', type: 'weaken', power: 72, cd: 0, boss: true, tell: 'The Glassblower draws a long, glowing breath. Molten Glaze is coming!', desc: 'A coat of hot glass that lowers your attack. Guard it; a heal clears it.' },
+    cinderdive:     { name: 'Cinder Dive', el: 'fire', type: 'dmg', power: 80, cd: 0, boss: true, tell: 'The Matriarch folds her wings and drops. Cinder Dive is coming!', desc: 'A burning dive from the top of the columns. Guard it, or stun her while she climbs.' },
+    coldquench:     { name: 'Cold Quench', el: 'water', type: 'dmg', power: 70, cd: 0, boss: true, tell: 'Every pool goes still and starts to hiss. Cold Quench is coming!', desc: 'Plunges you into the quench. Chilled: slower for two turns, so you may act second. Guard it; a heal warms you up.', fx: { k: 'soak', p: 1, n: 2 } },
+    blackout:       { name: 'Blackout', el: 'dark', type: 'dmg', power: 72, cd: 0, boss: true, tell: 'The last lamp in the gallery goes out. Blackout is coming!', desc: 'Total dark: no special abilities on your next turn (your basic move still works). Guard it; a heal clears it.', fx: { k: 'silence', p: 1, n: 2 } },
+    nightglass:     { name: 'Night Glass', el: 'dark', type: 'dmg', power: 84, cd: 0, boss: true, neutral: true, tell: 'Every mirror in the gallery turns to face you. Night Glass is coming!', desc: 'Your own reflection strikes back. Never resisted, but a guard blocks most of it.' },
+    shatterlight:   { name: 'Shatterlight', el: 'light', type: 'dmg', power: 78, cd: 0, boss: true, tell: 'The crystals ring, higher and higher. Shatterlight is coming!', desc: 'A note that breaks into light. Dark resists it; a guard blocks most of it.' },
+    ashbloom:       { name: 'Ashbloom', el: 'nature', type: 'weaken', power: 74, cd: 0, boss: true, tell: 'Grey blossom drifts down like snow. Ashbloom is coming!', desc: 'Ash-pollen that lowers your attack. Guard it; a heal clears it.' },
+    furnacedraught: { name: 'Furnace Draught', el: 'wind', type: 'dmg', power: 78, cd: 0, boss: true, tell: 'The bellows fill until the leather creaks. Furnace Draught is coming!', desc: 'A blast of forge air. Burns the target. Guard it; a heal clears the burn.', fx: { k: 'burn', p: 1, n: 2 } },
+    heartofforge:   { name: 'Heart of the Forge', el: 'earth', type: 'dmg', power: 92, cd: 0, boss: true, tell: 'The core flares white. Heart of the Forge is coming!', desc: 'The whole forge, at once. Guard it, or soak the core to make it sputter. Water answers Earth.' },
   });
 
   /* ---------- boss mechanics (read by the battle engine) ----------
@@ -302,6 +316,130 @@
       first: { gold: 4000, food: 600, gems: 30 }, repeat: { gold: 450, food: 90 },
       rewardText: 'Island Boss. First clear: 4,000 gold, 600 food, 30 gems. Replays: 450 gold, 90 food.',
     },
+
+    /* ======================= Phase 19C: Obsidian Reach (the Cooling Forge) =======================
+       Ten dungeons, recommended levels 38 to 47 (the level-cap-50 band approved in Phase 19A). Each opens when the one
+       before is cleared; the first when the Forest Crown has fallen and the island is reached. Foes are existing species
+       in the form their level calls for (third forms from 22); no new species and no legendary foes. The island's foes
+       carry a tier (D.CAMPAIGN.obsidian.foeTier, from ×1.3 HP / ×1.18 attack), tuned per dungeon and per battle with
+       `tune` after simulation (tools/p19c-sim.js). Cells: docs/PHASE19B.md. */
+    o_cinder: {
+      tune: { hp: 1.2 }, // Phase 19C tuning (tools/p19c-tune.js, tools/p19c-sim.js)
+      name: 'The Cinder Steps', island: 'obsidian', el: 'fire', playable: true, recommended: 38, env: 'o_cinder',
+      theme: 'Basalt steps from the black-sand landing up into the ash, warm underfoot. Every tenth step has a lantern hook.',
+      unlock: { islandBoss: 'verdant' }, unlockText: 'Defeat the Forest Crown, then reach Obsidian Reach.',
+      battles: vnine(['pyrokai', 'gaiaroki', 'emberix', 'pyrocell', 'pyrokai', 'gaiaroki', 'emberix', 'pyrokai', 'pyrocell'], 38, ['o_cinder', 'o_cinder', 'o_cinder'],
+        ['The steps come in two sizes again. Here the small ones are scorched black, and the large ones are not.', 'A lantern hook every ten steps. Every hook is empty, and every one has been polished.', 'At the top, the ash thins. Somewhere ahead, a square, and the smell of hot glass.'])
+        .concat([vboss({ sp: 'pyrokai', title: 'The Cinder Warden', hpMult: 1.6, move: 'ashfall' }, 38)]),
+      sections: sec({ name: 'The Black Sand Stair', first: { gold: 260, food: 50 } }, { name: 'The Lantern Hooks', first: { gold: 270, food: 52 } }, { name: 'The Ash Line', first: { gold: 280, food: 54 } }, { name: 'The Warden’s Landing', first: { gems: 6 } }),
+      first: { gold: 2200, food: 420, gems: 10 }, repeat: { gold: 500, food: 95 },
+      rewardText: 'First clear: 2,200 gold, 420 food, 10 gems. Replays: 500 gold, 95 food.',
+    },
+    o_kilns: {
+      tune: { hp: 1.1 }, // Phase 19C tuning (tools/p19c-tune.js, tools/p19c-sim.js)
+      name: 'The Glasswick Kilns', island: 'obsidian', el: 'fire', playable: true, recommended: 39, env: 'o_kilns', scene: 'o_kilns',
+      theme: 'Two rows of glass kilns behind Glasswick, one fired pale, one fired dark. Half-finished panes still stand in the racks.',
+      unlock: {}, unlockText: 'Clear the Cinder Steps.',
+      battles: vnine(['emberix', 'lumi', 'igniflare', 'emberix', 'voltar', 'igniflare', 'lumi', 'emberix', 'igniflare'], 39, ['o_kilns', 'o_kilns', 'o_kilns'],
+        ['Two rows of kilns face each other across the yard. One row is streaked pale, the other soot-dark.', 'Racks of unfinished panes, sorted by colour. Somebody labelled every rack in two hands.', 'The last kiln is still warm. Nobody has fed it for an age, and it does not seem to have noticed.'])
+        .concat([vboss({ sp: 'emberix', title: 'The Glassblower', hpMult: 1.62, move: 'moltenglaze' }, 39)]),
+      sections: sec({ name: 'The Kiln Yard', first: { gold: 270, food: 52 } }, { name: 'The Racks', first: { gold: 280, food: 54 } }, { name: 'The Pale Row and the Dark', first: { gold: 290, food: 56 } }, { name: 'The Last Kiln', first: { gems: 6 } }),
+      first: { gold: 2400, food: 440, gems: 10 }, repeat: { gold: 520, food: 95 },
+      rewardText: 'First clear: 2,400 gold, 440 food, 10 gems. Replays: 520 gold, 95 food.',
+    },
+    o_rookery: {
+      name: 'The Basalt Rookery', island: 'obsidian', el: 'fire', playable: true, recommended: 40, env: 'o_rookery',
+      theme: 'Basalt columns on the west ridge, honeycombed with nests. Something large keeps them warm.',
+      unlock: {}, unlockText: 'Clear the Glasswick Kilns.',
+      battles: vnine(['pyrospark', 'zephyr', 'voltar', 'pyrospark', 'zephyr', 'umbrit', 'pyrospark', 'zephyr', 'voltar'], 40, ['o_rookery', 'o_rookery', 'o_rookery'],
+        ['The nests are woven from glass thread: pale strands and dark strands, twisted together.', 'Feathers stuck in the basalt like pins. Some of them are still warm.', 'Higher up, the nests get bigger. Much bigger. The wind up here smells of smoke.'])
+        .concat([vboss({ sp: 'pyrospark', title: 'The Rookery Matriarch', hpMult: 1.62, move: 'cinderdive' }, 40)]),
+      sections: sec({ name: 'The Column Foot', first: { gold: 280, food: 54 } }, { name: 'The Glass Nests', first: { gold: 290, food: 56 } }, { name: 'The High Ledges', first: { gold: 300, food: 58 } }, { name: 'The Matriarch’s Crown', first: { gems: 7 } }),
+      first: { gold: 2600, food: 460, gems: 10 }, repeat: { gold: 540, food: 100 },
+      rewardText: 'First clear: 2,600 gold, 460 food, 10 gems. Replays: 540 gold, 100 food.',
+    },
+    o_quench: {
+      tune: { hp: 0.9, atk: 0.92 }, // the spike found in Phase 19A (threshold at rec); see docs/PHASE19C.md // Phase 19C tuning (tools/p19c-tune.js, tools/p19c-sim.js)
+      name: 'The Quench Pools', island: 'obsidian', el: 'water', playable: true, recommended: 41, env: 'o_quench',
+      theme: 'Steaming pools where hot glass was cooled. The water hisses whenever anything warm comes near.',
+      unlock: {}, unlockText: 'Clear the Basalt Rookery.',
+      battles: vnine(['cannonis', 'kairyu', 'aquaflora', 'pyrocell', { sp: 'cannonis', tune: { hp: 0.88 } }, { sp: 'kairyu', tune: { hp: 0.85 } }, 'aquaflora', 'cannonis', 'pyrocell'], 41, ['o_quench', 'o_quench', 'o_quench'],
+        ['Steam lies on the pools like a lid. Under it, the water is perfectly clear and very cold.', 'A row of iron tongs on hooks, long ones and short ones, all of them bent the same way.', 'One pool was drained long ago. Something round and very large once lay on its floor.'])
+        .concat([vboss({ sp: 'cannonis', title: 'The Quenchwarden', hpMult: 1.65, move: 'coldquench', tune: { hp: 0.92, atk: 0.86 } }, 41)]),
+      sections: sec({ name: 'The Steam Line', first: { gold: 290, food: 56 } }, { name: 'The Tong Racks', first: { gold: 300, food: 58 } }, { name: 'The Drained Pool', first: { gold: 310, food: 60 } }, { name: 'The Cold Basin', first: { gems: 8 } }),
+      first: { gold: 2800, food: 480, gems: 12 }, repeat: { gold: 560, food: 100 },
+      rewardText: 'First clear: 2,800 gold, 480 food, 12 gems. Replays: 560 gold, 100 food.',
+    },
+    o_seams: {
+      name: 'The Deep Seams', island: 'obsidian', el: 'metal', playable: true, recommended: 42, env: 'o_seams',
+      theme: 'Mine galleries under the central ridge. The lamps were all taken; something down here eats light.',
+      unlock: {}, unlockText: 'Clear the Quench Pools.',
+      battles: vnine(['voltar', 'zeep', 'pyrocell', 'voltar', 'umbrit', 'zeep', 'voltar', 'pyrocell', 'zeep'], 42, ['o_seams', 'o_seams', 'o_seams'],
+        ['Ore carts in two lines: pale ore in one, dark ore in the other. Someone was very tidy.', 'Every lamp bracket is empty. Not broken. Emptied, one after another, all the way down.', 'The dark ahead is thicker than dark ought to be. It moves when you are not looking at it.'])
+        .concat([vboss({ sp: 'voltar', title: 'The Lamp-Eater', hpMult: 1.65, move: 'blackout' }, 42)]),
+      sections: sec({ name: 'The Ore Carts', first: { gold: 300, food: 58 } }, { name: 'The Empty Brackets', first: { gold: 310, food: 60 } }, { name: 'The Deep Gallery', first: { gold: 320, food: 62 } }, { name: 'The Lamp-Eater’s Den', first: { gems: 8 } }),
+      first: { gold: 3000, food: 500, gems: 12 }, repeat: { gold: 580, food: 105 },
+      rewardText: 'First clear: 3,000 gold, 500 food, 12 gems. Replays: 580 gold, 105 food.',
+    },
+    o_gallery: {
+      tune: { hp: 0.85 }, // Phase 19C tuning (tools/p19c-tune.js, tools/p19c-sim.js)
+      name: 'The Mirror Gallery', island: 'obsidian', el: 'dark', playable: true, recommended: 43, env: 'o_gallery', scene: 'o_mould',
+      theme: 'The finishing hall on the central ridge: every pane that passed inspection hung here to be judged. Most are cracked.',
+      unlock: {}, unlockText: 'Clear the Deep Seams.',
+      battles: vnine(['umbrit', 'lumifern', 'lumi', 'voltar', 'umbrit', 'lumifern', 'voltar', 'lumi', 'lumifern'], 43, ['o_gallery', 'o_gallery', 'o_gallery'],
+        ['Frames down both walls, hundreds of them. Your reflection walks beside you in every pane, a moment late.', 'A judging bench with two seats: one high, one low. Both are worn through.', 'At the end of the hall, a covered shape, taller than a door. The cloth over it has not been moved in an age.'])
+        .concat([vboss({ sp: 'umbrit', title: 'The Dusk Warden', hpMult: 1.7, move: 'nightglass', mech: { type: 'prism', every: 2, els: ['dark', 'light'] } }, 43)]),
+      sections: sec({ name: 'The Long Hall', first: { gold: 320, food: 60 } }, { name: 'The Judging Bench', first: { gold: 330, food: 62 } }, { name: 'The Covered Frame', first: { gold: 340, food: 64 } }, { name: 'The Last Mirror', first: { gems: 9 } }),
+      first: { gold: 3400, food: 540, gems: 15 }, repeat: { gold: 600, food: 110 },
+      rewardText: 'First clear: 3,400 gold, 540 food, 15 gems. Replays: 600 gold, 110 food.',
+    },
+    o_hollows: {
+      name: 'The Magenta Hollows', island: 'obsidian', el: 'resonance', playable: true, recommended: 44, env: 'o_hollows', scene: 'o_crystals',
+      theme: 'Crystal caves under the north cliffs, at the top of the central path. The magenta crystals keep every sound ever made near them.',
+      unlock: {}, unlockText: 'Clear the Mirror Gallery.',
+      battles: vnine(['aimza', 'lumi', 'zeep', 'aimza', 'voltar', 'lumi', 'aimza', 'zeep', 'lumi'], 44, ['o_hollows', 'o_hollows', 'o_hollows'],
+        ['The crystals hum back whatever you say, a little later and a little sadder.', 'Footsteps echo that are not yours. Two sets, one heavy, one light, walking together.', 'Deeper in, the hum turns into a sound. You would rather it had stayed a hum.'])
+        .concat([vboss({ sp: 'lumi', title: 'The Lantern Below', hpMult: 1.65, move: 'shatterlight' }, 44)]),
+      sections: sec({ name: 'The Humming Mouth', first: { gold: 330, food: 62 } }, { name: 'The Echo Walk', first: { gold: 340, food: 64 } }, { name: 'The Singing Deep', first: { gold: 350, food: 66 } }, { name: 'The Lantern’s Hollow', first: { gems: 9 } }),
+      first: { gold: 3700, food: 570, gems: 15 }, repeat: { gold: 620, food: 110 },
+      rewardText: 'First clear: 3,700 gold, 570 food, 15 gems. Replays: 620 gold, 110 food.',
+    },
+    o_orchard: {
+      tune: { hp: 1.1 }, // Phase 19C tuning (tools/p19c-tune.js, tools/p19c-sim.js)
+      name: 'The Charred Orchard', island: 'obsidian', el: 'nature', playable: true, recommended: 45, env: 'o_orchard',
+      theme: 'A burned orchard on the west plain, still fruiting. Ash-grey leaves, magenta blossom.',
+      unlock: {}, unlockText: 'Clear the Magenta Hollows.',
+      battles: vnine(['terraflora', 'acinus', 'sylvaneer', 'terraflora', 'pyrokai', 'acinus', 'terraflora', 'sylvaneer', 'pyrokai'], 45, ['o_orchard', 'o_orchard', 'o_orchard'],
+        ['Black trunks in grey ash, every one of them in flower. Nothing about that is right, and it is very pretty.', 'The rows are uneven, as if two people planted from opposite ends and met in the middle.', 'In the middle row, two trees have grown into one. Nobody pruned them apart.'])
+        .concat([vboss({ sp: 'terraflora', title: 'The Ashbloom', hpMult: 1.65, move: 'ashbloom' }, 45)]),
+      sections: sec({ name: 'The Grey Rows', first: { gold: 340, food: 64 } }, { name: 'The Uneven Planting', first: { gold: 350, food: 66 } }, { name: 'The Joined Trees', first: { gold: 360, food: 68 } }, { name: 'The Blossom Heart', first: { gems: 10 } }),
+      first: { gold: 4000, food: 600, gems: 15 }, repeat: { gold: 640, food: 115 },
+      rewardText: 'First clear: 4,000 gold, 600 food, 15 gems. Replays: 640 gold, 115 food.',
+    },
+    o_bellows: {
+      tune: { hp: 1.15 }, // Phase 19C tuning (tools/p19c-tune.js, tools/p19c-sim.js)
+      name: 'The Great Bellows', island: 'obsidian', el: 'wind', playable: true, recommended: 46, env: 'o_bellows', scene: 'o_ledger',
+      theme: 'Inside the leather lungs on the east ridge that once fed the forge. Some of them still breathe.',
+      unlock: {}, unlockText: 'Clear the Charred Orchard.',
+      battles: vnine(['zephyr', 'pyrospark', 'igniflare', 'zephyr', 'pyrokai', 'pyrospark', 'zephyr', 'igniflare', 'zeep'], 46, ['o_bellows', 'o_bellows', 'o_bellows'],
+        ['The leather breathes in, very slowly, and the whole ridge leans with it.', 'A tally on the iron ribs: two kinds of mark, side by side, counting the same thing.', 'Behind the last lung, a small office with a desk and a chair, and a book left open.'])
+        .concat([vboss({ sp: 'zephyr', title: 'The Bellows Wind', hpMult: 1.65, move: 'furnacedraught' }, 46)]),
+      sections: sec({ name: 'The First Lung', first: { gold: 350, food: 66 } }, { name: 'The Iron Ribs', first: { gold: 360, food: 68 } }, { name: 'The Bellows Office', first: { gold: 370, food: 70 } }, { name: 'The Last Breath', first: { gems: 10 } }),
+      first: { gold: 4400, food: 650, gems: 18 }, repeat: { gold: 660, food: 120 },
+      rewardText: 'First clear: 4,400 gold, 650 food, 18 gems. Replays: 660 gold, 120 food.',
+    },
+    o_forge: {
+      tune: { hp: 1.12 }, // Phase 19C tuning (tools/p19c-tune.js, tools/p19c-sim.js)
+      name: 'The Heart of the Forge', island: 'obsidian', el: 'earth', playable: true, recommended: 47, env: 'o_forge', scene: 'o_heart',
+      theme: 'The Great Forge on the north-east headland: cold everywhere except its core, which has never gone out.',
+      unlock: {}, unlockText: 'Clear the Great Bellows.',
+      battles: vnine(['pyrocell', 'zeep', 'pyrokai', 'pyrocell', 'emberix', 'zeep', 'pyrocell', 'pyrokai', 'aimza'], 47, ['o_forge', 'o_forge', 'o_forge'],
+        ['Anvils in a ring, each with a hammer laid across it, ready. Nobody came back for the hammers.', 'Two moulds on the long bench, a door-shaped gap between them, as if the thing they made was carried out.', 'Ahead, the core. It beats. Slowly. Like something that has been waiting a very long time.'])
+        .concat([vboss({ sp: 'pyrocell', title: 'The Forge Heart', hpMult: 1.75, scale: 1.75, islandBoss: true, move: 'heartofforge', mech: { type: 'barrier', at: [0.66, 0.33], amt: 0.18 }, tune: { hp: 0.92, atk: 0.9 } }, 47)]),
+      sections: sec({ name: 'The Ring of Anvils', first: { gold: 380, food: 70 } }, { name: 'The Long Bench', first: { gold: 400, food: 75 } }, { name: 'The Core Approach', first: { gold: 420, food: 80 } }, { name: 'The Forge Heart', first: { gems: 18 } }),
+      first: { gold: 7000, food: 1000, gems: 40 }, repeat: { gold: 750, food: 130 },
+      rewardText: 'Island Boss. First clear: 7,000 gold, 1,000 food, 40 gems and Night Mail. Replays: 750 gold, 130 food.',
+    },
   };
 
   /* ---------- islands (world fragments) ---------- */
@@ -315,7 +453,10 @@
     // closed until that island is marked ready (D.ISLAND_LIVE, src/verdant18b.js).
     verdant: { dungeons: ['v_mossgate', 'v_aqueduct', 'v_spore', 'v_archive', 'v_glow', 'v_twinshrine', 'v_canopy', 'v_moonwell', 'v_choir', 'v_elderroot'],
       islandBoss: 'v_elderroot', next: 'obsidian', foeTier: { hp: 1.2, atk: 1.12 }, hint: 'Something green and very old, pressing at the edge of the sanctuary.' },
-    obsidian: { dungeons: [], islandBoss: null, next: 'celestial', hint: 'Dark stone, and a warmth that does not come from any sun.' },
+    // Phase 19C: the Obsidian Reach campaign. Its Island Boss (the Forge Heart) raises the level cap to 60 (R.levelCap)
+    // and would open the Celestial Crown, which stays closed until that island is marked ready (D.ISLAND_LIVE).
+    obsidian: { dungeons: ['o_cinder', 'o_kilns', 'o_rookery', 'o_quench', 'o_seams', 'o_gallery', 'o_hollows', 'o_orchard', 'o_bellows', 'o_forge'],
+      islandBoss: 'o_forge', next: 'celestial', foeTier: { hp: 1.3, atk: 1.18 }, hint: 'Dark stone, and a warmth that does not come from any sun.' },
     celestial: { dungeons: [], islandBoss: null, next: null, hint: 'High up. Higher than an island has any right to be.' },
   };
   /* ---------- Phase 17B: the run-up to each boss ----------

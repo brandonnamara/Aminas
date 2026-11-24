@@ -159,6 +159,47 @@
     fr(380, 0, 240, 420, VS.bark) + [...Array(8)].map((_, i) => '<path d="M' + (500 + (i - 3.5) * 40) + ' 380Q' + (500 + (i - 3.5) * 120) + ' 300 ' + (500 + (i - 3.5) * 150) + ' 420" stroke="' + VS.bark + '" stroke-width="26" fill="none"/>').join('') +
     fr(440, 260, 120, 160, '#1a0e08') + [...Array(6)].map((_, i) => fr(80 + i * 160, 60 + (i % 2) * 40, 120, 60, i % 2 ? VS.leaf : '#26783c')).join('') +
     (o.boss ? glowE(500, 300, 180, 90, '#9af2ff', 0.3) : '') + vfloor('#1f3326') + motes('#9af2ff');
+  /* ---- Phase 19C: Obsidian Reach's ten dungeons (the Cooling Forge): basalt, cooling metal, glasswork, forge chambers,
+     magenta crystal and volcanic ruins, in the island's violet-ash palette. Same flat voxel style, normal and boss room. ---- */
+  const OS = { bas: '#3a3446', basD: '#2a2436', basL: '#4a4458', ash: '#6a6070', iron: '#5a5e6a', ironD: '#3e424c', rust: '#a0583a', glass: '#a8d8e8', glassD: '#5a8aa0', crys: '#e64ab8', crysL: '#ff8ad8', ember: '#ff8a3a', emberL: '#ffd27a', leather: '#8a5a3a', brick: '#8a4a3a' };
+  const ofloor = (c) => '<rect y="390" width="1000" height="110" fill="' + c + '"/>' + [...Array(10)].map((_, i) => '<rect x="' + (i * 100 + 20) + '" y="' + (402 + (i % 3) * 20) + '" width="60" height="4" fill="' + shade(c, 0.12) + '"/>').join('');
+  const col = (x, w, h, c) => fr(x, 390 - h, w, h, c || OS.bas) + fr(x, 390 - h, w, 6, OS.basL);
+  const crys = (x, y, h, c) => '<path d="M' + x + ' ' + y + 'l' + (h * 0.22) + ' ' + (-h) + 'l' + (h * 0.22) + ' ' + h + 'z" fill="' + (c || OS.crys) + '"/><path d="M' + (x + h * 0.22) + ' ' + (y - h) + 'l' + (h * 0.22) + ' ' + h + 'h' + (-h * 0.12) + 'z" fill="' + OS.crysL + '" opacity=".6"/>';
+  const embers = (n, seed) => { const r = rnd(seed); return [...Array(n)].map(() => '<rect class="tw" x="' + Math.round(r() * 1000) + '" y="' + Math.round(80 + r() * 300) + '" width="4" height="4" fill="' + (r() < 0.5 ? OS.ember : OS.emberL) + '"/>').join(''); };
+  SCENES.o_cinder = (o) => sky('oc', o.boss ? '#2a1418' : '#4a3a4a', o.boss ? '#6a2a1a' : '#8a6a6a', '#6a5a60') + hills(41, '#5a5060', '#4a4252', '#3a3444', 260, 16) +
+    [...Array(7)].map((_, i) => fr(330 + i * 10, 380 - i * 34, 340 - i * 20, 34, i % 2 ? OS.bas : OS.basL) + fr(330 + i * 10, 380 - i * 34, 50, 34, '#1e1a24')).join('') +
+    [0, 1].map((i) => col(250 + i * 470, 30, 200, OS.basD) + blk(258 + i * 470, 196, 14, OS.iron, 10)).join('') + (o.boss ? glowE(500, 150, 160, 60, OS.ember, 0.35) + fr(420, 130, 160, 24, OS.basL) : '') + embers(18, 7) + ofloor('#2e2836') + motes(OS.emberL);
+  SCENES.o_kilns = (o) => sky('ok', o.boss ? '#2a1010' : '#3a2a2e', o.boss ? '#8a3a1a' : '#6a4a3a', '#4a3a3a') +
+    [...Array(5)].map((_, i) => { const x = 40 + i * 200, pale = i % 2 === 0; return fr(x, 170, 150, 220, pale ? '#cfc8c0' : '#3a3044') + '<path d="M' + (x + 20) + ' 170q55 -70 110 0z" fill="' + (pale ? '#e8e2da' : '#2a2236') + '"/>' + fr(x + 50, 260, 50, 60, '#1a1218') + glowE(x + 75, 300, 30, 20, OS.ember, o.boss ? 0.7 : 0.45); }).join('') +
+    [...Array(8)].map((_, i) => fr(60 + i * 115, 350, 8, 40, OS.iron) + fr(54 + i * 115, 330, 20, 26, i % 2 ? OS.glass : '#4a3a5a')).join('') + (o.boss ? glowE(500, 220, 260, 110, '#ffb05a', 0.25) : '') + ofloor('#3a2e30') + motes(OS.emberL);
+  SCENES.o_rookery = (o) => sky('or', o.boss ? '#2a1830' : '#7a6a8a', o.boss ? '#8a3a3a' : '#c0a0a8', '#a08890') +
+    [...Array(6)].map((_, i) => { const x = 30 + i * 170, h = 220 + (i % 3) * 60; return col(x, 60, h, OS.basD) + fr(x - 10, 390 - h + 40, 80, 16, '#c8b8a0') + '<ellipse cx="' + (x + 30) + '" cy="' + (390 - h + 44) + '" rx="34" ry="10" fill="' + (i % 2 ? OS.glass : '#4a3a5a') + '" opacity=".7"/>'; }).join('') +
+    (o.boss ? glowE(500, 120, 200, 70, OS.ember, 0.35) + '<path d="M420 120l80 -40l80 40l-80 -12z" fill="' + OS.rust + '"/>' : '') + ofloor('#3a3040') + motes('#ffe0c0');
+  SCENES.o_quench = (o) => sky('oq', o.boss ? '#0e1a2a' : '#3a4a5a', o.boss ? '#1a3a5a' : '#6a8a9a', '#5a7080') +
+    [...Array(5)].map((_, i) => col(20 + i * 230, 40, 230, OS.bas)).join('') + '<rect y="300" width="1000" height="200" fill="#2a4a6a"/>' +
+    [...Array(4)].map((_, i) => '<ellipse cx="' + (140 + i * 240) + '" cy="' + (330 + (i % 2) * 20) + '" rx="100" ry="18" fill="#dff4ff" opacity=".25"/>').join('') +
+    [...Array(12)].map((_, i) => fr(40 + i * 80, 210, 6, 90, OS.ironD)).join('') + '<rect y="180" width="1000" height="60" fill="#e8f4ff" opacity=".12"/>' +
+    (o.boss ? '<ellipse cx="500" cy="420" rx="260" ry="50" fill="#1a2a3a"/><ellipse cx="500" cy="420" rx="220" ry="38" fill="none" stroke="#8ab8d8" stroke-width="4" stroke-dasharray="40 10"/>' + glowE(500, 300, 200, 60, '#bfe8ff', 0.3) : '') + motes('#dff4ff');
+  SCENES.o_seams = (o) => sky('os', '#0e0c14', o.boss ? '#1a1424' : '#221e2c', '#2a2434') +
+    [...Array(5)].map((_, i) => { const x = i * 220; return fr(x, 0, 30, 400, '#4a3a2a') + fr(x, 60, 220, 22, '#4a3a2a') + blk(x + 100, 86, 16, OS.ironD, 12); }).join('') +
+    [...Array(6)].map((_, i) => fr(60 + i * 160, 340, 110, 40, OS.ironD) + fr(70 + i * 160, 326, 90, 18, i % 2 ? '#e8e0d0' : '#2a2236')).join('') + '<path d="M0 384h1000" stroke="' + OS.iron + '" stroke-width="6"/>' +
+    (o.boss ? glowE(700, 200, 160, 120, '#000000', 0.55) + glowE(300, 200, 60, 30, '#d8c0ff', 0.25) : glowE(250, 200, 80, 40, '#ffd890', 0.12)) + ofloor('#1e1a24') + motes('#c8b8e8');
+  SCENES.o_gallery = (o) => '<rect width="1000" height="500" fill="' + (o.boss ? '#14101e' : '#241e30') + '"/>' +
+    [...Array(7)].map((_, i) => { const x = 30 + i * 140, cr = i % 3 === 1; return fr(x, 80, 110, 230, '#6a5a3a') + '<rect x="' + (x + 8) + '" y="88" width="94" height="214" fill="' + (i % 2 ? '#3a3a5a' : '#8aa8c0') + '" opacity=".75"/>' + (cr ? '<path d="M' + (x + 20) + ' 100l40 90l-20 40l50 60" stroke="#e8f0ff" stroke-width="2" fill="none"/>' : ''); }).join('') +
+    fr(0, 310, 1000, 12, '#4a3a2a') + (o.boss ? fr(390, 60, 220, 300, '#2a2236') + '<rect x="404" y="74" width="192" height="272" fill="#c9a8ff" opacity=".35"/>' + glowE(500, 200, 140, 120, '#c9a8ff', 0.25) : '') + ofloor('#2e2838') + motes('#e8e0ff');
+  SCENES.o_hollows = (o) => sky('oh', '#160e1e', o.boss ? '#3a1434' : '#2a1a34', '#341e3a') + stars(o.boss ? 30 : 18, 97, OS.crysL) +
+    '<path d="M0 0H1000V140Q800 70 500 120T0 110z" fill="#1e1626"/>' + [...Array(14)].map((_, i) => crys(20 + i * 72, 390 - (i % 3) * 10, 70 + (i * 37) % 90, i % 4 ? OS.crys : '#a8d8ff')).join('') +
+    [...Array(8)].map((_, i) => crys(40 + i * 130, 120, -(40 + (i % 3) * 20), OS.crys)).join('') + (o.boss ? glowE(500, 230, 240, 120, '#fff0a8', 0.3) : glowE(500, 260, 300, 80, OS.crys, 0.15)) + ofloor('#2a1a30') + motes(OS.crysL);
+  SCENES.o_orchard = (o) => sky('oo', o.boss ? '#2a1a24' : '#6a6070', o.boss ? '#6a3a4a' : '#a89aa0', '#8a7a84') +
+    [...Array(7)].map((_, i) => { const x = 50 + i * 140; return fr(x + 30, 200, 18, 190, '#1e1a1e') + fr(x, 140 + (i % 2) * 20, 80, 60, '#8a8490') + [0, 1, 2].map((k) => blk(x + 10 + k * 24, 150 + (i % 2) * 20 + (k % 2) * 16, 10, OS.crys, 10)).join(''); }).join('') +
+    (o.boss ? fr(470, 160, 60, 230, '#1e1a1e') + fr(380, 90, 240, 90, '#9a94a0') + [...Array(6)].map((_, k) => blk(400 + k * 34, 110 + (k % 2) * 30, 14, OS.crysL, 14)).join('') + glowE(500, 140, 160, 60, OS.crysL, 0.3) : '') + ofloor('#4a4450') + motes('#d8d0e0');
+  SCENES.o_bellows = (o) => sky('ob', o.boss ? '#1e1418' : '#4a3a3a', o.boss ? '#6a2a1a' : '#8a6a5a', '#6a5048') +
+    [0, 1, 2].map((i) => { const x = 60 + i * 320; return '<ellipse cx="' + (x + 120) + '" cy="250" rx="130" ry="' + (o.boss ? 110 : 95) + '" fill="' + OS.leather + '"/>' + [...Array(5)].map((_, k) => '<rect x="' + (x + 10 + k * 50) + '" y="150" width="8" height="200" fill="' + OS.ironD + '"/>').join('') + fr(x + 220, 230, 90, 30, OS.brick); }).join('') +
+    fr(0, 120, 1000, 18, OS.brick) + (o.boss ? glowE(500, 250, 300, 120, OS.ember, 0.25) + fr(430, 300, 140, 90, '#4a3a2a') + fr(445, 290, 110, 12, '#e8dcc0') : '') + ofloor('#3a2e2c') + motes('#ffe0c0');
+  SCENES.o_forge = (o) => sky('of', '#100a0c', o.boss ? '#3a1408' : '#2a1a18', '#2a1c1a') +
+    [...Array(6)].map((_, i) => fr(40 + i * 170, 60, 30, 340, OS.brick) + fr(40 + i * 170, 60, 30, 10, '#a85a44')).join('') + fr(0, 40, 1000, 30, OS.ironD) +
+    [...Array(5)].map((_, i) => fr(90 + i * 190, 330, 70, 40, OS.ironD) + fr(80 + i * 190, 320, 90, 14, OS.iron) + fr(120 + i * 190, 300, 8, 26, '#6a4a2a')).join('') +
+    '<circle cx="500" cy="200" r="' + (o.boss ? 110 : 80) + '" fill="' + (o.boss ? '#ffd27a' : '#a0402a') + '" opacity="' + (o.boss ? 0.85 : 0.6) + '"/>' + glowE(500, 200, o.boss ? 260 : 170, o.boss ? 200 : 130, OS.ember, o.boss ? 0.4 : 0.25) + embers(o.boss ? 30 : 16, 13) + ofloor('#2a1e1c') + motes(OS.emberL);
   // the Hollow Veil and the Resonance Scar keep their v0.4 skies; their boss rooms get set dressing in front of them
   function hallRoom(stage) {
     let out = '';

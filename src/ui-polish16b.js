@@ -70,9 +70,13 @@
     // than that and it slid under Skip. Now the controls follow the panel's actual top edge.
     const panel = box.querySelector('.dlg-box');
     if (box.classList.contains('v7') && panel && root.ResizeObserver) {
-      const fit = () => { if (!box.isConnected) return ro.disconnect(); const top = panel.getBoundingClientRect().top, app = ($('#app') || document.body).getBoundingClientRect(), h = row.getBoundingClientRect().height || 40;
+      // Phase 19C: measured on the panel's resting place. The panel enters with a short slide (fadein: from .5rem lower);
+      // a fit made mid-slide used to leave the row up to .5rem too low over the panel once the slide ended (the
+      // intermittent browser-polish16b failure). The slide's offset is taken out, and the row is fitted again when it ends.
+      const restTop = () => { const r = panel.getBoundingClientRect().top; let dy = 0; try { const t = getComputedStyle(panel).transform; if (t && t !== 'none' && root.DOMMatrixReadOnly) dy = new root.DOMMatrixReadOnly(t).m42; } catch (e) { dy = 0; } return r - dy; };
+      const fit = () => { if (!box.isConnected) return ro.disconnect(); const top = restTop(), app = ($('#app') || document.body).getBoundingClientRect(), h = row.getBoundingClientRect().height || 40;
         if (top - h - 8 < app.top + 4) { row.style.top = '6px'; row.style.bottom = 'auto'; } else { row.style.top = 'auto'; row.style.bottom = Math.round(app.bottom - top + 6) + 'px'; } };
-      const ro = new ResizeObserver(fit); ro.observe(panel); fit();
+      const ro = new ResizeObserver(fit); ro.observe(panel); fit(); panel.addEventListener('animationend', fit);
     }
   };
   const script0 = UI.script; UI.script = function () { const box = script0.apply(this, arguments); addAa(box); return box; };

@@ -72,7 +72,7 @@ IDS.forEach((id, i) => {
     const r = V.claimGift(s); ok(r.ok && s.owned.solarbloom && s.starter === 'umbrit' && V.claimGift(s).ok === false, '   claimed once; the starter stays Umbrit; a second claim is refused');
   }
   if (id === 'v_elderroot') {
-    ok(out.islandBoss && s.campaign.bosses.verdant && !W.islandUnlocked(s, 'obsidian') && !out.unlockedIsland, '9. defeating the Forest Crown records the Verdant Island Boss; Obsidian Reach stays closed');
+    ok(out.islandBoss && s.campaign.bosses.verdant && W.islandUnlocked(s, 'obsidian') && out.unlockedIsland === 'obsidian', '9. defeating the Forest Crown records the Verdant Island Boss and opens Obsidian Reach (Phase 19C)');
   }
   if (i === 1 || i === 5 || i === 9) s = checkpoint(s, D.DUNGEONS[id].name + ' cleared');
 });

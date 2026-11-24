@@ -97,8 +97,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms)); const SHOTS = proce
   await battle('v_mossgate', 0);
   await ev(() => { const b = A.UI.B.b; b.party[b.pi].spd = 9999; b.enemy.hp = 1; b.rng = () => 0.5; const a = document.querySelector('#b-actions .abtn.ready.k-atk') || document.querySelector('#b-actions .abtn.ready'); a.click(); });
   await until(() => !!document.querySelector('.xprow'), null, 40000).catch(() => {});
-  const xp = await ev(() => [...document.querySelectorAll('.xprow')].map((r) => r.textContent.replace(/\s+/g, ' ').trim()));
-  ok(xp.length && /Level cap \d+, no more XP/.test(xp[0]), 'an Amina at the level cap shows “Level cap N, no more XP” on the victory screen (Phase 19B: “Max level” only at the final cap) (' + (xp[0] || '').slice(0, 80) + ')');
+  const xp = await ev(() => [...document.querySelectorAll('.xprow')].map((r) => r.textContent.replace(/\s+/g, ' ').trim())), capNow = await ev(() => A.Rules.levelCap(A.State.state));
+  ok(xp.length && (capNow < 60 ? new RegExp('Level cap ' + capNow + ', no more XP') : /Max level, no more XP/).test(xp[0]), 'an Amina at the level cap shows “Level cap N, no more XP” on the victory screen, and “Max level” only at the final cap (Phase 19B; this save’s cap: ' + capNow + ') (' + (xp[0] || '').slice(0, 80) + ')');
   ok(await ev(() => A.State.state.aminas[0].lv === A.Rules.levelCap(A.State.state) && A.State.state.aminas[0].xp === 0), 'and it keeps its level at the cap with no stored XP (Phase 19B: the staged cap)');
   await shot('victory-capped');
 

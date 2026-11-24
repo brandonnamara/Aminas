@@ -1,5 +1,5 @@
 // Phase 19B, real-browser check (Chromium + Playwright, software WebGL, 844×390 touch; NOT an iPhone): Obsidian Reach
-// through the developer construction preview: voxel island with the Cooling Forge places, ten sealed entrances, 59
+// (since Phase 19C opened as a player has it, not through the retired construction preview): voxel island with the Cooling Forge places, ten sealed entrances, 59
 // obstacles, tap areas, sheets with no way in, Wayfinder, reload (the island closes again for a normal load), travel
 // round trips without growth, the 2D fallback, the Forge (Metal) Habitat in 3D and 2D, the level cap in the interface
 // and its one-time notice, and draw calls / frame times against Starter Island and the Verdant Wilds (relative only).
@@ -31,11 +31,12 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms)); const SHOTS = proce
   await until(() => A.VoxIsland.ready(), null, 60000).catch(() => {});
 
   /* ---------- normal players: the Reach is not offered ---------- */
-  const np = await ev(() => ({ live: A.World.islandLive('obsidian'), r: A.UI.travelTo('obsidian'), isle: A.State.state.currentIsland, flag: A.Data.O19.live }));
-  ok(!np.live && np.r === false && np.isle === 'verdant' && np.flag === false, 'without the preview, Obsidian Reach is not live and travel is refused');
+  // Phase 19C: the island is live; a save that has not opened it (no Forest Crown) still cannot travel there
+  const np = await ev(() => ({ live: A.World.islandLive('obsidian'), r: A.UI.travelTo('obsidian'), isle: A.State.state.currentIsland, flag: A.Data.O19.live, pv: A.Rules.O19.preview(A.State.state).ok }));
+  ok(np.live && np.r === false && np.isle === 'verdant' && np.flag === true && np.pv === false, 'Obsidian Reach is live (Phase 19C), but a save without the Forest Crown cannot travel there, and the developer shortcut cannot open it');
 
-  /* ---------- the developer preview opens it for this session ---------- */
-  await ev(() => { A.Rules.O19.preview(A.State.state); A.State.save(); A.UI.travelTo('obsidian'); }); await sleep(1500); await tidy();
+  /* ---------- an old-build save that bought the Reach travels there (Phase 19C; it was the 19B preview) ---------- */
+  await ev(() => { const s = A.State.state; s.islands.obsidian = { unlocked: true, obstacles: {}, unlockedAt: 1 }; s.story.scenes = Object.assign({}, s.story.scenes, { o_arrival: 1 }); A.State.save(); A.UI.travelTo('obsidian'); }); await sleep(1500); await tidy();
   await until(() => A.VoxIsland.ready() && A.State.state.currentIsland === 'obsidian', null, 90000).catch(() => {});
   const vx = await ev(() => { const s = A.State.state, D = A.Data, kinds = A.IsoArt.landmark('obsidian', s).map((l) => l.kind);
     const want = D.O19.sites.map((x) => x.kind).concat(D.O19.gates.map((g) => 'o_gate_' + g.id));
@@ -44,7 +45,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms)); const SHOTS = proce
       hits: [...new Set([...document.querySelectorAll('#objs [data-hit^="o19:"]').values()].map((e) => e.dataset.hit))].length,
       expect: D.O19.sites.length + D.O19.gates.filter((g) => !g.site).length };
   });
-  ok(vx.on && vx.isle === 'obsidian', 'Obsidian Reach draws on the voxel island in the preview (it was always 2D before Phase 19B)');
+  ok(vx.on && vx.isle === 'obsidian', 'Obsidian Reach draws on the voxel island (it was always 2D before Phase 19B)');
   ok(vx.has === vx.want, 'every place and entrance has its own 3D model (' + vx.has + ' of ' + vx.want + ')');
   ok(vx.obTypes === 6, 'all six obstacle types have 3D models (' + vx.obTypes + ' of 6)');
   ok(vx.hits === vx.expect, 'every place part and free-standing entrance has a tap area (' + vx.hits + ' of ' + vx.expect + ')');
@@ -59,14 +60,14 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms)); const SHOTS = proce
   ok(/Dungeon 1 of 10/.test(g1.gate) && /Locked/.test(g1.gate) && /Forest Crown/.test(g1.gate) && !g1.enter && g1.dots === 10, 'Dungeon 1 says it is locked until the Forest Crown, with no Enter button and the ten-step order');
   await shot('sheet-gate1'); await tidy();
   const all = await ev(() => { const s = A.State.state, O = A.Rules.O19; s.campaign = s.campaign || {}; s.campaign.bosses = Object.assign({}, s.campaign.bosses, { verdant: true });
-    const st = O.gates(s).map((g) => g.state), runs = A.Data.O19.gates.map((g) => A.Rules.startRun(s, g.id, s.aminas.slice(0, 3).map((a) => a.uid)));
+    const st = O.gates(s).map((g) => g.state), runs = A.Data.O19.gates.slice(1).map((g) => A.Rules.startRun(s, g.id, s.aminas.slice(0, 3).map((a) => a.uid)));
     A.UI.o19Open('o_cinder'); const enter = !!document.querySelector('[data-act="o19Enter"]'), txt = (document.querySelector('.v18-gate') || {}).textContent || ''; A.UI.closeAll();
     delete s.campaign.bosses.verdant; return { st, runs: runs.every((r) => r && r.ok === false), enter, txt, prog: O.progress(s) }; });
-  ok(all.st[0] === 'sealed' && all.st.slice(1).every((x) => x === 'locked') && !all.enter && /Sealed/.test(all.txt), 'with the Forest Crown beaten, Dungeon 1 is sealed (not built), the rest wait in order, and no sheet offers Enter');
-  ok(all.runs, 'starting any Obsidian dungeon directly is refused');
+  ok(all.st[0] === 'open' && all.st.slice(1).every((x) => x === 'locked') && all.enter && /Recommended level 38/.test(all.txt), 'with the Forest Crown beaten, Dungeon 1 is open with an Enter button (Phase 19C) and the rest wait in order');
+  ok(all.runs, 'starting a later Obsidian dungeon out of order is refused');
   ok(all.prog.seen === all.prog.total, 'every place can be visited (' + all.prog.seen + ' of ' + all.prog.total + ')');
   const dd = await ev(() => { A.UI.dungeons(); const t = [...document.querySelectorAll('.overlay [data-act="dIsle"], .overlay .isle-tab')].map((e) => e.textContent).join('|'); A.UI.closeAll(); return t; });
-  ok(!/Obsidian/.test(dd), 'the Dungeons screen has no Obsidian tab');
+  ok(/Reach|Obsidian/.test(dd), 'the Dungeons screen has an Obsidian Reach tab (Phase 19C)');
 
   /* ---------- tap on the island and the Wayfinder ---------- */
   const tapAt = async (id) => { await ev((i) => { const O = A.Rules.O19, q = O.site(i) || O.gate(i); A.UI.focusFoot(q.x, q.y, q.w || 1, q.h || 1, 0.9); }, id);
@@ -140,11 +141,11 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms)); const SHOTS = proce
   await ev(() => { document.querySelectorAll('.toast').forEach((t) => t.remove()); A.UI.showIsland(); }); await sleep(2000);
   ok(!(await ev(() => [...document.querySelectorAll('.toast')].some((e) => /Level cap raised/.test(e.textContent)))), 'and only once');
 
-  /* ---------- reload: a normal load closes the Reach again ---------- */
-  await ev(() => { A.State.state.islands.obsidian = { unlocked: true, obstacles: {}, unlockedAt: 1, by: 'preview' }; A.State.state.currentIsland = 'obsidian'; A.State.save(); });
+  /* ---------- reload: a 19B construction-preview unlock without the Forest Crown closes again (Phase 19C) ---------- */
+  await ev(() => { const s0 = A.State.state; if (s0.campaign && s0.campaign.bosses) delete s0.campaign.bosses.verdant; delete s0.dungeon.v_elderroot; A.State.state.islands.obsidian = { unlocked: true, obstacles: {}, unlockedAt: 1, by: 'preview' }; A.State.state.currentIsland = 'obsidian'; A.State.save(); });
   await page.reload(); await page.waitForFunction(() => window.A && A.UI && A.UI.screen);
-  const rl = await ev(() => { const s = A.State.state; return { live: A.World.islandLive('obsidian'), isle: s ? s.currentIsland : null, kept: !!(s && s.islands.obsidian && s.islands.obsidian.unlocked) }; });
-  ok(!rl.live && rl.isle !== 'obsidian' && rl.kept, 'after a reload the preview is gone: the save is moved to a ready island and keeps its record');
+  const rl = await ev(() => { const s = A.State.state; return { live: A.World.islandLive('obsidian'), isle: s ? s.currentIsland : null, open: !!(s && s.islands.obsidian && s.islands.obsidian.unlocked), kept: !!(s && s.islands.obsidian && s.islands.obsidian.obstacles) }; });
+  ok(rl.live && rl.isle !== 'obsidian' && !rl.open && rl.kept, 'after a reload a preview unlock without the Forest Crown is closed: the save moves to a ready island and keeps its island record');
 
   ok(errors.length === 0, 'no page errors' + (errors.length ? ': ' + errors.slice(0, 3).join(' | ') : ''));
   if (SHOTS) fs.writeFileSync(path.join(SHOTS, 'perf.json'), JSON.stringify(perf, null, 1));

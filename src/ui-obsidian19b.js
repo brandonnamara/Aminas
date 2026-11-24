@@ -97,17 +97,31 @@
   const capLater = (n) => { clearTimeout(capTimer); capTimer = setTimeout(() => { if (UI.screen !== 'island') return; if (UI.modalOpen() || UI.sceneBox || document.querySelector('.dlg')) { if (n < 80) capLater(n + 1); return; } UI.capCheck(); }, n ? 1500 : 1200); };
   if (showIsland0) UI.showIsland = function () { const r = showIsland0.apply(this, arguments); capLater(0); return r; };
 
-  /* ---------- developer panel: Obsidian Reach construction preview ---------- */
+  /* ---------- Phase 19C: story hooks ----------
+     The Heart of the Forge's first entry plays the confrontation before the party picker; travelling to Obsidian Reach
+     for the first time plays the arrival (also on load, through the pending scene). Scenes never grant anything. */
+  const enter0 = UI.acts && UI.acts.enterDungeon;
+  if (enter0) UI.acts.enterDungeon = function (el) {
+    const s = st(), id = el && el.dataset && el.dataset.id;
+    if (id === 'o_forge' && !(s.story && s.story.scenes && s.story.scenes.o_confront) && A.Scenes.get('o_confront')) { UI.playScene('o_confront', () => enter0.call(this, el)); return; }
+    return enter0.apply(this, arguments);
+  };
+  const tr2 = UI.travelTo;
+  if (tr2) UI.travelTo = function (iid) { const r = tr2.apply(this, arguments); const s = st(); if (r !== false && s.story && s.story.pendingScene === 'o_arrival' && !UI.sceneBox) setTimeout(() => { // queued after the island's own arrival lines (the existing dialogue plays first, unchanged)
+    if (UI.screen === 'island' && s.story.pendingScene === 'o_arrival' && !UI.sceneBox && !UI.queue.some((x) => x.o19arrival)) { UI.queue.push({ type: 'fn', o19arrival: true, fn: (done) => { if (s.story.pendingScene === 'o_arrival' && !UI.sceneBox) UI.playScene('o_arrival', () => done()); else done(); } }); UI.pump(); } }, 500); return r; };
+
+  /* ---------- developer panel (Phase 19B's construction preview, retired in Phase 19C) ----------
+     The island is part of the campaign now; the shortcut only travels there on a save that has opened it normally. */
   const dev0 = UI.devPanel;
   if (dev0) UI.devPanel = function () {
     const r = dev0.apply(this, arguments);
     const ov = [...document.querySelectorAll('#modal-root .overlay')].pop(), at = ov && ov.querySelector('.row-actions');
-    if (at) at.insertAdjacentHTML('beforeend', '<button class="btn small" data-act="o19Preview">Obsidian Reach construction preview</button>');
+    if (at) at.insertAdjacentHTML('beforeend', '<button class="btn small" data-act="o19Preview">Travel to Obsidian Reach</button>');
     return r;
   };
   UI.act('o19Preview', () => {
-    const s = st(); O.preview(s); S.save && S.save(); UI.closeAll();
-    UI.toast && UI.toast('Construction preview: Obsidian Reach is open for this session only. Its dungeons stay sealed.', 'w');
+    const s = st(), r = O.preview(s); UI.closeAll();
+    if (!r.ok) { UI.toast && UI.toast(r.text, 'w'); return; }
     UI.travelTo('obsidian');
   });
 })(typeof window !== 'undefined' ? window : globalThis);

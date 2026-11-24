@@ -181,6 +181,124 @@
         { who: '*', entity: 'out', text: 'He does not say who he means. When you look again, he is gone, and so is the shard.' },
       ],
     },
+
+    /* ======================= Phase 19C: Obsidian Reach (the Cooling Forge) =======================
+       Canon guard as above, plus: the old event was an accident neither starter intended, and a third party wanted a part
+       in it. That is shown only through evidence (the mould, the crystals, the ledger, the repair order). The third party
+       is never named, described or explained; the Entity never confirms anything and never looks at the chiselled shape. */
+    o_arrival: {
+      title: 'Warm Stone', tone: 'quiet', bg: 'o_cinder',
+      cast: {},
+      beats: [
+        { who: '*', text: 'The skiff grinds onto black sand. It is warm underfoot, like a hearthstone an hour after the fire.' },
+        { who: '*', entity: 'in', text: 'The Entity is standing on the basalt jetty, holding his coat clear of the ash.' },
+        { who: 'entity', mood: 'w', text: 'Obsidian Reach. Warm stone, quiet crystals. Don’t lick anything. I say that from experience.' },
+        { who: '*', text: 'Steps climb from the landing into the grey. Two sizes again, tall and small. Here the small steps are scorched black, and the tall ones are not.' },
+        { who: 'you', choice: [{ text: 'Why only the small steps?' }, { text: 'Who lived here?', goto: 'who' }] },
+        { who: 'entity', mood: 'a', text: 'Small feet stand closer to the fire. Ask any kitchen.', goto: 'go' },
+        { id: 'who', who: 'entity', mood: 'n', text: 'Glassmakers. People and Kind Souls, working the same furnaces. The square is up the steps. It is called Glasswick, because nobody here had any imagination about names.' },
+        { id: 'go', who: 'entity', mood: 'n', entity: 'out', text: 'Up the Cinder Steps, then. Ten places worth your trouble, and one forge that is still warm. I would like to know why. I would also like not to know. We shall see which wins.' },
+      ],
+    },
+    o_kilns: {
+      title: 'Two Furnaces', tone: 'quiet', dungeon: 'o_kilns', bg: 'o_kilns',
+      cast: { blower: { name: 'The Glassblower', sp: 'infernox' }, soul: { name: 'An old Glasswick Kind Soul', sp: 'flaremon' } },
+      beats: [
+        { who: '*', show: { sp: 'infernox', pose: 'bow' }, text: 'The Glassblower lets its breath out slowly. The glow in the last kiln sinks to embers.' },
+        { who: '*', text: 'Two rows of kilns. In the pale row, every rack is labelled in a neat hand. In the dark row, the same labels, in a hand with paw-prints for punctuation.' },
+        { who: '*', entity: 'in', text: 'The Entity takes something from his coat: the shard of carved glass from the Elder Root. He slides it into an empty slot in a rack. It fits exactly.' },
+        { who: 'entity', mood: 'n', text: 'Glass remembers where it was made. It is very boring about it.' },
+        { who: 'you', choice: [{ text: 'So the shrine’s panels were made here?' }, { text: 'Why do you still have that shard?', goto: 'shard' }] },
+        { who: 'entity', mood: 'a', text: 'Made here, carried there, broken somewhere in between. Glass travels badly.', goto: 'soul' },
+        { id: 'shard', who: 'entity', mood: 'w', text: 'I collect things. It is a hobby. Most people find it endearing.' },
+        { id: 'soul', who: 'soul', show: { sp: 'flaremon', pose: 'watch' }, text: 'An old Kind Soul has come to the kiln door, ash on its whiskers. It looks straight at the Entity. “You came back.”' },
+        { who: 'entity', mood: 's', text: '…', pause: 1200 },
+        { who: 'entity', mood: 'w', text: 'You have me confused with someone taller.' },
+        { who: 'soul', text: '“The pale ones say the light one shut the door on us. We were here when it shut. We heard it from this side.” It goes back to its furnace without waiting for an answer.' },
+        { who: 'entity', mood: 'n', entity: 'out', text: 'Glasswick’s Kind Souls have long memories and short tempers. I recommend you do not ask them about doors. I recommend that to everyone.' },
+      ],
+    },
+    o_mould: {
+      title: 'The Mould', tone: 'melancholy', dungeon: 'o_gallery', bg: 'o_gallery',
+      cast: { warden: { name: 'The Dusk Warden', sp: 'eclipsar' } },
+      beats: [
+        { who: '*', show: { sp: 'eclipsar', pose: 'bow' }, text: 'The Dusk Warden folds into its own reflection and is gone. Every mirror in the hall goes back to showing only you.' },
+        { who: '*', text: 'At the end of the gallery, the covered shape. The cloth slides off at a touch: not a mirror, but a mould. The mould for the Twin Shrine’s broken panel, whole.' },
+        { who: '*', pause: 900, text: 'It shows a door. The two Keepers are holding it shut, the light one and the dark one, shoulder to shoulder. From the same side.' },
+        { who: '*', text: 'Beside them there was a third shape once. Someone has chiselled it out, carefully, down to the bare glass. Only its edge is left.' },
+        { who: '*', text: 'Your companion presses its face to the glass, very close to the Keeper that looks like it.' },
+        { who: '*', entity: 'in', text: 'The Entity is beside you. He looks at the two Keepers for a long time.' },
+        { who: 'entity', mood: 'n', text: 'Moulds lie less than panels. Not much less.' },
+        { who: 'you', choice: [{ text: 'They were on the same side.' }, { text: 'Who was the third one?', goto: 'third' }] },
+        { who: 'entity', mood: 't', text: 'So it seems. The pale side says one thing and the dark side says another, and the glass says neither. Glass does that.', goto: 'end' },
+        { id: 'third', who: 'entity', mood: 'a', text: 'Somebody who did not want to be remembered. It happens. Leave it.' },
+        { id: 'end', who: '*', text: 'He does not look at the chiselled edge. Not once.' },
+        { who: 'entity', mood: 'c', entity: 'out', text: 'Put the cloth back, please. Some things should be allowed to stay under cloth.' },
+      ],
+    },
+    o_crystals: {
+      title: 'What the Crystals Kept', tone: 'unsettling', dungeon: 'o_hollows', bg: 'o_hollows',
+      cast: { lantern: { name: 'The Lantern Below', sp: 'lumi3' } },
+      beats: [
+        { who: '*', show: { sp: 'lumi3', pose: 'bow' }, text: 'The Lantern Below dims. In the quiet, the crystals begin to play back something they have kept for a very long time.' },
+        { who: '*', pause: 900, text: 'A great sound, like a bell the size of a hill. Then a crack, very clear, like glass that has cooled wrong.' },
+        { who: '*', text: 'Two voices, one bright and one deep, calling to each other. Not angry. Frightened. Each calling the other’s name, though the crystals have worn the names away.' },
+        { who: '*', entity: 'in', text: 'The Entity is there, and his hands are over your companion’s ears. He takes them away at once, as if he had never put them there.' },
+        { who: '*', text: 'Under the voices, a long hum begins. It is not light. It is not shadow. It goes on for a long time after the voices stop.' },
+        { who: 'you', choice: [{ text: 'They didn’t mean for it to happen.' }, { text: 'What was that hum?', goto: 'hum' }] },
+        { who: 'entity', mood: 't', text: 'Nobody calls a name like that on purpose.', goto: 'end' },
+        { id: 'hum', who: 'entity', mood: 's', text: 'Crystals. They hum. That is all they do. I would prefer we agreed on that.' },
+        { id: 'end', who: 'entity', mood: 'n', entity: 'out', text: 'There is an orchard to the west. Burned, and still flowering. Let us go and be confused by that instead.' },
+      ],
+    },
+    o_ledger: {
+      title: 'The Ledger', tone: 'quiet', dungeon: 'o_bellows', bg: 'o_bellows',
+      cast: { wind: { name: 'The Bellows Wind', sp: 'stormbringer' } },
+      beats: [
+        { who: '*', show: { sp: 'stormbringer', pose: 'bow' }, text: 'The Bellows Wind sinks into the leather, and the great lungs breathe out, very slowly, for the last time today.' },
+        { who: '*', text: 'Behind the last lung, the little office. A desk, a chair, and the forge ledger, left open, its pages stiff with ash.' },
+        { who: '*', text: 'Orders for nails, hinges, glass, more glass. Then one entry, written larger than the rest:' },
+        { who: '*', pause: 1200, text: '“Commission: one door, two keys. Paid in full.”' },
+        { who: '*', pause: 1400, text: 'Below it, in a different hand, the ink pressed hard into the page: “Third key: refused.”' },
+        { who: '*', entity: 'in', text: 'The Entity reads it over your shoulder. He does not touch the book.' },
+        { who: 'entity', mood: 'n', text: 'Ledgers. The only honest thing anyone ever wrote, and nobody reads them.' },
+        { who: 'you', choice: [{ text: 'Who wanted a third key?' }, { text: 'Two keys for the two Keepers?', goto: 'keys' }] },
+        { who: 'entity', mood: 'a', text: 'Someone who was told no. The ledger does not say who. Ledgers are discreet. I admire that in a book.', goto: 'end' },
+        { id: 'keys', who: 'entity', mood: 't', text: 'Two keys, two keepers, one door. It is the sort of arithmetic that holds until somebody wants to add.' },
+        { id: 'end', who: 'entity', mood: 'c', entity: 'out', text: 'Leave it open at that page. Somebody may want to read it one day. It will not be me.' },
+      ],
+    },
+    o_confront: {
+      title: 'Still Warm', tone: 'quiet', dungeon: 'o_forge', bg: 'o_forge',
+      cast: { heart: { name: 'The Forge Heart', sp: 'pyrocore' } },
+      beats: [
+        { who: '*', text: 'The iron doors of the Great Forge stand open. Inside, everything is cold: anvils, chains, the long benches. Everything except the core.' },
+        { who: '*', show: { sp: 'pyrocore', pose: 'watch' }, text: 'In the core, something vast turns over, glowing white at the seams. It beats, slowly, like a heart that has been told to keep going and never told to stop.' },
+        { who: '*', entity: 'in', text: 'The Entity stops on the threshold. He does not like thresholds. He likes this one less than most.' },
+        { who: 'entity', mood: 't', text: 'It is keeping the fire in for a job nobody finished. Admirable. Inconvenient.' },
+        { who: 'you', choice: [{ text: 'What job?' }, { text: 'How do we stop it?', goto: 'how' }] },
+        { who: 'entity', mood: 'a', text: 'Ask it. Politely, and from behind something solid.', goto: 'go' },
+        { id: 'how', who: 'entity', mood: 'n', text: 'Its shell cracks under your specials. When the core flares white, guard. Water helps. Everything helps a little, except standing still.' },
+        { id: 'go', who: 'entity', mood: 'n', entity: 'out', text: 'After you, Kind Soul. It is the custom. I invented it just now.' },
+      ],
+    },
+    o_heart: {
+      title: 'Three Clocks', tone: 'unsettling', dungeon: 'o_forge', bg: 'o_forge',
+      cast: { heart: { name: 'The Forge Heart', sp: 'pyrocore' } },
+      beats: [
+        { who: '*', show: { sp: 'pyrocore', pose: 'bow' }, text: 'The Forge Heart settles. Its glow sinks from white to gold to the dull red of a fire banked for the night.' },
+        { who: '*', text: 'In the core’s cradle lies one last order, on a plate of iron so it would not burn: “Repair: one door. Requested by both keys.” The rest of the plate is blank. Nobody came back to finish it.' },
+        { who: '*', entity: 'in', text: 'The Entity reads it twice. The second time, his mouth goes thin.' },
+        { who: 'entity', mood: 't', text: 'Both of them. Together. Asking for the same thing.' },
+        { who: 'you', choice: [{ text: 'So it was an accident.' }, { text: 'Why was it never finished?', goto: 'why' }] },
+        { who: 'entity', mood: 'a', text: 'Nobody orders a repair for something they meant to break. That much even I can work out.', goto: 'clocks' },
+        { id: 'why', who: 'entity', mood: 's', text: 'Because somebody refused to be refused. Don’t ask me who. I don’t know. I would also prefer not to.' },
+        { id: 'clocks', who: '*', pause: 900, text: 'The core gives one last beat. Far across the sea, the Dormant Spire pulses. The standing stones of the Choir hum. All three keep exactly the same time.' },
+        { who: '*', text: 'Three clocks in three houses. And high above the clouds, on an island you have not seen yet, something old turns slowly to watch.' },
+        { who: 'entity', mood: 'n', text: 'The sky has always had more to say. I would prefer it said it to someone else.' },
+        { who: '*', entity: 'out', text: 'This time he takes nothing. He leaves the ledger open at the refused key, and the plate where it lies.' },
+      ],
+    },
   };
   // Dungeons without a scene get a short line from the Entity after their first clear (toast). Keyed by dungeon id.
   SC.after = {
@@ -194,6 +312,12 @@
     v_spore: 'Spores remember things. So do I. Neither of us is obliged to share.',
     v_glow: 'Two kinds of lantern, side by side, and then only one. Do not ask me to read anything into that. I will refuse.',
     v_moonwell: 'I am not going down there. Do not take it personally. The reflection and I have an understanding.',
+    // Phase 19C: Obsidian Reach
+    o_cinder: 'Scorched small steps and clean tall ones. Somebody stood closer to the fire than the rest. Somebody always does.',
+    o_rookery: 'Nests woven from both kinds of glass. Nobody told the birds they were supposed to choose.',
+    o_quench: 'A drained pool, and the outline of one great round plate, cracked across. It cooled wrong. Things do, if you hurry them.',
+    o_seams: 'Pale ore, dark ore, sorted by someone very tidy. I trust tidy people. They are too busy to plot.',
+    o_orchard: 'Planted from both ends, by the look of the rows. They met in the middle. That part rarely happens.',
   };
   SC.get = (id) => SC.list[id] || null;
   // Estimated playing time in seconds at the normal text speed (typing plus reading), used by tests and the editor.

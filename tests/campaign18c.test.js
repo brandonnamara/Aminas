@@ -31,7 +31,7 @@ ok(D.DUNGEONS.v_twinshrine.battles[9].mech.type === 'prism' && D.DUNGEONS.v_twin
 ok(IDS.every((id) => D.DUNGEONS[id].battles.every((b) => b.tier && b.tier.hp > 0 && b.tier.atk > 0)), 'every Verdant foe carries the island’s foe tier (with its own tuning)');
 { const spec = D.DUNGEONS.v_mossgate.battles[0], e = R.enemyFromSpec(spec), plain = B.fighter(spec.sp, spec.lv); ok(e.hpMax === Math.round(plain.hpMax * spec.tier.hp) && e.atk === Math.round(plain.atk * spec.tier.atk), 'the tier raises a foe’s health and attack by its multipliers (' + spec.tier.hp + ' / ' + spec.tier.atk + ')'); }
 { const st0 = D.DUNGEONS.forgottenroad.battles[0], e0 = R.enemyFromSpec(st0), p0 = B.fighter(st0.sp, st0.lv); ok(!st0.tier && e0.hpMax === p0.hpMax && e0.atk === p0.atk, 'Starter Island foes are unchanged (no tier)'); }
-ok(D.DUNGEON_ORDER.length === 20 && D.DUNGEON_ORDER.slice(10).join() === IDS.join(), 'the dungeon order lists Starter Island then the Verdant Wilds');
+ok(D.DUNGEON_ORDER.length === 30 && D.DUNGEON_ORDER.slice(10, 20).join() === IDS.join() && D.DUNGEON_ORDER.slice(20).every((id) => D.DUNGEONS[id].island === 'obsidian'), 'the dungeon order lists Starter Island, then the Verdant Wilds, then Obsidian Reach (Phase 19C)');
 ok(IDS.every((id) => D.DUNGEON_GEAR[id] && D.ITEMS[D.DUNGEON_GEAR[id]]), 'each Verdant dungeon has a first-clear item, all existing items');
 
 /* ---------- unlock order ---------- */
@@ -80,13 +80,14 @@ ok(IDS.every((id) => D.DUNGEON_GEAR[id] && D.ITEMS[D.DUNGEON_GEAR[id]]), 'each V
   const s = verdantSave(); IDS.slice(0, 9).forEach((id) => clearDungeon(s, id));
   R.drain(); const out = clearDungeon(s, 'v_elderroot'); const evs = R.drain();
   ok(out.cleared && out.islandBoss && s.campaign.bosses.verdant, 'defeating the Forest Crown records the Verdant Island Boss');
-  ok(!out.unlockedIsland && !W.islandUnlocked(s, 'obsidian'), 'Obsidian Reach does not open: it is not ready');
+  ok(out.unlockedIsland === 'obsidian' && W.islandUnlocked(s, 'obsidian'), 'Obsidian Reach opens (Phase 19C: the island is ready)');
   ok(evs.filter((e) => e.name === 'islandBossDefeated').length === 1, 'the Island Boss event fires once');
   const again = clearDungeon(s, 'v_elderroot', { from: 0 }); ok(!again.unlockedIsland && R.drain().filter((e) => e.name === 'islandBossDefeated').length === 0, 'a replay does not fire it again');
-  ok(Q.status(s, Q.get('s_reach')) === 'locked', 'the Dark Shore quest stays hidden');
-  D.ISLAND_LIVE.obsidian = true; S.sanitize(s);
-  ok(W.islandUnlocked(s, 'obsidian'), 'once Obsidian Reach is marked ready, a save that already beat the Verdant boss gets it on load (no migration)');
-  D.ISLAND_LIVE.obsidian = false;
+  // Phase 19C: Obsidian Reach is ready, so the boss opened it above; a save whose Forest Crown fell before 19C (island
+  // record missing) gets it on load, once, with no rank reward repeated by a second load
+  const old = clone(s); delete old.islands.obsidian; S.sanitize(old); const rk = old.rankXp;
+  ok(W.islandUnlocked(old, 'obsidian') && old.islands.obsidian.by === 'boss', 'a save that beat the Verdant boss before Obsidian Reach was ready gets it on load (no migration)');
+  S.sanitize(old); ok(old.rankXp === rk && R.drain().filter((e) => e.name === 'islandUnlocked').length <= 1, 'a second load does not unlock or reward it again');
 }
 
 /* ---------- the seven new charged moves ---------- */
@@ -167,7 +168,7 @@ ok(IDS.every((id) => { const d = D.DUNGEONS[id], e = R.enemyFromSpec(d.battles[9
   ok(r1 && r1.ok !== false && s.res.gold === g0 + 400 && (!r2 || r2.ok === false) && s.res.gold === g0 + 400, 'its reward is paid once (400 gold), never twice');
   ok(Q.status(s, Q.get('m_v2')) !== 'locked', 'and the next one appears');
   const nav = A.Nav && A.Nav.resolve ? A.Nav.resolve(s, Q.get('m_v2').objectives[0]) : null; ok(!nav || nav.type === 'screen' || nav.kind || true, 'its navigation resolves');
-  ok(Q.status(s, Q.get('s_reach')) === 'locked' && Q.status(s, Q.get('s_crown')) === 'locked', 'future-island quests stay hidden');
+  ok(Q.status(s, Q.get('s_reach')) !== 'locked' && Q.status(s, Q.get('s_crown')) === 'locked', 'The Dark Shore is listed (Phase 19C: Obsidian Reach is ready); the Celestial quest stays hidden');
 }
 
 /* ---------- scenes ---------- */

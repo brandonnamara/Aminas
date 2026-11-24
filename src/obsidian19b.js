@@ -13,7 +13,7 @@
   const now = () => (R.now ? R.now() : Date.now());
 
   D.O19 = {
-    live: false, // the campaign switch: off until the ten dungeons are playable (Phase 19C/19D)
+    live: true, // the campaign switch: on since Phase 19C, with the ten playable dungeons in campaign-data.js
     island: 'obsidian',
     sites: [
       { id: 'landing', kind: 'o_landing', name: 'Black Sand Landing', x: 16, y: 28, w: 1, h: 1, role: 'arrival',
@@ -49,6 +49,9 @@
       { id: 'o_forge', n: 10, name: 'Heart of the Forge', rec: 47, el: 'earth', x: 23, y: 9, site: 'forge', boss: true, theme: 'The forge’s core. The Island Boss waits here.' },
     ],
   };
+  // Phase 19C: Obsidian Reach is ready. It opens when the Forest Crown falls (W.unlockByBoss, as the Verdant Wilds did),
+  // and saves whose Forest Crown fell before this build get it on load (V.settle in src/verdant18b.js), once.
+  D.ISLAND_LIVE.obsidian = true;
   const G = {}; D.O19.gates.forEach((g, i) => { G[g.id] = g; g.prev = i ? D.O19.gates[i - 1].id : null; });
   const SITE = {}; D.O19.sites.forEach((s) => { SITE[s.id] = s; });
 
@@ -112,16 +115,31 @@
   O.seen = (st, id) => !!(st.o19 && st.o19.seen && st.o19.seen[id]);
   O.progress = (st) => { const ids = D.O19.sites.filter((s) => !s.part).map((s) => s.id); return { seen: ids.filter((id) => O.seen(st, id)).length, total: ids.length }; };
 
-  /* ---------- the construction preview (developer panel only; never offered to normal players) ----------
-     Opens the island for this session only (D.ISLAND_LIVE is not saved). If the save has never unlocked it, the preview
-     unlocks it the way an old build's purchase did, so the island can be walked and built on; like every developer
-     shortcut, "Reset save" in Settings clears it. On the next load the island is closed again and the save is moved
-     back to a ready island, as for any save that unlocked it in an older build. */
+  /* ---------- the developer shortcut (Phase 19B's construction preview, retired in Phase 19C) ----------
+     Obsidian Reach is now part of the campaign, so the developer panel can only travel there on a save that has opened
+     it the normal way. It never unlocks the island, never opens a dungeon and never sets the island ready: progression
+     cannot be skipped from here. */
   O.preview = function (st) {
-    D.ISLAND_LIVE.obsidian = true; O.previewOn = true;
-    if (!W.islandUnlocked(st, 'obsidian')) { st.islands.obsidian = st.islands.obsidian || { obstacles: {} }; Object.assign(st.islands.obsidian, { unlocked: true, unlockedAt: now() || 1, by: 'preview' }); if (!st.islands.obsidian.obstacles) st.islands.obsidian.obstacles = {}; }
+    if (!W.islandUnlocked(st, 'obsidian')) return { ok: false, reason: 'progress', text: R.islandBossDefeated(st, 'verdant') ? 'Travel from the Map.' : 'Defeat the Forest Crown first.' };
     return { ok: true };
   };
+
+  /* ---------- Phase 19C: the arrival scene, once (also for saves that reached the island before 19C) ---------- */
+  O.arrivalDue = (st) => !!(D.O19.live && st && W.islandUnlocked(st, D.O19.island) && st.currentIsland === D.O19.island && !(st.story && st.story.scenes && st.story.scenes.o_arrival) && !(st.story && st.story.pendingScene));
+  O.queueArrival = function (st) { if (!O.arrivalDue(st)) return false; st.story = st.story || {}; st.story.pendingScene = 'o_arrival'; return true; };
+  const travel0 = W.travel;
+  W.travel = function (st, id) { const r = travel0.apply(this, arguments); if (r && r.ok && id === D.O19.island) O.queueArrival(st); return r; };
+
+  /* ---------- Phase 19C: each dungeon's first-clear item (existing items that had no source yet; Night Mail last) ---------- */
+  if (D.DUNGEON_GEAR) Object.assign(D.DUNGEON_GEAR, { o_cinder: 'surgespear', o_kilns: 'noonchrm', o_rookery: 'skycrest', o_quench: 'abyssplate', o_seams: 'titanmaul',
+    o_gallery: 'solstice', o_hollows: 'choirshell', o_orchard: 'bloomcloak', o_bellows: 'tempestlance', o_forge: 'nightmail' });
+
+  /* ---------- Phase 19C: rare third-form encounters in the Reach's Explore areas (the Verdant rules of Phase 18D) ----------
+     Once all three usual finds of an area are met, the first exploration of each day rolls 20% (certain on the 8th);
+     met once ever; joins at a level never above the dungeon ahead when the area opens. Pyrokai III on the Ash Plain
+     (after Dungeon 1: the Kilns are 39 → 38), Zeep III on Glass Beach (after Dungeon 4: the Seams are 42 → 41), Aimza III
+     in the Crystal Vein (after Dungeon 7: the Orchard is 45 → 44). Stored with the Verdant records (st.v18.rare). */
+  if (D.V18 && D.V18.rare) { Object.assign(D.V18.rare.of, { ashplain: 'infernokai', glassbeach: 'zeep3', crystalvein: 'aimza3' }); Object.assign(D.V18.rare.lvOf, { ashplain: 38, glassbeach: 41, crystalvein: 44 }); }
 
   /* ---------- level cap: announce a raise once (old saves included) ---------- */
   O.capNotice = function (st) {
@@ -140,6 +158,12 @@
     Object.keys(st.o19.seen).forEach((k) => { if (!SITE[k] && !G[k]) delete st.o19.seen[k]; else st.o19.seen[k] = +st.o19.seen[k] || 1; });
     if (st.o19.cap != null) st.o19.cap = Math.max(D.CAP_BASE, Math.min(D.MAX_LEVEL, +st.o19.cap || D.CAP_BASE));
     delete st.capSeen; // the v45 construction preview stored this record at the top level
+    // Phase 19C: a 19B construction-preview unlock (developer builds only) never stands in for the Forest Crown. Without
+    // it, the island closes again; its obstacle records and any buildings placed there are kept, and come back when the
+    // Forest Crown falls. With it, the record becomes the normal one.
+    const oi = st.islands && st.islands.obsidian;
+    if (oi && oi.by === 'preview') { if (R.islandBossDefeated(st, 'verdant')) oi.by = 'boss'; else { oi.unlocked = false; delete oi.unlockedAt; delete oi.by; if (st.currentIsland === 'obsidian') st.currentIsland = W.islandUnlocked(st, 'verdant') ? 'verdant' : 'starter'; } }
+    O.queueArrival(st);
     return st;
   };
   if (A.State && A.State.sanitize) { const san0 = A.State.sanitize; A.State.sanitize = function (st) { const r = san0.apply(this, arguments); O.settle(st); return r; }; }

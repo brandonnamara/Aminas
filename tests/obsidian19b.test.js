@@ -1,5 +1,5 @@
 // Phase 19B: Obsidian Reach construction. The island's map, obstacles and saves are preserved; the staged level cap
-// (40 → 50 after the Forest Crown → 60 after the Forge Heart); ten sealed dungeon entrances that cannot be entered;
+// (40 → 50 after the Forest Crown → 60 after the Forge Heart); ten dungeon entrances in order (sealed in 19B, open since 19C);
 // places with save-safe visits; three prepared Explore areas; the Forge (Metal) Habitat; readiness unchanged.
 const { load, ok, done } = require('./harness');
 const c = load(), A = c.A, D = A.Data, R = A.Rules, W = A.World, S = A.State, Q = A.Quests, O = R.O19;
@@ -68,12 +68,12 @@ const beatObsidian = (s) => { beatVerdant(s); s.campaign.bosses.obsidian = true;
   s.islands.obsidian = { unlocked: true, obstacles: {}, unlockedAt: 1 };
   ok(st(s).every((x) => x === 'locked') && /Forest Crown/.test(O.gateState(s, 'o_cinder').text), 'with the Reach but not the Forest Crown, Dungeon 1 says why it is locked');
   beatObsidian(s);
-  ok(O.gateState(s, 'o_cinder').state === 'sealed' && st(s).slice(1).every((x) => x === 'locked'), 'with the bosses beaten, Dungeon 1 is sealed (not built) and the rest wait in order');
+  // Phase 19C: the ten dungeons are built, so entrances open in order instead of staying sealed
+  ok(O.gateState(s, 'o_cinder').state === 'open' && st(s).slice(1).every((x) => x === 'locked'), 'with the Forest Crown beaten, Dungeon 1 is open (Phase 19C) and the rest wait in order');
+  const early = D.O19.gates.slice(1).map((g) => R.startRun(s, g.id)); ok(early.every((r) => r && r.ok === false), 'starting a later Obsidian dungeon out of order is refused');
   D.O19.gates.forEach((g) => { s.dungeon = s.dungeon || {}; s.dungeon[g.id] = { clears: 1 }; });
-  ok(O.gateState(s, 'o_cinder').state === 'sealed' && st(s).slice(1).every((x) => x === 'locked' || x === 'sealed'), 'even with forged clear records, no entrance opens while the battles are unfinished');
-  const runs = D.O19.gates.map((g) => R.startRun(s, g.id)); ok(runs.every((r) => r && r.ok === false), 'starting any Obsidian dungeon is refused');
-  ok(D.O19.gates.every((g) => !O.canEnter(s, g.id)), 'canEnter is false for all ten');
-  ok(D.O19.live === false, 'the construction flag stays off');
+  ok(st(s).every((x) => x === 'open') && D.O19.gates.every((g) => O.canEnter(s, g.id)), 'once each is cleared, every entrance is open');
+  ok(D.O19.live === true && D.O19.gates.every((g) => O.built(g.id)), 'the campaign switch is on and all ten dungeons are built (Phase 19C)');
   // Explore areas wait on unbuilt dungeons
   ok(['ashplain', 'glassbeach', 'crystalvein'].every((id) => D.AREAS[id] && D.AREAS[id].island === 'obsidian' && D.AREAS[id].unlock.o19), 'three Explore areas are prepared');
   const f = fresh(); ok(['ashplain', 'glassbeach', 'crystalvein'].every((id) => !R.reqMet(f, D.AREAS[id].unlock)), 'none is open in a new save');
@@ -118,16 +118,19 @@ const beatObsidian = (s) => { beatVerdant(s); s.campaign.bosses.obsidian = true;
 
 /* ---------- old saves with buildings on the Reach; readiness unchanged ---------- */
 {
-  ok(!W.islandLive('obsidian'), 'Obsidian Reach is still not live for normal players');
+  ok(W.islandLive('obsidian'), 'Obsidian Reach is live (Phase 19C)');
   const L = builder(); L.islands.verdant = { unlocked: true, obstacles: {} }; const oid = D.OBSTACLES.obsidian[0].id; L.islands.obsidian = { unlocked: true, obstacles: { [oid]: { state: 'cleared', rewarded: true } }, unlockedAt: 1 };
-  D.ISLAND_LIVE.obsidian = true; const spot = W.findSpot(L, 'obsidian', 'hab_fire', 0, [10, 10]); const br = spot && W.buildNew(L, 'obsidian', 'hab_fire', spot[0], spot[1], 0); D.ISLAND_LIVE.obsidian = false;
+  const spot = W.findSpot(L, 'obsidian', 'hab_fire', 0, [10, 10]); const br = spot && W.buildNew(L, 'obsidian', 'hab_fire', spot[0], spot[1], 0);
   const keep = clone(L.buildings); L.currentIsland = 'obsidian'; S.sanitize(L);
   ok(br && br.ok !== false && JSON.stringify(L.buildings) === JSON.stringify(keep) && Object.values(L.buildings).some((x) => x.island === 'obsidian'), 'a building already on the Reach (old build) is kept exactly where it was');
-  ok(L.currentIsland !== 'obsidian' && L.islands.obsidian.unlocked && L.islands.obsidian.obstacles[oid] && L.islands.obsidian.obstacles[oid].state === 'cleared', 'the save moves to a ready island; its unlock and obstacle records are kept');
-  ok(Q.visible(L).map((q) => q.id).indexOf('s_reach') < 0, 'the Reach quest stays hidden');
-  // preview is developer-only and session-only
-  const p = fresh(); O.preview(p); ok(W.islandLive('obsidian') && p.islands.obsidian.unlocked && p.islands.obsidian.by === 'preview', 'the developer preview opens the island for the session');
-  D.ISLAND_LIVE.obsidian = false; O.previewOn = false; ok(!JSON.stringify(D.ISLAND_LIVE).includes('"obsidian":true'), 'and is not a saved flag');
+  ok(L.currentIsland === 'obsidian' && L.islands.obsidian.unlocked && L.islands.obsidian.obstacles[oid] && L.islands.obsidian.obstacles[oid].state === 'cleared', 'the save stays on the Reach (Phase 19C: it is ready); its unlock and obstacle records are kept');
+  ok(Q.islandReachable(L, 'obsidian'), 'quests can point at the Reach again');
+  // Phase 19C: the developer shortcut cannot skip progression
+  const p = fresh(); const pr = O.preview(p); ok(pr.ok === false && !W.islandUnlocked(p, 'obsidian'), 'the developer shortcut never unlocks the island on a save that has not opened it');
+  const q = fresh(); q.islands.obsidian = { unlocked: true, obstacles: { [oid]: { state: 'cleared', rewarded: true } }, unlockedAt: 1, by: 'preview' }; q.currentIsland = 'obsidian'; S.sanitize(q);
+  ok(!W.islandUnlocked(q, 'obsidian') && q.currentIsland !== 'obsidian' && q.islands.obsidian.obstacles[oid].state === 'cleared', 'a 19B construction-preview unlock without the Forest Crown is closed on load; its obstacle record is kept');
+  const r = fresh(); beatVerdant(r); r.islands.verdant = { unlocked: true, obstacles: {} }; r.islands.obsidian = { unlocked: true, obstacles: {}, unlockedAt: 1, by: 'preview' }; S.sanitize(r);
+  ok(W.islandUnlocked(r, 'obsidian') && r.islands.obsidian.by === 'boss', 'with the Forest Crown beaten it becomes the normal unlock');
 }
 
 done('obsidian19b');

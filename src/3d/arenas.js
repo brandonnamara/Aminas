@@ -425,6 +425,52 @@ Object.keys(VARENA).forEach((id) => {
   delete ALIAS[id];
 });
 export const verdantArenas = () => Object.keys(VARENA).map((id) => ({ id, base: VARENA[id].base }));
+/* Phase 19C: Obsidian Reach's ten arenas, recoloured from the existing arenas the same way (no new geometry, so every
+   quality tier, Battery Saver and Reduce Motion behave exactly as before). Grey stone becomes violet basalt, greens become
+   ash, wood and earth go darker, and each place's accent (crystal, glass, ember, forge light) replaces the bright tones. */
+function obsidianColour(c, tint, vivid) {
+  if (typeof c !== 'string' || c[0] !== '#' || c.length !== 7) return c;
+  let [h, s2, l] = hex2hsl(c);
+  if (s2 < 0.16) { h = 268; s2 = Math.max(s2, 0.1); l = l * 0.72; }                         // grey stone → violet basalt
+  else if (h >= 65 && h <= 175) { h = 285; s2 = s2 * 0.22; l = Math.min(0.62, l * 0.92); }   // greens → violet ash
+  else if (h >= 15 && h < 65 && l < 0.55) { s2 = s2 * 0.7; l = l * 0.72; }                    // wood and earth → scorched
+  else if (vivid && s2 >= 0.35) { h = vivid.h; s2 = Math.min(1, s2 * (vivid.s || 1)); l = Math.min(0.9, l * (vivid.l || 1)); } // accent
+  const out = hsl2hex(h, s2, l);
+  if (!tint) return out;
+  const a = parseInt(out.slice(1), 16), b = parseInt(tint.slice(1), 16), k = 0.18, mix = (sh) => Math.round(((a >> sh) & 255) * (1 - k) + ((b >> sh) & 255) * k);
+  return '#' + [16, 8, 0].map((sh) => mix(sh).toString(16).padStart(2, '0')).join('');
+}
+function obsidianKit(K, tint, vivid) {
+  const m = (c) => obsidianColour(c, tint, vivid), K2 = Object.create(K);
+  K2.box = (c, ...a) => K.box(m(c), ...a);
+  K2.stack = (a, b, ...rest) => K.stack(m(a), m(b), ...rest);
+  K2.floor = (fn, ...rest) => K.floor((...q) => m(fn(...q)), ...rest);
+  if (K.tree) K2.tree = (x, z, sc, l1, l2, o) => K.tree(x, z, sc, m(l1), m(l2), Object.assign({}, o, { trunk: m((o && o.trunk) || '#6a4424') }));
+  if (K.tuft) K2.tuft = (x, z, c) => K.tuft(x, z, m(c));
+  return K2;
+}
+const OARENA = {
+  o_cinder:  { base: 'forgottenroad', vivid: { h: 22, s: 1.1 }, tint: '#ff8a3a', mood: 'dusk', fog: '#4a3a40', motes: '#ffd27a', light: { key: ['#ffd8b0', 2.0], rim: ['#ff9a5a', 1.8], hemi: ['#c8a8a8', '#1a1420', 1.05] }, particles: { kind: 'embers', colors: ['#ff8a3a', '#ffd27a', '#ffb05a'], n: 30 }, backdrop: ['#2a2232', '#8a5a4a'] },
+  o_kilns:   { base: 'coldkiln', vivid: { h: 28, s: 1.1 }, tint: '#ffb05a', mood: 'dusk', fog: '#3a2a2a', motes: '#ffd27a', light: { key: ['#ffe0b8', 2.1], rim: ['#ffb05a', 1.9], hemi: ['#d8b8a0', '#1a1214', 1.05] }, particles: { kind: 'embers', colors: ['#ffb05a', '#ffe8c0', '#ff8a3a'], n: 30 }, backdrop: ['#2a1e22', '#a06a4a'] },
+  o_rookery: { base: 'windstair', vivid: { h: 18, s: 1.0 }, tint: '#c8a0a8', mood: 'dusk', fog: '#6a5a6a', motes: '#ffe0c0', light: { key: ['#ffe8d8', 2.2], rim: ['#ffb898', 1.7], hemi: ['#d8c0c8', '#2a2030', 1.2] }, particles: { kind: 'embers', colors: ['#ffe0c0', '#ff9a5a', '#ffffff'], n: 24 }, backdrop: ['#3a3048', '#c0a0a8'] },
+  o_quench:  { base: 'drownedsteps', vivid: { h: 200, s: 0.8 }, tint: '#6a9ac0', mood: 'dark', fog: '#2a3a4a', motes: '#dff4ff', light: { key: ['#e0f0ff', 1.9], rim: ['#9ad0ff', 1.8], hemi: ['#a8c0d8', '#10161e', 1.05] }, particles: { kind: 'bubbles', colors: ['#dff4ff', '#bfe0ff', '#ffffff'], n: 26 }, backdrop: ['#1a2a3a', '#5a7a9a'] },
+  o_seams:   { base: 'hollowveil', vivid: { h: 268, s: 0.7 }, tint: '#4a3a5a', mood: 'dark', fog: '#14101c', motes: '#c8b8e8', light: { key: ['#d8d0f0', 1.6], rim: ['#a898d8', 1.7], hemi: ['#8a80a8', '#08060c', 0.9] }, particles: { kind: 'dust', colors: ['#c8b8e8', '#8a80a8', '#e8e0ff'], n: 20 }, backdrop: ['#0e0c14', '#3a3048'] },
+  o_gallery: { base: 'gatheringhall', vivid: { h: 262, s: 0.9 }, tint: '#c9a8ff', mood: 'dark', fog: '#1e1a2c', motes: '#e8e0ff', light: { key: ['#f0e8ff', 1.8], rim: ['#c9a8ff', 2.0], hemi: ['#b0a8d0', '#100c18', 1.0] }, particles: { kind: 'glitter', colors: ['#e8e0ff', '#c9a8ff', '#a8d8e8'], n: 24 }, backdrop: ['#14101e', '#4a3a6a'] },
+  o_hollows: { base: 'resonancescar', vivid: { h: 318, s: 1.1, l: 1.05 }, tint: '#e64ab8', mood: 'dark', fog: '#2a1a30', motes: '#ff8ad8', light: { key: ['#ffd8f0', 1.8], rim: ['#ff8ad8', 2.1], hemi: ['#c8a0c0', '#14081a', 1.0] }, particles: { kind: 'glitter', colors: ['#ff8ad8', '#e64ab8', '#fff0a8'], n: 30 }, backdrop: ['#1e1426', '#7a2a6a'] },
+  o_orchard: { base: 'lanternorchard', vivid: { h: 318, s: 1.0 }, tint: '#a89aa0', mood: 'dusk', fog: '#5a5060', motes: '#d8d0e0', light: { key: ['#f0e8f0', 2.0], rim: ['#ff9ad8', 1.6], hemi: ['#c8c0c8', '#2a2430', 1.15] }, particles: { kind: 'leaves', colors: ['#9a94a0', '#e64ab8', '#d8d0e0'], n: 26 }, backdrop: ['#3a3444', '#a89aa0'] },
+  o_bellows: { base: 'reliquary', vivid: { h: 24, s: 1.0 }, tint: '#8a5a3a', mood: 'dusk', fog: '#3a2a28', motes: '#ffe0c0', light: { key: ['#ffe0c8', 2.0], rim: ['#ff9a5a', 1.8], hemi: ['#c8a898', '#1a1210', 1.05] }, particles: { kind: 'dust', colors: ['#ffe0c0', '#c8a080', '#ff9a5a'], n: 24 }, backdrop: ['#2a1e1c', '#8a5a3a'] },
+  o_forge:   { base: 'heartwood', vivid: { h: 26, s: 1.15, l: 1.05 }, tint: '#ff7a3a', mood: 'dark', fog: '#1a0e0c', motes: '#ffd27a', light: { key: ['#ffd8b0', 1.9], rim: ['#ff8a3a', 2.2], hemi: ['#c09080', '#0c0606', 1.0] }, particles: { kind: 'embers', colors: ['#ff8a3a', '#ffd27a', '#ffffff'], n: 34 }, backdrop: ['#140a0a', '#6a2a14'] },
+};
+Object.keys(OARENA).forEach((id) => {
+  const v = OARENA[id], b = ARENAS[v.base];
+  ARENAS[id] = Object.assign({}, b, { mood: v.mood, fog: v.fog, motes: v.motes, obsidian: true, build(add, T, r, K, o) { return b.build.call(this, add, T, r, obsidianKit(K, v.tint, v.vivid), o); } });
+  const at = ATMOS[v.base] || {};
+  ATMOS[id] = Object.assign({}, at, { light: v.light, particles: v.particles, fog: at.fog, shafts: at.shafts ? Object.assign({}, at.shafts, { color: obsidianColour(at.shafts.color, v.tint) }) : null, backdrop: at.backdrop ? Object.assign({}, at.backdrop, { colors: v.backdrop }) : null });
+  const dd = DRESS[v.base]; if (dd) DRESS[id] = Object.assign({}, dd, { ground: (dd.ground || []).map((c) => obsidianColour(c, v.tint, v.vivid)), leaf: dd.leaf ? dd.leaf.map((c) => obsidianColour(c, v.tint, v.vivid)) : dd.leaf }, dd.a ? { a: obsidianColour(dd.a, v.tint, v.vivid) } : {}, dd.b ? { b: obsidianColour(dd.b, v.tint, v.vivid) } : {}, dd.glow ? { glow: obsidianColour(dd.glow, v.tint, v.vivid) } : {});
+  delete ALIAS[id];
+});
+export const obsidianArenas = () => Object.keys(OARENA).map((id) => ({ id, base: OARENA[id].base }));
+
 
 function dress(K, r, key, def, o) {
   const d = DRESS[key]; if (!d) return 0;
