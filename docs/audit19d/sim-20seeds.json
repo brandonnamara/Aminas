@@ -1,0 +1,2748 @@
+{
+ "note": "Automated rule-level simulation with scripted policies (tools/p19c-sim.js), not real gameplay and not an iPhone.",
+ "seeds": [
+  11,
+  22,
+  33,
+  44,
+  55,
+  66,
+  77,
+  88,
+  99,
+  110,
+  121,
+  132,
+  143,
+  154,
+  165,
+  176,
+  187,
+  198,
+  209,
+  220
+ ],
+ "n100": 20,
+ "tries": 10,
+ "trio": [
+  "lumifern",
+  "cannonis",
+  "emberix"
+ ],
+ "tune": {
+  "o_cinder": {
+   "dungeon": {
+    "hp": 1.2
+   },
+   "guardian": null,
+   "tier": [
+    {
+     "hp": 1.56,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.56,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.56,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.56,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.56,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.56,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.56,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.56,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.56,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.56,
+     "atk": 1.18
+    }
+   ]
+  },
+  "o_kilns": {
+   "dungeon": {
+    "hp": 1.1
+   },
+   "guardian": null,
+   "tier": [
+    {
+     "hp": 1.43,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.43,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.43,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.43,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.43,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.43,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.43,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.43,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.43,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.43,
+     "atk": 1.18
+    }
+   ]
+  },
+  "o_rookery": {
+   "dungeon": null,
+   "guardian": null,
+   "tier": [
+    {
+     "hp": 1.3,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.3,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.3,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.3,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.3,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.3,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.3,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.3,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.3,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.3,
+     "atk": 1.18
+    }
+   ]
+  },
+  "o_quench": {
+   "dungeon": {
+    "hp": 0.9,
+    "atk": 0.92
+   },
+   "guardian": {
+    "hp": 0.92,
+    "atk": 0.86
+   },
+   "tier": [
+    {
+     "hp": 1.17,
+     "atk": 1.086
+    },
+    {
+     "hp": 1.17,
+     "atk": 1.086
+    },
+    {
+     "hp": 1.17,
+     "atk": 1.086
+    },
+    {
+     "hp": 1.17,
+     "atk": 1.086
+    },
+    {
+     "hp": 1.03,
+     "atk": 1.086
+    },
+    {
+     "hp": 0.995,
+     "atk": 1.086
+    },
+    {
+     "hp": 1.17,
+     "atk": 1.086
+    },
+    {
+     "hp": 1.17,
+     "atk": 1.086
+    },
+    {
+     "hp": 1.17,
+     "atk": 1.086
+    },
+    {
+     "hp": 1.076,
+     "atk": 0.934
+    }
+   ]
+  },
+  "o_seams": {
+   "dungeon": null,
+   "guardian": null,
+   "tier": [
+    {
+     "hp": 1.3,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.3,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.3,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.3,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.3,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.3,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.3,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.3,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.3,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.3,
+     "atk": 1.18
+    }
+   ]
+  },
+  "o_gallery": {
+   "dungeon": {
+    "hp": 0.85
+   },
+   "guardian": null,
+   "tier": [
+    {
+     "hp": 1.105,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.105,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.105,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.105,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.105,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.105,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.105,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.105,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.105,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.105,
+     "atk": 1.18
+    }
+   ]
+  },
+  "o_hollows": {
+   "dungeon": null,
+   "guardian": null,
+   "tier": [
+    {
+     "hp": 1.3,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.3,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.3,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.3,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.3,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.3,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.3,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.3,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.3,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.3,
+     "atk": 1.18
+    }
+   ]
+  },
+  "o_orchard": {
+   "dungeon": {
+    "hp": 1.1
+   },
+   "guardian": null,
+   "tier": [
+    {
+     "hp": 1.43,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.43,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.43,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.43,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.43,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.43,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.43,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.43,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.43,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.43,
+     "atk": 1.18
+    }
+   ]
+  },
+  "o_bellows": {
+   "dungeon": {
+    "hp": 1.15
+   },
+   "guardian": null,
+   "tier": [
+    {
+     "hp": 1.495,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.495,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.495,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.495,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.495,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.495,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.495,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.495,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.495,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.495,
+     "atk": 1.18
+    }
+   ]
+  },
+  "o_forge": {
+   "dungeon": {
+    "hp": 1.12
+   },
+   "guardian": {
+    "hp": 0.92,
+    "atk": 0.9
+   },
+   "tier": [
+    {
+     "hp": 1.456,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.456,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.456,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.456,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.456,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.456,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.456,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.456,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.456,
+     "atk": 1.18
+    },
+    {
+     "hp": 1.34,
+     "atk": 1.062
+    }
+   ]
+  }
+ },
+ "battles": [
+  {
+   "id": "o_cinder",
+   "i": 1,
+   "sp": "infernokai",
+   "lv": 35,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 7.2,
+   "basic": 100,
+   "basicTurns": 9.3
+  },
+  {
+   "id": "o_cinder",
+   "i": 2,
+   "sp": "rockraki",
+   "lv": 35,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 8.3,
+   "basic": 100,
+   "basicTurns": 11.4
+  },
+  {
+   "id": "o_cinder",
+   "i": 3,
+   "sp": "infernox",
+   "lv": 36,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.1,
+   "basic": 100,
+   "basicTurns": 8
+  },
+  {
+   "id": "o_cinder",
+   "i": 4,
+   "sp": "pyrocore",
+   "lv": 36,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 11.5,
+   "basic": 100,
+   "basicTurns": 16.9
+  },
+  {
+   "id": "o_cinder",
+   "i": 5,
+   "sp": "infernokai",
+   "lv": 37,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 7.5,
+   "basic": 100,
+   "basicTurns": 10.1
+  },
+  {
+   "id": "o_cinder",
+   "i": 6,
+   "sp": "rockraki",
+   "lv": 37,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 8.4,
+   "basic": 100,
+   "basicTurns": 12.1
+  },
+  {
+   "id": "o_cinder",
+   "i": 7,
+   "sp": "infernox",
+   "lv": 38,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.4,
+   "basic": 100,
+   "basicTurns": 8.6
+  },
+  {
+   "id": "o_cinder",
+   "i": 8,
+   "sp": "infernokai",
+   "lv": 38,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 7.5,
+   "basic": 100,
+   "basicTurns": 10.3
+  },
+  {
+   "id": "o_cinder",
+   "i": 9,
+   "sp": "pyrocore",
+   "lv": 38,
+   "boss": false,
+   "move": "ashfall",
+   "tactical": 100,
+   "tacticalTurns": 11.4,
+   "basic": 100,
+   "basicTurns": 15.9
+  },
+  {
+   "id": "o_cinder",
+   "i": 10,
+   "sp": "infernokai",
+   "lv": 41,
+   "boss": true,
+   "move": "ashfall",
+   "tactical": 100,
+   "tacticalTurns": 12.1,
+   "basic": 10,
+   "basicTurns": 14.8
+  },
+  {
+   "id": "o_kilns",
+   "i": 1,
+   "sp": "infernox",
+   "lv": 36,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 5.4,
+   "basic": 100,
+   "basicTurns": 7.7
+  },
+  {
+   "id": "o_kilns",
+   "i": 2,
+   "sp": "lumi3",
+   "lv": 36,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 7.2,
+   "basic": 100,
+   "basicTurns": 10
+  },
+  {
+   "id": "o_kilns",
+   "i": 3,
+   "sp": "ignivor",
+   "lv": 37,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 7,
+   "basic": 100,
+   "basicTurns": 9.1
+  },
+  {
+   "id": "o_kilns",
+   "i": 4,
+   "sp": "infernox",
+   "lv": 37,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 5.7,
+   "basic": 100,
+   "basicTurns": 7.8
+  },
+  {
+   "id": "o_kilns",
+   "i": 5,
+   "sp": "voltar3",
+   "lv": 38,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 5.5,
+   "basic": 100,
+   "basicTurns": 12.6
+  },
+  {
+   "id": "o_kilns",
+   "i": 6,
+   "sp": "ignivor",
+   "lv": 38,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 7,
+   "basic": 100,
+   "basicTurns": 9.2
+  },
+  {
+   "id": "o_kilns",
+   "i": 7,
+   "sp": "lumi3",
+   "lv": 39,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 7.5,
+   "basic": 100,
+   "basicTurns": 11.6
+  },
+  {
+   "id": "o_kilns",
+   "i": 8,
+   "sp": "infernox",
+   "lv": 39,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.2,
+   "basic": 100,
+   "basicTurns": 7.9
+  },
+  {
+   "id": "o_kilns",
+   "i": 9,
+   "sp": "ignivor",
+   "lv": 39,
+   "boss": false,
+   "move": "moltenglaze",
+   "tactical": 100,
+   "tacticalTurns": 8.3,
+   "basic": 100,
+   "basicTurns": 11.3
+  },
+  {
+   "id": "o_kilns",
+   "i": 10,
+   "sp": "infernox",
+   "lv": 42,
+   "boss": true,
+   "move": "moltenglaze",
+   "tactical": 100,
+   "tacticalTurns": 11.1,
+   "basic": 100,
+   "basicTurns": 19
+  },
+  {
+   "id": "o_rookery",
+   "i": 1,
+   "sp": "pyrophoenix",
+   "lv": 37,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6,
+   "basic": 100,
+   "basicTurns": 7.1
+  },
+  {
+   "id": "o_rookery",
+   "i": 2,
+   "sp": "stormbringer",
+   "lv": 37,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6,
+   "basic": 100,
+   "basicTurns": 8.9
+  },
+  {
+   "id": "o_rookery",
+   "i": 3,
+   "sp": "voltar3",
+   "lv": 38,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 4.8,
+   "basic": 100,
+   "basicTurns": 10.5
+  },
+  {
+   "id": "o_rookery",
+   "i": 4,
+   "sp": "pyrophoenix",
+   "lv": 38,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.2,
+   "basic": 100,
+   "basicTurns": 7.5
+  },
+  {
+   "id": "o_rookery",
+   "i": 5,
+   "sp": "stormbringer",
+   "lv": 39,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.4,
+   "basic": 100,
+   "basicTurns": 9.6
+  },
+  {
+   "id": "o_rookery",
+   "i": 6,
+   "sp": "eclipsar",
+   "lv": 39,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 5,
+   "basic": 100,
+   "basicTurns": 8.6
+  },
+  {
+   "id": "o_rookery",
+   "i": 7,
+   "sp": "pyrophoenix",
+   "lv": 40,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.5,
+   "basic": 100,
+   "basicTurns": 8
+  },
+  {
+   "id": "o_rookery",
+   "i": 8,
+   "sp": "stormbringer",
+   "lv": 40,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.5,
+   "basic": 100,
+   "basicTurns": 10
+  },
+  {
+   "id": "o_rookery",
+   "i": 9,
+   "sp": "voltar3",
+   "lv": 40,
+   "boss": false,
+   "move": "cinderdive",
+   "tactical": 100,
+   "tacticalTurns": 4.7,
+   "basic": 100,
+   "basicTurns": 10.3
+  },
+  {
+   "id": "o_rookery",
+   "i": 10,
+   "sp": "pyrophoenix",
+   "lv": 43,
+   "boss": true,
+   "move": "cinderdive",
+   "tactical": 100,
+   "tacticalTurns": 9.9,
+   "basic": 100,
+   "basicTurns": 14.6
+  },
+  {
+   "id": "o_quench",
+   "i": 1,
+   "sp": "shellfin",
+   "lv": 38,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 8.1,
+   "basic": 100,
+   "basicTurns": 11.9
+  },
+  {
+   "id": "o_quench",
+   "i": 2,
+   "sp": "oceanfang",
+   "lv": 38,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 4,
+   "basic": 100,
+   "basicTurns": 7
+  },
+  {
+   "id": "o_quench",
+   "i": 3,
+   "sp": "aquaflora3",
+   "lv": 39,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 5.5,
+   "basic": 100,
+   "basicTurns": 8.3
+  },
+  {
+   "id": "o_quench",
+   "i": 4,
+   "sp": "pyrocore",
+   "lv": 39,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 9.4,
+   "basic": 100,
+   "basicTurns": 12.1
+  },
+  {
+   "id": "o_quench",
+   "i": 5,
+   "sp": "shellfin",
+   "lv": 40,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 7.9,
+   "basic": 100,
+   "basicTurns": 11
+  },
+  {
+   "id": "o_quench",
+   "i": 6,
+   "sp": "oceanfang",
+   "lv": 40,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 4,
+   "basic": 100,
+   "basicTurns": 7
+  },
+  {
+   "id": "o_quench",
+   "i": 7,
+   "sp": "aquaflora3",
+   "lv": 41,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.1,
+   "basic": 100,
+   "basicTurns": 8.9
+  },
+  {
+   "id": "o_quench",
+   "i": 8,
+   "sp": "shellfin",
+   "lv": 41,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 9.3,
+   "basic": 100,
+   "basicTurns": 13.1
+  },
+  {
+   "id": "o_quench",
+   "i": 9,
+   "sp": "pyrocore",
+   "lv": 41,
+   "boss": false,
+   "move": "coldquench",
+   "tactical": 100,
+   "tacticalTurns": 10.7,
+   "basic": 100,
+   "basicTurns": 13.2
+  },
+  {
+   "id": "o_quench",
+   "i": 10,
+   "sp": "shellfin",
+   "lv": 44,
+   "boss": true,
+   "move": "coldquench",
+   "tactical": 100,
+   "tacticalTurns": 15.1,
+   "basic": 60,
+   "basicTurns": 21.8
+  },
+  {
+   "id": "o_seams",
+   "i": 1,
+   "sp": "voltar3",
+   "lv": 39,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 4.2,
+   "basic": 100,
+   "basicTurns": 9.8
+  },
+  {
+   "id": "o_seams",
+   "i": 2,
+   "sp": "zeep3",
+   "lv": 39,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 9.1,
+   "basic": 100,
+   "basicTurns": 13.1
+  },
+  {
+   "id": "o_seams",
+   "i": 3,
+   "sp": "pyrocore",
+   "lv": 40,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 9.8,
+   "basic": 100,
+   "basicTurns": 13.7
+  },
+  {
+   "id": "o_seams",
+   "i": 4,
+   "sp": "voltar3",
+   "lv": 40,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 4.7,
+   "basic": 100,
+   "basicTurns": 10.3
+  },
+  {
+   "id": "o_seams",
+   "i": 5,
+   "sp": "eclipsar",
+   "lv": 41,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 5,
+   "basic": 100,
+   "basicTurns": 8.6
+  },
+  {
+   "id": "o_seams",
+   "i": 6,
+   "sp": "zeep3",
+   "lv": 41,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 9.7,
+   "basic": 100,
+   "basicTurns": 14.4
+  },
+  {
+   "id": "o_seams",
+   "i": 7,
+   "sp": "voltar3",
+   "lv": 42,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 5.3,
+   "basic": 100,
+   "basicTurns": 12.1
+  },
+  {
+   "id": "o_seams",
+   "i": 8,
+   "sp": "pyrocore",
+   "lv": 42,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 10.1,
+   "basic": 100,
+   "basicTurns": 14.6
+  },
+  {
+   "id": "o_seams",
+   "i": 9,
+   "sp": "zeep3",
+   "lv": 42,
+   "boss": false,
+   "move": "blackout",
+   "tactical": 100,
+   "tacticalTurns": 10.4,
+   "basic": 100,
+   "basicTurns": 13.8
+  },
+  {
+   "id": "o_seams",
+   "i": 10,
+   "sp": "voltar3",
+   "lv": 45,
+   "boss": true,
+   "move": "blackout",
+   "tactical": 100,
+   "tacticalTurns": 13.1,
+   "basic": 15,
+   "basicTurns": 15
+  },
+  {
+   "id": "o_gallery",
+   "i": 1,
+   "sp": "eclipsar",
+   "lv": 40,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 3,
+   "basic": 100,
+   "basicTurns": 6.5
+  },
+  {
+   "id": "o_gallery",
+   "i": 2,
+   "sp": "aurelith",
+   "lv": 40,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.3,
+   "basic": 100,
+   "basicTurns": 8.8
+  },
+  {
+   "id": "o_gallery",
+   "i": 3,
+   "sp": "lumi3",
+   "lv": 41,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 5.4,
+   "basic": 100,
+   "basicTurns": 8.2
+  },
+  {
+   "id": "o_gallery",
+   "i": 4,
+   "sp": "voltar3",
+   "lv": 41,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 4,
+   "basic": 100,
+   "basicTurns": 8.7
+  },
+  {
+   "id": "o_gallery",
+   "i": 5,
+   "sp": "eclipsar",
+   "lv": 42,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 3,
+   "basic": 100,
+   "basicTurns": 7.3
+  },
+  {
+   "id": "o_gallery",
+   "i": 6,
+   "sp": "aurelith",
+   "lv": 42,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.5,
+   "basic": 100,
+   "basicTurns": 9.7
+  },
+  {
+   "id": "o_gallery",
+   "i": 7,
+   "sp": "voltar3",
+   "lv": 43,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 4.2,
+   "basic": 100,
+   "basicTurns": 10.8
+  },
+  {
+   "id": "o_gallery",
+   "i": 8,
+   "sp": "lumi3",
+   "lv": 43,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.1,
+   "basic": 100,
+   "basicTurns": 8.6
+  },
+  {
+   "id": "o_gallery",
+   "i": 9,
+   "sp": "aurelith",
+   "lv": 43,
+   "boss": false,
+   "move": "nightglass",
+   "tactical": 100,
+   "tacticalTurns": 6.8,
+   "basic": 100,
+   "basicTurns": 9.7
+  },
+  {
+   "id": "o_gallery",
+   "i": 10,
+   "sp": "eclipsar",
+   "lv": 46,
+   "boss": true,
+   "move": "nightglass",
+   "tactical": 100,
+   "tacticalTurns": 8.8,
+   "basic": 100,
+   "basicTurns": 15.1
+  },
+  {
+   "id": "o_hollows",
+   "i": 1,
+   "sp": "aimza3",
+   "lv": 41,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6,
+   "basic": 100,
+   "basicTurns": 8.3
+  },
+  {
+   "id": "o_hollows",
+   "i": 2,
+   "sp": "lumi3",
+   "lv": 41,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.5,
+   "basic": 100,
+   "basicTurns": 9.2
+  },
+  {
+   "id": "o_hollows",
+   "i": 3,
+   "sp": "zeep3",
+   "lv": 42,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 9.4,
+   "basic": 100,
+   "basicTurns": 13.8
+  },
+  {
+   "id": "o_hollows",
+   "i": 4,
+   "sp": "aimza3",
+   "lv": 42,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.2,
+   "basic": 100,
+   "basicTurns": 9
+  },
+  {
+   "id": "o_hollows",
+   "i": 5,
+   "sp": "voltar3",
+   "lv": 43,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 5.2,
+   "basic": 100,
+   "basicTurns": 11.7
+  },
+  {
+   "id": "o_hollows",
+   "i": 6,
+   "sp": "lumi3",
+   "lv": 43,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.8,
+   "basic": 100,
+   "basicTurns": 9.9
+  },
+  {
+   "id": "o_hollows",
+   "i": 7,
+   "sp": "aimza3",
+   "lv": 44,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 7,
+   "basic": 100,
+   "basicTurns": 9.7
+  },
+  {
+   "id": "o_hollows",
+   "i": 8,
+   "sp": "zeep3",
+   "lv": 44,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 9.8,
+   "basic": 100,
+   "basicTurns": 15
+  },
+  {
+   "id": "o_hollows",
+   "i": 9,
+   "sp": "lumi3",
+   "lv": 44,
+   "boss": false,
+   "move": "shatterlight",
+   "tactical": 100,
+   "tacticalTurns": 7.2,
+   "basic": 100,
+   "basicTurns": 9.9
+  },
+  {
+   "id": "o_hollows",
+   "i": 10,
+   "sp": "lumi3",
+   "lv": 47,
+   "boss": true,
+   "move": "shatterlight",
+   "tactical": 100,
+   "tacticalTurns": 13.3,
+   "basic": 0,
+   "basicTurns": 14
+  },
+  {
+   "id": "o_orchard",
+   "i": 1,
+   "sp": "terraflora3",
+   "lv": 42,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 8.3,
+   "basic": 100,
+   "basicTurns": 13.4
+  },
+  {
+   "id": "o_orchard",
+   "i": 2,
+   "sp": "calyxar",
+   "lv": 42,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 14.8,
+   "basic": 100,
+   "basicTurns": 17.3
+  },
+  {
+   "id": "o_orchard",
+   "i": 3,
+   "sp": "sylvaneer3",
+   "lv": 43,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.9,
+   "basic": 100,
+   "basicTurns": 12.5
+  },
+  {
+   "id": "o_orchard",
+   "i": 4,
+   "sp": "terraflora3",
+   "lv": 43,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 9.1,
+   "basic": 100,
+   "basicTurns": 13.6
+  },
+  {
+   "id": "o_orchard",
+   "i": 5,
+   "sp": "infernokai",
+   "lv": 44,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.8,
+   "basic": 100,
+   "basicTurns": 9.2
+  },
+  {
+   "id": "o_orchard",
+   "i": 6,
+   "sp": "calyxar",
+   "lv": 44,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 14.4,
+   "basic": 75,
+   "basicTurns": 17.4
+  },
+  {
+   "id": "o_orchard",
+   "i": 7,
+   "sp": "terraflora3",
+   "lv": 45,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 10.9,
+   "basic": 100,
+   "basicTurns": 13.7
+  },
+  {
+   "id": "o_orchard",
+   "i": 8,
+   "sp": "sylvaneer3",
+   "lv": 45,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 8.4,
+   "basic": 100,
+   "basicTurns": 12.4
+  },
+  {
+   "id": "o_orchard",
+   "i": 9,
+   "sp": "infernokai",
+   "lv": 45,
+   "boss": false,
+   "move": "ashbloom",
+   "tactical": 100,
+   "tacticalTurns": 8.8,
+   "basic": 100,
+   "basicTurns": 11.3
+  },
+  {
+   "id": "o_orchard",
+   "i": 10,
+   "sp": "terraflora3",
+   "lv": 48,
+   "boss": true,
+   "move": "ashbloom",
+   "tactical": 100,
+   "tacticalTurns": 14.6,
+   "basic": 30,
+   "basicTurns": 16.6
+  },
+  {
+   "id": "o_bellows",
+   "i": 1,
+   "sp": "stormbringer",
+   "lv": 43,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.5,
+   "basic": 100,
+   "basicTurns": 10.1
+  },
+  {
+   "id": "o_bellows",
+   "i": 2,
+   "sp": "pyrophoenix",
+   "lv": 43,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.7,
+   "basic": 100,
+   "basicTurns": 8
+  },
+  {
+   "id": "o_bellows",
+   "i": 3,
+   "sp": "ignivor",
+   "lv": 44,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 7,
+   "basic": 100,
+   "basicTurns": 9.2
+  },
+  {
+   "id": "o_bellows",
+   "i": 4,
+   "sp": "stormbringer",
+   "lv": 44,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.9,
+   "basic": 100,
+   "basicTurns": 10.1
+  },
+  {
+   "id": "o_bellows",
+   "i": 5,
+   "sp": "infernokai",
+   "lv": 45,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 7.3,
+   "basic": 100,
+   "basicTurns": 9.9
+  },
+  {
+   "id": "o_bellows",
+   "i": 6,
+   "sp": "pyrophoenix",
+   "lv": 45,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.6,
+   "basic": 100,
+   "basicTurns": 8.7
+  },
+  {
+   "id": "o_bellows",
+   "i": 7,
+   "sp": "stormbringer",
+   "lv": 46,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 7.5,
+   "basic": 100,
+   "basicTurns": 11.1
+  },
+  {
+   "id": "o_bellows",
+   "i": 8,
+   "sp": "ignivor",
+   "lv": 46,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 7.3,
+   "basic": 100,
+   "basicTurns": 10.1
+  },
+  {
+   "id": "o_bellows",
+   "i": 9,
+   "sp": "zeep3",
+   "lv": 46,
+   "boss": false,
+   "move": "furnacedraught",
+   "tactical": 100,
+   "tacticalTurns": 11.5,
+   "basic": 100,
+   "basicTurns": 14.4
+  },
+  {
+   "id": "o_bellows",
+   "i": 10,
+   "sp": "stormbringer",
+   "lv": 49,
+   "boss": true,
+   "move": "furnacedraught",
+   "tactical": 100,
+   "tacticalTurns": 12.4,
+   "basic": 15,
+   "basicTurns": 13.9
+  },
+  {
+   "id": "o_forge",
+   "i": 1,
+   "sp": "pyrocore",
+   "lv": 44,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 10.7,
+   "basic": 100,
+   "basicTurns": 14.9
+  },
+  {
+   "id": "o_forge",
+   "i": 2,
+   "sp": "zeep3",
+   "lv": 44,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 9.9,
+   "basic": 100,
+   "basicTurns": 15.2
+  },
+  {
+   "id": "o_forge",
+   "i": 3,
+   "sp": "infernokai",
+   "lv": 45,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 7,
+   "basic": 100,
+   "basicTurns": 9.1
+  },
+  {
+   "id": "o_forge",
+   "i": 4,
+   "sp": "pyrocore",
+   "lv": 45,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 10.9,
+   "basic": 100,
+   "basicTurns": 15.6
+  },
+  {
+   "id": "o_forge",
+   "i": 5,
+   "sp": "infernox",
+   "lv": 46,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.3,
+   "basic": 100,
+   "basicTurns": 7.8
+  },
+  {
+   "id": "o_forge",
+   "i": 6,
+   "sp": "zeep3",
+   "lv": 46,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 10.5,
+   "basic": 100,
+   "basicTurns": 16.4
+  },
+  {
+   "id": "o_forge",
+   "i": 7,
+   "sp": "pyrocore",
+   "lv": 47,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 11.1,
+   "basic": 100,
+   "basicTurns": 16.9
+  },
+  {
+   "id": "o_forge",
+   "i": 8,
+   "sp": "infernokai",
+   "lv": 47,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 7.2,
+   "basic": 100,
+   "basicTurns": 10.1
+  },
+  {
+   "id": "o_forge",
+   "i": 9,
+   "sp": "aimza3",
+   "lv": 47,
+   "boss": false,
+   "move": "heartofforge",
+   "tactical": 100,
+   "tacticalTurns": 7,
+   "basic": 100,
+   "basicTurns": 10.8
+  },
+  {
+   "id": "o_forge",
+   "i": 10,
+   "sp": "pyrocore",
+   "lv": 50,
+   "boss": true,
+   "move": "heartofforge",
+   "tactical": 100,
+   "tacticalTurns": 22.2,
+   "basic": 0,
+   "basicTurns": 24.4
+  }
+ ],
+ "thresholds": [
+  {
+   "id": "o_cinder",
+   "rec": 38,
+   "threshold": 36
+  },
+  {
+   "id": "o_kilns",
+   "rec": 39,
+   "threshold": 37
+  },
+  {
+   "id": "o_rookery",
+   "rec": 40,
+   "threshold": 38
+  },
+  {
+   "id": "o_quench",
+   "rec": 41,
+   "threshold": 39
+  },
+  {
+   "id": "o_seams",
+   "rec": 42,
+   "threshold": 40
+  },
+  {
+   "id": "o_gallery",
+   "rec": 43,
+   "threshold": 41
+  },
+  {
+   "id": "o_hollows",
+   "rec": 44,
+   "threshold": 43
+  },
+  {
+   "id": "o_orchard",
+   "rec": 45,
+   "threshold": 43
+  },
+  {
+   "id": "o_bellows",
+   "rec": 46,
+   "threshold": 44
+  },
+  {
+   "id": "o_forge",
+   "rec": 47,
+   "threshold": 44
+  }
+ ],
+ "styles": [
+  {
+   "id": "o_cinder",
+   "rec": 38,
+   "counter": [
+    "cannonis",
+    "kairyu",
+    "aquaflora"
+   ],
+   "tactical": 100,
+   "auto": 100,
+   "basic": 0,
+   "matchup": 100
+  },
+  {
+   "id": "o_kilns",
+   "rec": 39,
+   "counter": [
+    "cannonis",
+    "kairyu",
+    "aquaflora"
+   ],
+   "tactical": 100,
+   "auto": 100,
+   "basic": 0,
+   "matchup": 100
+  },
+  {
+   "id": "o_rookery",
+   "rec": 40,
+   "counter": [
+    "cannonis",
+    "kairyu",
+    "aquaflora"
+   ],
+   "tactical": 100,
+   "auto": 100,
+   "basic": 0,
+   "matchup": 100
+  },
+  {
+   "id": "o_quench",
+   "rec": 41,
+   "counter": [
+    "acinus",
+    "sylvaneer",
+    "terraflora"
+   ],
+   "tactical": 100,
+   "auto": 100,
+   "basic": 0,
+   "matchup": 100
+  },
+  {
+   "id": "o_seams",
+   "rec": 42,
+   "counter": [
+    "lumifern",
+    "lumi",
+    "umbrit"
+   ],
+   "tactical": 100,
+   "auto": 100,
+   "basic": 0,
+   "matchup": 100
+  },
+  {
+   "id": "o_gallery",
+   "rec": 43,
+   "counter": [
+    "lumifern",
+    "lumi",
+    "umbrit"
+   ],
+   "tactical": 100,
+   "auto": 100,
+   "basic": 0,
+   "matchup": 100
+  },
+  {
+   "id": "o_hollows",
+   "rec": 44,
+   "counter": [
+    "zeep",
+    "umbrit",
+    "voltar"
+   ],
+   "tactical": 100,
+   "auto": 100,
+   "basic": 0,
+   "matchup": 100
+  },
+  {
+   "id": "o_orchard",
+   "rec": 45,
+   "counter": [
+    "emberix",
+    "pyrokai",
+    "igniflare"
+   ],
+   "tactical": 100,
+   "auto": 100,
+   "basic": 0,
+   "matchup": 100
+  },
+  {
+   "id": "o_bellows",
+   "rec": 46,
+   "counter": [
+    "gaiaroki",
+    "pyrocell",
+    "emberix"
+   ],
+   "tactical": 100,
+   "auto": 100,
+   "basic": 0,
+   "matchup": 100
+  },
+  {
+   "id": "o_forge",
+   "rec": 47,
+   "counter": [
+    "cannonis",
+    "kairyu",
+    "aquaflora"
+   ],
+   "tactical": 100,
+   "auto": 100,
+   "basic": 0,
+   "matchup": 100
+  }
+ ],
+ "moves": [
+  {
+   "id": "o_cinder",
+   "guardian": "The Cinder Warden",
+   "move": "Ashfall",
+   "el": "fire",
+   "power": 76,
+   "fx": "burn",
+   "rows": [
+    {
+     "member": "aurelith",
+     "hp": 430,
+     "unguarded": 162,
+     "guarded": 41,
+     "unguardedPct": 38,
+     "guardedPct": 10
+    },
+    {
+     "member": "shellfin",
+     "hp": 486,
+     "unguarded": 86,
+     "guarded": 22,
+     "unguardedPct": 18,
+     "guardedPct": 5
+    },
+    {
+     "member": "infernox",
+     "hp": 395,
+     "unguarded": 204,
+     "guarded": 51,
+     "unguardedPct": 52,
+     "guardedPct": 13
+    }
+   ],
+   "worstUnguardedPct": 52,
+   "worstGuardedPct": 13
+  },
+  {
+   "id": "o_kilns",
+   "guardian": "The Glassblower",
+   "move": "Molten Glaze",
+   "el": "fire",
+   "power": 72,
+   "fx": "weaken",
+   "rows": [
+    {
+     "member": "aurelith",
+     "hp": 440,
+     "unguarded": 145,
+     "guarded": 36,
+     "unguardedPct": 33,
+     "guardedPct": 8
+    },
+    {
+     "member": "shellfin",
+     "hp": 497,
+     "unguarded": 77,
+     "guarded": 19,
+     "unguardedPct": 15,
+     "guardedPct": 4
+    },
+    {
+     "member": "infernox",
+     "hp": 404,
+     "unguarded": 184,
+     "guarded": 46,
+     "unguardedPct": 46,
+     "guardedPct": 11
+    }
+   ],
+   "worstUnguardedPct": 46,
+   "worstGuardedPct": 11
+  },
+  {
+   "id": "o_rookery",
+   "guardian": "The Rookery Matriarch",
+   "move": "Cinder Dive",
+   "el": "fire",
+   "power": 80,
+   "fx": null,
+   "rows": [
+    {
+     "member": "aurelith",
+     "hp": 449,
+     "unguarded": 163,
+     "guarded": 41,
+     "unguardedPct": 36,
+     "guardedPct": 9
+    },
+    {
+     "member": "shellfin",
+     "hp": 507,
+     "unguarded": 87,
+     "guarded": 22,
+     "unguardedPct": 17,
+     "guardedPct": 4
+    },
+    {
+     "member": "infernox",
+     "hp": 412,
+     "unguarded": 206,
+     "guarded": 52,
+     "unguardedPct": 50,
+     "guardedPct": 13
+    }
+   ],
+   "worstUnguardedPct": 50,
+   "worstGuardedPct": 13
+  },
+  {
+   "id": "o_quench",
+   "guardian": "The Quenchwarden",
+   "move": "Cold Quench",
+   "el": "water",
+   "power": 70,
+   "fx": "soak",
+   "rows": [
+    {
+     "member": "aurelith",
+     "hp": 459,
+     "unguarded": 100,
+     "guarded": 25,
+     "unguardedPct": 22,
+     "guardedPct": 5
+    },
+    {
+     "member": "shellfin",
+     "hp": 518,
+     "unguarded": 80,
+     "guarded": 20,
+     "unguardedPct": 15,
+     "guardedPct": 4
+    },
+    {
+     "member": "infernox",
+     "hp": 421,
+     "unguarded": 189,
+     "guarded": 47,
+     "unguardedPct": 45,
+     "guardedPct": 11
+    }
+   ],
+   "worstUnguardedPct": 45,
+   "worstGuardedPct": 11
+  },
+  {
+   "id": "o_seams",
+   "guardian": "The Lamp-Eater",
+   "move": "Blackout",
+   "el": "dark",
+   "power": 72,
+   "fx": "silence",
+   "rows": [
+    {
+     "member": "aurelith",
+     "hp": 468,
+     "unguarded": 230,
+     "guarded": 58,
+     "unguardedPct": 49,
+     "guardedPct": 12
+    },
+    {
+     "member": "shellfin",
+     "hp": 528,
+     "unguarded": 121,
+     "guarded": 30,
+     "unguardedPct": 23,
+     "guardedPct": 6
+    },
+    {
+     "member": "infernox",
+     "hp": 429,
+     "unguarded": 194,
+     "guarded": 48,
+     "unguardedPct": 45,
+     "guardedPct": 11
+    }
+   ],
+   "worstUnguardedPct": 49,
+   "worstGuardedPct": 12
+  },
+  {
+   "id": "o_gallery",
+   "guardian": "The Dusk Warden",
+   "move": "Night Glass",
+   "el": "dark",
+   "power": 84,
+   "fx": "never resisted",
+   "rows": [
+    {
+     "member": "aurelith",
+     "hp": 477,
+     "unguarded": 181,
+     "guarded": 45,
+     "unguardedPct": 38,
+     "guardedPct": 9
+    },
+    {
+     "member": "shellfin",
+     "hp": 539,
+     "unguarded": 144,
+     "guarded": 36,
+     "unguardedPct": 27,
+     "guardedPct": 7
+    },
+    {
+     "member": "infernox",
+     "hp": 438,
+     "unguarded": 228,
+     "guarded": 57,
+     "unguardedPct": 52,
+     "guardedPct": 13
+    }
+   ],
+   "worstUnguardedPct": 52,
+   "worstGuardedPct": 13
+  },
+  {
+   "id": "o_hollows",
+   "guardian": "The Lantern Below",
+   "move": "Shatterlight",
+   "el": "light",
+   "power": 78,
+   "fx": null,
+   "rows": [
+    {
+     "member": "aurelith",
+     "hp": 487,
+     "unguarded": 173,
+     "guarded": 43,
+     "unguardedPct": 36,
+     "guardedPct": 9
+    },
+    {
+     "member": "shellfin",
+     "hp": 550,
+     "unguarded": 137,
+     "guarded": 34,
+     "unguardedPct": 25,
+     "guardedPct": 6
+    },
+    {
+     "member": "infernox",
+     "hp": 446,
+     "unguarded": 219,
+     "guarded": 55,
+     "unguardedPct": 49,
+     "guardedPct": 12
+    }
+   ],
+   "worstUnguardedPct": 49,
+   "worstGuardedPct": 12
+  },
+  {
+   "id": "o_orchard",
+   "guardian": "The Ashbloom",
+   "move": "Ashbloom",
+   "el": "nature",
+   "power": 74,
+   "fx": "weaken",
+   "rows": [
+    {
+     "member": "aurelith",
+     "hp": 496,
+     "unguarded": 166,
+     "guarded": 42,
+     "unguardedPct": 33,
+     "guardedPct": 8
+    },
+    {
+     "member": "shellfin",
+     "hp": 560,
+     "unguarded": 197,
+     "guarded": 49,
+     "unguardedPct": 35,
+     "guardedPct": 9
+    },
+    {
+     "member": "infernox",
+     "hp": 455,
+     "unguarded": 140,
+     "guarded": 35,
+     "unguardedPct": 31,
+     "guardedPct": 8
+    }
+   ],
+   "worstUnguardedPct": 35,
+   "worstGuardedPct": 9
+  },
+  {
+   "id": "o_bellows",
+   "guardian": "The Bellows Wind",
+   "move": "Furnace Draught",
+   "el": "wind",
+   "power": 78,
+   "fx": "burn",
+   "rows": [
+    {
+     "member": "aurelith",
+     "hp": 505,
+     "unguarded": 178,
+     "guarded": 44,
+     "unguardedPct": 35,
+     "guardedPct": 9
+    },
+    {
+     "member": "shellfin",
+     "hp": 571,
+     "unguarded": 142,
+     "guarded": 36,
+     "unguardedPct": 25,
+     "guardedPct": 6
+    },
+    {
+     "member": "infernox",
+     "hp": 464,
+     "unguarded": 225,
+     "guarded": 56,
+     "unguardedPct": 49,
+     "guardedPct": 12
+    }
+   ],
+   "worstUnguardedPct": 49,
+   "worstGuardedPct": 12
+  },
+  {
+   "id": "o_forge",
+   "guardian": "The Forge Heart",
+   "move": "Heart of the Forge",
+   "el": "earth",
+   "power": 92,
+   "fx": null,
+   "rows": [
+    {
+     "member": "aurelith",
+     "hp": 515,
+     "unguarded": 166,
+     "guarded": 42,
+     "unguardedPct": 32,
+     "guardedPct": 8
+    },
+    {
+     "member": "shellfin",
+     "hp": 581,
+     "unguarded": 88,
+     "guarded": 22,
+     "unguardedPct": 15,
+     "guardedPct": 4
+    },
+    {
+     "member": "infernox",
+     "hp": 472,
+     "unguarded": 212,
+     "guarded": 53,
+     "unguardedPct": 45,
+     "guardedPct": 11
+    }
+   ],
+   "worstUnguardedPct": 45,
+   "worstGuardedPct": 11
+  }
+ ],
+ "campaigns": {
+  "rarelyFed": {
+   "label": "Rarely fed: balanced trio, no gear, moves Lv 1",
+   "open": true,
+   "capOnArrival": 50,
+   "arrive": 34.7,
+   "end": 44.2,
+   "capAfter": 60,
+   "losses": 5.3,
+   "grinds": 0.8,
+   "minutes": 69,
+   "gold": 60397,
+   "allCleared": true,
+   "bossFlag": true,
+   "nightMail": true,
+   "arrivePer": [
+    34.7,
+    35.7,
+    36.4,
+    37.3,
+    38.4,
+    39.8,
+    40.7,
+    41.5,
+    42.4,
+    43.4
+   ],
+   "slack": [
+    -1.3,
+    -1.3,
+    -1.6,
+    -1.7,
+    -1.6,
+    -1.2,
+    -2.3,
+    -1.5,
+    -1.7,
+    -0.6
+   ],
+   "lossesPer": [
+    0.6,
+    0.3,
+    0.1,
+    1,
+    0.1,
+    0.3,
+    1.3,
+    0.1,
+    0.9,
+    0.6
+   ],
+   "grindsPer": [
+    0,
+    0,
+    0,
+    0.1,
+    0,
+    0,
+    0.4,
+    0,
+    0.3,
+    0
+   ],
+   "minutesPer": [
+    6.6,
+    6,
+    5.4,
+    8.1,
+    6.3,
+    5.5,
+    9.2,
+    6.1,
+    8,
+    8.1
+   ],
+   "firstTry": [
+    51,
+    79,
+    100,
+    10,
+    94,
+    65,
+    22,
+    89,
+    49,
+    47
+   ]
+  },
+  "fedRegularly": {
+   "label": "Fed regularly (half of food), no gear, moves Lv 1",
+   "open": true,
+   "capOnArrival": 50,
+   "arrive": 39.3,
+   "end": 50.7,
+   "capAfter": 60,
+   "losses": 0,
+   "grinds": 0,
+   "minutes": 50,
+   "gold": 58870,
+   "allCleared": true,
+   "bossFlag": true,
+   "nightMail": true,
+   "arrivePer": [
+    39.3,
+    40.8,
+    42.1,
+    43.3,
+    44.7,
+    45.7,
+    47,
+    48,
+    49,
+    50
+   ],
+   "slack": [
+    3.3,
+    3.8,
+    4.1,
+    4.3,
+    4.7,
+    4.7,
+    4,
+    5,
+    5,
+    6
+   ],
+   "lossesPer": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "grindsPer": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "minutesPer": [
+    5.3,
+    4.6,
+    4.2,
+    5.2,
+    4.9,
+    3.6,
+    4.9,
+    6.1,
+    5,
+    6.3
+   ],
+   "firstTry": [
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100
+   ]
+  },
+  "basicFed": {
+   "label": "Fed regularly, relying on basic attacks only (no guards, heals or specials)",
+   "open": true,
+   "capOnArrival": 50,
+   "arrive": 39.3,
+   "end": 50.7,
+   "capAfter": 60,
+   "losses": 14.9,
+   "grinds": 3.4,
+   "minutes": 108,
+   "gold": 63390,
+   "allCleared": true,
+   "bossFlag": true,
+   "nightMail": true,
+   "arrivePer": [
+    39.3,
+    41,
+    42.3,
+    43.3,
+    44.4,
+    45.7,
+    46.7,
+    47.9,
+    49.1,
+    50
+   ],
+   "slack": [
+    3.3,
+    4,
+    4.3,
+    4.3,
+    4.4,
+    4.7,
+    3.7,
+    4.9,
+    5.1,
+    6
+   ],
+   "lossesPer": [
+    3,
+    1.7,
+    0.7,
+    0.8,
+    1.1,
+    0.3,
+    1.3,
+    2.1,
+    1.1,
+    2.8
+   ],
+   "grindsPer": [
+    0,
+    0.7,
+    0,
+    0,
+    0.1,
+    0,
+    0.4,
+    0.8,
+    0.2,
+    1.1
+   ],
+   "minutesPer": [
+    10.4,
+    12.7,
+    6.8,
+    8.3,
+    9.5,
+    6.2,
+    10.5,
+    15.1,
+    8.3,
+    20
+   ],
+   "firstTry": [
+    0,
+    0,
+    42,
+    21,
+    3,
+    85,
+    7,
+    0,
+    19,
+    0
+   ]
+  }
+ },
+ "entryLevels": {
+  "L38": {
+   "level": 38,
+   "end": 50.7,
+   "losses": 0.1,
+   "grinds": 0,
+   "minutes": 51,
+   "arrivePer": [
+    38,
+    39.3,
+    41,
+    42.7,
+    44,
+    45,
+    46.3,
+    47.6,
+    48.7,
+    49.7
+   ],
+   "slack": [
+    2,
+    2.3,
+    3,
+    3.7,
+    4,
+    4,
+    3.3,
+    4.6,
+    4.7,
+    5.7
+   ],
+   "lossesPer": [
+    0.1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "firstTry": [
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100
+   ]
+  },
+  "L40": {
+   "level": 40,
+   "end": 50.7,
+   "losses": 0,
+   "grinds": 0,
+   "minutes": 50,
+   "arrivePer": [
+    40,
+    41.3,
+    42.3,
+    43.7,
+    44.7,
+    46,
+    47,
+    48,
+    49,
+    50
+   ],
+   "slack": [
+    4,
+    4.3,
+    4.3,
+    4.7,
+    4.7,
+    5,
+    4,
+    5,
+    5,
+    6
+   ],
+   "lossesPer": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "firstTry": [
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100
+   ]
+  },
+  "L43": {
+   "level": 43,
+   "end": 51,
+   "losses": 0,
+   "grinds": 0,
+   "minutes": 48,
+   "arrivePer": [
+    43,
+    43.7,
+    44.7,
+    45.7,
+    46.3,
+    47.3,
+    48.3,
+    49,
+    50,
+    50
+   ],
+   "slack": [
+    7,
+    6.7,
+    6.7,
+    6.7,
+    6.3,
+    6.3,
+    5.3,
+    6,
+    6,
+    6
+   ],
+   "lossesPer": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "firstTry": [
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100
+   ]
+  },
+  "L46": {
+   "level": 46,
+   "end": 51.7,
+   "losses": 0,
+   "grinds": 0,
+   "minutes": 46,
+   "arrivePer": [
+    46,
+    46.3,
+    47.3,
+    48,
+    48.7,
+    49.3,
+    50,
+    50,
+    50,
+    50
+   ],
+   "slack": [
+    10,
+    9.3,
+    9.3,
+    9,
+    8.7,
+    8.3,
+    7,
+    7,
+    6,
+    6
+   ],
+   "lossesPer": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "firstTry": [
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100
+   ]
+  }
+ }
+}

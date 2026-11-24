@@ -242,7 +242,7 @@
     // ---------- Phase 19C: the Obsidian Reach campaign (main, after Shut from the Inside) ----------
     { id: 'm_o1', title: 'Don’t Lick Anything', desc: 'Climb the Cinder Steps from Black Sand Landing into the ash.', after: ['m_v10'],
       objectives: [o('dungeon_clear', { dungeon: 'o_cinder', count: 1, hint: 'Tap the gate marked 1 above the landing, or open Dungeons and pick Obsidian Reach.' })], reward: { gold: 800, gems: 3 } },
-    { id: 'm_o2', title: 'Two Furnaces', desc: 'Clear the Glasswick Kilns behind the kilnworkers’ square.', after: ['m_o1'],
+    { id: 'm_o2', title: 'The Kiln Yard', desc: 'Clear the Glasswick Kilns behind the kilnworkers’ square.', after: ['m_o1'],
       objectives: [o('dungeon_clear', { dungeon: 'o_kilns', count: 1, hint: 'Molten Glaze lowers attack: guard it, or heal to clear it.' })], reward: { gold: 900, food: 120 } },
     { id: 'm_o3', title: 'Glass Thread', desc: 'Climb the Basalt Rookery on the west ridge.', after: ['m_o2'],
       objectives: [o('dungeon_clear', { dungeon: 'o_rookery', count: 1, hint: 'Swift foes here. Water and Earth beat Fire; guard the Cinder Dive.' })], reward: { gold: 1000, gems: 3 } },
@@ -268,6 +268,13 @@
     { id: 's_o_clear', title: 'Cold Ash', side: true, desc: 'Clear ten obstacles on Obsidian Reach.', after: ['m_o1'], objectives: [o('remove_obstacle', { island: 'obsidian', count: 10 })], reward: { gold: 4000, gems: 6 } },
     { id: 's_o_farm', title: 'Something Grows in the Ash', side: true, desc: 'Build a Berry Farm on Obsidian Reach.', after: ['m_o1'], objectives: [o('build', { building: 'farm', island: 'obsidian', count: 1 })], reward: { gold: 2500, gems: 4 } },
     { id: 's_o_census', title: 'Glasswick Census', side: true, desc: 'Befriend forty different Aminas.', after: ['m_o3'], objectives: [o('species', { count: 40 })], reward: { gold: 3000, gems: 8 } },
+    // Phase 19D: the two Codex quests approved in Phase 19A. Both read the Codex (every species ever befriended), so older
+    // saves that already qualify can claim them at once. Every form can be had by anyone: Zeep is found in the Dusk Grove
+    // and on Glass Beach and hatches from Metal pairs; Lumifern hatches from Light + Nature and Umbrit from Dark + Fire.
+    { id: 's_o_metalworks', title: 'Metalworks', side: true, desc: 'Befriend every Zeep form: Zeep, Zeep II and Zeep III. Glasswick would have put all three to work.', after: ['m_o1'],
+      objectives: [o('befriend', { species: ['zeep', 'zeep2', 'zeep3'], label: 'Befriend Zeep, Zeep II and Zeep III', hint: 'Zeep turns up in the Dusk Grove and Zeep II on Glass Beach, and each evolves. Glass Beach sometimes shows a Zeep III to the day’s first explorer.' })], reward: { gold: 3000, gems: 6 } },
+    { id: 's_o_twofurnaces', title: 'Two Furnaces', side: true, desc: 'Befriend both starters’ third forms, Aurelith and Eclipsar: one fired pale, one fired dark, like the kilns.', after: ['m_o2'],
+      objectives: [o('befriend', { species: ['aurelith', 'eclipsar'], label: 'Befriend Aurelith and Eclipsar', hint: 'Raise Lumifern and Umbrit to their third forms. The starter you did not choose hatches from a pairing: Light + Nature for Lumifern, Dark + Fire for Umbrit.' })], reward: { gold: 4000, gems: 8 } },
 
     // ---------- Sanctuary tasks (side) ----------
     { id: 's_collect8', title: 'Naturalist I', side: true, desc: 'Befriend eight different Aminas.', after: ['m_hollow'], objectives: [o('species', { count: 8 })], reward: { gold: 80, food: 30 } },

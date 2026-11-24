@@ -249,17 +249,20 @@ class Bursts {
 
 /* ------------------------------------------------------------------ living-pixel aura (Dev 8) */
 // One InstancedMesh of tiny cubes orbiting and rising around a point; colours shift for the Island Boss.
-function pixelAura(scene, at, scale, prismatic) {
+// Phase 19D: `hue` maps a 0..1 cycle to a hue; the default is the full rainbow, the Forge Heart keeps to ember tones
+const HUE = { rainbow: (x) => x % 1, forge: (x) => 0.015 + 0.1 * (0.5 + 0.5 * Math.sin(x * Math.PI * 2)) };
+function pixelAura(scene, at, scale, prismatic, hue) {
+  const H = HUE[hue] || HUE.rainbow;
   const n = calm() ? 8 : 22, geo = new THREE.BoxGeometry(0.06, 0.06, 0.06), mat = new THREE.MeshBasicMaterial({ color: prismatic ? '#ffffff' : '#ffe9a0', transparent: true, opacity: 0.9, depthWrite: false, blending: THREE.AdditiveBlending });
   const mesh = new THREE.InstancedMesh(geo, mat, n), m = new THREE.Matrix4(), q = new THREE.Quaternion(), v = new THREE.Vector3(), one = new THREE.Vector3(1, 1, 1), col = new THREE.Color();
   const seed = Array.from({ length: n }, (_, i) => ({ a: (i / n) * Math.PI * 2, h: Math.random(), r: 0.55 + Math.random() * 0.5, sp: 0.25 + Math.random() * 0.3 }));
-  if (prismatic) for (let i = 0; i < n; i++) mesh.setColorAt(i, col.setHSL(i / n, 0.85, 0.65));
+  if (prismatic) for (let i = 0; i < n; i++) mesh.setColorAt(i, col.setHSL(H(i / n), 0.85, 0.65));
   scene.add(mesh);
   return {
     update(t, dt) {
       for (let i = 0; i < n; i++) { const s = seed[i]; s.h += (dt || 0.016) * s.sp; if (s.h > 1) s.h -= 1; const a = s.a + t * 0.6;
         v.set(at.x + Math.cos(a) * s.r * scale * 0.7, 0.15 + s.h * 1.9 * scale / 1.3, at.z + Math.sin(a) * s.r * scale * 0.5); m.compose(v, q, one.setScalar(1 - s.h * 0.6)); mesh.setMatrixAt(i, m);
-        if (prismatic) mesh.setColorAt(i, col.setHSL((i / n + t * 0.1) % 1, 0.85, 0.65)); }
+        if (prismatic) mesh.setColorAt(i, col.setHSL(H(i / n + t * 0.1), 0.85, 0.65)); }
       mesh.instanceMatrix.needsUpdate = true; if (prismatic && mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
     },
     dispose() { scene.remove(mesh); geo.dispose(); mat.dispose(); mesh.dispose(); },
@@ -296,7 +299,8 @@ export async function createBattle(container, o) {
   const dome = new THREE.Mesh(new THREE.SphereGeometry(1.05 * eScale / 1.3, 18, 12, 0, Math.PI * 2, 0, Math.PI / 2), new THREE.MeshBasicMaterial({ color: '#c8d2e0', transparent: true, opacity: 0, depthWrite: false }));
   dome.position.copy(E.pos); scene.add(dome); let barrier = false;
   // Dev 8 living pixel: a boss sheds small glowing cubes that rise around it (prismatic for the Island Boss)
-  const aura = o.boss ? pixelAura(scene, E.pos, eScale, !!o.prismatic) : null;
+  const aura = o.boss ? pixelAura(scene, E.pos, eScale, !!o.prismatic, o.halo) : null;
+  const HH = HUE[o.halo] || HUE.rainbow; // Phase 19D: the Island Boss halo's palette
   let shake = 0, telegraph = false, t0 = 0;
   const camBase = new THREE.Vector3(-0.35, 1.7, 5.0), look = new THREE.Vector3(0.05, 0.62, -0.15);
   // Phase 7 camera: a gentle push towards whoever unleashes an ultimate, and a short punch-in on big hits
@@ -337,7 +341,7 @@ export async function createBattle(container, o) {
       slots.p.update(hold); slots.e.update(hold); arena.update(t, dt); bursts.update(dt); fx.update(dt); marks.update(dt, t, still); if (aura) aura.update(t, dt);
       ring.material.opacity = telegraph ? 0.45 + Math.sin(t * 8) * 0.3 : Math.max(0, ring.material.opacity - dt * 2);
       if (bossRune) bossRune.rotation.z += dt * 0.25;
-      if (prism && !still) { prism.material.color.setHSL((t * 0.12) % 1, 0.85, 0.62); prismUp.material.color.setHSL((t * 0.12 + 0.5) % 1, 0.85, 0.66); prism.rotation.z += dt * 0.4; prismUp.material.opacity = 0.24 + Math.sin(t * 2.2) * 0.1; }
+      if (prism && !still) { prism.material.color.setHSL(HH(t * 0.12), 0.85, 0.62); prismUp.material.color.setHSL(HH(t * 0.12 + 0.5), 0.85, 0.66); prism.rotation.z += dt * 0.4; prismUp.material.opacity = 0.24 + Math.sin(t * 2.2) * 0.1; }
       dome.material.opacity += ((barrier ? 0.28 : 0) - dome.material.opacity) * Math.min(1, dt * 6);
       cam.push += (cam.pushTo - cam.push) * Math.min(1, dt * 5); cam.punch = Math.max(0, cam.punch - dt * 3.5); cam.focus += ((still ? 0 : cam.focusTo) - cam.focus) * Math.min(1, dt * 4);
       camera.position.copy(camBase); lookTmp.copy(look);

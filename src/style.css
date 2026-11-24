@@ -876,6 +876,10 @@ img.portrait.vox { image-rendering: auto; }
 body.perf-rest #world *, body.perf-covered #world *, body.perf-hidden #world *,
 body.perf-rest .fest-layer *, body.perf-covered .fest-layer *, body.perf-hidden *,
 body.perf-rest .title-wrap *, body.perf-hidden .screen * { animation-play-state: paused !important; }
+/* Phase 19D: the rules above match elements, not their ::before/::after, so a decorative sweep drawn on a pseudo-element
+   (the ready task pill, a gold pulse button) kept running while the page was hidden or the island was resting */
+body.perf-hidden *::before, body.perf-hidden *::after,
+body.perf-rest .mission-pill::after, body.perf-covered .mission-pill::after, body.perf-rest .btn::after, body.perf-covered .btn::after { animation-play-state: paused !important; }
 /* Phase 18D: a companion's walking hop is a CSS transition, which animation-play-state does not pause; one that was in
    flight when the app was hidden kept running. Hidden now ends it where it was heading. */
 body.perf-hidden #world .cr-mv { transition: none !important; }

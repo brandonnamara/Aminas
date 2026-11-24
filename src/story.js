@@ -360,7 +360,11 @@
       case 'upgraded': toast(D.BUILDINGS[d.type].name + ' reached level ' + d.level + '. ' + T.pick(st, 'upgraded'), 'w'); break;
       case 'obstacleRemoved': if (once('firstClear')) toast('Cleared. See? Space. Space is the beginning of every good idea. And most bad ones.', 'w'); break;
       case 'islandUnlocked': script(T.scripts.island(d.island), 'island_' + d.island); break;
-      case 'traveled': if (d.changed && d.island !== 'starter' && once('visit_' + d.island)) toast(T.islandHello[d.island], 'n'); break;
+      // Phase 19D: the first-visit greeting is kept even when the same arrival also completes a quest objective (the
+      // flush keeps only a batch's last ordinary toast, so it used to be replaced by “Done. Your reward…”). On Obsidian
+      // Reach the arrival scene (o_arrival) speaks the greeting word for word, so while that scene is due the toast is
+      // not shown as well; the line is still marked as said.
+      case 'traveled': if (d.changed && d.island !== 'starter' && once('visit_' + d.island)) { if (!(d.island === 'obsidian' && st.story && st.story.pendingScene === 'o_arrival')) out.push({ type: 'toast', text: T.islandHello[d.island], mood: 'n', keep: true }); } break;
     }
     return out;
   };

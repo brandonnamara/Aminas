@@ -191,7 +191,7 @@
     if (!A.C3D || !A.C3D.enabled()) return Promise.resolve(false);
     const host = $('#b-3d'), b = U.b; let settled = false;
     const go = A.C3D.load()
-      .then((mod) => (mod && !U.dead && UI.B === U ? mod.createBattle(host, { dungeon: U.d, player: B.cur(b).sp, enemy: b.enemy.sp, boss: !!b.enemy.boss, scale: b.enemy.scale || null, prismatic: !!b.enemy.islandBoss }) : null))
+      .then((mod) => (mod && !U.dead && UI.B === U ? mod.createBattle(host, { dungeon: U.d, player: B.cur(b).sp, enemy: b.enemy.sp, boss: !!b.enemy.boss, scale: b.enemy.scale || null, prismatic: !!b.enemy.islandBoss, halo: b.enemy.islandBoss && D.DUNGEONS[U.d] && D.DUNGEONS[U.d].island === 'obsidian' ? 'forge' : null }) : null))
       .then((s3) => {
         if (!s3) return false;
         if (settled || U.dead || UI.B !== U || !$('#battle')) { s3.dispose(); return false; }
@@ -436,9 +436,16 @@
     if (!ev) { t.hidden = true; t.innerHTML = ''; t.className = 'b-tele'; if (U.stage) U.stage.setTelegraph(false); U.disp.charging = false; return; }
     const b = U.b, alive = b.party.filter((f) => f.hp > 0);
     const show = (cl, title, tip) => { t.className = 'b-tele ' + cl; t.innerHTML = '<b>' + I('warn') + ' ' + esc(title) + '</b><span>' + esc(tip) + '</span>'; t.hidden = false; };
-    if (ev.t === 'intro') { show('prism', 'Island Boss: ' + b.enemy.name, 'Its element shifts every few turns and it charges Prismfall. Read the colour, change your approach, and guard the big one.'); return; }
+    // Phase 19D: the Island Boss introduction names what this boss actually does (it used to describe the Starter Island
+    // boss's Prism Shift and Prismfall for every island boss). A hint, not the whole plan.
+    if (ev.t === 'intro') { const e = b.enemy, mv = e.move && D.ABILITIES[e.move], m = e.mech || {}, bits = [];
+      if (m.type === 'prism') bits.push('its element shifts every few turns'); if (m.type === 'barrier') bits.push('it raises a Stone Barrier as it weakens'); if (m.type === 'echo') bits.push('the crystals echo its big move if it lands unguarded');
+      if (mv) bits.push('it charges ' + mv.name);
+      const lead = bits.length ? bits.join(', and ').replace(/^./, (c) => c.toUpperCase()) + '. ' : '';
+      show('prism', 'Island Boss: ' + e.name, lead + (m.type === 'prism' ? 'Read the colour, change your approach, and guard the big one.' : m.type === 'barrier' ? 'Watch for its warnings, and guard the big one.' : 'Guard the big one.')); return; }
     if (ev.t === 'barrierTell') { const sp = alive.some((f) => f.abil.some((a) => D.ABILITIES[a].cd > 0 && D.ABILITIES[a].power)); show('barrier', ev.name + ' will raise a Stone Barrier', sp ? 'It soaks damage. Special abilities (the ones with a cooldown) crack it twice as fast.' : 'It soaks damage until it breaks. Keep hitting.'); return; }
-    if (ev.t === 'prismWarn') { const good = Object.keys(D.ELEMENTS).filter((x) => R.elMult(x, ev.el) > 1.01); show('prism', 'Its colours drift towards ' + D.ELEMENTS[ev.el].name, 'Next turn it becomes ' + D.ELEMENTS[ev.el].name + '.' + (good.length ? ' ' + good.map((x) => D.ELEMENTS[x].name).join(' and ') + ' will hit it hard.' : '')); return; }
+    if (ev.t === 'steamWarn') { show('prism', 'The vents are building pressure', 'Steam fills the pool next turn and slows both sides for a turn. A guardian already charging is braced against it. A heal clears the steam.'); return; } // Phase 19D
+    if (ev.t === 'prismWarn') { const good = Object.keys(D.ELEMENTS).filter((x) => R.elMult(x, ev.el) > 1.01); show('prism', (b.enemy.mech && b.enemy.mech.kilns ? 'The other kiln is heating up: ' : 'Its colours drift towards ') + D.ELEMENTS[ev.el].name, 'Next turn it becomes ' + D.ELEMENTS[ev.el].name + '.' + (good.length ? ' ' + good.map((x) => D.ELEMENTS[x].name).join(' and ') + ' will hit it hard.' : '')); return; }
     const mv = D.ABILITIES[ev.move];
     const canGuard = alive.some((f) => f.abil.some((a) => D.ABILITIES[a].type === 'guard'));
     const canStun = alive.some((f) => f.abil.some((a) => D.ABILITIES[a].fx && D.ABILITIES[a].fx.k === 'stun'));
@@ -530,7 +537,10 @@
         case 'barrier':
           d.eShield = e.shield; d.eShieldMax = e.shield; stg.setBarrier(true); stg.guard('e'); Au.play('guard'); floatAt('e', 'Stone Barrier', 'status');
           bLog(e.name + ' raises a Stone Barrier!'); bRender(); await sleep(900); setTele(null); break;
-        case 'prismWarn': setTele(e); bLog('The light around ' + d.eName + ' shifts colour…'); await sleep(700); break;
+        case 'prismWarn': setTele(e); bLog(U.b.enemy.mech && U.b.enemy.mech.kilns ? 'Across the yard, the other kiln roars up…' : 'The light around ' + d.eName + ' shifts colour…'); await sleep(700); break; // Phase 19D: the two kilns
+        // Phase 19D: the Quench Pools' steam vents (the soak itself arrives as ordinary status events)
+        case 'steamWarn': setTele(e); bLog('The vents hiss. Steam is building under the pool…'); await sleep(650); break;
+        case 'steam': setTele(null); if (stg.status) stg.status('e', '#dff4ff'); floatAt('e', 'Steam!', 'status'); Au.play('hum'); bLog('Steam rolls over the pool. Both sides are slowed.'); await sleep(700); break;
         case 'prismShift':
           d.eEl = e.el; stg.status('e', D.ELEMENTS[e.el].color); if (stg.setElement) stg.setElement(e.el); floatAt('e', D.ELEMENTS[e.el].name + '!', 'status'); Au.play('hum');
           bLog(e.name + ' shifts to ' + D.ELEMENTS[e.el].name + '!'); setTele(null); bRender(); await sleep(800); break;
@@ -617,21 +627,28 @@
     }
     if (out.challenges && out.challenges.fresh.length) { const C = D.CHALLENGE17, el = out.challenges.el, n = out.challenges.fresh.length, lst = [{ k: 'gold', n: C.reward.gold * n }, { k: 'essence', el, n: C.reward.essence * n }]; if (out.challenges.all) lst.push({ k: 'gems', n: C.allThree.gems });
       groups.push({ title: 'Challenge' + (n > 1 ? 's' : '') + ' complete: ' + out.challenges.fresh.map((k) => C.list[k].name).join(', '), icon: 'star', list: lst }); } // Phase 17D
-    if (out.items && out.items.length) groups.push({ title: 'Equipment found', icon: 'anvil', list: out.items.map((id) => ({ k: 'item', id })) });
+    // Phase 19D: an Island Boss's first-clear item is its own reward line (Night Mail from the Forge Heart)
+    const bossItem = isl && out.first && D.DUNGEON_GEAR && D.DUNGEON_GEAR[dn.id || out.dungeon];
+    const restItems = (out.items || []).filter((id) => !(bossItem && id === bossItem));
+    if (bossItem && (out.items || []).indexOf(bossItem) >= 0) groups.push({ title: 'Island Boss reward', icon: 'boss', list: [{ k: 'item', id: bossItem }] });
+    if (restItems.length) groups.push({ title: 'Equipment found', icon: 'anvil', list: restItems.map((id) => ({ k: 'item', id })) });
     const spoilsHtml = groups.filter((g) => g.list.length).map((g) => RW.group(g)).join('');
     const lore = out.lore && out.lore.length ? '<div class="v-note">' + I('book') + ' New journal entr' + (out.lore.length > 1 ? 'ies' : 'y') + ': ' + out.lore.map((k) => '<b>' + esc(D.LORE[k].title) + '</b>') .join(', ') + '</div>' : '';
     const rest = !cleared && out.sectionDone ? '<div class="v-note">' + I('heart') + ' The party rests at a glowing spring and recovers some health.</div>' : '';
+    // Phase 19D: the level-cap rise is announced here, on the victory card, and only once (the same record as the toast)
+    const capUp = isl && cleared && R.O19 && R.O19.capNotice ? R.O19.capNotice(s) : null;
+    const capHtml = capUp ? '<div class="v-unlock v-cap">' + I('xp') + '<div><small>Level cap raised</small><b>Level ' + capUp + '</b><span>Your Aminas can grow up to level ' + capUp + ' now.</span></div></div>' : '';
     const unlock = out.unlockedIsland ? '<div class="v-unlock">' + I('island') + '<div><small>New island unlocked</small><b>' + esc(D.ISLANDS[out.unlockedIsland].name) + '</b><span>It is now part of the sanctuary.</span></div></div>' : '';
     const prog = '<div class="pips big" aria-label="Battle ' + (out.battle + 1) + ' of ' + dn.battles.length + '">' + dn.battles.map((x, i) => '<i class="' + (i <= out.battle ? 'on' : '') + (x.boss ? ' b' : '') + '"></i>').join('') + '</div>';
     const title = cleared ? (isl ? 'Island Boss defeated!' : 'Dungeon cleared!') : boss ? 'Guardian defeated!' : 'Victory!';
     const kicker = isl ? (foe ? foe.name : 'The Island Boss') + ' · ' + dname : boss ? (foe ? foe.name : 'The guardian') + ' · ' + dname : dname + ' · battle ' + (out.battle + 1) + ' of ' + dn.battles.length;
     const tier = isl ? 'isle' : boss || cleared ? 'boss' : 'win';
-    const body = '<div class="vcard vic v-' + tier + '"><div class="v-banner"><span class="v-crest">' + I(isl ? 'boss' : boss || cleared ? 'crown' : 'swords') + '</span><small class="v-kick">' + esc(kicker) + '</small><h1>' + title + '</h1></div>' + prog +
+    const body = '<div class="vcard vic v-' + tier + '"><div class="v-banner"><span class="v-crest">' + I(isl ? 'boss' : boss || cleared ? 'crown' : 'swords') + '</span><small class="v-kick">' + esc(kicker) + '</small><h1>' + title + '</h1></div>' + prog + capHtml + // Phase 19D: the cap rise first, so it is seen without scrolling
       '<div class="v-spoils">' + spoilsHtml + '</div>' + unlock + lore + rest + '<div class="v-party">' + rows + '</div></div>';
     const nextLbl = cleared ? (out.scene ? 'Continue' : 'Return to the sanctuary') : 'Next: battle ' + (out.battle + 2) + (out.battle + 1 === 9 ? ' · the boss' : '');
     const ov = UI.modal(UI.sheet('Battle result', body, (cleared ? '' : '<button class="btn ghost" id="v-leave">Leave for now</button>') + '<button class="btn gold" id="v-go">' + nextLbl + '</button>', 'narrow res-sheet r-' + tier), { dismiss: false });
     $('.x', ov).remove();
-    if (!UI.calm()) UI.sparkles($('.v-banner h1', ov), isl ? 40 : boss || cleared ? 28 : 16, isl ? ['#ff86d6', '#8fe6d6', '#ffd86b', '#9a78e6'] : boss || cleared ? ['#ffd86b', '#fff3c0', '#ffffff', '#ffb46b'] : null);
+    if (!UI.calm()) UI.sparkles($('.v-banner h1', ov), isl ? 40 : boss || cleared ? 28 : 16, isl ? (dn.island === 'obsidian' ? ['#ff8a3a', '#ffd27a', '#ffb05a', '#ffffff'] : ['#ff86d6', '#8fe6d6', '#ffd86b', '#9a78e6']) : boss || cleared ? ['#ffd86b', '#fff3c0', '#ffffff', '#ffb46b'] : null);
     RW.celebrate(ov);
     const lv = $('#v-leave', ov); if (lv) lv.onclick = () => { UI.close(ov); R.abandonRun(st()); S.save(); UI.leaveBattle(); };
     $('#v-go', ov).onclick = () => {

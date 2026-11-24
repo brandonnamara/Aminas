@@ -70,6 +70,9 @@
       case 'creature_level': return [maxLv(st), ob.count];
       case 'own_aminas': return [st.aminas.length, ob.count];
       case 'species': return [R().ownedCount(st), ob.count];
+      // Phase 19D: befriend particular species (Codex quests). Read from the Codex record (st.owned), so it counts Aminas
+      // befriended before the quest existed (retroactive) and keeps counting if one is later released.
+      case 'befriend': return [(ob.species || []).filter((id) => st.owned && st.owned[id]).length, (ob.species || []).length];
       case 'resonance': return [st.flags[ob.flag] ? 1 : 0, 1];
       case 'hatch': return [st.stats.hatched, ob.count || 1];
       case 'evolve': return [st.stats.evolved, ob.count || 1];
@@ -78,7 +81,7 @@
       default: return [0, 1];
     }
   };
-  Q.OBJECTIVE_TYPES = ['restore', 'build', 'place', 'store', 'move', 'upgrade', 'remove_obstacle', 'feed', 'collect', 'unlock_island', 'visit_island', 'dungeon_stage', 'dungeon_clear', 'creature_level', 'own_aminas', 'species', 'resonance', 'hatch', 'evolve', 'win_battles', 'restore_all'];
+  Q.OBJECTIVE_TYPES = ['restore', 'build', 'place', 'store', 'move', 'upgrade', 'remove_obstacle', 'feed', 'collect', 'unlock_island', 'visit_island', 'dungeon_stage', 'dungeon_clear', 'creature_level', 'own_aminas', 'species', 'befriend', 'resonance', 'hatch', 'evolve', 'win_battles', 'restore_all'];
 
   // All quests the game knows right now: the static list plus the tasks of any running season (src/events.js).
   Q.list = () => (A.Events ? D.QUESTS.concat(A.Events.quests()) : D.QUESTS);
@@ -165,6 +168,7 @@
       case 'creature_level': return 'Raise an Amina to level ' + ob.count;
       case 'own_aminas': return 'Have ' + ob.count + ' Aminas';
       case 'species': return 'Befriend ' + ob.count + ' different Aminas';
+      case 'befriend': return ob.label || ('Befriend ' + (ob.species || []).map((id) => (D.SPECIES[id] || {}).name || id).join(', '));
       case 'resonance': return ob.flag === 'stone' ? 'Examine the standing stone' : ob.flag === 'r1' ? 'Investigate the humming stones' : 'Wake the Dormant Spire';
       case 'hatch': return 'Hatch ' + n + ' egg' + s;
       case 'evolve': return 'Evolve an Amina';
@@ -307,6 +311,10 @@
         if (!R().dungeonUnlocked(st, id)) return locked('requirement', R().dungeonLockText(st, id), prereqPlan(st, R().dungeonBlocker(st, id)));
         const rec = R().dungeonRec(st, id), at = st.run && st.run.d === id ? st.run.battle : rec.next, sec = R().sectionOf(d, at);
         return plan('screen', { screen: 'dungeons', dungeon: id, highlight: ['dungeon:' + id, 'stage:' + id + ':' + sec, 'enter:' + id], message: hint || 'Tap ' + (st.run && st.run.d === id ? 'Continue' : 'Enter') + ', choose up to three Aminas and fight through the ten battles.' });
+      }
+      case 'befriend': { // the first species still missing: where it is found, or how its line evolves
+        const miss = (ob.species || []).find((id) => !(st.owned && st.owned[id])), sp = miss && D.SPECIES[miss];
+        return plan('screen', { screen: 'collection', highlight: ['collection'], message: hint || (sp ? 'Still missing: ' + sp.name + '. ' + (sp.stage > 1 ? 'Evolve one from the form before it.' : 'Find one while exploring, or hatch one.') : 'All befriended.') });
       }
       case 'own_aminas': case 'species': {
         const area = D.AREA_ORDER.find((a) => R().areaUnlocked(st, a) && D.AREAS[a].steps.some((s) => s[0] === 'find' && !st.owned[s[1]])) || D.AREA_ORDER.find((a) => R().areaUnlocked(st, a)) || 'meadow';

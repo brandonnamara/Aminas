@@ -152,7 +152,7 @@
         case 'evolve': UI.queue.push({ type: 'fn', fn: (done) => UI.evolveFx(d.from, d.to, done, d.uid) }); break;
         case 'eggStart': Au.play('ok'); break;
       }
-      T.beats(s, ev).forEach((b) => { if (b.type === 'toast') lastToast = b; else UI.queue.push(b); });
+      T.beats(s, ev).forEach((b) => { if (b.type === 'toast' && !b.keep) lastToast = b; else UI.queue.push(b); }); // Phase 19D: `keep` toasts (island greetings) are never replaced
     });
     if (lastToast) UI.queue.push(lastToast);
     UI.pump();

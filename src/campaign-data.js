@@ -40,6 +40,8 @@
     shatterlight:   { name: 'Shatterlight', el: 'light', type: 'dmg', power: 78, cd: 0, boss: true, tell: 'The crystals ring, higher and higher. Shatterlight is coming!', desc: 'A note that breaks into light. Dark resists it; a guard blocks most of it.' },
     ashbloom:       { name: 'Ashbloom', el: 'nature', type: 'weaken', power: 74, cd: 0, boss: true, tell: 'Grey blossom drifts down like snow. Ashbloom is coming!', desc: 'Ash-pollen that lowers your attack. Guard it; a heal clears it.' },
     furnacedraught: { name: 'Furnace Draught', el: 'wind', type: 'dmg', power: 78, cd: 0, boss: true, tell: 'The bellows fill until the leather creaks. Furnace Draught is coming!', desc: 'A blast of forge air. Burns the target. Guard it; a heal clears the burn.', fx: { k: 'burn', p: 1, n: 2 } },
+    // Phase 19D: the Magenta Hollows' echo (see echoAfter in rules.js): Shatterlight rung back at under half power
+    crystalecho:    { name: 'Crystal Echo', el: 'light', type: 'dmg', power: 72, cd: 0, boss: true, tell: 'Shatterlight hit unguarded, and the crystals ring it back. Crystal Echo is coming!', desc: 'When Shatterlight lands unguarded, the crystals answer it with a weaker copy. Guard Shatterlight and they stay quiet; or guard the echo, or stun the guardian while the crystals ring.' },
     heartofforge:   { name: 'Heart of the Forge', el: 'earth', type: 'dmg', power: 92, cd: 0, boss: true, tell: 'The core flares white. Heart of the Forge is coming!', desc: 'The whole forge, at once. Guard it, or soak the core to make it sputter. Water answers Earth.' },
   });
 
@@ -50,6 +52,7 @@
   D.BOSS_MECHS = {
     barrier: { name: 'Stone Barrier', desc: 'Raises a barrier at two health thresholds. Special abilities crack it twice as fast.' },
     prism: { name: 'Prism Shift', desc: 'Its element keeps shifting. Watch the colour and change your approach.' },
+    echo: { name: 'Crystal Echo', desc: 'If its charged move lands unguarded, the crystals ring it back as a weaker echo. Guard the first one and they stay quiet.' }, // Phase 19D
   };
 
   // Generates the nine ordinary battles of a dungeon from a species pool and a level curve (deterministic).
@@ -342,7 +345,7 @@
       unlock: {}, unlockText: 'Clear the Cinder Steps.',
       battles: vnine(['emberix', 'lumi', 'igniflare', 'emberix', 'voltar', 'igniflare', 'lumi', 'emberix', 'igniflare'], 39, ['o_kilns', 'o_kilns', 'o_kilns'],
         ['Two rows of kilns face each other across the yard. One row is streaked pale, the other soot-dark.', 'Racks of unfinished panes, sorted by colour. Somebody labelled every rack in two hands.', 'The last kiln is still warm. Nobody has fed it for an age, and it does not seem to have noticed.'])
-        .concat([vboss({ sp: 'emberix', title: 'The Glassblower', hpMult: 1.62, move: 'moltenglaze' }, 39)]),
+        .concat([vboss({ sp: 'emberix', title: 'The Glassblower', hpMult: 1.62, move: 'moltenglaze', mech: { type: 'prism', every: 2, els: ['fire', 'light'], kilns: true } }, 39)]),
       sections: sec({ name: 'The Kiln Yard', first: { gold: 270, food: 52 } }, { name: 'The Racks', first: { gold: 280, food: 54 } }, { name: 'The Pale Row and the Dark', first: { gold: 290, food: 56 } }, { name: 'The Last Kiln', first: { gems: 6 } }),
       first: { gold: 2400, food: 440, gems: 10 }, repeat: { gold: 520, food: 95 },
       rewardText: 'First clear: 2,400 gold, 440 food, 10 gems. Replays: 520 gold, 95 food.',
@@ -359,6 +362,7 @@
       rewardText: 'First clear: 2,600 gold, 460 food, 10 gems. Replays: 540 gold, 100 food.',
     },
     o_quench: {
+      field: { type: 'steam', every: 3, n: 1 }, // Phase 19D: steam vents in every battle (rules.js endOfTurn)
       tune: { hp: 0.9, atk: 0.92 }, // the spike found in Phase 19A (threshold at rec); see docs/PHASE19C.md // Phase 19C tuning (tools/p19c-tune.js, tools/p19c-sim.js)
       name: 'The Quench Pools', island: 'obsidian', el: 'water', playable: true, recommended: 41, env: 'o_quench',
       theme: 'Steaming pools where hot glass was cooled. The water hisses whenever anything warm comes near.',
@@ -399,7 +403,7 @@
       unlock: {}, unlockText: 'Clear the Mirror Gallery.',
       battles: vnine(['aimza', 'lumi', 'zeep', 'aimza', 'voltar', 'lumi', 'aimza', 'zeep', 'lumi'], 44, ['o_hollows', 'o_hollows', 'o_hollows'],
         ['The crystals hum back whatever you say, a little later and a little sadder.', 'Footsteps echo that are not yours. Two sets, one heavy, one light, walking together.', 'Deeper in, the hum turns into a sound. You would rather it had stayed a hum.'])
-        .concat([vboss({ sp: 'lumi', title: 'The Lantern Below', hpMult: 1.65, move: 'shatterlight' }, 44)]),
+        .concat([vboss({ sp: 'lumi', title: 'The Lantern Below', hpMult: 1.65, move: 'shatterlight', mech: { type: 'echo', move: 'crystalecho' } }, 44)]),
       sections: sec({ name: 'The Humming Mouth', first: { gold: 330, food: 62 } }, { name: 'The Echo Walk', first: { gold: 340, food: 64 } }, { name: 'The Singing Deep', first: { gold: 350, food: 66 } }, { name: 'The Lantern’s Hollow', first: { gems: 9 } }),
       first: { gold: 3700, food: 570, gems: 15 }, repeat: { gold: 620, food: 110 },
       rewardText: 'First clear: 3,700 gold, 570 food, 15 gems. Replays: 620 gold, 110 food.',
@@ -485,6 +489,8 @@
     const c = D.CAMPAIGN[iid]; if (!c) return;
     c.dungeons.forEach((id, i) => { const d = D.DUNGEONS[id]; d.id = id; d.island = iid; d.index = i + 1; d.prev = i ? c.dungeons[i - 1] : null; D.DUNGEON_ORDER.push(id); });
   });
+  // Phase 19D: a dungeon-wide field effect (the Quench Pools' steam) is carried by each of its battles
+  Object.keys(D.DUNGEONS).forEach((id) => { const d = D.DUNGEONS[id]; if (d.field) d.battles.forEach((b) => { if (!b.field) b.field = d.field; }); });
   // Phase 18C: an island's foe tier, stamped on each of its battles (with that battle's own tuning) for R.enemyFromSpec
   D.ISLAND_ORDER.forEach((iid) => {
     const c = D.CAMPAIGN[iid], T = c && c.foeTier; if (!T) return;

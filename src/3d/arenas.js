@@ -36,7 +36,7 @@ export function kit(add, T, r) {
     mat(c, o) {
       o = o || {}; const k = c + '|' + (o.e || '') + '|' + (o.ei || 0) + '|' + (o.op || 1);
       if (!mats.has(k)) mats.set(k, T.m(new THREE.MeshStandardMaterial({ color: c, roughness: o.rough != null ? o.rough : 0.9, flatShading: true, emissive: o.e || '#000000', emissiveIntensity: o.ei || 0, transparent: (o.op || 1) < 1, opacity: o.op || 1, depthWrite: (o.op || 1) >= 1 })));
-      return mats.get(k);
+      const km = mats.get(k); km.userData.kit = true; return km;
     },
     box(c, x, y, z, w, h, d, o) {
       o = o || {}; const plain = !o.e && !o.ei && (o.op || 1) >= 1 && o.rough == null && !o.spin;
@@ -52,7 +52,7 @@ export function kit(add, T, r) {
         const nx = x / rx, nz = (z + 1) / rz; if (nx * nx + nz * nz > 1) continue;
         const c = fn(Math.round(x / step), Math.round(z / step), x, z); if (c) cells.push([x, z, c]);
       }
-      const mesh = new THREE.InstancedMesh(geo, T.m(new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.95, flatShading: true })), cells.length);
+      const mesh = new THREE.InstancedMesh(geo, T.m(new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.95, flatShading: true })), cells.length); mesh.material.userData.kit = true;
       const m = new THREE.Matrix4(), col = new THREE.Color();
       cells.forEach(([x, z, c], i) => { const h = 0.12 + r() * (o.bump || 0.05); m.compose(new THREE.Vector3(x, h / 2 - 0.1, z), new THREE.Quaternion(), new THREE.Vector3(step * 0.98, h, step * 0.98)); mesh.setMatrixAt(i, m); mesh.setColorAt(i, col.set(c)); });
       mesh.instanceMatrix.needsUpdate = true; if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
@@ -461,9 +461,53 @@ const OARENA = {
   o_bellows: { base: 'reliquary', vivid: { h: 24, s: 1.0 }, tint: '#8a5a3a', mood: 'dusk', fog: '#3a2a28', motes: '#ffe0c0', light: { key: ['#ffe0c8', 2.0], rim: ['#ff9a5a', 1.8], hemi: ['#c8a898', '#1a1210', 1.05] }, particles: { kind: 'dust', colors: ['#ffe0c0', '#c8a080', '#ff9a5a'], n: 24 }, backdrop: ['#2a1e1c', '#8a5a3a'] },
   o_forge:   { base: 'heartwood', vivid: { h: 26, s: 1.15, l: 1.05 }, tint: '#ff7a3a', mood: 'dark', fog: '#1a0e0c', motes: '#ffd27a', light: { key: ['#ffd8b0', 1.9], rim: ['#ff8a3a', 2.2], hemi: ['#c09080', '#0c0606', 1.0] }, particles: { kind: 'embers', colors: ['#ff8a3a', '#ffd27a', '#ffffff'], n: 34 }, backdrop: ['#140a0a', '#6a2a14'] },
 };
+/* Phase 19D: each Obsidian arena also gets a little of the forge's own furniture on its back line and outer edges,
+   beyond the recolour: basalt pillars, a kiln with a lit mouth, glass panes on iron frames, forge machinery (a gear and
+   a piston), and bars cooling from orange to iron. Plain boxes join the arena's one shared vertex-coloured mesh; every
+   glow in an arena uses that arena's single glow colour, so each arena adds at most one merged glow mesh and one small
+   animated mesh (a kiln mouth or a piston). The animation stops under Reduce Motion like everything else, and the
+   pieces stand in front of the base arenas' back walls (z -3.0 to -3.6) and outside both fighters' silhouettes
+   (x <= -3.8 left of the player, x >= 2.9 right of the foe; only low pieces between them), above the action buttons. */
+const OKIT = {
+  pillar(K, x, z, h) { K.stack('#2f2838', '#3e3446', x, z, h, 0.42); K.box('#8a8090', x, h * 0.42, z, 0.46, 0.06, 0.46); },
+  kiln(K, x, z, g, animate) { K.box('#5e423f', x, 0, z, 1.0, 0.9, 0.8); K.box('#6a4a48', x, 0.9, z, 0.7, 0.35, 0.6); K.box('#523a38', x, 1.25, z, 0.3, 0.9, 0.3);
+    K.box(g, x, 0.18, z + 0.41, 0.42, 0.34, 0.04, { e: g, ei: 1.4, spin: animate ? 'flicker' : undefined }); },
+  panes(K, x, z, n, g) { for (let i = 0; i < n; i++) { const px = x + i * 0.55; K.box('#4e444c', px, 0, z, 0.06, 1.6, 0.06); K.box(i % 2 ? '#9fd8e8' : '#b8e6f0', px + 0.27, 0.3, z, 0.44, 1.1, 0.04); }
+    K.box('#4e444c', x + n * 0.55, 0, z, 0.06, 1.6, 0.06); K.box(g, x + 0.27, 1.0, z + 0.03, 0.1, 0.1, 0.02, { e: g, ei: 1.4 }); },
+  gear(K, x, z) { for (let i = 0; i < 8; i++) { const t = i / 8 * Math.PI * 2; K.box(i % 2 ? '#5a4e56' : '#66585f', x + Math.cos(t) * 0.55, 0.75 + Math.sin(t) * 0.55, z, 0.2, 0.2, 0.14); } K.box('#a8603a', x, 0.66, z, 0.22, 0.22, 0.16); K.box('#4e444c', x, 0, z - 0.08, 0.12, 0.7, 0.08); },
+  piston(K, x, z, g, animate) { K.box('#4e444c', x, 0, z, 0.5, 0.25, 0.5); K.box('#5a4e56', x, 0.25, z, 0.16, 1.6, 0.16); K.box('#66585f', x, 1.0, z, 0.3, 0.3, 0.3, animate ? { spin: 'piston', e: '#000000' } : {}); K.box(g, x, 1.86, z, 0.12, 0.08, 0.12, { e: g, ei: 1.4 }); },
+  bars(K, x, z, g) { [g, '#ff7a3a', '#b44a2a', '#6a3a32', '#4e444c'].forEach((c, i) => K.box(c, x + i * 0.22, 0.32, z, 0.14, 0.08, 0.6, i ? undefined : { e: g, ei: 1.4 })); K.box('#4e444c', x - 0.1, 0, z, 0.06, 0.32, 0.6); K.box('#4e444c', x + 1.0, 0, z, 0.06, 0.32, 0.6); },
+  shards(K, x, z) { [[0, 0, 0.9, 0.2], [0.25, 0.15, 0.6, -0.25], [-0.2, 0.2, 0.5, 0.3]].forEach(([dx, dz, h, rz]) => K.box('#221a30', x + dx, 0, z + dz, 0.16, h, 0.12, { rz })); K.box('#6a5a9a', x, 0.7, z + 0.07, 0.08, 0.08, 0.02); },
+};
+// what each arena is furnished with (left-to-right on the back line, then the edges)
+const OFURN = {
+  o_cinder:  (K, g, a) => { OKIT.pillar(K, -4.4, -3.2, 4); OKIT.shards(K, 3.4, -3.0); OKIT.kiln(K, 4.2, -3.6, g, a); },
+  o_kilns:   (K, g, a) => { OKIT.kiln(K, -4.2, -3.4, g, a); OKIT.kiln(K, 3.6, -3.4, g, false); OKIT.bars(K, -0.4, -3.6, g); },
+  o_rookery: (K, g, a) => { OKIT.pillar(K, -4.4, -3.2, 6); OKIT.pillar(K, 3.8, -3.4, 5); OKIT.shards(K, 0.0, -3.6); },
+  o_quench:  (K, g, a) => { OKIT.piston(K, -4.2, -3.2, g, a); OKIT.bars(K, 2.9, -3.4, g); OKIT.pillar(K, 4.4, -3.2, 3); },
+  o_seams:   (K, g, a) => { OKIT.pillar(K, -4.4, -3.2, 5); OKIT.shards(K, 3.4, -3.2); OKIT.shards(K, 0.0, -3.6); OKIT.gear(K, 4.2, -3.6); },
+  o_gallery: (K, g, a) => { OKIT.panes(K, -4.8, -3.4, 2, g); OKIT.panes(K, 3.0, -3.6, 3, g); OKIT.shards(K, -0.2, -3.6); },
+  o_hollows: (K, g, a) => { OKIT.shards(K, -4.0, -3.0); OKIT.shards(K, 3.2, -3.0); OKIT.pillar(K, -4.6, -3.6, 4); OKIT.pillar(K, 4.2, -3.6, 6); },
+  o_orchard: (K, g, a) => { OKIT.pillar(K, -4.4, -3.4, 3); OKIT.kiln(K, 3.8, -3.4, g, a); },
+  o_bellows: (K, g, a) => { OKIT.piston(K, -4.2, -3.2, g, a); OKIT.piston(K, 4.2, -3.4, g, false); OKIT.gear(K, 3.2, -3.6); OKIT.bars(K, -0.5, -3.6, g); },
+  o_forge:   (K, g, a) => { OKIT.kiln(K, -4.2, -3.4, g, a); OKIT.gear(K, 3.4, -3.6); OKIT.piston(K, 4.4, -3.2, g, false); OKIT.bars(K, -0.5, -3.6, g); },
+};
+const OGLOW = { o_cinder: '#ff8a3a', o_kilns: '#ffb05a', o_rookery: '#ff9a5a', o_quench: '#5ab8e8', o_seams: '#b8c4d4', o_gallery: '#b89aff', o_hollows: '#ff6ad0', o_orchard: '#ff6ad0', o_bellows: '#ff9a5a', o_forge: '#ff7a3a' };
 Object.keys(OARENA).forEach((id) => {
   const v = OARENA[id], b = ARENAS[v.base];
-  ARENAS[id] = Object.assign({}, b, { mood: v.mood, fog: v.fog, motes: v.motes, obsidian: true, build(add, T, r, K, o) { return b.build.call(this, add, T, r, obsidianKit(K, v.tint, v.vivid), o); } });
+  ARENAS[id] = Object.assign({}, b, { mood: v.mood, fog: v.fog, motes: v.motes, obsidian: true, build(add, T, r, K, o) {
+    // Phase 19D: some base arenas (the Great Bellows' reliquary) make their floor, pillars and moss from their own
+    // materials, not the kit, so the 19C recolour never reached them and the Bellows stayed bright green. Those
+    // materials are recoloured here too (the kit's own materials are tagged and already recoloured; a textured floor
+    // gets a violet-ash multiplier, since its texture can't be re-hued).
+    const done = new Set(), fix = (mat) => { if (!mat || done.has(mat) || (mat.userData && (mat.userData.kit || mat.userData.vcol))) return; done.add(mat);
+      if (mat.map) mat.color.set('#b08aa8'); else if (mat.color) mat.color.set(obsidianColour('#' + mat.color.getHexString(), v.tint, v.vivid));
+      if (mat.emissive && mat.emissive.getHex()) mat.emissive.set(obsidianColour('#' + mat.emissive.getHexString(), v.tint, v.vivid)); };
+    const addO = (mesh, p) => { if (mesh && mesh.material) (Array.isArray(mesh.material) ? mesh.material : [mesh.material]).forEach(fix); return add(mesh, p); };
+    const out = b.build.call(this, addO, T, r, obsidianKit(K, v.tint, v.vivid), o);
+    if (OFURN[id]) OFURN[id](K, OGLOW[id], !(o && o.still && o.still()));
+    return out;
+  } });
   const at = ATMOS[v.base] || {};
   ATMOS[id] = Object.assign({}, at, { light: v.light, particles: v.particles, fog: at.fog, shafts: at.shafts ? Object.assign({}, at.shafts, { color: obsidianColour(at.shafts.color, v.tint) }) : null, backdrop: at.backdrop ? Object.assign({}, at.backdrop, { colors: v.backdrop }) : null });
   const dd = DRESS[v.base]; if (dd) DRESS[id] = Object.assign({}, dd, { ground: (dd.ground || []).map((c) => obsidianColour(c, v.tint, v.vivid)), leaf: dd.leaf ? dd.leaf.map((c) => obsidianColour(c, v.tint, v.vivid)) : dd.leaf }, dd.a ? { a: obsidianColour(dd.a, v.tint, v.vivid) } : {}, dd.b ? { b: obsidianColour(dd.b, v.tint, v.vivid) } : {}, dd.glow ? { glow: obsidianColour(dd.glow, v.tint, v.vivid) } : {});
@@ -566,6 +610,7 @@ export function buildArena(scene, id, o) {
         else if (a.kind === 'orbit') { m.position.y = a.y0 + Math.sin(t * 0.5 + a.ph) * 0.25; m.rotation.x += 0.003; m.rotation.y += 0.005; }
         else if (a.kind === 'flicker') m.scale.y = a.sy * (1 + Math.sin(t * 13 + a.ph) * 0.15);
         else if (a.kind === 'bob') m.position.y = a.y0 + Math.sin(t * 0.8) * 0.03;
+        else if (a.kind === 'piston') m.position.y = a.y0 + (Math.sin(t * 1.3 + a.ph) * 0.5 + 0.5) * 0.45;      // Phase 19D: a forge piston
         else if (a.kind === 'sway') m.rotation.y = Math.sin(t * 1.6 + a.ph) * 0.35;
         else if (a.kind === 'vane') m.rotation.y = Math.sin(t * 0.35) * 1.2;
         else if (a.kind === 'prism') { col.setHSL((t * 0.12) % 1, 0.85, 0.62); m.material.emissive.copy(col); m.material.color.copy(col); if (!quiet) m.rotation.y += 0.01; m.scale.setScalar(0.6 * (1 + (quiet ? 0 : Math.sin(t * 2.2) * 0.08))); }

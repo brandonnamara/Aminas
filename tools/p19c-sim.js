@@ -14,7 +14,7 @@ process.env.P17B_LIB = '1';
 const fs = require('fs'), path = require('path');
 const { Game, loadAt, seeded, pct, mean } = require('./p17b-sim.js');
 const OUT = process.argv[2] || path.join(__dirname, '..', 'docs', 'audit19c'); fs.mkdirSync(OUT, { recursive: true });
-const QUICK = !!process.env.QUICK, SEEDS = QUICK ? [11] : [11, 22], TRIES = QUICK ? 6 : 10, N100 = QUICK ? 8 : 20, SECS = 4.5;
+const QUICK = !!process.env.QUICK, SEEDS = process.env.SEEDS ? process.env.SEEDS.split(',').map(Number) : QUICK ? [11] : [11, 22], TRIES = QUICK ? 6 : 10, N100 = QUICK ? 8 : 20, SECS = 4.5;
 const g = Game(loadAt(null), '19C'), D = g.D, R = g.R, B = g.B, A = g.A;
 const IDS = D.CAMPAIGN.obsidian.dungeons, TRIO = ['lumifern', 'cannonis', 'emberix'];
 if (IDS.length !== 10) throw new Error('needs the ten Obsidian dungeons');

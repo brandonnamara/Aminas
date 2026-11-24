@@ -72,13 +72,16 @@
     };
     box.addEventListener('click', (e) => {
       if (e.target.closest('.sc-ctl') || e.target.closest('.sc-choice')) return;
+      // Phase 19D fix: a tap during the opening fade used to show line 1 early, and the opening timer then moved straight
+      // on to line 2, so the first line of a scene could be lost. Taps before the scene has started do nothing now.
+      if (i < 0) return;
       if (typing) { clearTimeout(tm); typing = false; tx.textContent = full; nx.style.visibility = 'visible'; scheduleAuto(); } else next();
     });
     $('#sc-skip', box).onclick = (e) => { e.stopPropagation(); finish('skipped'); };
     $('#sc-auto', box).onclick = (e) => { e.stopPropagation(); auto = !auto; e.currentTarget.classList.toggle('on', auto); e.currentTarget.setAttribute('aria-pressed', String(auto)); if (auto && !typing) scheduleAuto(); };
     setBg(sc.bg); setEnt('n');
     Au.play('hum');
-    setTimeout(() => { box.classList.add('started'); next(); }, calm ? 0 : 1100);
+    setTimeout(() => { box.classList.add('started'); if (i < 0) next(); }, calm ? 0 : 1100);
     UI.sceneBox = box;
     return box;
   };

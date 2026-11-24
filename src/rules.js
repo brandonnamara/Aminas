@@ -435,7 +435,7 @@
   function applyFx(b, f, fx, who, ev) {
     if (fx.p < 1 && b.rng() >= fx.p) return;
     if (fx.k === 'stun' && f.boss) {
-      if (f.charging) { f.charging = false; f.st.stun = 1; f.chargeIn = 2; ev.push({ t: 'stagger', who }); }
+      if (f.charging) { f.charging = false; f.st.stun = 1; f.chargeIn = 2; if (f.echoOf) { f.move = f.echoOf; f.echoOf = null; f.echoIn = null; } ev.push({ t: 'stagger', who }); } // Phase 19D: a staggered echo is gone
       else ev.push({ t: 'resist', who, k: 'stun' });
       return;
     }
@@ -446,7 +446,7 @@
 
   function doAbility(b, who, ev) {
     const att = who === 'p' ? B.cur(b) : b.enemy, def = who === 'p' ? b.enemy : B.cur(b), foe = who === 'p' ? 'e' : 'p';
-    return function (id) {
+    const run = function (id) {
       const ab0 = D.ABILITIES[id], mlv = (att.mvl && att.mvl[id]) || 1, MV = D.MOVE_LEVELS;
       // Dev 8: an upgraded move (levels 1-5) hits harder, guards better or heals more. Level 1 is the original move.
       const ab = mlv > 1 && MV && ab0.power ? Object.assign({}, ab0, { power: Math.round(ab0.power * MV.power[mlv]) }) : ab0;
@@ -495,6 +495,23 @@
       if (ab.fx && def.hp > 0) applyFx(b, ab.fx.self ? att : def, ab.fx, ab.fx.self ? who : foe, ev);
       if (ab.after === 'guard' && att.hp > 0) { att.guard = true; ev.push({ t: 'guard', who }); }
     };
+    return function (id) { const r = run(id); echoAfter(att, who, id, ev); return r; };
+  }
+  /* Phase 19D: echoes (the Magenta Hollows). When a guardian with an echo mechanic lands its charged move unguarded, the
+     crystals ring it back: it charges the echo at once (announced with its own warning) and releases it on its next action, at
+     a fraction of the power. It is an ordinary charged move to every rule: guard blocks three-quarters and goes up
+     first (Phase 18D), a stun while it rings staggers it, soak holds it a turn. Then the guardian's own move returns. */
+  function echoAfter(att, who, id, ev) {
+    const m = att.mech; if (who !== 'e' || !m || m.type !== 'echo' || att.hp <= 0) return;
+    // the echo has rung out: the guardian's own move returns, and its countdown carries on from where Shatterlight left
+    // it (one turn has passed), so the echo takes the place of an ordinary attack instead of delaying the next big move
+    if (id === m.move) { att.move = att.echoOf || att.move; att.echoOf = null; if (att.echoIn != null) { att.chargeIn = Math.max(0, att.echoIn - 1); att.echoIn = null; } return; }
+    if (!D.ABILITIES[id] || !D.ABILITIES[id].boss || id !== att.move) return;                        // only its own charged move echoes
+    // and only when it landed unanswered: a guarded (or blocked) Shatterlight does not ring back, so a player who answers
+    // the guardian never meets the echo, and one who ignores the warning gets a second, weaker hit
+    const hit = ev.slice().reverse().find((x) => x.t === 'hit' && x.who !== who && x.big); if (!hit || hit.guarded || hit.blocked) return;
+    const mv = D.ABILITIES[m.move]; att.echoIn = att.chargeIn; att.echoOf = att.move; att.move = m.move; att.charging = true; att.held = false;
+    ev.push({ t: 'charge', who, name: att.name, move: m.move, abName: mv.name, el: mv.el, tell: mv.tell, echo: true });
   }
   // End of a full turn: burn and regen tick on the two active fighters, then timed effects count down.
   function endOfTurn(b, ev) {
@@ -513,6 +530,18 @@
       e.prismT = (e.prismT || 0) + 1;
       if (e.prismT === m.every - 1) ev.push({ t: 'prismWarn', who: 'e', el: next });
       if (e.prismT >= m.every) { e.prismT = 0; e.prismI = (e.prismI + 1) % m.els.length; e.el = next; ev.push({ t: 'prismShift', who: 'e', el: next, name: e.name }); }
+    }
+    /* Phase 19D: steam (the Quench Pools). Every few turns the vents fill the pool with steam: both active fighters are
+       soaked for the next turn (slower). A guardian already charging is braced and not soaked, so steam alone never holds
+       a charge and the Quenchwarden stays as hard as in 19C. Announced a turn ahead; no damage,
+       and a heal clears it as it clears any soak. */
+    if (e.field && e.field.type === 'steam' && e.hp > 0) {
+      const fe = e.field; e.fieldT = (e.fieldT || 0) + 1;
+      if (e.fieldT === fe.every - 1) ev.push({ t: 'steamWarn', who: 'e' });
+      if (e.fieldT >= fe.every) { e.fieldT = 0; ev.push({ t: 'steam', who: 'e' });
+        // a guardian already charging is braced against the steam (so steam alone never holds its charge: the player's own
+        // soak still does)
+        [['p', B.cur(b)], ['e', e]].forEach(([w, f]) => { if (f.hp > 0 && !(w === 'e' && f.charging)) { const had = f.st.soak > 0; f.st.soak = Math.max(f.st.soak || 0, fe.n || 1); ev.push({ t: 'status', who: w, k: 'soak', n: f.st.soak, refresh: had, steam: true }); } }); }
     }
     checkEnd(b, ev);
   }
@@ -743,6 +772,8 @@
       if (e.mech.type === 'prism') { e.prismI = 0; e.prismT = 0; e.el = e.mech.els[0]; }
       if (e.mech.type === 'barrier') { e.mechDone = []; e.shield = 0; }
     }
+    // Phase 19D: a dungeon's field effect (the Quench Pools' steam vents), carried by every foe of that dungeon
+    if (spec.field) { e.field = JSON.parse(JSON.stringify(spec.field)); e.fieldT = 0; }
     e.scale = spec.scale || (spec.boss ? 1.3 : 1);
     return e;
   };
@@ -874,6 +905,9 @@
     if (mv && party.length) advice.push(has((x) => x.type === 'guard') ? { k: 'good', t: 'You can guard when it charges ' + mv.name + '.' } : has((x) => x.fx && x.fx.k === 'soak') ? { k: 'good', t: 'Soak it to hold back ' + mv.name + '.' } : { k: 'bad', t: 'No guard or soak move to answer ' + mv.name + '.' });
     if (boss.mech && boss.mech.type === 'barrier') advice.push({ k: 'tip', t: 'Special moves crack its barrier twice as fast.' });
     if (boss.mech && boss.mech.type === 'prism') advice.push({ k: 'tip', t: 'Its element shifts: bring more than one element.' });
+    // Phase 19D: the Reach's lighter mechanics
+    if (boss.mech && boss.mech.type === 'echo') advice.push({ k: 'tip', t: 'If its big move lands unguarded, the crystals ring it back as a weaker echo straight after. Guard the first one and they stay quiet.' });
+    if (boss.field && boss.field.type === 'steam') advice.push({ k: 'tip', t: 'Steam fills the pool every few turns and slows both sides for a turn (a guardian already charging is braced against it). A heal clears the steam.' });
     return { known, title: boss.title || null, els: known ? els : null, weakTo: known ? weakTo : null, resists: known ? resists : null, move: mv ? mv.name : null, mech: boss.mech ? boss.mech.type : null, advice };
   };
   // Story scenes: 'seen' or 'skipped'. Marking one also clears it from the pending slot (a scene that was due when
