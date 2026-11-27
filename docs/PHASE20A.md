@@ -332,7 +332,7 @@ Recommended: **after the final campaign**. It gives the post-game loop a clear s
 - **No service worker.** The `sw.js` registration was removed in 19D; the file never existed.
 - **Saves** are in `localStorage` (`src/state.js`). `main.js` asks for persistent storage.
 - **Assets:** about 2.9 MB of scripts and styles (`src/`) and about 15 MB of assets (124 portraits, 177 voxel files, 9 GLB models).
-- **three.js 0.170.0 loads from jsDelivr at run time:** the core module, GLTFLoader and BufferGeometryUtils, in five places.
+- **three.js 0.170.0 loads from jsDelivr at run time:** the core module, GLTFLoader and BufferGeometryUtils, imported on about ten lines across the 3D modules.
 - **Offline today:** with no network, `C3D` catches the failed import and the game falls back to 2D, if the browser's HTTP cache still has `src/`. **Nothing guarantees that.** There is no offline mode.
 
 **Plan** (to implement in a later phase, then test on a real iPhone before claiming it works)
