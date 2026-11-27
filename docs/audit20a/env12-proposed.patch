@@ -1,0 +1,19 @@
+--- a/tests/browser-env12.test.js	2026-11-27 23:55:18.199419701 +0000
++++ b/tests/browser-env12.test.js	2026-11-27 23:55:18.200998781 +0000
+@@ -22,7 +22,15 @@
+   });
+   await page.waitForSelector('#world.vox', { timeout: 30000 }).catch(() => {}); await sleep(1000); await calm();
+   ok(await ev(() => { const w = document.getElementById('world'), kids = [...w.children], i = kids.indexOf(document.getElementById('iso')), o = kids.findIndex((e) => e.classList && e.classList.contains('vox-occ')); return i >= 0 && o > i; }), 'the occlusion layer sits directly above the interactive SVG');
+-  await ev(() => A.UI.focusBuilding('hatchery', 1.4)); await sleep(1200); await calm();
++  // [proposed 20A correction] hold the companion's timers BEFORE the zoom (a walk already queued then finishes during the
++  // wait), hold the production tick (it re-renders objects and restores the companion's old walking offset), and wait
++  // until the view and the creature have stopped moving on screen, instead of a fixed 1.2 s
++  await ev(() => { clearInterval(A.UI.timers.life); clearInterval(A.UI.timers.prod); });
++  await ev(() => A.UI.focusBuilding('hatchery', 1.4)); await sleep(600); await calm();
++  await page.waitForFunction(() => { const w = document.getElementById('iso'), c = document.querySelector('#objs .creature'); if (!w || !c) return false;
++    const k = [w.getBoundingClientRect(), c.getBoundingClientRect()].map((r) => [r.x, r.y, r.width, r.height].map(Math.round).join(',')).join('|');
++    const o = window.__still || (window.__still = { k: '', n: 0, t: 0 }); const now = performance.now(); if (now - o.t < 120) return false; o.t = now;
++    o.n = k === o.k ? o.n + 1 : 0; o.k = k; return o.n >= 3; }, null, { timeout: 15000, polling: 60 }).catch(() => {});
+   // freeze the companion and stand it behind, then in front of, the Hatchery
+   const place = (where) => ev((where) => {
+     const hb = A.State.state.buildings.hatchery, sz = A.World.size(hb.type, hb.rot), el = document.querySelector('#objs .creature'); if (!el) return null;
