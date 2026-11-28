@@ -42,6 +42,23 @@
     furnacedraught: { name: 'Furnace Draught', el: 'wind', type: 'dmg', power: 78, cd: 0, boss: true, tell: 'The bellows fill until the leather creaks. Furnace Draught is coming!', desc: 'A blast of forge air. Burns the target. Guard it; a heal clears the burn.', fx: { k: 'burn', p: 1, n: 2 } },
     // Phase 19D: the Magenta Hollows' echo (see echoAfter in rules.js): Shatterlight rung back at under half power
     crystalecho:    { name: 'Crystal Echo', el: 'light', type: 'dmg', power: 72, cd: 0, boss: true, tell: 'Shatterlight hit unguarded, and the crystals ring it back. Crystal Echo is coming!', desc: 'When Shatterlight lands unguarded, the crystals answer it with a weaker copy. Guard Shatterlight and they stay quiet; or guard the echo, or stun the guardian while the crystals ring.' },
+    /* Phase 20C: the Celestial Crown guardians' charged moves (approved in Phase 20A). Existing effects only: burn, soak
+       (chilled), silence, lowered attack, never resisted. Telegraphed a turn ahead; a guard blocks three-quarters and always
+       goes up first (Phase 18D); a stun while charging staggers; a soaked guardian holds its charge a turn. */
+    updraft:      { name: 'Updraft', el: 'wind', type: 'weaken', power: 74, cd: 0, boss: true, tell: 'The wind gathers under its wings. Updraft is coming!', desc: 'A rising gust that lowers your attack. Guard it; a heal clears it. Fire and Earth hit the Warden hard.' },
+    starfall:     { name: 'Starfall', el: 'light', type: 'dmg', power: 80, cd: 0, boss: true, tell: 'Shards brighten overhead. Starfall is coming!', desc: 'Star shards fall like hail. Burns the target. Guard it; a heal clears the burn. Dark answers Light.', fx: { k: 'burn', p: 1, n: 2 } },
+    orreryturn:   { name: 'Orrery Turn', el: 'metal', type: 'dmg', power: 84, cd: 0, boss: true, tell: 'The great wheel lines up. Orrery Turn is coming!', desc: 'The whole orrery swings round at once. Guard it. Its body shifts between Metal and Earth: Fire and Water answer Metal, Nature and Water answer Earth.' },
+    cloudburst:   { name: 'Cloudburst', el: 'water', type: 'dmg', power: 78, cd: 0, boss: true, tell: 'The mist thickens to rain. Cloudburst is coming!', desc: 'A drenching downpour. Chilled: slower for two turns. Guard it; a heal warms you up.', fx: { k: 'soak', p: 1, n: 2 } },
+    focalray:     { name: 'Focal Ray', el: 'light', type: 'dmg', power: 82, cd: 0, boss: true, tell: 'Every lens turns to the same point. Focal Ray is coming!', desc: 'Light gathered into one beam. If it lands unguarded, the lenses bend it back as Refraction. Metal and Dark resist it.' },
+    refraction:   { name: 'Refraction', el: 'light', type: 'dmg', power: 74, cd: 0, boss: true, tell: 'Focal Ray hit unguarded, and the lenses bend it back. Refraction is coming!', desc: 'Focal Ray, bent back by the lenses at a little less power. Guard Focal Ray and the lenses stay quiet; or guard this, or stun the guardian.' },
+    twindusk:     { name: 'Twin Dusk', el: 'dark', type: 'dmg', power: 82, cd: 0, boss: true, tell: 'Both rooms go dark at once. Twin Dusk is coming!', desc: 'Dusk from both doors. Guard it. The Steward shifts between Dark and Light: Light and Dark beat each other.' },
+    hourseal:     { name: 'Hour Seal', el: 'metal', type: 'dmg', power: 74, cd: 0, boss: true, tell: 'The clerk stamps the hour shut. Hour Seal is coming!', desc: 'Seals your next turn: no special abilities (your basic move still works). Guard it; a heal clears it.', fx: { k: 'silence', p: 1, n: 2 } },
+    belltoll:     { name: 'Bell Toll', el: 'resonance', type: 'dmg', power: 80, cd: 0, boss: true, neutral: true, tell: 'The bell draws a breath. Bell Toll is coming!', desc: 'The cracked bell sounds. Never resisted. If it lands unguarded, the crack rings on as After-ring.' },
+    afterring:    { name: 'After-ring', el: 'resonance', type: 'dmg', power: 72, cd: 0, boss: true, neutral: true, tell: 'Bell Toll hit unguarded, and the crack rings on. After-ring is coming!', desc: 'The crack ringing on after Bell Toll. Guard Bell Toll and it never sounds; or guard this, or stun the bell.' },
+    umbralhush:   { name: 'Umbral Hush', el: 'dark', type: 'weaken', power: 78, cd: 0, boss: true, tell: 'The last stars go out. Umbral Hush is coming!', desc: 'A hush that lowers your attack. Guard it; a heal clears it. Light hits the Curator hard.' },
+    // The Two Keys (the Island Boss): the door's defence, in the Keepers' two shapes
+    keepersdawn:  { name: 'Keeper’s Dawn', el: 'light', type: 'dmg', power: 84, cd: 0, boss: true, tell: 'The Light Key lifts its light. Keeper’s Dawn is coming!', desc: 'A blinding dawn that burns. Guard it; a heal clears the burn. Dark answers Light.', fx: { k: 'burn', p: 1, n: 2 } },
+    closingdoor:  { name: 'The Closing Door', el: 'resonance', type: 'dmg', power: 90, cd: 0, boss: true, neutral: true, tell: 'The door begins to swing. The Closing Door is coming!', desc: 'The door itself, closing on you. Never resisted. Guard it, or soak the Shadow Key to make it hesitate.' },
     heartofforge:   { name: 'Heart of the Forge', el: 'earth', type: 'dmg', power: 92, cd: 0, boss: true, tell: 'The core flares white. Heart of the Forge is coming!', desc: 'The whole forge, at once. Guard it, or soak the core to make it sputter. Water answers Earth.' },
   });
 
@@ -444,6 +461,131 @@
       first: { gold: 7000, food: 1000, gems: 40 }, repeat: { gold: 750, food: 130 },
       rewardText: 'Island Boss. First clear: 7,000 gold, 1,000 food, 40 gems and Night Mail. Replays: 750 gold, 130 food.',
     },
+
+    /* ======================= Phase 20C: the Celestial Crown (the Silent Observatory) =======================
+       Ten dungeons, recommended levels 48 to 57, guardians 51 to 60 (the band approved in Phase 20A). Each opens when the one
+       before is cleared; the first when the Forge Heart has fallen and the island is reached. Foes are existing species
+       in the form their level calls for (third forms); no new species and no legendary foes. The island's foes carry
+       Obsidian's tier (D.CAMPAIGN.celestial.foeTier, ×1.3 HP / ×1.18 attack), with the two approved adjustments (Starfall
+       Terrace and the Cloud Sea Cistern) and any tuning from tools/p20c-sim.js. Cells: docs/PHASE20B.md. */
+    c_cloudstair: {
+      name: 'Cloudstair Landing', island: 'celestial', el: 'wind', playable: true, recommended: 48, env: 'c_cloudstair',
+      theme: 'Steps cut into the cloud cliff from the jetty, two sizes side by side, and the first light-bridges.',
+      unlock: { islandBoss: 'obsidian' }, unlockText: 'Defeat the Forge Heart, then reach the Celestial Crown.',
+      battles: vnine(['zephyr', 'lumi', 'zephyr', 'pyrospark', 'lumi', 'zephyr', 'igniflare', 'pyrospark', 'zephyr'], 48, ['c_cloudstair', 'c_cloudstair', 'c_cloudstair'],
+        ['The steps come in two sizes again, tall and short, side by side all the way up. Both are worn the same.', 'A light-bridge hums across a gap in the cliff. It holds. It does not look as if it should.', 'At the top, the wind drops all at once, as if someone had shut a window.'])
+        .concat([vboss({ sp: 'zephyr', title: 'The Stair Warden', hpMult: 1.65, move: 'updraft' }, 48)]),
+      sections: sec({ name: 'The Jetty Steps', first: { gold: 300, food: 58 } }, { name: 'The Light-Bridge', first: { gold: 310, food: 60 } }, { name: 'The Still Landing', first: { gold: 320, food: 62 } }, { name: 'The Warden’s Stair', first: { gems: 7 } }),
+      first: { gold: 2550, food: 480, gems: 12 }, repeat: { gold: 580, food: 110 },
+      rewardText: 'First clear: 2,550 gold, 480 food, 12 gems and a Dawn Charm. Replays: 580 gold, 110 food.',
+    },
+    c_starfall: {
+      tune: { hp: 0.92, atk: 0.92 }, // Phase 20A adjustment (the threshold sat at the recommended level)
+      name: 'Starfall Terrace', island: 'celestial', el: 'light', playable: true, recommended: 49, env: 'c_starfall', scene: 'c_charts',
+      theme: 'Terraced gardens where star shards fell long ago and took root. Moonblooms open between them at noon.',
+      unlock: {}, unlockText: 'Clear Cloudstair Landing.',
+      battles: vnine(['lumi', 'terraflora', 'lumifern', 'lumi', 'acinus', 'lumifern', 'terraflora', 'lumi', 'lumifern'], 49, ['c_starfall', 'c_starfall', 'c_starfall'],
+        ['The shards grow in rows, the way someone planted them. They are warm to the touch.', 'A gardener’s bench, two trowels on it: one large, one small. Both left mid-row.', 'At the top terrace, a star chart is carved into the paving, too big to read standing up.'])
+        .concat([vboss({ sp: 'lumifern', title: 'The Shard Gardener', hpMult: 1.65, move: 'starfall', tune: { hp: 0.9 / 0.92, atk: 0.88 / 0.92 } }, 49)]),
+      sections: sec({ name: 'The Lower Beds', first: { gold: 312, food: 60 } }, { name: 'The Gardener’s Bench', first: { gold: 322, food: 62 } }, { name: 'The Chart Terrace', first: { gold: 332, food: 64 } }, { name: 'The Shard Garden', first: { gems: 8 } }),
+      first: { gold: 2750, food: 500, gems: 12 }, repeat: { gold: 600, food: 110 },
+      rewardText: 'First clear: 2,750 gold, 500 food, 12 gems and a Moonstone. Replays: 600 gold, 110 food.',
+    },
+    c_orrery: {
+      name: 'The Orrery Wheel', island: 'celestial', el: 'metal', playable: true, recommended: 50, env: 'c_orrery',
+      theme: 'A great brass orrery under a cracked glass roof: four bodies on four arms around a bronze sun. One arm is bent.',
+      unlock: {}, unlockText: 'Clear Starfall Terrace.',
+      battles: vnine(['zeep', 'pyrocell', 'zeep', 'gaiaroki', 'zeep', 'pyrocell', 'zeep', 'gaiaroki', 'zeep'], 50, ['c_orrery', 'c_orrery', 'c_orrery'],
+        ['Gears the size of cartwheels, every tooth polished. Nobody polishes a gear they do not mean to use.', 'Brass rails run round the floor for the arms to ride on. One rail is scored deep, as if something was dragged.', 'Under the bent arm, the floor is scratched with marks that point the same way.'])
+        .concat([vboss({ sp: 'zeep', title: 'The Orrery Keeper', hpMult: 1.65, move: 'orreryturn', mech: { type: 'prism', every: 3, els: ['metal', 'earth'] } }, 50)]),
+      sections: sec({ name: 'The Gear Pit', first: { gold: 324, food: 62 } }, { name: 'The Brass Rails', first: { gold: 334, food: 64 } }, { name: 'The Bent Arm', first: { gold: 344, food: 66 } }, { name: 'The Bronze Sun', first: { gems: 8 } }),
+      first: { gold: 3000, food: 530, gems: 12 }, repeat: { gold: 620, food: 115 },
+      rewardText: 'First clear: 3,000 gold, 530 food, 12 gems and an Ironbound Club. Replays: 620 gold, 115 food.',
+    },
+    c_cistern: {
+      tune: { hp: 0.9, atk: 0.92 }, // Phase 20A adjustment (the threshold sat at the recommended level)
+      field: { type: 'steam', every: 3, n: 1 }, // the cloud mist rolls in waves (the 19D steam field)
+      name: 'Cloud Sea Cistern', island: 'celestial', el: 'water', playable: true, recommended: 51, env: 'c_cistern',
+      theme: 'Stone basins on the western cliff that catch the cloud and keep it as water. Mist rolls over the rim in waves.',
+      unlock: {}, unlockText: 'Clear the Orrery Wheel.',
+      battles: vnine(['aquaflora', 'kairyu', 'cannonis', 'zephyr', 'aquaflora', 'kairyu', 'cannonis', 'aquaflora', 'kairyu'], 51, ['c_cistern', 'c_cistern', 'c_cistern'],
+        ['The mist comes in waves, every few breaths. When it passes, everything is slower for a moment, you included.', 'Three brass gutters feed the deepest basin, from three directions. The water in it tastes of three different places.', 'At the bottom of the last basin, under very clear water, a ring of keys, all the same size.'])
+        .concat([vboss({ sp: 'kairyu', title: 'The Mist Serpent', hpMult: 1.6, move: 'cloudburst', tune: { hp: 0.92 / 0.9, atk: 0.88 / 0.92 } }, 51)]),
+      sections: sec({ name: 'The Mist Line', first: { gold: 336, food: 64 } }, { name: 'The Three Gutters', first: { gold: 346, food: 66 } }, { name: 'The Deep Basin', first: { gold: 356, food: 68 } }, { name: 'The Serpent’s Pool', first: { gems: 9 } }),
+      first: { gold: 3200, food: 550, gems: 14 }, repeat: { gold: 640, food: 115 },
+      rewardText: 'First clear: 3,200 gold, 550 food, 14 gems and Reef Plate. Replays: 640 gold, 115 food.',
+    },
+    c_lens: {
+      name: 'The Lens Gallery', island: 'celestial', el: 'light', playable: true, recommended: 52, env: 'c_lens', scene: 'c_mount',
+      theme: 'A colonnade of great lenses in brass frames. Light comes in at one end and goes somewhere else entirely.',
+      unlock: {}, unlockText: 'Clear Cloud Sea Cistern.',
+      battles: vnine(['lumi', 'zeep', 'lumi', 'pyrospark', 'zeep', 'lumi', 'lumifern', 'zeep', 'lumi'], 52, ['c_lens', 'c_lens', 'c_lens'],
+        ['Every lens has a label in two hands. One hand writes what the lens is for. The other writes what it shows.', 'One frame stands empty, its glass swept up and stacked neatly in a box beside it.', 'The last lens is pointed back down the hall, at the door you came in by.'])
+        .concat([vboss({ sp: 'lumi', title: 'The Focal Lantern', hpMult: 1.6, move: 'focalray', mech: { type: 'echo', move: 'refraction' } }, 52)]),
+      sections: sec({ name: 'The Labelled Lenses', first: { gold: 348, food: 66 } }, { name: 'The Empty Frame', first: { gold: 358, food: 68 } }, { name: 'The Turned Lens', first: { gold: 368, food: 70 } }, { name: 'The Focal Point', first: { gems: 9 } }),
+      first: { gold: 3450, food: 580, gems: 14 }, repeat: { gold: 670, food: 120 },
+      rewardText: 'First clear: 3,450 gold, 580 food, 14 gems and Basalt Mail. Replays: 670 gold, 120 food.',
+    },
+    c_twinhall: {
+      name: 'The Hall of Two Doors', island: 'celestial', el: 'dark', playable: true, recommended: 53, env: 'c_twinhall', scene: 'c_cups',
+      theme: 'The Keepers’ quarters: two rooms side by side, one bright and one dark, and a shared table between them.',
+      unlock: {}, unlockText: 'Clear the Lens Gallery.',
+      battles: vnine(['lumifern', 'umbrit', 'lumi', 'voltar', 'lumifern', 'umbrit', 'lumi', 'voltar', 'umbrit'], 53, ['c_twinhall', 'c_twinhall', 'c_twinhall'],
+        ['The bright room is tidy. The dark room is tidier. Someone was competing.', 'A doorway between the two rooms, with no door in it. The frame is worn smooth at two heights.', 'The shared table is laid for two. Nobody cleared it.'])
+        .concat([vboss({ sp: 'umbrit', title: 'The Dusk Steward', hpMult: 1.65, move: 'twindusk', mech: { type: 'prism', every: 2, els: ['dark', 'light'] } }, 53)]),
+      sections: sec({ name: 'The Bright Room', first: { gold: 360, food: 68 } }, { name: 'The Doorless Frame', first: { gold: 370, food: 70 } }, { name: 'The Dark Room', first: { gold: 380, food: 72 } }, { name: 'The Shared Table', first: { gems: 10 } }),
+      first: { gold: 3900, food: 620, gems: 16 }, repeat: { gold: 690, food: 125 },
+      rewardText: 'First clear: 3,900 gold, 620 food, 16 gems and an Inferno Fang. Replays: 690 gold, 125 food.',
+    },
+    c_chart: {
+      name: 'The Chart Room', island: 'celestial', el: 'metal', playable: true, recommended: 54, env: 'c_chart', scene: 'c_ledger',
+      theme: 'Star charts and ledgers of hours, in a tower on the northern edge. Every visitor in the sky’s long history, written down.',
+      unlock: {}, unlockText: 'Clear the Hall of Two Doors.',
+      battles: vnine(['zeep', 'aimza', 'voltar', 'zeep', 'aimza', 'lumi', 'zeep', 'aimza', 'voltar'], 54, ['c_chart', 'c_chart', 'c_chart'],
+        ['Shelves of rolled charts, floor to ceiling. Every roll is tied with two ribbons, one pale, one dark.', 'A clock with three hands, all stopped at the same moment.', 'On the desk, a visitors’ book, its ink long dry, open at its last page.'])
+        .concat([vboss({ sp: 'zeep', title: 'The Hour Clerk', hpMult: 1.65, move: 'hourseal', mech: { type: 'barrier', at: [0.5], amt: 0.2 } }, 54)]),
+      sections: sec({ name: 'The Chart Shelves', first: { gold: 372, food: 70 } }, { name: 'The Stopped Clock', first: { gold: 382, food: 72 } }, { name: 'The Visitors’ Book', first: { gold: 392, food: 74 } }, { name: 'The Clerk’s Desk', first: { gems: 10 } }),
+      first: { gold: 4250, food: 660, gems: 16 }, repeat: { gold: 710, food: 125 },
+      rewardText: 'First clear: 4,250 gold, 660 food, 16 gems and a Worldsplitter. Replays: 710 gold, 125 food.',
+    },
+    c_bellloft: {
+      name: 'The Bell Loft', island: 'celestial', el: 'resonance', playable: true, recommended: 55, env: 'c_bellloft', scene: 'c_bell',
+      theme: 'The great bell, cracked from rim to crown, in the tower over the eastern path. It still hums when nobody strikes it.',
+      unlock: {}, unlockText: 'Clear the Chart Room.',
+      battles: vnine(['aimza', 'zephyr', 'aimza', 'lumi', 'voltar', 'aimza', 'zephyr', 'aimza', 'voltar'], 55, ['c_bellloft', 'c_bellloft', 'c_bellloft'],
+        ['The stairs spiral up inside the tower. Every few steps the hum gets a little louder, and a little lower.', 'A bell-rope, cut. The cut is clean and very old.', 'The bell fills the loft. The crack in it is wide enough to put a hand through. You do not.'])
+        .concat([vboss({ sp: 'aimza', title: 'The Cracked Bell', hpMult: 1.6, move: 'belltoll', mech: { type: 'echo', move: 'afterring' } }, 55)]),
+      sections: sec({ name: 'The Spiral Stair', first: { gold: 384, food: 72 } }, { name: 'The Cut Rope', first: { gold: 394, food: 74 } }, { name: 'The Loft', first: { gold: 404, food: 76 } }, { name: 'The Cracked Bell', first: { gems: 11 } }),
+      first: { gold: 4600, food: 690, gems: 16 }, repeat: { gold: 740, food: 130 },
+      rewardText: 'First clear: 4,600 gold, 690 food, 16 gems, and the Starwell Habitat opens. Replays: 740 gold, 130 food.',
+    },
+    c_dome: {
+      name: 'The Shadowed Dome', island: 'celestial', el: 'dark', playable: true, recommended: 56, env: 'c_dome', scene: 'c_outline',
+      theme: 'The observatory’s night side: a dome painted with stars, some of them scraped away.',
+      unlock: {}, unlockText: 'Clear the Bell Loft.',
+      battles: vnine(['voltar', 'umbrit', 'aimza', 'voltar', 'umbrit', 'pyrospark', 'voltar', 'umbrit', 'aimza'], 56, ['c_dome', 'c_dome', 'c_dome'],
+        ['The painted stars are tiny and exact. Somebody climbed a very long ladder, many times.', 'Flakes of paint on the floor, swept into a pile and left.', 'High in the dome, where stars were scraped off, the bare plaster makes a shape.'])
+        .concat([vboss({ sp: 'voltar', title: 'The Night Curator', hpMult: 1.65, move: 'umbralhush' }, 56)]),
+      sections: sec({ name: 'The Painted Sky', first: { gold: 396, food: 74 } }, { name: 'The Swept Flakes', first: { gold: 406, food: 76 } }, { name: 'The Bare Plaster', first: { gold: 410, food: 78 } }, { name: 'The Curator’s Gallery', first: { gems: 12 } }),
+      first: { gold: 5050, food: 750, gems: 18 }, repeat: { gold: 760, food: 135 },
+      rewardText: 'First clear: 5,050 gold, 750 food, 18 gems and a Feather Token. Replays: 760 gold, 135 food.',
+    },
+    c_threshold: {
+      name: 'The Threshold', island: 'celestial', el: 'resonance', playable: true, recommended: 57, env: 'c_threshold', scene: 'c_door',
+      theme: 'Beneath the observatory: the door from the mould and the shrine. Cracked. Still standing.',
+      unlock: {}, unlockText: 'Clear the Shadowed Dome.',
+      battles: vnine(['aimza', 'lumifern', 'umbrit', 'aimza', 'voltar', 'lumi', 'aimza', 'lumifern', 'umbrit'], 57, ['c_threshold', 'c_threshold', 'c_threshold'],
+        ['A stair goes down under the observatory, lit by nothing. The walls are carved with two hands, one open, one closed, over and over.', 'Halfway down, a landing with two chairs facing the same way. Toward the door.', 'The door. Taller than the tower above it. A crack runs from top to bottom, and light and dark both leak through it.'])
+        // The Island Boss: The Two Keys (approved in Phase 20A). One battle, two stages: the door's defence in the Light
+        // Keeper's shape (Lumifern III), then in the Shadow Keeper's (Umbrit III), who steps through ready to charge. Each
+        // raises a barrier at half health. Not the starters: manifestations the door makes of what it remembers.
+        .concat([vboss({ sp: 'lumifern', title: 'The Two Keys', islandBoss: true, scale: 1.7, equalHp: true, stages: [
+          { sp: 'aurelith', title: 'The Light Key', hpMult: 0.95, scale: 1.7, move: 'keepersdawn', mech: { type: 'barrier', at: [0.5], amt: 0.2 }, keeper: 'light' },
+          { sp: 'eclipsar', title: 'The Shadow Key', hpMult: 0.95, scale: 1.7, move: 'closingdoor', mech: { type: 'barrier', at: [0.5], amt: 0.2 }, keeper: 'shadow', enters: 'charging' }] }, 57)]),
+      sections: sec({ name: 'The Carved Stair', first: { gold: 400, food: 78 } }, { name: 'The Two Chairs', first: { gold: 405, food: 79 } }, { name: 'The Door', first: { gold: 410, food: 80 } }, { name: 'The Two Keys', first: { gems: 20 } }),
+      first: { gold: 8000, food: 1150, gems: 50 }, repeat: { gold: 860, food: 150 },
+      rewardText: 'Island Boss. First clear: 8,000 gold, 1,150 food, 50 gems and the Keeper’s Emblem. Replays: 860 gold, 150 food.',
+    },
   };
 
   /* ---------- islands (world fragments) ---------- */
@@ -461,7 +603,10 @@
     // and would open the Celestial Crown, which stays closed until that island is marked ready (D.ISLAND_LIVE).
     obsidian: { dungeons: ['o_cinder', 'o_kilns', 'o_rookery', 'o_quench', 'o_seams', 'o_gallery', 'o_hollows', 'o_orchard', 'o_bellows', 'o_forge'],
       islandBoss: 'o_forge', next: 'celestial', foeTier: { hp: 1.3, atk: 1.18 }, hint: 'Dark stone, and a warmth that does not come from any sun.' },
-    celestial: { dungeons: [], islandBoss: null, next: null, hint: 'High up. Higher than an island has any right to be.' },
+    // Phase 20C: the Celestial Crown campaign, the last island of the main story. Its Island Boss (The Two Keys) completes
+    // the campaign; it opens no further island.
+    celestial: { dungeons: ['c_cloudstair', 'c_starfall', 'c_orrery', 'c_cistern', 'c_lens', 'c_twinhall', 'c_chart', 'c_bellloft', 'c_dome', 'c_threshold'],
+      islandBoss: 'c_threshold', next: null, foeTier: { hp: 1.3, atk: 1.18 }, hint: 'High up. Higher than an island has any right to be.' },
   };
   /* ---------- Phase 17B: the run-up to each boss ----------
      elites: the third section's foes (battles 7-9) appear in the form their level calls for (second form from level 12,
@@ -478,7 +623,8 @@
       b.base17 = { sp: b.sp }; // what the battle was before Phase 17B (kept for the simulator and the notes)
       if (D.DUNGEON17.elites && i >= 6 && i <= 8) b.sp = form(b.sp, b.lv);
       if (D.DUNGEON17.herald && i === 8 && boss) {
-        if (boss.move) b.move = boss.move;
+        if (boss.stages) b.move = boss.stages[0].move; // Phase 20C: a staged boss is rehearsed by its first stage's move
+        else if (boss.move) b.move = boss.move;
         else if (boss.mech && boss.mech.type === 'barrier') b.mech = { type: 'barrier', at: [0.5], amt: boss.mech.amt };
         b.herald = true;
       }
@@ -494,7 +640,9 @@
   // Phase 18C: an island's foe tier, stamped on each of its battles (with that battle's own tuning) for R.enemyFromSpec
   D.ISLAND_ORDER.forEach((iid) => {
     const c = D.CAMPAIGN[iid], T = c && c.foeTier; if (!T) return;
-    c.dungeons.forEach((id) => { const d = D.DUNGEONS[id]; d.battles.forEach((b) => { const dt = d.tune || {}, t = b.tune || {}; b.tier = { hp: +(T.hp * (dt.hp || 1) * (t.hp || 1)).toFixed(3), atk: +(T.atk * (dt.atk || 1) * (t.atk || 1)).toFixed(3) }; }); });
+    c.dungeons.forEach((id) => { const d = D.DUNGEONS[id]; d.battles.forEach((b) => { const dt = d.tune || {}, t = b.tune || {}; b.tier = { hp: +(T.hp * (dt.hp || 1) * (t.hp || 1)).toFixed(3), atk: +(T.atk * (dt.atk || 1) * (t.atk || 1)).toFixed(3) };
+      // Phase 20C: each stage of a staged boss carries the same tier, with its own tuning on top
+      (b.stages || []).forEach((sg) => { const u = sg.tune || {}; sg.lv = sg.lv || b.lv; sg.boss = true; sg.islandBoss = !!b.islandBoss; sg.tier = { hp: +(b.tier.hp * (u.hp || 1)).toFixed(3), atk: +(b.tier.atk * (u.atk || 1)).toFixed(3) }; }); }); });
   });
   // Islands no longer cost gold: the Island Boss of the island before opens each one. (Earlier builds sold them for
   // 100k/200k/400k gold; islands bought that way stay unlocked.)

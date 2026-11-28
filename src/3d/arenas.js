@@ -514,6 +514,55 @@ Object.keys(OARENA).forEach((id) => {
   delete ALIAS[id];
 });
 export const obsidianArenas = () => Object.keys(OARENA).map((id) => ({ id, base: OARENA[id].base }));
+/* Phase 20C: the Celestial Crown's ten arenas (the Silent Observatory), recoloured from the existing arenas the same way
+   (no new geometry, so every quality tier, Battery Saver and Reduce Motion behave as before). Grey stone becomes pale
+   moonstone, greens become periwinkle, wood and earth become brass and bronze, and each place's accent (star gold, lens
+   blue, violet Resonance) replaces the bright tones. The Threshold (The Two Keys) is the final arena: moonstone and
+   slate, lit by the Light Keeper's gold and then the Shadow Keeper's violet (runtime setKeeper; its rim light does not
+   walk the spectrum like other Island Boss rooms). */
+function celestialColour(c, tint, vivid) {
+  if (typeof c !== 'string' || c[0] !== '#' || c.length !== 7) return c;
+  let [h, s2, l] = hex2hsl(c);
+  if (s2 < 0.16) { h = 252; s2 = Math.max(s2, 0.14); l = Math.min(0.92, 0.35 + l * 0.7); }            // grey stone → moonstone
+  else if (h >= 65 && h <= 175) { h = 228; s2 = Math.min(0.7, s2 * 0.85); l = Math.min(0.8, l * 1.12); } // greens → periwinkle
+  else if (h >= 15 && h < 65 && l < 0.55) { h = 40; s2 = Math.min(0.7, s2 * 0.95 + 0.12); l = Math.min(0.6, l * 1.1); } // wood and earth → brass
+  else if (vivid && s2 >= 0.35) { h = vivid.h; s2 = Math.min(1, s2 * (vivid.s || 1)); l = Math.min(0.9, l * (vivid.l || 1)); } // accent
+  const out = hsl2hex(h, s2, l);
+  if (!tint) return out;
+  const a = parseInt(out.slice(1), 16), b = parseInt(tint.slice(1), 16), k = 0.16, mix = (sh) => Math.round(((a >> sh) & 255) * (1 - k) + ((b >> sh) & 255) * k);
+  return '#' + [16, 8, 0].map((sh) => mix(sh).toString(16).padStart(2, '0')).join('');
+}
+function celestialKit(K, tint, vivid) {
+  const m = (c) => celestialColour(c, tint, vivid), K2 = Object.create(K);
+  K2.box = (c, ...a) => K.box(m(c), ...a);
+  K2.stack = (a, b, ...rest) => K.stack(m(a), m(b), ...rest);
+  K2.floor = (fn, ...rest) => K.floor((...q) => m(fn(...q)), ...rest);
+  if (K.tree) K2.tree = (x, z, sc, l1, l2, o) => K.tree(x, z, sc, m(l1), m(l2), Object.assign({}, o, { trunk: m((o && o.trunk) || '#bdb5e4') }));
+  if (K.tuft) K2.tuft = (x, z, c) => K.tuft(x, z, m(c));
+  return K2;
+}
+const CARENA = {
+  c_cloudstair: { base: 'windstair', vivid: { h: 200, s: 0.8 }, tint: '#dce4ff', mood: 'day', fog: '#c8d0f0', motes: '#ffffff', light: { key: ['#ffffff', 2.4], rim: ['#c8d8ff', 1.7], hemi: ['#e8ecff', '#6a6aa8', 1.3] }, particles: { kind: 'leaves', colors: ['#ffffff', '#e4e2f6', '#c8d0f0'], n: 22 }, backdrop: ['#8a96d8', '#e8ecff'] },
+  c_starfall:   { base: 'lanternorchard', vivid: { h: 46, s: 1.0, l: 1.08 }, tint: '#ffe9a0', mood: 'dusk', fog: '#5a5a8a', motes: '#fff3b0', light: { key: ['#fff2d0', 2.2], rim: ['#ffd86b', 1.8], hemi: ['#e0d8f8', '#2a2850', 1.15] }, particles: { kind: 'glitter', colors: ['#fff3b0', '#ffd86b', '#ffffff'], n: 26 }, backdrop: ['#3a3a6a', '#c8b8f0'] },
+  c_orrery:     { base: 'reliquary', vivid: { h: 40, s: 0.9 }, tint: '#c8a050', mood: 'dusk', fog: '#3a3458', motes: '#ffe0a0', light: { key: ['#ffe8c0', 2.1], rim: ['#d6b062', 1.8], hemi: ['#d8d0f0', '#1e1c3a', 1.05] }, particles: { kind: 'dust', colors: ['#ffe0a0', '#d6b062', '#e8e4fb'], n: 22 }, backdrop: ['#2a2850', '#8a7a9a'] },
+  c_cistern:    { base: 'drownedsteps', vivid: { h: 200, s: 0.7, l: 1.1 }, tint: '#bfe4ff', mood: 'day', fog: '#b8c8e8', motes: '#ffffff', light: { key: ['#f4f8ff', 2.2], rim: ['#bfe4ff', 1.7], hemi: ['#e0e8ff', '#4a5a8a', 1.25] }, particles: { kind: 'bubbles', colors: ['#ffffff', '#dff4ff', '#e4e2f6'], n: 24 }, backdrop: ['#7a88c8', '#e0e8ff'] },
+  c_lens:       { base: 'gatheringhall', vivid: { h: 194, s: 0.8, l: 1.1 }, tint: '#9fd8e8', mood: 'dusk', fog: '#2a3050', motes: '#e8f6ff', light: { key: ['#f4fbff', 2.1], rim: ['#9fd8e8', 2.0], hemi: ['#d8e0f8', '#1a1c34', 1.05] }, particles: { kind: 'glitter', colors: ['#e8f6ff', '#9fd8e8', '#fff8d8'], n: 24 }, backdrop: ['#20243e', '#7a9ab8'] },
+  c_twinhall:   { base: 'hollowveil', vivid: { h: 262, s: 0.8 }, tint: '#8a86c8', mood: 'dark', fog: '#1a1830', motes: '#f0ecff', light: { key: ['#fff2d8', 1.9], rim: ['#9a7ae8', 2.0], hemi: ['#c8c4e8', '#0c0a18', 0.95] }, particles: { kind: 'dust', colors: ['#f0ecff', '#ffe9a0', '#9a7ae8'], n: 20 }, backdrop: ['#14122a', '#5a5698'] },
+  c_chart:      { base: 'coldkiln', vivid: { h: 40, s: 0.85 }, tint: '#f4ecd4', mood: 'dusk', fog: '#3a3448', motes: '#fff6e0', light: { key: ['#fff4dc', 2.0], rim: ['#d6b062', 1.7], hemi: ['#e0dcf0', '#1c1a2c', 1.05] }, particles: { kind: 'dust', colors: ['#fff6e0', '#f4ecd4', '#d6b062'], n: 22 }, backdrop: ['#2a2840', '#a898b8'] },
+  c_bellloft:   { base: 'resonancescar', vivid: { h: 300, s: 0.9, l: 1.05 }, tint: '#ff9ee0', mood: 'dark', fog: '#241a36', motes: '#ffd0f4', light: { key: ['#ffe8f8', 1.9], rim: ['#ff9ee0', 2.0], hemi: ['#d8c0e8', '#120a1e', 1.0] }, particles: { kind: 'glitter', colors: ['#ffd0f4', '#ff9ee0', '#ffe9a0'], n: 26 }, backdrop: ['#1e1630', '#7a4a8a'] },
+  c_dome:       { base: 'hollowveil', vivid: { h: 50, s: 1.0 }, tint: '#3e3b72', mood: 'dark', fog: '#100e22', motes: '#ffd86b', light: { key: ['#d8d0ff', 1.6], rim: ['#7a5ad8', 1.9], hemi: ['#8a84b8', '#06050e', 0.9] }, particles: { kind: 'glitter', colors: ['#ffd86b', '#fff3b0', '#b89aff'], n: 22 }, backdrop: ['#0c0a1c', '#3e3b72'] },
+  c_threshold:  { base: 'heartwood', vivid: { h: 270, s: 0.9 }, tint: '#e8e4fb', mood: 'dark', fog: '#181430', motes: '#f4f0ff', keys: true, light: { key: ['#ffe6b0', 2.0], rim: ['#fff2c8', 1.9], hemi: ['#fff0d8', '#120e24', 1.0] }, particles: { kind: 'glitter', colors: ['#ffe9a0', '#f4f0ff', '#b89aff'], n: 28 }, backdrop: ['#120e24', '#5a4a8a'] },
+};
+Object.keys(CARENA).forEach((id) => {
+  const v = CARENA[id], b = ARENAS[v.base];
+  ARENAS[id] = Object.assign({}, b, { mood: v.mood, fog: v.fog, motes: v.motes, celestial: true, build(add, T, r, K, o) { return b.build.call(this, add, T, r, celestialKit(K, v.tint, v.vivid), o); } });
+  const at = ATMOS[v.base] || {};
+  ATMOS[id] = Object.assign({}, at, { light: v.light, particles: v.particles, fog: at.fog, keys: !!v.keys, shafts: at.shafts ? Object.assign({}, at.shafts, { color: celestialColour(at.shafts.color, v.tint) }) : null, backdrop: at.backdrop ? Object.assign({}, at.backdrop, { colors: v.backdrop }) : null });
+  const dd = DRESS[v.base]; if (dd) DRESS[id] = Object.assign({}, dd, { ground: (dd.ground || []).map((c) => celestialColour(c, v.tint, v.vivid)), leaf: dd.leaf ? dd.leaf.map((c) => celestialColour(c, v.tint, v.vivid)) : dd.leaf }, dd.a ? { a: celestialColour(dd.a, v.tint, v.vivid) } : {}, dd.b ? { b: celestialColour(dd.b, v.tint, v.vivid) } : {}, dd.glow ? { glow: celestialColour(dd.glow, v.tint, v.vivid) } : {});
+  delete ALIAS[id];
+});
+export const celestialArenas = () => Object.keys(CARENA).map((id) => ({ id, base: CARENA[id].base }));
+
 
 
 function dress(K, r, key, def, o) {
@@ -622,7 +671,7 @@ export function buildArena(scene, id, o) {
       if (rig && !quiet) {
         const kl = rig.children[1], rl = rig.children[2];
         if (AT.flicker && kl) kl.intensity = key0 * (0.94 + Math.sin(t * 7) * 0.03 + Math.sin(t * 13.1) * 0.03);
-        if (o.island && rl) rl.color.setHSL((t * 0.05) % 1, 0.7, 0.72);
+        if (o.island && rl && !AT.keys) rl.color.setHSL((t * 0.05) % 1, 0.7, 0.72); // Phase 20C: The Two Keys' arena keeps its Keeper lighting
       }
       if (mt) { const u = mt.userData, p = u.pos, step = Math.min(0.05, dt || 0.016);
         if (!quiet) { for (let i = 0; i < u.n; i++) { p[i * 3 + 1] += step * (0.22 + (i % 5) * 0.05); p[i * 3] += Math.sin(t * 0.7 + u.seed[i]) * step * 0.08; if (p[i * 3 + 1] > 3.4) p[i * 3 + 1] = 0.05; }

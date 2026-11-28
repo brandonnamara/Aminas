@@ -17,7 +17,7 @@
   const now = () => (R.now ? R.now() : Date.now());
 
   D.C20 = {
-    live: false, // the campaign switch: off until the ten dungeons exist (Phase 20C)
+    live: true, // the campaign switch: on since Phase 20C, with the ten playable dungeons in campaign-data.js
     island: 'celestial',
     sites: [
       { id: 'jetty', kind: 'c_jetty', name: 'The Cloud Jetty', x: 13, y: 33, w: 4, h: 1, role: 'arrival',
@@ -72,6 +72,9 @@
       { id: 'c_threshold', n: 10, name: 'The Threshold', rec: 57, el: 'resonance', x: 16, y: 16, site: 'observatory', inside: true, boss: true, theme: 'Beneath the observatory. The Island Boss waits here.' },
     ],
   };
+  // Phase 20C: the Celestial Crown is ready. It opens when the Forge Heart falls (W.unlockByBoss); saves whose Forge Heart
+  // fell before this build get it on load, once (V.settle in src/verdant18b.js).
+  D.ISLAND_LIVE.celestial = true;
   const G = {}; D.C20.gates.forEach((g, i) => { G[g.id] = g; g.prev = i ? D.C20.gates[i - 1].id : null; });
   const SITE = {}; D.C20.sites.forEach((s) => { SITE[s.id] = s; });
 
@@ -96,15 +99,29 @@
   // Loft is 55 → 54). Stored with the Verdant records (st.v18.rare), like Obsidian's.
   if (D.V18 && D.V18.rare) { Object.assign(D.V18.rare.of, { cloudshelf: 'stormbringer', moonbloombeds: 'calyxar', starfield: 'voltar3' }); Object.assign(D.V18.rare.lvOf, { cloudshelf: 48, moonbloombeds: 51, starfield: 54 }); }
 
+  /* ---------- Phase 20C: first-clear items and the Keeper's Emblem ----------
+     Each dungeon's first clear gives an existing item that no dungeon gave yet (approved in Phase 20A); the Bell Loft
+     opens the Starwell Habitat instead. The Two Keys give the Keeper's Emblem: a unique charm (no family: cannot be
+     merged, bought or crafted; a second copy becomes gold). Stats: the trimmed Steadfast line approved for Phase 20C,
+     compared with the Watcher's Lens and the best charms in docs/PHASE20C.md (tools/p20c-emblem.js). */
+  D.ITEMS.keeperemblem = { id: 'keeperemblem', name: 'Keeper’s Emblem', slot: 'charm', bonus: { hp: 0.06, def: 0.08, atk: 0.03, spd: 0.02 }, rarity: 'mythic', unique: true, dupGold: 400, tier: 4, icon: 'emblem',
+    desc: 'Two keys. One purpose.' };
+  if (D.DUNGEON_GEAR) Object.assign(D.DUNGEON_GEAR, { c_cloudstair: 'dawncharm', c_starfall: 'moonstone', c_orrery: 'ironclub', c_cistern: 'reefplate', c_lens: 'basaltmail',
+    c_twinhall: 'infernofang', c_chart: 'worldsplit', c_dome: 'feathertok', c_threshold: 'keeperemblem' });
+
   /* ---------- rules ---------- */
   const C = (R.C20 = {});
   // Session-only developer switches (never saved; a reload clears them): the construction preview, and access to the
   // Starwell Habitat without its campaign requirement. Both need the developer build (D.DEV_TOOLS).
-  C.dev = { preview: false, habitat: false };
+  // Phase 20C: the 20B developer switches are retired (the island is part of the campaign). Kept as inert flags so an
+  // older developer session cannot turn either back on.
+  C.dev = Object.freeze({ preview: false, habitat: false });
   C.gate = (id) => G[id] || null;
   C.site = (id) => SITE[id] || null;
   C.built = (id) => { const d = D.DUNGEONS[id]; return !!(D.C20.live && d && d.playable && d.island === D.C20.island); };
-  C.cleared = (st, id) => !!(G[id] && D.DUNGEONS[id] && R.dungeonCleared(st, id));
+  // Phase 20C: a Celestial dungeon counts as cleared only with its whole chain: the Forge Heart beaten and every dungeon
+  // before it cleared too. A clear record forged on its own (or left by a developer session) opens nothing.
+  C.cleared = (st, id) => { const g = G[id]; if (!g || !D.DUNGEONS[id] || !R.dungeonCleared(st, id) || !R.islandBossDefeated(st, 'obsidian')) return false; return !g.prev || C.cleared(st, g.prev); };
   C.gateFor = (siteId) => D.C20.gates.find((g) => g.site === siteId) || null;
   // 'locked' | 'sealed' | 'open', with the reason in words (never claims anything can be entered when it cannot)
   C.gateState = function (st, id) {
@@ -122,7 +139,7 @@
 
   const reqMet0 = R.reqMet;
   R.reqMet = function (st, req) {
-    if (req && req.c20 && !C.cleared(st, req.c20) && !(C.dev.habitat && D.DEV_TOOLS && req.c20 === 'c_bellloft' && req.hab20)) return false;
+    if (req && req.c20 && !C.cleared(st, req.c20)) return false;
     return reqMet0.call(this, st, req && req.c20 ? Object.assign({}, req, { c20: undefined, hab20: undefined }) : req);
   };
   const reqText0 = W.reqText;
@@ -169,13 +186,23 @@
      opens it the way an old build's purchase did, marked by: 'preview', so it can be built on. It opens no dungeon, no
      Explore area and no quest (the campaign switch stays off). On the next load the preview mark is removed again
      (C.settle below): the island closes, and its obstacle records and any buildings placed there are kept. */
+  // Phase 20C: the 20B construction preview is retired. The developer shortcut only travels to the Crown on a save that
+  // opened it the normal way; it never unlocks the island, opens a dungeon or sets anything ready.
   C.preview = function (st) {
-    if (!D.DEV_TOOLS) return { ok: false, reason: 'dev', text: 'Developer builds only.' };
-    D.ISLAND_LIVE.celestial = true; C.dev.preview = true;
-    if (!W.islandUnlocked(st, 'celestial')) { st.islands.celestial = st.islands.celestial || { obstacles: {} }; Object.assign(st.islands.celestial, { unlocked: true, unlockedAt: now() || 1, by: 'preview' }); if (!st.islands.celestial.obstacles) st.islands.celestial.obstacles = {}; }
+    if (!W.islandUnlocked(st, D.C20.island)) return { ok: false, reason: 'progress', text: R.islandBossDefeated(st, 'obsidian') ? 'Travel from the Map.' : 'Defeat the Forge Heart first.' };
     return { ok: true };
   };
-  C.devHabitat = function (on) { if (!D.DEV_TOOLS) return false; C.dev.habitat = on !== false; return C.dev.habitat; };
+  C.devHabitat = () => false; // retired (Phase 20C): the Starwell Habitat opens only with the Bell Loft
+
+  /* ---------- an older purchase waits for the Forge Heart (Phase 20C) ----------
+     An early build sold the Crown for gold. That record (and any obstacle or building on it) is kept exactly as it is,
+     but the island only counts as open once the Forge Heart has fallen, so no save reaches the final campaign without
+     the three islands before it. When the Forge Heart falls such a save finds its Crown, and its buildings, as it left
+     them; the unlock is not granted twice (no second rank reward). */
+  const unl0 = W.islandUnlocked;
+  W.islandUnlocked = (st, id) => unl0(st, id) && (id !== D.C20.island || !!R.islandBossDefeated(st, 'obsidian'));
+  C.waiting = (st) => unl0(st, D.C20.island) && !R.islandBossDefeated(st, 'obsidian'); // a kept purchase, not yet open
+  W.islandKept = (st, id) => id === D.C20.island && C.waiting(st);
 
   /* ---------- saves ---------- */
   C.settle = function (st) {
@@ -183,14 +210,16 @@
     if (!st.c20 || typeof st.c20 !== 'object' || Array.isArray(st.c20)) st.c20 = { seen: {} };
     if (!st.c20.seen || typeof st.c20.seen !== 'object' || Array.isArray(st.c20.seen)) st.c20.seen = {};
     Object.keys(st.c20.seen).forEach((k) => { if (!SITE[k] && !G[k]) delete st.c20.seen[k]; else st.c20.seen[k] = +st.c20.seen[k] || 1; });
-    Object.keys(st.c20).forEach((k) => { if (k !== 'seen') delete st.c20[k]; });
+    Object.keys(st.c20).forEach((k) => { if (['seen', 'done', 'mastery', 'celebrate', 'lens'].indexOf(k) < 0) delete st.c20[k]; }); // Phase 20C: the completion state and the Lens moment
     // a developer preview's unlock never stands in for the Forge Heart: the island closes again on load, keeping its
     // obstacle records and buildings (a legacy purchase, by: 'gold' or no mark, is kept exactly as it is)
     const ci = st.islands && st.islands.celestial;
-    if (ci && ci.by === 'preview') { ci.unlocked = false; delete ci.unlockedAt; delete ci.by; if (st.currentIsland === 'celestial') st.currentIsland = W.islandUnlocked(st, 'obsidian') ? 'obsidian' : W.islandUnlocked(st, 'verdant') ? 'verdant' : 'starter'; }
+    if (ci && ci.by === 'preview') { if (R.islandBossDefeated(st, 'obsidian')) ci.by = 'boss'; else { ci.unlocked = false; delete ci.unlockedAt; delete ci.by; if (st.currentIsland === 'celestial') st.currentIsland = W.islandUnlocked(st, 'obsidian') ? 'obsidian' : W.islandUnlocked(st, 'verdant') ? 'verdant' : 'starter'; } }
+    if (st.currentIsland === 'celestial' && C.waiting(st)) st.currentIsland = W.islandUnlocked(st, 'obsidian') ? 'obsidian' : W.islandUnlocked(st, 'verdant') ? 'verdant' : 'starter'; // record kept
+    if (C.settleExtra) C.settleExtra(st); // Phase 20C (src/celestial20c.js)
     // a forged or stale run inside an unfinished Celestial dungeon is dropped
     if (st.run && G[st.run.d] && !C.canEnter(st, st.run.d)) st.run = null;
     return st;
   };
-  if (A.State && A.State.sanitize) { const san0 = A.State.sanitize; A.State.sanitize = function (st) { const r = san0.apply(this, arguments); C.settle(st); return r; }; }
+  if (A.State && A.State.sanitize) { const san0 = A.State.sanitize; A.State.sanitize = function (st) { try { if (st && st.islands && st.currentIsland === 'celestial' && st.campaign && C.waiting(st)) st.currentIsland = unl0(st, 'obsidian') ? 'obsidian' : unl0(st, 'verdant') ? 'verdant' : 'starter'; } catch (e) { /* the base sanitize repairs it */ } const r = san0.apply(this, arguments); C.settle(st); return r; }; }
 })(typeof window !== 'undefined' ? window : globalThis);

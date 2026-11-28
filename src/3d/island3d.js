@@ -298,14 +298,14 @@ export function createIsland() {
   const matSway = new THREE.MeshLambertMaterial({ vertexColors: true });
   matSway.onBeforeCompile = (sh) => { sh.uniforms.uTime = uni.uTime; sh.vertexShader = 'uniform float uTime;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n#ifdef USE_INSTANCING\nfloat ph = instanceMatrix[3].x * 1.7 + instanceMatrix[3].z * 2.3;\n#else\nfloat ph = 0.0;\n#endif\nfloat k = max(0.0, position.y - 0.6) * 0.035;\ntransformed.x += sin(uTime * 1.3 + ph) * k;\ntransformed.z += cos(uTime * 1.1 + ph) * k * 0.6;'); };
   let state = { iid: null, key: null, built: false, view: null, dirty: true, shadowDirty: true, things: new Map(), sig: '' };
-  let terr = null, waterMesh = null, detail = null, motes = null, sparks = null, clouds = []; let curIid = null; // Phase 18C: the island whose ground is built (its colours, ISLAND_PAL)
+  let terr = null, waterMesh = null, detail = null, motes = null, sparks = null, clouds = [], spinners = []; /* Phase 20C: spinners: slow turning parts (the Orrery Wheel) */ let curIid = null; // Phase 18C: the island whose ground is built (its colours, ISLAND_PAL)
   const disposables = [];
 
   const cost = { terrainMs: 0, syncMs: 0 };
   function setTerrain(iid, key, cols, extras) { const c0 = performance.now(); try { return setTerrain0(iid, key, cols, extras); } finally { cost.terrainMs = +(performance.now() - c0).toFixed(1); } }
   function setTerrain0(iid, key, cols, extras) {
     if (state.key === key && terr) return;
-    clearGroup(groups.terrain); clouds = [];
+    clearGroup(groups.terrain); clouds = []; spinners = [];
     curIid = iid; const t = withIslandPal(iid, () => buildTerrain(cols, (extras || []).filter((e) => e.kind === 'jetty' || e.kind === 'skiff').map((e) => [e.x, e.z]))); terr = t;
     const geo = meshGrid(t.g, { size: TV, shadeFaces: false }); disposables.push(geo);
     const m = new THREE.Mesh(facing(geo, BACK, 'terrain|' + key), matTerrain); m.receiveShadow = true; groups.terrain.add(m); disposables.push(m.geometry);
@@ -366,7 +366,7 @@ export function createIsland() {
           ' if (a < 0.02) discard; gl_FragColor = vec4(mix(vec3(0.75, 0.93, 1.0), vec3(1.0), streak * 0.6), a); }' });
       disposables.push(vm); const veil = new THREE.Mesh(vg, vm); veil.renderOrder = 3; groups.terrain.add(veil); }
     // fixed scenery that belongs to the island: the jetty with its skiff, the lighthouse rock
-    (extras || []).forEach((e) => { const md = VB.extraModel(e.kind); if (!md) return; const g = new THREE.Group(); addModel(g, md); g.position.set(e.x, e.y || 0, e.z); if (e.ry) g.rotation.y = e.ry; g.userData.bob = e.bob ? { y0: g.position.y, ph: e.x } : null; groups.terrain.add(g); if (e.bob) clouds.push(g); });
+    (extras || []).forEach((e) => { const md = VB.extraModel(e.kind); if (!md) return; const g = new THREE.Group(); addModel(g, md); g.position.set(e.x, e.y || 0, e.z); if (e.ry) g.rotation.y = e.ry; g.userData.bob = e.bob ? { y0: g.position.y, ph: e.x } : null; groups.terrain.add(g); if (e.bob) clouds.push(g); if (e.spin) { g.userData.kind = e.kind; g.traverse((o) => { o.castShadow = false; }); } if (e.spin) spinners.push({ g, axis: e.spin.axis || 'y', speed: e.spin.speed || 0.1, when: e.spin.when || null, a: 0 }); });
     // mist and cloud banks drifting below and around the island
     const b = t.bounds, cx = (b.minX + b.maxX) / 2, cz = (b.minZ + b.maxZ) / 2;
     [[cx + 9, -7.5, cz + 14, 1.6], [cx - 14, -6, cz + 6, 1.3], [cx + 16, -5, cz - 6, 1.1], [cx - 4, -9, cz + 20, 1.9], [cx + 22, -8, cz + 10, 1.2]].forEach(([x, y, z, s], i) => {
@@ -684,6 +684,9 @@ export function createIsland() {
   function tickAmbient(t, dt) {
     uni.uTime.value = t;
     if (glbGroups.length) MS.tick(glbGroups, dt);
+    // Phase 20C: the Orrery Wheel turns slowly once its dungeon is cleared (only on this ambient tick, which stops for
+    // Reduce Motion, Battery saver, a hidden page and slow devices; no geometry is made, one rotation is set)
+    spinners.forEach((sp) => { if (sp.when && !sp.when()) return; sp.a += dt * sp.speed; sp.g.rotation[sp.axis] = sp.a; });
     clouds.forEach((c) => { const d = c.userData.drift; if (d) c.position.x = d.x0 + Math.sin(t * d.sp * 0.3 + d.ph) * 1.2; const b = c.userData.bob; if (b) c.position.y = b.y0 + Math.sin(t * 1.2 + b.ph) * 0.06; });
     if (sparks) { const u = sparks.userData, p = sparks.geometry.attributes.position.array; for (let i = 0; i < u.N; i++) { const cx = u.seed[i * 4], cz = u.seed[i * 4 + 1], r = u.seed[i * 4 + 2] * 0.55, ph = u.seed[i * 4 + 3]; let y = p[i * 3 + 1] + dt * 0.35; if (y > 3.4) y = 0.3; const a = ph + t * 0.6 + y * 1.4, rr = r * (0.6 + 0.4 * Math.sin(ph * 3)); p[i * 3] = cx + Math.cos(a) * rr; p[i * 3 + 1] = y; p[i * 3 + 2] = cz + Math.sin(a) * rr; } sparks.geometry.attributes.position.needsUpdate = true; }
     if (motes) { const u = motes.userData, p = u.mp; for (let i = 0; i < u.N; i++) { p[i * 3 + 1] += dt * 0.25; p[i * 3] += Math.sin(t * 0.7 + u.seed[i]) * dt * 0.08; if (p[i * 3 + 1] > 3.2) p[i * 3 + 1] = 0.1; } motes.geometry.attributes.position.needsUpdate = true; }
@@ -741,6 +744,8 @@ export function createIsland() {
     gpuMem() { const seen = new Set(); let geo = 0, inst = 0; const add = (o) => { if (o.isInstancedMesh) inst += o.instanceMatrix.array.byteLength + (o.instanceColor ? o.instanceColor.array.byteLength : 0); const g = o.geometry; if (!g || seen.has(g.uuid)) return; seen.add(g.uuid); Object.values(g.attributes).forEach((a) => { geo += a.array.byteLength; }); if (g.index) geo += g.index.array.byteLength; };
       [groups.terrain, groups.things, farGroup, groups.fx].forEach((gr) => gr && gr.traverse((o) => { if (o.isMesh || o.isPoints) add(o); }));
       const sm = sun.shadow.map ? sun.shadow.mapSize.x * sun.shadow.mapSize.y * 4 : 0; return { geometriesMB: +(geo / 1048576).toFixed(2), instancesMB: +(inst / 1048576).toFixed(2), shadowMB: +(sm / 1048576).toFixed(2), totalMB: +((geo + inst + sm) / 1048576).toFixed(2), distinct: seen.size }; },
+    // Phase 20C: the turning parts (the Orrery Wheel's arms), their angle in radians, for the tests
+    spinners() { return spinners.map((sp) => ({ kind: sp.g.userData.kind || null, a: +sp.a.toFixed(4), on: !sp.when || !!sp.when() })); },
     stats() { const i = R.info; return { ctx: { lost: ctxLost, events: Object.assign({}, ctxEvents) }, occPace: { passes: occ.passes, frameMs: +occ.frameCost.toFixed(1), passMs: +occ.cost.toFixed(1) }, programs: i.programs ? i.programs.length : null, frames, avgDrawMs: frames ? +(drawMs / frames).toFixed(2) : 0, calls: i.render.calls, triangles: i.render.triangles, geometries: i.memory.geometries, textures: i.memory.textures, shadow: sun.castShadow, shadowMap: sun.shadow.mapSize.x, shadowType: R.shadowMap.type === THREE.VSMShadowMap ? 'vsm' : 'pcf', detail: detail ? detail.count : 0, grade: { toneMapping: R.toneMapping === THREE.NeutralToneMapping ? 'neutral' : 'none', exposure: R.toneMappingExposure }, tinted: groups.things.children.filter((o) => o.isInstancedMesh && o.instanceColor).length, tier: tier().id, canvas: [R.domElement.width, R.domElement.height], pixelRatio: R.getPixelRatio(), slow, lod: lodOn === 0 ? 'off' : lodOn === 1 ? 'nature' : 'all', terrainMs: cost.terrainMs, syncMs: cost.syncMs, occ: { shown: occ.shown, proxies: occ.data ? occ.data.up.length + occ.data.flat.length : 0, ms: +occ.cost.toFixed(1) } }; },
     dispose() { if (raf) cancelAnimationFrame(raf); raf = 0; clearGroup(groups.terrain); groups.things.children.slice().forEach((c) => { groups.things.remove(c); if (c.isInstancedMesh) c.dispose(); }); state = { things: new Map(), sig: '' }; },
   };

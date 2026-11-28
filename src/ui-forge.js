@@ -27,7 +27,11 @@
     echo: ['....####....', '...######...', '..##....##..', '.##..##..##.', '.##.####.##.', '.##.####.##.', '.##..##..##.', '..##....##..', '...######...', '....####....', '............', '............'],
     feather: ['.........###', '........####', '.......####.', '......####..', '.....####...', '....####....', '...####.....', '..###.......', '.##.........', '#...........', '............', '............'],
     eye: ['............', '...######...', '.##########.', '###..##..###', '##..####..##', '##..####..##', '###..##..###', '.##########.', '...######...', '............', '............', '............'],
+    // Phase 20C: the Keeper's Emblem: a gold sun-half and a silver moon-half locked round an amethyst, each reaching into
+    // the other (g gold, s silver, a amethyst; drawn in its own colours rather than the rarity's)
+    emblem: ['....ggss....', '..ggggssss..', '.gggg..ssss.', '.ggg.aa.sss.', 'gggg.aaa.sss', 'ggg.aaaa.sss', 'ggg.aaaa.sss', 'gggg.aa.ssss', '.gggs..gsss.', '.ggss..ggss.', '..ggggssss..', '....ggss....'],
   };
+  const PIX_COL = { g: ['#ffd86b', '#c9962a'], s: ['#e8ecf4', '#9aa4b8'], a: ['#c89aff', '#7a4ad8'] };
   const TIER_COL = { common: ['#c9c2b0', '#8f8a83'], uncommon: ['#8fe08a', '#3f9a3f'], rare: ['#7cc4ff', '#2f6fc4'], epic: ['#d7a0ff', '#8a4ad8'], mythic: ['#ffd86b', '#c9962a'] };
   const iconCache = {};
   UI.itemIcon = function (id, size) {
@@ -35,7 +39,7 @@
     const k = id + '@' + (size || 40); if (iconCache[k]) return iconCache[k];
     const g = PIX[d.icon] || PIX.vest, [c1, c2] = TIER_COL[d.rarity] || TIER_COL.common;
     let r = '';
-    g.forEach((row, y) => row.split('').forEach((ch, x) => { if (ch === '#') r += '<rect x="' + x + '" y="' + y + '" width="1.02" height="1.02" fill="' + ((x + y) % 5 === 0 || y > 7 ? c2 : c1) + '"/>'; }));
+    g.forEach((row, y) => row.split('').forEach((ch, x) => { const pc = PIX_COL[ch]; if (ch === '#' || pc) r += '<rect x="' + x + '" y="' + y + '" width="1.02" height="1.02" fill="' + (pc ? ((x + y) % 5 === 0 || y > 7 ? pc[1] : pc[0]) : (x + y) % 5 === 0 || y > 7 ? c2 : c1) + '"/>'; }));
     return (iconCache[k] = '<svg class="gicon r-' + d.rarity + '" viewBox="-1 -1 14 14" width="' + (size || 40) + '" height="' + (size || 40) + '" aria-hidden="true" shape-rendering="crispEdges"><rect x="-1" y="-1" width="14" height="14" rx="2" fill="rgba(0,0,0,.28)"/>' + r + '</svg>');
   };
   const G = () => R.Gear, P = () => UI.P13C;

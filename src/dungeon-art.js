@@ -200,6 +200,59 @@
     [...Array(6)].map((_, i) => fr(40 + i * 170, 60, 30, 340, OS.brick) + fr(40 + i * 170, 60, 30, 10, '#a85a44')).join('') + fr(0, 40, 1000, 30, OS.ironD) +
     [...Array(5)].map((_, i) => fr(90 + i * 190, 330, 70, 40, OS.ironD) + fr(80 + i * 190, 320, 90, 14, OS.iron) + fr(120 + i * 190, 300, 8, 26, '#6a4a2a')).join('') +
     '<circle cx="500" cy="200" r="' + (o.boss ? 110 : 80) + '" fill="' + (o.boss ? '#ffd27a' : '#a0402a') + '" opacity="' + (o.boss ? 0.85 : 0.6) + '"/>' + glowE(500, 200, o.boss ? 260 : 170, o.boss ? 200 : 130, OS.ember, o.boss ? 0.4 : 0.25) + embers(o.boss ? 30 : 16, 13) + ofloor('#2a1e1c') + motes(OS.emberL);
+  /* ---- Phase 20C: the Celestial Crown's ten dungeons (the Silent Observatory): moonstone, brass astronomical machinery,
+     celestial crystals, old lenses, astral ruins and forgotten research rooms, with restrained Light and Shadow. Same
+     flat voxel style, normal and boss room; plus the observatory's lens mount (scene backdrop only). ---- */
+  const CS = { moon: '#e8e4fb', moonD: '#bdb5e4', moonL: '#f4f0ff', slate: '#5d5a9a', slateD: '#3e3b72', brass: '#c8a050', brassD: '#8a6a30', gold: '#ffd86b', goldL: '#fff3b0', lens: '#9fd8e8', violet: '#b89aff', cloud: '#ffffff', paper: '#f4ecd4' };
+  const cfloor = (c) => '<rect y="390" width="1000" height="110" fill="' + c + '"/>' + [...Array(10)].map((_, i) => '<rect x="' + (i * 100 + 20) + '" y="' + (402 + (i % 3) * 20) + '" width="60" height="4" fill="' + shade(c, -0.1) + '"/>').join('') + '<rect y="388" width="1000" height="4" fill="' + CS.brass + '" opacity=".55"/>';
+  const mcol = (x, w, h, c) => fr(x, 390 - h, w, h, c || CS.moon) + fr(x, 390 - h + 30, w, 6, CS.brass) + fr(x, 390 - h, w, 8, CS.moonL);
+  const shard = (x, y, h, c) => '<path d="M' + x + ' ' + y + 'l' + (h * 0.18) + ' ' + (-h) + 'l' + (h * 0.18) + ' ' + h + 'z" fill="' + (c || CS.gold) + '"/><path d="M' + (x + h * 0.18) + ' ' + (y - h) + 'l' + (h * 0.18) + ' ' + h + 'h' + (-h * 0.1) + 'z" fill="' + CS.goldL + '" opacity=".7"/>';
+  const lensC = (cx, cy, r, tint) => '<circle cx="' + cx + '" cy="' + cy + '" r="' + (r + 6) + '" fill="' + CS.brass + '"/><circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="' + (tint || CS.lens) + '" opacity=".85"/><ellipse cx="' + (cx - r * 0.3) + '" cy="' + (cy - r * 0.35) + '" rx="' + (r * 0.3) + '" ry="' + (r * 0.15) + '" fill="#fff" opacity=".6"/>';
+  const cloudB = (x, y, w, c) => '<ellipse cx="' + x + '" cy="' + y + '" rx="' + w + '" ry="' + (w * 0.28) + '" fill="' + (c || CS.cloud) + '" opacity=".85"/><ellipse cx="' + (x - w * 0.4) + '" cy="' + (y + 6) + '" rx="' + (w * 0.5) + '" ry="' + (w * 0.22) + '" fill="' + (c || CS.cloud) + '" opacity=".7"/>';
+  SCENES.c_cloudstair = (o) => sky('cc', o.boss ? '#5a5a9a' : '#8a96d8', o.boss ? '#b8b0e8' : '#cfd6ff', '#e8ecff') + [...Array(5)].map((_, i) => cloudB(120 + i * 200, 360 + (i % 2) * 20, 140)).join('') +
+    [...Array(8)].map((_, i) => fr(300 + i * 12, 380 - i * 36, 200 - i * 10, 36, i % 2 ? CS.moonD : CS.moon) + fr(500 - i * 2, 380 - i * 36, 110 - i * 4, 24, i % 2 ? CS.moon : CS.moonD)).join('') +
+    [0, 1, 2, 3].map((i) => fr(240 + i * 90, 340 - i * 70, 4, 60, CS.brass) + '<rect x="' + (244 + i * 90) + '" y="' + (344 - i * 70) + '" width="90" height="3" fill="' + CS.violet + '" opacity=".6"/>').join('') +
+    (o.boss ? glowE(500, 120, 180, 60, '#ffffff', 0.4) + fr(440, 100, 120, 20, CS.moonL) : '') + cfloor('#bdb5e4') + motes('#ffffff');
+  SCENES.c_starfall = (o) => sky('cs', o.boss ? '#1e1c3a' : '#3a3a6a', o.boss ? '#5a4a8a' : '#8a7ab8', '#a898d0') + stars(o.boss ? 40 : 26, 207, CS.goldL) +
+    [0, 1, 2].map((t) => fr(60 + t * 40, 300 + t * 30, 880 - t * 80, 30, t % 2 ? CS.moonD : CS.moon) + fr(60 + t * 40, 300 + t * 30, 880 - t * 80, 5, CS.brass)).join('') +
+    [...Array(12)].map((_, i) => shard(90 + i * 72, 300 + (i % 3) * 30, 40 + (i * 23) % 50)).join('') + [...Array(8)].map((_, i) => '<circle cx="' + (130 + i * 110) + '" cy="' + (360 + (i % 2) * 10) + '" r="7" fill="#f4f0ff"/><circle cx="' + (130 + i * 110) + '" cy="' + (360 + (i % 2) * 10) + '" r="2.5" fill="' + CS.gold + '"/>').join('') +
+    (o.boss ? glowE(500, 200, 220, 120, CS.gold, 0.25) + shard(480, 300, 140, CS.gold) : '') + cfloor('#7a6a8a') + motes(CS.goldL);
+  SCENES.c_orrery = (o) => sky('co', '#1e1c3a', o.boss ? '#3a3060' : '#2a2850', '#3a3458') + '<rect x="40" y="40" width="920" height="16" fill="' + CS.brass + '"/>' +
+    [...Array(9)].map((_, i) => '<rect x="' + (40 + i * 112) + '" y="56" width="100" height="70" fill="' + (i === 6 ? '#1e1c3a' : CS.lens) + '" opacity="' + (i === 6 ? 1 : 0.35) + '"/>').join('') +
+    [60, 920].map((x) => fr(x, 56, 20, 334, CS.brass)).join('') + '<circle cx="500" cy="230" r="' + (o.boss ? 64 : 52) + '" fill="#b8803a"/>' + glowE(500, 230, 90, 90, '#ffd27a', o.boss ? 0.3 : 0.18) +
+    [[-1, 0, 260, '#8a86c8'], [1, 0, 200, CS.lens], [0, -1, 150, CS.moon], [0.7, 0.8, 230, '#c8a8ff']].map(([dx, dy, r, c], i) => '<path d="M500 230L' + (500 + dx * r) + ' ' + (230 + dy * r * 0.45 + (i === 3 ? 60 : 0)) + '" stroke="' + CS.brass + '" stroke-width="6"/><circle cx="' + (500 + dx * r) + '" cy="' + (230 + dy * r * 0.45 + (i === 3 ? 60 : 0)) + '" r="' + (14 + i * 2) + '" fill="' + c + '"/>').join('') +
+    fr(380, 330, 240, 60, CS.moonD) + cfloor('#3a3458') + motes('#ffe0a0');
+  SCENES.c_cistern = (o) => sky('cw', o.boss ? '#5a6a9a' : '#7a88c8', o.boss ? '#a8b8e0' : '#c8d4f4', '#e0e8ff') + [...Array(6)].map((_, i) => cloudB(80 + i * 180, 120 + (i % 3) * 30, 120 + (i % 2) * 40)).join('') +
+    [...Array(3)].map((_, i) => fr(80 + i * 300, 250, 240, 140, CS.moon) + '<rect x="' + (96 + i * 300) + '" y="262" width="208" height="110" fill="#bfe4ff"/>' + fr(80 + i * 300, 250, 240, 8, CS.brass)).join('') +
+    '<rect x="0" y="230" width="1000" height="10" fill="' + CS.brass + '"/>' + [...Array(4)].map((_, i) => '<ellipse cx="' + (150 + i * 240) + '" cy="' + (300 + (i % 2) * 30) + '" rx="120" ry="22" fill="#ffffff" opacity=".35"/>').join('') +
+    (o.boss ? '<ellipse cx="500" cy="420" rx="260" ry="50" fill="#9fc8e8"/><ellipse cx="500" cy="420" rx="220" ry="38" fill="none" stroke="#ffffff" stroke-width="4" stroke-dasharray="40 10"/>' + glowE(500, 300, 220, 70, '#ffffff', 0.35) : '') + cfloor('#bdb5e4') + motes('#ffffff');
+  SCENES.c_lens = (o) => '<rect width="1000" height="500" fill="' + (o.boss ? '#14162a' : '#20243e') + '"/>' + [...Array(6)].map((_, i) => { const x = 70 + i * 160; return mcol(x - 30, 24, 330) + lensC(x + 50, 180 + (i % 2) * 30, 48, i === 2 ? '#1e1c3a' : null); }).join('') +
+    '<path d="M0 180L1000 230" stroke="#fff8d8" stroke-width="' + (o.boss ? 10 : 4) + '" opacity=".35"/>' + (o.boss ? lensC(500, 200, 90, '#fff8d8') + glowE(500, 200, 200, 120, '#fff8d8', 0.25) : '') + cfloor('#2a3050') + motes('#e8f6ff');
+  SCENES.c_twinhall = (o) => '<rect width="500" height="500" fill="' + (o.boss ? '#4a4878' : '#8a86c8') + '"/><rect x="500" width="500" height="500" fill="' + (o.boss ? '#14122a' : '#2a2850') + '"/>' +
+    fr(120, 120, 260, 270, CS.moon) + fr(620, 120, 260, 270, CS.slateD) + '<rect x="170" y="170" width="160" height="220" fill="#f0ecff"/><rect x="670" y="170" width="160" height="220" fill="#1e1c3a"/>' + fr(100, 100, 800, 24, CS.brass) +
+    fr(380, 300, 240, 16, '#8a6a4a') + fr(400, 316, 12, 74, '#8a6a4a') + fr(588, 316, 12, 74, '#8a6a4a') + fr(440, 280, 22, 22, '#f4f0ff') + fr(540, 280, 22, 22, CS.slateD) +
+    (o.boss ? glowE(250, 260, 160, 140, '#fff2c8', 0.25) + glowE(750, 260, 160, 140, CS.violet, 0.25) : '') + cfloor('#3a3860') + motes('#f0ecff');
+  SCENES.c_chart = (o) => sky('ch', '#1c1a2c', o.boss ? '#3a3050' : '#2a2840', '#3a3448') + stars(18, 311, '#fff6e0') +
+    [...Array(6)].map((_, i) => fr(40 + i * 160, 90, 140, 260, '#5a4a3a') + [...Array(5)].map((_, k) => fr(50 + i * 160, 100 + k * 50, 120, 40, k % 2 ? CS.paper : '#e8dcc0')).join('')).join('') +
+    '<circle cx="500" cy="140" r="60" fill="' + CS.moonL + '"/><circle cx="500" cy="140" r="64" fill="none" stroke="' + CS.brass + '" stroke-width="8"/>' + [0, 1, 2].map((k) => '<path d="M500 140L' + (500 + Math.cos(k * 0.3 - 1.2) * 48) + ' ' + (140 + Math.sin(k * 0.3 - 1.2) * 48) + '" stroke="#2a2840" stroke-width="' + (5 - k) + '"/>').join('') +
+    fr(330, 320, 340, 40, '#8a6a4a') + fr(450, 300, 100, 22, CS.paper) + (o.boss ? glowE(500, 300, 200, 80, '#fff4dc', 0.25) : '') + cfloor('#3a3040') + motes('#fff6e0');
+  SCENES.c_bellloft = (o) => sky('cb', '#1e1630', o.boss ? '#4a2a5a' : '#3a2a4a', '#3a2a50') + stars(20, 401, '#ffd0f4') +
+    [120, 820].map((x) => mcol(x, 60, 380)).join('') + fr(100, 40, 800, 30, CS.slateD) +
+    '<path d="M380 120Q500 60 620 120L660 320H340z" fill="' + CS.brass + '"/><path d="M500 92L492 160L506 220L494 320" stroke="#4a3a20" stroke-width="6" fill="none"/>' + glowE(500, 220, o.boss ? 220 : 160, o.boss ? 140 : 90, '#ff9ee0', o.boss ? 0.3 : 0.18) +
+    fr(470, 320, 60, 40, CS.brassD) + cfloor('#2a2040') + motes('#ffd0f4');
+  SCENES.c_dome = (o) => '<rect width="1000" height="500" fill="#0c0a1c"/><path d="M60 390Q500 -60 940 390z" fill="' + CS.slateD + '"/>' + stars(o.boss ? 70 : 50, 509, CS.gold).replace(/fill="[^"]+"/g, 'fill="' + CS.gold + '"') +
+    '<path d="M560 120q40 -10 70 20q10 40 -20 70q-40 10 -60 -20z" fill="#d8d0e8" opacity=".8"/>' + fr(470, 300, 60, 90, '#1e1c3a') + fr(460, 290, 80, 12, CS.brass) + fr(700, 360, 60, 30, '#8a84b8') +
+    (o.boss ? glowE(500, 260, 260, 120, CS.violet, 0.25) : '') + cfloor('#1e1c3a') + motes(CS.goldL);
+  SCENES.c_threshold = (o) => '<rect width="1000" height="500" fill="#120e24"/>' + '<rect x="0" y="0" width="500" height="500" fill="#2a2440" opacity=".7"/>' +
+    fr(330, 40, 340, 350, CS.slateD) + '<rect x="350" y="60" width="150" height="330" fill="#e8e4fb" opacity=".9"/><rect x="500" y="60" width="150" height="330" fill="#1e1c3a"/>' +
+    (o.boss ? '' : '<path d="M500 60L494 140L506 230L496 320L500 390" stroke="#fff2c8" stroke-width="6" fill="none"/><path d="M500 60L494 140L506 230L496 320L500 390" stroke="' + CS.violet + '" stroke-width="2" fill="none"/>') +
+    fr(320, 30, 360, 20, CS.brass) + glowE(420, 220, 140, 180, '#ffe6b0', o.boss ? 0.32 : 0.2) + glowE(580, 220, 140, 180, CS.violet, o.boss ? 0.32 : 0.2) +
+    [...Array(6)].map((_, i) => fr(40 + i * 40, 390 - i * 30, 200, 30, i % 2 ? CS.moonD : '#8a84b8')).join('') + [0, 1].map((i) => '<ellipse cx="' + (440 + i * 120) + '" cy="398" rx="36" ry="8" fill="' + (i ? '#0c0a1c' : '#bdb5e4') + '"/>').join('') + cfloor('#2a2440') + motes('#f4f0ff');
+  // the observatory's lens mount (scene backdrop for the grief beat and the Watcher's Lens moment)
+  SCENES.c_mount = () => '<rect width="1000" height="500" fill="#1c1a34"/><path d="M80 500V160Q500 -40 920 160V500z" fill="#2a2850"/>' + '<path d="M470 40h60l60 300h-180z" fill="#fff6d8" opacity=".12"/>' +
+    [...Array(4)].map((_, i) => fr(120 + i * 220, 200, 20, 190, CS.brassD)).join('') + fr(140, 230, 160, 14, '#8a6a4a') + fr(150, 210, 60, 20, CS.paper) + fr(720, 260, 40, 60, '#8a6a4a') +
+    fr(440, 300, 120, 90, CS.moon) + fr(440, 330, 120, 8, CS.brass) + '<circle cx="500" cy="230" r="66" fill="none" stroke="' + CS.brass + '" stroke-width="12"/><circle cx="500" cy="230" r="54" fill="#1c1a34"/>' +
+    [[500, 160], [500, 300], [430, 230], [570, 230]].map(([x, y]) => '<rect x="' + (x - 6) + '" y="' + (y - 6) + '" width="12" height="12" fill="' + CS.gold + '"/>').join('') + fr(494, 296, 12, 10, CS.brassD) + cfloor('#2a2850');
   // the Hollow Veil and the Resonance Scar keep their v0.4 skies; their boss rooms get set dressing in front of them
   function hallRoom(stage) {
     let out = '';

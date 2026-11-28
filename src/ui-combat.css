@@ -378,3 +378,18 @@ body.perf-hidden .battle *, body.perf-hidden .rtile * { animation-play-state: pa
 .stx.stx-new { animation: stxIn .5s cubic-bezier(.2,.9,.3,1.2) both; }
 .calm .stx.stx-new { animation: none; }
 @media (prefers-reduced-motion: reduce) { .stx.stx-new { animation: none; } }
+
+/* Phase 20C: The Two Keys' stage banner (Stage II · The Shadow Key), and the encounter card's two portraits */
+.b-stage { position: absolute; left: 50%; top: 30%; transform: translate(-50%, -50%); z-index: 30; pointer-events: none; text-align: center; padding: .55rem 1.4rem .65rem; border-radius: 14px;
+  background: linear-gradient(90deg, rgba(255, 230, 170, .92), rgba(184, 154, 255, .92)); color: #1a1430; box-shadow: 0 6px 24px rgba(20, 10, 40, .45); animation: bstageIn .45s ease-out both; }
+.b-stage.shadow { background: linear-gradient(90deg, rgba(120, 96, 200, .95), rgba(40, 30, 80, .95)); color: #f4f0ff; }
+.b-stage.light { background: linear-gradient(90deg, rgba(255, 236, 180, .95), rgba(255, 214, 120, .95)); }
+.b-stage small { display: block; font-size: .72rem; letter-spacing: .06em; opacity: .85; }
+.b-stage b { display: block; font-size: 1.25rem; }
+.b-stage.out { opacity: 0; transition: opacity .35s; }
+@keyframes bstageIn { from { opacity: 0; transform: translate(-50%, -40%) scale(.96); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+@media (prefers-reduced-motion: reduce) { .b-stage { animation: none; } }
+body.calm .b-stage, body.perf-saver .b-stage { animation: none; }
+.foedots.stages i { width: .9rem; border-radius: 3px; }
+.enc-por.duo { display: flex; gap: .2rem; align-items: flex-end; justify-content: center; }
+.enc-por.duo > div, .enc-por.duo > svg, .enc-por.duo > img { flex: 0 0 48%; }

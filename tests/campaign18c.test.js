@@ -31,7 +31,7 @@ ok(D.DUNGEONS.v_twinshrine.battles[9].mech.type === 'prism' && D.DUNGEONS.v_twin
 ok(IDS.every((id) => D.DUNGEONS[id].battles.every((b) => b.tier && b.tier.hp > 0 && b.tier.atk > 0)), 'every Verdant foe carries the island’s foe tier (with its own tuning)');
 { const spec = D.DUNGEONS.v_mossgate.battles[0], e = R.enemyFromSpec(spec), plain = B.fighter(spec.sp, spec.lv); ok(e.hpMax === Math.round(plain.hpMax * spec.tier.hp) && e.atk === Math.round(plain.atk * spec.tier.atk), 'the tier raises a foe’s health and attack by its multipliers (' + spec.tier.hp + ' / ' + spec.tier.atk + ')'); }
 { const st0 = D.DUNGEONS.forgottenroad.battles[0], e0 = R.enemyFromSpec(st0), p0 = B.fighter(st0.sp, st0.lv); ok(!st0.tier && e0.hpMax === p0.hpMax && e0.atk === p0.atk, 'Starter Island foes are unchanged (no tier)'); }
-ok(D.DUNGEON_ORDER.length === 30 && D.DUNGEON_ORDER.slice(10, 20).join() === IDS.join() && D.DUNGEON_ORDER.slice(20).every((id) => D.DUNGEONS[id].island === 'obsidian'), 'the dungeon order lists Starter Island, then the Verdant Wilds, then Obsidian Reach (Phase 19C)');
+ok(D.DUNGEON_ORDER.length === 40 && D.DUNGEON_ORDER.slice(10, 20).join() === IDS.join() && D.DUNGEON_ORDER.slice(20, 30).every((id) => D.DUNGEONS[id].island === 'obsidian') && D.DUNGEON_ORDER.slice(30).every((id) => D.DUNGEONS[id].island === 'celestial'), 'the dungeon order lists Starter Island, the Verdant Wilds, Obsidian Reach (Phase 19C), then the Celestial Crown (Phase 20C)');
 ok(IDS.every((id) => D.DUNGEON_GEAR[id] && D.ITEMS[D.DUNGEON_GEAR[id]]), 'each Verdant dungeon has a first-clear item, all existing items');
 
 /* ---------- unlock order ---------- */

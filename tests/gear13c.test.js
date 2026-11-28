@@ -9,7 +9,7 @@ const snap = (st) => JSON.stringify(st), give = (st, id) => R.grantItem(st, id, 
 const KEYS = ['hp', 'atk', 'def', 'spd'];
 
 /* ---- the data is what it was ---- */
-ok(D.GEAR_SLOTS.join() === 'weapon,armour,charm' && Object.keys(D.ITEMS).length === 47 && Object.keys(D.GEAR_FAMILIES).length === 12 && D.MAX_ITEMS === 150, 'three slots, 47 items (12 lines and three unique items) and the 150-item bag are unchanged');
+ok(D.GEAR_SLOTS.join() === 'weapon,armour,charm' && Object.keys(D.ITEMS).length === 48 && Object.keys(D.GEAR_FAMILIES).length === 12 && D.MAX_ITEMS === 150, 'three slots, 48 items (12 lines and four unique items: the Keeper’s Emblem joined in Phase 20C) and the 150-item bag are unchanged');
 ok(JSON.stringify(D.ITEMS.driftclub.bonus) === '{"atk":0.06}' && JSON.stringify(D.ITEMS.titanmaul.bonus) === '{"atk":0.15}' && JSON.stringify(D.ITEMS.abyssplate.bonus) === '{"def":0.19,"hp":0.11}' && JSON.stringify(D.ITEMS.entityeye.bonus) === '{"hp":0.06,"atk":0.06,"def":0.06,"spd":0.06}', 'item bonuses are unchanged (spot checks across tiers and the unique items)');
 ok(D.FORGE.recipes.length === 12 && D.FORGE.recipes.map((r) => r.cost.gold).join() === '120,150,140,120,100,110,130,220,380,520,450,450' && D.FORGE.shop.map((o) => o.price).join() === '180,220,200,180,160,200,220,480,480,520,900,900,950', 'the 12 recipes and 13 shop prices are unchanged');
 ok(JSON.stringify(D.FORGE.merge) === '{"2":{"gold":60,"lv":1},"3":{"gold":180,"lv":2},"4":{"gold":450,"lv":3}}' && D.BUILDINGS.forge.levels.map((l) => l.cost.gold).join() === '300,1500,4500', 'merge costs (60, 180, 450 gold) and the Forge’s three levels are unchanged');
@@ -29,7 +29,7 @@ p = V.unequipPreview(st, b.uid, 'weapon'); r = R.unequip(st, b.uid, 'weapon'); o
 ok(!V.unequipPreview(st, b.uid, 'weapon').ok && V.unequipPreview(st, b.uid, 'weapon').reason === 'empty' && !R.unequip(st, b.uid, 'weapon').ok, 'an empty slot cannot be removed from');
 // every item on a mid-level Amina: preview == result
 { let bad = 0, n = 0; Object.keys(D.ITEMS).forEach((id) => { const s2 = mk(), x = R.addAmina(s2, 'gaiaroki', 17), it = give(s2, id); const pv = V.equipPreview(s2, x.uid, it.iid); R.equip(s2, x.uid, it.iid); const now = R.statsWithGear(s2, x), f = R.partyFighter(s2, x); n++; if (!pv.ok || JSON.stringify(now) !== JSON.stringify(pv.after) || f.atk !== now.atk || f.def !== now.def || f.spd !== now.spd || f.hpMax !== now.hp || x.gear[D.ITEMS[id].slot] !== it.iid) bad++; });
-  ok(bad === 0 && n === 47, 'for all 47 items the preview equals the stats after equipping and the stats the Amina fights with'); }
+  ok(bad === 0 && n === 48, 'for all 48 items the preview equals the stats after equipping and the stats the Amina fights with'); }
 // three slots together: bonuses add once each
 st = mk(); a = R.addAmina(st, 'lumifern', 20); [give(st, 'titanmaul'), give(st, 'abyssplate'), give(st, 'eclipseorb')].forEach((it) => R.equip(st, a.uid, it.iid));
 const base = R.statsAt('lumifern', 20), eff = R.statsWithGear(st, a), f1 = R.partyFighter(st, a), f2 = R.partyFighter(st, a);

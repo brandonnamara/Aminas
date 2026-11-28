@@ -179,6 +179,9 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms)); const SHOTS = proce
   ok(ghost === 0, 'its fade-out copy is gone moments later');
 
   /* ---------- hidden page: nothing animates or draws ---------- */
+  // Phase 20C: the Forge Heart now also opens the Celestial Crown, so its notice is queued first and the Heart of the Forge
+  // scene starts later (when the panels above close). Finish any story scene before hiding: this check is about the island.
+  for (let i = 0; i < 40; i++) { const on = await ev(() => { const b = document.querySelector('#sc-skip'); if (b) b.click(); return !!(b || A.UI.sceneBox); }); if (!on) break; await sleep(300); } await dlgAway(); await sleep(800);
   const hide = (h) => ev((h) => { Object.defineProperty(document, 'hidden', { configurable: true, get: () => h }); Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => (h ? 'hidden' : 'visible') }); document.dispatchEvent(new Event('visibilitychange')); }, h);
   await hide(true); await sleep(400);
   const h0 = await ev(() => ({ run: document.getAnimations().filter((a) => a.playState === 'running').length, drawn: A.C3D && A.C3D.stats ? A.C3D.stats().drawn : null })); await sleep(1500);

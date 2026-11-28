@@ -90,11 +90,11 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms)); const SHOTS = proce
   await sleep(800); await tidy(); const lk1 = await ev(() => ({ g: A.VoxIsland.stats().geometries, t: A.VoxIsland.stats().textures, n: document.getElementsByTagName('*').length }));
   ok(lk1.g === lk0.g && lk1.t === lk0.t && lk1.n === lk0.n, 'six more round trips leave GPU geometries, textures and page nodes where they were (' + JSON.stringify(lk0) + ' → ' + JSON.stringify(lk1) + ')');
 
-  /* ---------- a future island that is not ready (Phase 19C: Obsidian Reach is ready, so the Celestial Crown) ---------- */
+  /* ---------- an older build's Celestial Crown purchase (Phase 19C: not ready; Phase 20C: waits for the Forge Heart) ---------- */
   await setup({ celestial: true, isle: 'verdant' }); await sleep(700); await tidy();
   await ev(() => A.UI.islandMap()); await sleep(400);
   const ob = await ev(() => { const c = document.querySelector('.frag[data-island="celestial"]'); return { txt: c ? c.textContent : '', travel: !!(c && c.querySelector('[data-act="travel"]')) }; });
-  ok(/Not ready/.test(ob.txt) && !ob.travel, 'a Celestial Crown unlocked by an older build shows “Not ready” on the map, with no Travel button');
+  ok(/Defeat the Island Boss of Obsidian Reach/.test(ob.txt) && !ob.travel, 'a Celestial Crown unlocked by an older build waits for the Forge Heart on the map (Phase 20C; “Not ready” before), with no Travel button');
   await shot('map-notready');
   const ob2 = await ev(() => { const r = A.UI.travelTo('celestial'); return { r, isle: A.State.state.currentIsland, kept: !!A.State.state.islands.celestial.unlocked }; });
   ok(ob2.r === false && ob2.isle === 'verdant' && ob2.kept, 'travel there is refused, and the save keeps its unlock record');

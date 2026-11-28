@@ -50,6 +50,8 @@
     Au && Au.play && Au.play('ok');
     const born = Date.now(), ov = UI.modal(UI.sheet(title, '<div class="v18 o19">' + body + '</div>', foot, 'narrow v18-sheet o19-sheet'), { dismiss: false, onClose: () => UI.refresh && UI.refresh() });
     ov.addEventListener('click', (e) => { if (Date.now() - born < 400) { e.stopPropagation(); e.preventDefault(); } }, true); // the tap that opened it must not close it
+    // Phase 20C: the input lock's end is marked on the sheet (data-input-ready), so a test can wait for it instead of guessing
+    setTimeout(() => { ov.dataset.inputReady = '1'; }, 400);
     ov.addEventListener('click', (e) => { if (e.target === ov) UI.close(ov); });
     return ov;
   };

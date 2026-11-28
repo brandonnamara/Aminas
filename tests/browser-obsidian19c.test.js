@@ -56,7 +56,10 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms)); const SHOTS = proce
   await shot('gate-1'); await tidy();
   await ev(() => A.UI.o19Open('o_kilns')); await sleep(300);
   ok(!(await ev(() => !!document.querySelector('[data-act="o19Enter"]'))), 'Dungeon 2 waits for Dungeon 1 (no Enter button)'); await tidy();
-  await ev(() => A.UI.o19Open('o_cinder')); await sleep(300); await ev(() => document.querySelector('[data-act="o19Enter"]').click()); await sleep(900);
+  await ev(() => A.UI.o19Open('o_cinder'));
+  // Phase 20C: wait for the sheet's input lock (400 ms, so the tap that opened it cannot press a button) to end, by its marker
+  await until(() => { const o = [...document.querySelectorAll('.overlay')].pop(); return !!(o && o.dataset.inputReady && o.querySelector('[data-act="o19Enter"]')); }, null, 5000).catch(() => {});
+  await ev(() => document.querySelector('[data-act="o19Enter"]').click()); await sleep(900);
   const dscr = await ev(() => (document.querySelector('.overlay') || {}).textContent || '');
   ok(/Obsidian Reach/.test(dscr) && /The Cinder Steps/.test(dscr) && /0 \/ 10 dungeons/.test(dscr), 'Enter opens the Dungeons screen on Obsidian Reach: ten dungeons, the first ready');
   await shot('dungeons-reach');

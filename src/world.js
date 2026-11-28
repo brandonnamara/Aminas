@@ -433,6 +433,9 @@
     Object.keys(st.buildings).sort((a, b) => (D.BUILDINGS[st.buildings[b].type].story ? 1 : 0) - (D.BUILDINGS[st.buildings[a].type].story ? 1 : 0) || (a < b ? -1 : 1)).forEach((id) => {
       const b = st.buildings[id];
       if (b.state === 'stored') { b.island = null; b.x = b.y = null; return; }
+      // Phase 20C: a building on an island the save owns but cannot visit yet (an old Celestial purchase waiting for the
+      // Forge Heart) stays exactly where it was, untouched, until the island opens
+      if (W.islandKept && W.islandKept(st, b.island)) return;
       if (!W.islandUnlocked(st, b.island)) { b.island = 'starter'; b.x = b.y = null; }
       const ok = Number.isInteger(b.x) && Number.isInteger(b.y) && W.canPlace(st, b.island, b.type, b.x, b.y, b.rot, id).ok;
       if (!ok) {

@@ -1,0 +1,497 @@
+{
+ "note": "Item bonuses from the real data. onLumifern60: points each item adds to a level-60 Lumifern III ({\"hp\":636,\"atk\":149,\"def\":142,\"spd\":112}).",
+ "rows": [
+  {
+   "id": "abyssplate",
+   "name": "Abyss Plate",
+   "slot": "armour",
+   "rarity": "epic",
+   "tier": 4,
+   "unique": false,
+   "bonus": {
+    "def": 0.19,
+    "hp": 0.11
+   },
+   "sum": 0.3,
+   "onLumifern60": {
+    "hp": 70,
+    "atk": 0,
+    "def": 27,
+    "spd": 0
+   }
+  },
+  {
+   "id": "coralaegis",
+   "name": "Coral Aegis",
+   "slot": "armour",
+   "rarity": "mythic",
+   "tier": 4,
+   "unique": true,
+   "bonus": {
+    "def": 0.14,
+    "hp": 0.1
+   },
+   "sum": 0.24,
+   "onLumifern60": {
+    "hp": 64,
+    "atk": 0,
+    "def": 20,
+    "spd": 0
+   }
+  },
+  {
+   "id": "entityeye",
+   "name": "Watcher’s Lens",
+   "slot": "charm",
+   "rarity": "mythic",
+   "tier": 4,
+   "unique": true,
+   "bonus": {
+    "hp": 0.06,
+    "atk": 0.06,
+    "def": 0.06,
+    "spd": 0.06
+   },
+   "sum": 0.24,
+   "onLumifern60": {
+    "hp": 38,
+    "atk": 9,
+    "def": 9,
+    "spd": 7
+   }
+  },
+  {
+   "id": "stormglass",
+   "name": "Stormglass Blade",
+   "slot": "weapon",
+   "rarity": "mythic",
+   "tier": 4,
+   "unique": true,
+   "bonus": {
+    "atk": 0.18,
+    "spd": 0.04
+   },
+   "sum": 0.22,
+   "onLumifern60": {
+    "hp": 0,
+    "atk": 27,
+    "def": 0,
+    "spd": 4
+   }
+  },
+  {
+   "id": "tempestlance",
+   "name": "Tempest Lance",
+   "slot": "weapon",
+   "rarity": "epic",
+   "tier": 4,
+   "unique": false,
+   "bonus": {
+    "atk": 0.15,
+    "spd": 0.06
+   },
+   "sum": 0.21,
+   "onLumifern60": {
+    "hp": 0,
+    "atk": 22,
+    "def": 0,
+    "spd": 7
+   }
+  },
+  {
+   "id": "nightmail",
+   "name": "Night Mail",
+   "slot": "armour",
+   "rarity": "epic",
+   "tier": 4,
+   "unique": false,
+   "bonus": {
+    "def": 0.19
+   },
+   "sum": 0.19,
+   "onLumifern60": {
+    "hp": 0,
+    "atk": 0,
+    "def": 27,
+    "spd": 0
+   }
+  },
+  {
+   "id": "eclipseorb",
+   "name": "Eclipse Orb",
+   "slot": "charm",
+   "rarity": "epic",
+   "tier": 4,
+   "unique": false,
+   "bonus": {
+    "hp": 0.12,
+    "def": 0.07
+   },
+   "sum": 0.19,
+   "onLumifern60": {
+    "hp": 76,
+    "atk": 0,
+    "def": 10,
+    "spd": 0
+   }
+  },
+  {
+   "id": "keeperemblem",
+   "name": "Keeper’s Emblem",
+   "slot": "charm",
+   "rarity": "mythic",
+   "tier": 4,
+   "unique": true,
+   "bonus": {
+    "hp": 0.06,
+    "def": 0.08,
+    "atk": 0.03,
+    "spd": 0.02
+   },
+   "sum": 0.19,
+   "onLumifern60": {
+    "hp": 38,
+    "atk": 4,
+    "def": 11,
+    "spd": 2
+   }
+  },
+  {
+   "id": "worldsplit",
+   "name": "Worldsplitter",
+   "slot": "weapon",
+   "rarity": "epic",
+   "tier": 4,
+   "unique": false,
+   "bonus": {
+    "atk": 0.17
+   },
+   "sum": 0.17,
+   "onLumifern60": {
+    "hp": 0,
+    "atk": 25,
+    "def": 0,
+    "spd": 0
+   }
+  },
+  {
+   "id": "elderguard",
+   "name": "Elder Guard",
+   "slot": "armour",
+   "rarity": "epic",
+   "tier": 4,
+   "unique": false,
+   "bonus": {
+    "def": 0.17
+   },
+   "sum": 0.17,
+   "onLumifern60": {
+    "hp": 0,
+    "atk": 0,
+    "def": 24,
+    "spd": 0
+   }
+  },
+  {
+   "id": "infernofang",
+   "name": "Inferno Fang",
+   "slot": "weapon",
+   "rarity": "epic",
+   "tier": 4,
+   "unique": false,
+   "bonus": {
+    "atk": 0.16
+   },
+   "sum": 0.16,
+   "onLumifern60": {
+    "hp": 0,
+    "atk": 24,
+    "def": 0,
+    "spd": 0
+   }
+  },
+  {
+   "id": "moonpearl",
+   "name": "Moon Pearl",
+   "slot": "charm",
+   "rarity": "rare",
+   "tier": 3,
+   "unique": false,
+   "bonus": {
+    "hp": 0.1,
+    "def": 0.06
+   },
+   "sum": 0.16,
+   "onLumifern60": {
+    "hp": 64,
+    "atk": 0,
+    "def": 9,
+    "spd": 0
+   }
+  },
+  {
+   "id": "choirshell",
+   "name": "Choir Shell",
+   "slot": "charm",
+   "rarity": "epic",
+   "tier": 4,
+   "unique": false,
+   "bonus": {
+    "atk": 0.08,
+    "spd": 0.08
+   },
+   "sum": 0.16,
+   "onLumifern60": {
+    "hp": 0,
+    "atk": 12,
+    "def": 0,
+    "spd": 9
+   }
+  },
+  {
+   "id": "skycrest",
+   "name": "Sky Crest",
+   "slot": "charm",
+   "rarity": "epic",
+   "tier": 4,
+   "unique": false,
+   "bonus": {
+    "spd": 0.16
+   },
+   "sum": 0.16,
+   "onLumifern60": {
+    "hp": 0,
+    "atk": 0,
+    "def": 0,
+    "spd": 18
+   }
+  },
+  {
+   "id": "titanmaul",
+   "name": "Titan Maul",
+   "slot": "weapon",
+   "rarity": "epic",
+   "tier": 4,
+   "unique": false,
+   "bonus": {
+    "atk": 0.15
+   },
+   "sum": 0.15,
+   "onLumifern60": {
+    "hp": 0,
+    "atk": 22,
+    "def": 0,
+    "spd": 0
+   }
+  },
+  {
+   "id": "bloomcloak",
+   "name": "Bloom Cloak",
+   "slot": "armour",
+   "rarity": "epic",
+   "tier": 4,
+   "unique": false,
+   "bonus": {
+    "hp": 0.15
+   },
+   "sum": 0.15,
+   "onLumifern60": {
+    "hp": 95,
+    "atk": 0,
+    "def": 0,
+    "spd": 0
+   }
+  },
+  {
+   "id": "moonstone",
+   "name": "Moonstone",
+   "slot": "charm",
+   "rarity": "uncommon",
+   "tier": 2,
+   "unique": false,
+   "bonus": {
+    "hp": 0.08,
+    "def": 0.05
+   },
+   "sum": 0.13,
+   "onLumifern60": {
+    "hp": 51,
+    "atk": 0,
+    "def": 7,
+    "spd": 0
+   }
+  },
+  {
+   "id": "chorusshell",
+   "name": "Chorus Shell",
+   "slot": "charm",
+   "rarity": "rare",
+   "tier": 3,
+   "unique": false,
+   "bonus": {
+    "atk": 0.065,
+    "spd": 0.065
+   },
+   "sum": 0.13,
+   "onLumifern60": {
+    "hp": 0,
+    "atk": 10,
+    "def": 0,
+    "spd": 7
+   }
+  },
+  {
+   "id": "galeplume",
+   "name": "Gale Plume",
+   "slot": "charm",
+   "rarity": "rare",
+   "tier": 3,
+   "unique": false,
+   "bonus": {
+    "spd": 0.13
+   },
+   "sum": 0.13,
+   "onLumifern60": {
+    "hp": 0,
+    "atk": 0,
+    "def": 0,
+    "spd": 15
+   }
+  },
+  {
+   "id": "solstice",
+   "name": "Solstice Charm",
+   "slot": "charm",
+   "rarity": "epic",
+   "tier": 4,
+   "unique": false,
+   "bonus": {
+    "spd": 0.12
+   },
+   "sum": 0.12,
+   "onLumifern60": {
+    "hp": 0,
+    "atk": 0,
+    "def": 0,
+    "spd": 13
+   }
+  },
+  {
+   "id": "noonchrm",
+   "name": "Noon Charm",
+   "slot": "charm",
+   "rarity": "rare",
+   "tier": 3,
+   "unique": false,
+   "bonus": {
+    "spd": 0.1
+   },
+   "sum": 0.1,
+   "onLumifern60": {
+    "hp": 0,
+    "atk": 0,
+    "def": 0,
+    "spd": 11
+   }
+  },
+  {
+   "id": "moonbead",
+   "name": "Moon Bead",
+   "slot": "charm",
+   "rarity": "common",
+   "tier": 1,
+   "unique": false,
+   "bonus": {
+    "hp": 0.06,
+    "def": 0.04
+   },
+   "sum": 0.1,
+   "onLumifern60": {
+    "hp": 38,
+    "atk": 0,
+    "def": 6,
+    "spd": 0
+   }
+  },
+  {
+   "id": "echoshell",
+   "name": "Echo Shell",
+   "slot": "charm",
+   "rarity": "uncommon",
+   "tier": 2,
+   "unique": false,
+   "bonus": {
+    "atk": 0.05,
+    "spd": 0.05
+   },
+   "sum": 0.1,
+   "onLumifern60": {
+    "hp": 0,
+    "atk": 7,
+    "def": 0,
+    "spd": 6
+   }
+  },
+  {
+   "id": "feathertok",
+   "name": "Feather Token",
+   "slot": "charm",
+   "rarity": "uncommon",
+   "tier": 2,
+   "unique": false,
+   "bonus": {
+    "spd": 0.1
+   },
+   "sum": 0.1,
+   "onLumifern60": {
+    "hp": 0,
+    "atk": 0,
+    "def": 0,
+    "spd": 11
+   }
+  },
+  {
+   "id": "dawncharm",
+   "name": "Dawn Charm",
+   "slot": "charm",
+   "rarity": "uncommon",
+   "tier": 2,
+   "unique": false,
+   "bonus": {
+    "spd": 0.08
+   },
+   "sum": 0.08,
+   "onLumifern60": {
+    "hp": 0,
+    "atk": 0,
+    "def": 0,
+    "spd": 9
+   }
+  },
+  {
+   "id": "suncharm",
+   "name": "Sun Charm",
+   "slot": "charm",
+   "rarity": "common",
+   "tier": 1,
+   "unique": false,
+   "bonus": {
+    "spd": 0.06
+   },
+   "sum": 0.06,
+   "onLumifern60": {
+    "hp": 0,
+    "atk": 0,
+    "def": 0,
+    "spd": 7
+   }
+  }
+ ],
+ "summary": {
+  "emblem": 0.19,
+  "lens": 0.24,
+  "bestNonUniqueCharm": "eclipseorb 0.19",
+  "emblemRank": 3,
+  "sameAsLens": false
+ }
+}

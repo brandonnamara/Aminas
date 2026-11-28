@@ -1,0 +1,1854 @@
+{
+ "note": "Simulation of the Celestial Crown campaign (tools/p20c-sim.js) on the real game data. Rule-level, scripted policies; not real gameplay, not an iPhone.",
+ "seeds": [
+  11,
+  22
+ ],
+ "profiles": {},
+ "saves": {
+  "rarelyFed": {
+   "label": "Rarely fed: balanced trio, no gear, moves Lv 1, tactical",
+   "arrive": 44.1,
+   "cap": 60,
+   "forge": true,
+   "open": true
+  },
+  "fedRegularly": {
+   "label": "Fed regularly (half of food), no gear, moves Lv 1, tactical",
+   "arrive": 50.7,
+   "cap": 60,
+   "forge": true,
+   "open": true
+  },
+  "completionist": {
+   "label": "Thorough completionist: two full replays of every Verdant and Obsidian dungeon, moves Lv 4, best gear",
+   "arrive": 57.7,
+   "cap": 60,
+   "forge": true,
+   "open": true
+  },
+  "upgraded": {
+   "label": "Highly upgraded: all food, moves Lv 5, best gear, extra replays",
+   "arrive": 51,
+   "cap": 60,
+   "forge": true,
+   "open": true
+  },
+  "basicFed": {
+   "label": "Fed regularly, basic attacks only on the Celestial Crown (no guards, heals or specials)",
+   "arrive": 50.7,
+   "cap": 60,
+   "forge": true,
+   "open": true
+  },
+  "autoFed": {
+   "label": "Fed regularly, the game’s own auto-battle on the Celestial Crown",
+   "arrive": 50.7,
+   "cap": 60,
+   "forge": true,
+   "open": true
+  }
+ },
+ "battles": [
+  {
+   "id": "c_cloudstair",
+   "i": 1,
+   "sp": "stormbringer",
+   "lv": 45,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6,
+   "basic": 100,
+   "basicTurns": 8.9
+  },
+  {
+   "id": "c_cloudstair",
+   "i": 2,
+   "sp": "lumi3",
+   "lv": 45,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.5,
+   "basic": 100,
+   "basicTurns": 9.4
+  },
+  {
+   "id": "c_cloudstair",
+   "i": 3,
+   "sp": "stormbringer",
+   "lv": 46,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.3,
+   "basic": 100,
+   "basicTurns": 9
+  },
+  {
+   "id": "c_cloudstair",
+   "i": 4,
+   "sp": "pyrophoenix",
+   "lv": 46,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.2,
+   "basic": 100,
+   "basicTurns": 7.5
+  },
+  {
+   "id": "c_cloudstair",
+   "i": 5,
+   "sp": "lumi3",
+   "lv": 47,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.8,
+   "basic": 100,
+   "basicTurns": 9.9
+  },
+  {
+   "id": "c_cloudstair",
+   "i": 6,
+   "sp": "stormbringer",
+   "lv": 47,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.4,
+   "basic": 100,
+   "basicTurns": 9.6
+  },
+  {
+   "id": "c_cloudstair",
+   "i": 7,
+   "sp": "ignivor",
+   "lv": 48,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.5,
+   "basic": 100,
+   "basicTurns": 9.1
+  },
+  {
+   "id": "c_cloudstair",
+   "i": 8,
+   "sp": "pyrophoenix",
+   "lv": 48,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.5,
+   "basic": 100,
+   "basicTurns": 8
+  },
+  {
+   "id": "c_cloudstair",
+   "i": 9,
+   "sp": "stormbringer",
+   "lv": 48,
+   "boss": false,
+   "move": "updraft",
+   "tactical": 100,
+   "tacticalTurns": 7.5,
+   "basic": 100,
+   "basicTurns": 10.6
+  },
+  {
+   "id": "c_cloudstair",
+   "i": 10,
+   "sp": "stormbringer",
+   "lv": 51,
+   "boss": true,
+   "move": "updraft",
+   "tactical": 100,
+   "tacticalTurns": 12.4,
+   "basic": 50,
+   "basicTurns": 15.7
+  },
+  {
+   "id": "c_starfall",
+   "i": 1,
+   "sp": "lumi3",
+   "lv": 46,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6,
+   "basic": 100,
+   "basicTurns": 8.8
+  },
+  {
+   "id": "c_starfall",
+   "i": 2,
+   "sp": "terraflora3",
+   "lv": 46,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.7,
+   "basic": 100,
+   "basicTurns": 13.1
+  },
+  {
+   "id": "c_starfall",
+   "i": 3,
+   "sp": "aurelith",
+   "lv": 47,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 7.1,
+   "basic": 100,
+   "basicTurns": 10.1
+  },
+  {
+   "id": "c_starfall",
+   "i": 4,
+   "sp": "lumi3",
+   "lv": 47,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.6,
+   "basic": 100,
+   "basicTurns": 8.9
+  },
+  {
+   "id": "c_starfall",
+   "i": 5,
+   "sp": "calyxar",
+   "lv": 48,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 13.7,
+   "basic": 100,
+   "basicTurns": 16.6
+  },
+  {
+   "id": "c_starfall",
+   "i": 6,
+   "sp": "aurelith",
+   "lv": 48,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 7.2,
+   "basic": 100,
+   "basicTurns": 10.2
+  },
+  {
+   "id": "c_starfall",
+   "i": 7,
+   "sp": "terraflora3",
+   "lv": 49,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 8.2,
+   "basic": 100,
+   "basicTurns": 13.2
+  },
+  {
+   "id": "c_starfall",
+   "i": 8,
+   "sp": "lumi3",
+   "lv": 49,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.5,
+   "basic": 100,
+   "basicTurns": 9.8
+  },
+  {
+   "id": "c_starfall",
+   "i": 9,
+   "sp": "aurelith",
+   "lv": 49,
+   "boss": false,
+   "move": "starfall",
+   "tactical": 100,
+   "tacticalTurns": 7.2,
+   "basic": 100,
+   "basicTurns": 10.7
+  },
+  {
+   "id": "c_starfall",
+   "i": 10,
+   "sp": "aurelith",
+   "lv": 52,
+   "boss": true,
+   "move": "starfall",
+   "tactical": 100,
+   "tacticalTurns": 13.4,
+   "basic": 60,
+   "basicTurns": 16.3
+  },
+  {
+   "id": "c_orrery",
+   "i": 1,
+   "sp": "zeep3",
+   "lv": 47,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 9.2,
+   "basic": 100,
+   "basicTurns": 13.2
+  },
+  {
+   "id": "c_orrery",
+   "i": 2,
+   "sp": "pyrocore",
+   "lv": 47,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 9.8,
+   "basic": 100,
+   "basicTurns": 13.3
+  },
+  {
+   "id": "c_orrery",
+   "i": 3,
+   "sp": "zeep3",
+   "lv": 48,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 9.4,
+   "basic": 100,
+   "basicTurns": 13.8
+  },
+  {
+   "id": "c_orrery",
+   "i": 4,
+   "sp": "rockraki",
+   "lv": 48,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 7,
+   "basic": 100,
+   "basicTurns": 9.7
+  },
+  {
+   "id": "c_orrery",
+   "i": 5,
+   "sp": "zeep3",
+   "lv": 49,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 9.6,
+   "basic": 100,
+   "basicTurns": 14.4
+  },
+  {
+   "id": "c_orrery",
+   "i": 6,
+   "sp": "pyrocore",
+   "lv": 49,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 9.9,
+   "basic": 100,
+   "basicTurns": 14.3
+  },
+  {
+   "id": "c_orrery",
+   "i": 7,
+   "sp": "zeep3",
+   "lv": 50,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 9.8,
+   "basic": 100,
+   "basicTurns": 15
+  },
+  {
+   "id": "c_orrery",
+   "i": 8,
+   "sp": "rockraki",
+   "lv": 50,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 7,
+   "basic": 100,
+   "basicTurns": 10.2
+  },
+  {
+   "id": "c_orrery",
+   "i": 9,
+   "sp": "zeep3",
+   "lv": 50,
+   "boss": false,
+   "move": "orreryturn",
+   "tactical": 100,
+   "tacticalTurns": 10.1,
+   "basic": 100,
+   "basicTurns": 13.8
+  },
+  {
+   "id": "c_orrery",
+   "i": 10,
+   "sp": "zeep3",
+   "lv": 53,
+   "boss": true,
+   "move": "orreryturn",
+   "tactical": 100,
+   "tacticalTurns": 15.3,
+   "basic": 80,
+   "basicTurns": 22.1
+  },
+  {
+   "id": "c_cistern",
+   "i": 1,
+   "sp": "aquaflora3",
+   "lv": 48,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 5.1,
+   "basic": 100,
+   "basicTurns": 8
+  },
+  {
+   "id": "c_cistern",
+   "i": 2,
+   "sp": "oceanfang",
+   "lv": 48,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 4,
+   "basic": 100,
+   "basicTurns": 7
+  },
+  {
+   "id": "c_cistern",
+   "i": 3,
+   "sp": "shellfin",
+   "lv": 49,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 8.3,
+   "basic": 100,
+   "basicTurns": 12.3
+  },
+  {
+   "id": "c_cistern",
+   "i": 4,
+   "sp": "stormbringer",
+   "lv": 49,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 4.8,
+   "basic": 100,
+   "basicTurns": 8.9
+  },
+  {
+   "id": "c_cistern",
+   "i": 5,
+   "sp": "aquaflora3",
+   "lv": 50,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.1,
+   "basic": 100,
+   "basicTurns": 8.5
+  },
+  {
+   "id": "c_cistern",
+   "i": 6,
+   "sp": "oceanfang",
+   "lv": 50,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 4.7,
+   "basic": 100,
+   "basicTurns": 8
+  },
+  {
+   "id": "c_cistern",
+   "i": 7,
+   "sp": "shellfin",
+   "lv": 51,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 9.3,
+   "basic": 100,
+   "basicTurns": 13.2
+  },
+  {
+   "id": "c_cistern",
+   "i": 8,
+   "sp": "aquaflora3",
+   "lv": 51,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.1,
+   "basic": 100,
+   "basicTurns": 8.9
+  },
+  {
+   "id": "c_cistern",
+   "i": 9,
+   "sp": "oceanfang",
+   "lv": 51,
+   "boss": false,
+   "move": "cloudburst",
+   "tactical": 100,
+   "tacticalTurns": 5,
+   "basic": 100,
+   "basicTurns": 8
+  },
+  {
+   "id": "c_cistern",
+   "i": 10,
+   "sp": "oceanfang",
+   "lv": 54,
+   "boss": true,
+   "move": "cloudburst",
+   "tactical": 100,
+   "tacticalTurns": 9.3,
+   "basic": 75,
+   "basicTurns": 13.8
+  },
+  {
+   "id": "c_lens",
+   "i": 1,
+   "sp": "lumi3",
+   "lv": 49,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.5,
+   "basic": 100,
+   "basicTurns": 9.4
+  },
+  {
+   "id": "c_lens",
+   "i": 2,
+   "sp": "zeep3",
+   "lv": 49,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 9.3,
+   "basic": 100,
+   "basicTurns": 13.2
+  },
+  {
+   "id": "c_lens",
+   "i": 3,
+   "sp": "lumi3",
+   "lv": 50,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.8,
+   "basic": 100,
+   "basicTurns": 10
+  },
+  {
+   "id": "c_lens",
+   "i": 4,
+   "sp": "pyrophoenix",
+   "lv": 50,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.2,
+   "basic": 100,
+   "basicTurns": 7.5
+  },
+  {
+   "id": "c_lens",
+   "i": 5,
+   "sp": "zeep3",
+   "lv": 51,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 9.7,
+   "basic": 100,
+   "basicTurns": 14.6
+  },
+  {
+   "id": "c_lens",
+   "i": 6,
+   "sp": "lumi3",
+   "lv": 51,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.7,
+   "basic": 100,
+   "basicTurns": 9.8
+  },
+  {
+   "id": "c_lens",
+   "i": 7,
+   "sp": "aurelith",
+   "lv": 52,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 7.5,
+   "basic": 100,
+   "basicTurns": 11.4
+  },
+  {
+   "id": "c_lens",
+   "i": 8,
+   "sp": "zeep3",
+   "lv": 52,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 9.8,
+   "basic": 100,
+   "basicTurns": 14.9
+  },
+  {
+   "id": "c_lens",
+   "i": 9,
+   "sp": "lumi3",
+   "lv": 52,
+   "boss": false,
+   "move": "focalray",
+   "tactical": 100,
+   "tacticalTurns": 7.2,
+   "basic": 100,
+   "basicTurns": 9.8
+  },
+  {
+   "id": "c_lens",
+   "i": 10,
+   "sp": "lumi3",
+   "lv": 55,
+   "boss": true,
+   "move": "focalray",
+   "tactical": 100,
+   "tacticalTurns": 12.6,
+   "basic": 5,
+   "basicTurns": 13.9
+  },
+  {
+   "id": "c_twinhall",
+   "i": 1,
+   "sp": "aurelith",
+   "lv": 50,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 7.2,
+   "basic": 100,
+   "basicTurns": 10.3
+  },
+  {
+   "id": "c_twinhall",
+   "i": 2,
+   "sp": "eclipsar",
+   "lv": 50,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 4.3,
+   "basic": 100,
+   "basicTurns": 7.9
+  },
+  {
+   "id": "c_twinhall",
+   "i": 3,
+   "sp": "lumi3",
+   "lv": 51,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.8,
+   "basic": 100,
+   "basicTurns": 10
+  },
+  {
+   "id": "c_twinhall",
+   "i": 4,
+   "sp": "voltar3",
+   "lv": 51,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 5,
+   "basic": 100,
+   "basicTurns": 10.8
+  },
+  {
+   "id": "c_twinhall",
+   "i": 5,
+   "sp": "aurelith",
+   "lv": 52,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 7.4,
+   "basic": 100,
+   "basicTurns": 11.1
+  },
+  {
+   "id": "c_twinhall",
+   "i": 6,
+   "sp": "eclipsar",
+   "lv": 52,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 5.2,
+   "basic": 100,
+   "basicTurns": 8.7
+  },
+  {
+   "id": "c_twinhall",
+   "i": 7,
+   "sp": "lumi3",
+   "lv": 53,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.7,
+   "basic": 100,
+   "basicTurns": 10.3
+  },
+  {
+   "id": "c_twinhall",
+   "i": 8,
+   "sp": "voltar3",
+   "lv": 53,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 5.3,
+   "basic": 100,
+   "basicTurns": 12.2
+  },
+  {
+   "id": "c_twinhall",
+   "i": 9,
+   "sp": "eclipsar",
+   "lv": 53,
+   "boss": false,
+   "move": "twindusk",
+   "tactical": 100,
+   "tacticalTurns": 4,
+   "basic": 100,
+   "basicTurns": 8.6
+  },
+  {
+   "id": "c_twinhall",
+   "i": 10,
+   "sp": "eclipsar",
+   "lv": 56,
+   "boss": true,
+   "move": "twindusk",
+   "tactical": 100,
+   "tacticalTurns": 9.9,
+   "basic": 65,
+   "basicTurns": 15.6
+  },
+  {
+   "id": "c_chart",
+   "i": 1,
+   "sp": "zeep3",
+   "lv": 51,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 9.3,
+   "basic": 100,
+   "basicTurns": 13.3
+  },
+  {
+   "id": "c_chart",
+   "i": 2,
+   "sp": "aimza3",
+   "lv": 51,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6,
+   "basic": 100,
+   "basicTurns": 8.7
+  },
+  {
+   "id": "c_chart",
+   "i": 3,
+   "sp": "voltar3",
+   "lv": 52,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 5,
+   "basic": 100,
+   "basicTurns": 10.8
+  },
+  {
+   "id": "c_chart",
+   "i": 4,
+   "sp": "zeep3",
+   "lv": 52,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 9.4,
+   "basic": 100,
+   "basicTurns": 13.9
+  },
+  {
+   "id": "c_chart",
+   "i": 5,
+   "sp": "aimza3",
+   "lv": 53,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.9,
+   "basic": 100,
+   "basicTurns": 9
+  },
+  {
+   "id": "c_chart",
+   "i": 6,
+   "sp": "lumi3",
+   "lv": 53,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.8,
+   "basic": 100,
+   "basicTurns": 9.8
+  },
+  {
+   "id": "c_chart",
+   "i": 7,
+   "sp": "zeep3",
+   "lv": 54,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 9.8,
+   "basic": 100,
+   "basicTurns": 15
+  },
+  {
+   "id": "c_chart",
+   "i": 8,
+   "sp": "aimza3",
+   "lv": 54,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 7,
+   "basic": 100,
+   "basicTurns": 9.7
+  },
+  {
+   "id": "c_chart",
+   "i": 9,
+   "sp": "voltar3",
+   "lv": 54,
+   "boss": false,
+   "move": "hourseal",
+   "tactical": 100,
+   "tacticalTurns": 5,
+   "basic": 100,
+   "basicTurns": 10.6
+  },
+  {
+   "id": "c_chart",
+   "i": 10,
+   "sp": "zeep3",
+   "lv": 57,
+   "boss": true,
+   "move": "hourseal",
+   "tactical": 100,
+   "tacticalTurns": 18.1,
+   "basic": 85,
+   "basicTurns": 24.1
+  },
+  {
+   "id": "c_bellloft",
+   "i": 1,
+   "sp": "aimza3",
+   "lv": 52,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6,
+   "basic": 100,
+   "basicTurns": 8.7
+  },
+  {
+   "id": "c_bellloft",
+   "i": 2,
+   "sp": "stormbringer",
+   "lv": 52,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.3,
+   "basic": 100,
+   "basicTurns": 9
+  },
+  {
+   "id": "c_bellloft",
+   "i": 3,
+   "sp": "aimza3",
+   "lv": 53,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.5,
+   "basic": 100,
+   "basicTurns": 9
+  },
+  {
+   "id": "c_bellloft",
+   "i": 4,
+   "sp": "lumi3",
+   "lv": 53,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.9,
+   "basic": 100,
+   "basicTurns": 10
+  },
+  {
+   "id": "c_bellloft",
+   "i": 5,
+   "sp": "voltar3",
+   "lv": 54,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 5.3,
+   "basic": 100,
+   "basicTurns": 12
+  },
+  {
+   "id": "c_bellloft",
+   "i": 6,
+   "sp": "aimza3",
+   "lv": 54,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.9,
+   "basic": 100,
+   "basicTurns": 9.2
+  },
+  {
+   "id": "c_bellloft",
+   "i": 7,
+   "sp": "stormbringer",
+   "lv": 55,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.5,
+   "basic": 100,
+   "basicTurns": 9.9
+  },
+  {
+   "id": "c_bellloft",
+   "i": 8,
+   "sp": "aimza3",
+   "lv": 55,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 7,
+   "basic": 100,
+   "basicTurns": 9.3
+  },
+  {
+   "id": "c_bellloft",
+   "i": 9,
+   "sp": "voltar3",
+   "lv": 55,
+   "boss": false,
+   "move": "belltoll",
+   "tactical": 100,
+   "tacticalTurns": 4.7,
+   "basic": 100,
+   "basicTurns": 10.2
+  },
+  {
+   "id": "c_bellloft",
+   "i": 10,
+   "sp": "aimza3",
+   "lv": 58,
+   "boss": true,
+   "move": "belltoll",
+   "tactical": 100,
+   "tacticalTurns": 12.1,
+   "basic": 60,
+   "basicTurns": 16.1
+  },
+  {
+   "id": "c_dome",
+   "i": 1,
+   "sp": "voltar3",
+   "lv": 53,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 4.5,
+   "basic": 100,
+   "basicTurns": 10.3
+  },
+  {
+   "id": "c_dome",
+   "i": 2,
+   "sp": "eclipsar",
+   "lv": 53,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 4.3,
+   "basic": 100,
+   "basicTurns": 8.1
+  },
+  {
+   "id": "c_dome",
+   "i": 3,
+   "sp": "aimza3",
+   "lv": 54,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.4,
+   "basic": 100,
+   "basicTurns": 9
+  },
+  {
+   "id": "c_dome",
+   "i": 4,
+   "sp": "voltar3",
+   "lv": 54,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 5,
+   "basic": 100,
+   "basicTurns": 10.8
+  },
+  {
+   "id": "c_dome",
+   "i": 5,
+   "sp": "eclipsar",
+   "lv": 55,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 5.2,
+   "basic": 100,
+   "basicTurns": 8.7
+  },
+  {
+   "id": "c_dome",
+   "i": 6,
+   "sp": "pyrophoenix",
+   "lv": 55,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.3,
+   "basic": 100,
+   "basicTurns": 8
+  },
+  {
+   "id": "c_dome",
+   "i": 7,
+   "sp": "voltar3",
+   "lv": 56,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 5.3,
+   "basic": 100,
+   "basicTurns": 12.1
+  },
+  {
+   "id": "c_dome",
+   "i": 8,
+   "sp": "eclipsar",
+   "lv": 56,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 5.5,
+   "basic": 100,
+   "basicTurns": 9.2
+  },
+  {
+   "id": "c_dome",
+   "i": 9,
+   "sp": "aimza3",
+   "lv": 56,
+   "boss": false,
+   "move": "umbralhush",
+   "tactical": 100,
+   "tacticalTurns": 7.2,
+   "basic": 100,
+   "basicTurns": 10.2
+  },
+  {
+   "id": "c_dome",
+   "i": 10,
+   "sp": "voltar3",
+   "lv": 59,
+   "boss": true,
+   "move": "umbralhush",
+   "tactical": 100,
+   "tacticalTurns": 14.7,
+   "basic": 5,
+   "basicTurns": 14.3
+  },
+  {
+   "id": "c_threshold",
+   "i": 1,
+   "sp": "aimza3",
+   "lv": 54,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6,
+   "basic": 100,
+   "basicTurns": 8.7
+  },
+  {
+   "id": "c_threshold",
+   "i": 2,
+   "sp": "aurelith",
+   "lv": 54,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 7.2,
+   "basic": 100,
+   "basicTurns": 10.3
+  },
+  {
+   "id": "c_threshold",
+   "i": 3,
+   "sp": "eclipsar",
+   "lv": 55,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 4.9,
+   "basic": 100,
+   "basicTurns": 8.5
+  },
+  {
+   "id": "c_threshold",
+   "i": 4,
+   "sp": "aimza3",
+   "lv": 55,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.3,
+   "basic": 100,
+   "basicTurns": 9
+  },
+  {
+   "id": "c_threshold",
+   "i": 5,
+   "sp": "voltar3",
+   "lv": 56,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 5.2,
+   "basic": 100,
+   "basicTurns": 11.6
+  },
+  {
+   "id": "c_threshold",
+   "i": 6,
+   "sp": "lumi3",
+   "lv": 56,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 6.8,
+   "basic": 100,
+   "basicTurns": 9.8
+  },
+  {
+   "id": "c_threshold",
+   "i": 7,
+   "sp": "aimza3",
+   "lv": 57,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 7,
+   "basic": 100,
+   "basicTurns": 9.3
+  },
+  {
+   "id": "c_threshold",
+   "i": 8,
+   "sp": "aurelith",
+   "lv": 57,
+   "boss": false,
+   "move": null,
+   "tactical": 100,
+   "tacticalTurns": 7.7,
+   "basic": 100,
+   "basicTurns": 11.5
+  },
+  {
+   "id": "c_threshold",
+   "i": 9,
+   "sp": "eclipsar",
+   "lv": 57,
+   "boss": false,
+   "move": "keepersdawn",
+   "tactical": 100,
+   "tacticalTurns": 4,
+   "basic": 100,
+   "basicTurns": 8.3
+  },
+  {
+   "id": "c_threshold",
+   "i": 10,
+   "sp": "aurelith+eclipsar",
+   "lv": 60,
+   "boss": true,
+   "move": "keepersdawn+closingdoor",
+   "tactical": 100,
+   "tacticalTurns": 17.4,
+   "basic": 0,
+   "basicTurns": 17.4
+  }
+ ],
+ "charges": [
+  {
+   "id": "c_cloudstair",
+   "stages": [
+    {
+     "sp": "stormbringer",
+     "name": "The Stair Warden",
+     "stage": null,
+     "move": "updraft",
+     "unguardedMax": 0.46,
+     "guardedMax": 0.11
+    }
+   ]
+  },
+  {
+   "id": "c_starfall",
+   "stages": [
+    {
+     "sp": "aurelith",
+     "name": "The Shard Gardener",
+     "stage": null,
+     "move": "starfall",
+     "unguardedMax": 0.4,
+     "guardedMax": 0.1
+    }
+   ]
+  },
+  {
+   "id": "c_orrery",
+   "stages": [
+    {
+     "sp": "zeep3",
+     "name": "The Orrery Keeper",
+     "stage": null,
+     "move": "orreryturn",
+     "unguardedMax": 0.49,
+     "guardedMax": 0.12
+    }
+   ]
+  },
+  {
+   "id": "c_cistern",
+   "stages": [
+    {
+     "sp": "oceanfang",
+     "name": "The Mist Serpent",
+     "stage": null,
+     "move": "cloudburst",
+     "unguardedMax": 0.64,
+     "guardedMax": 0.16
+    }
+   ]
+  },
+  {
+   "id": "c_lens",
+   "stages": [
+    {
+     "sp": "lumi3",
+     "name": "The Focal Lantern",
+     "stage": null,
+     "move": "focalray",
+     "unguardedMax": 0.5,
+     "guardedMax": 0.13
+    }
+   ]
+  },
+  {
+   "id": "c_twinhall",
+   "stages": [
+    {
+     "sp": "eclipsar",
+     "name": "The Dusk Steward",
+     "stage": null,
+     "move": "twindusk",
+     "unguardedMax": 0.55,
+     "guardedMax": 0.14
+    }
+   ]
+  },
+  {
+   "id": "c_chart",
+   "stages": [
+    {
+     "sp": "zeep3",
+     "name": "The Hour Clerk",
+     "stage": null,
+     "move": "hourseal",
+     "unguardedMax": 0.43,
+     "guardedMax": 0.11
+    }
+   ]
+  },
+  {
+   "id": "c_bellloft",
+   "stages": [
+    {
+     "sp": "aimza3",
+     "name": "The Cracked Bell",
+     "stage": null,
+     "move": "belltoll",
+     "unguardedMax": 0.49,
+     "guardedMax": 0.12
+    }
+   ]
+  },
+  {
+   "id": "c_dome",
+   "stages": [
+    {
+     "sp": "voltar3",
+     "name": "The Night Curator",
+     "stage": null,
+     "move": "umbralhush",
+     "unguardedMax": 0.52,
+     "guardedMax": 0.13
+    }
+   ]
+  },
+  {
+   "id": "c_threshold",
+   "stages": [
+    {
+     "sp": "aurelith",
+     "name": "The Light Key",
+     "stage": 1,
+     "move": "keepersdawn",
+     "unguardedMax": 0.47,
+     "guardedMax": 0.12
+    },
+    {
+     "sp": "eclipsar",
+     "name": "The Shadow Key",
+     "stage": 2,
+     "move": "closingdoor",
+     "unguardedMax": 0.46,
+     "guardedMax": 0.11
+    }
+   ]
+  }
+ ],
+ "thresholds": [
+  44,
+  47,
+  46,
+  49,
+  50,
+  52,
+  52,
+  53,
+  55,
+  57
+ ],
+ "rec": [
+  48,
+  49,
+  50,
+  51,
+  52,
+  53,
+  54,
+  55,
+  56,
+  57
+ ],
+ "slackAtRec": [
+  4,
+  2,
+  4,
+  2,
+  2,
+  1,
+  2,
+  2,
+  1,
+  0
+ ],
+ "styles": [
+  {
+   "tactical": 100,
+   "auto": 100,
+   "basic": 16.7
+  },
+  {
+   "tactical": 100,
+   "auto": 100,
+   "basic": 0
+  },
+  {
+   "tactical": 100,
+   "auto": 100,
+   "basic": 0
+  },
+  {
+   "tactical": 100,
+   "auto": 100,
+   "basic": 0
+  },
+  {
+   "tactical": 91.7,
+   "auto": 91.7,
+   "basic": 0
+  },
+  {
+   "tactical": 100,
+   "auto": 100,
+   "basic": 0
+  },
+  {
+   "tactical": 100,
+   "auto": 100,
+   "basic": 0
+  },
+  {
+   "tactical": 100,
+   "auto": 100,
+   "basic": 0
+  },
+  {
+   "tactical": 100,
+   "auto": 100,
+   "basic": 0
+  },
+  {
+   "tactical": 75,
+   "auto": 75,
+   "basic": 0
+  }
+ ],
+ "campaigns": {
+  "rarelyFed": {
+   "arrive": 44.1,
+   "end": 53.3,
+   "losses": 9,
+   "grinds": 3,
+   "minutes": 86,
+   "allCleared": true,
+   "reach60At": [
+    null,
+    null
+   ],
+   "arrivePer": [
+    44.1,
+    45,
+    45.6,
+    46.4,
+    47.7,
+    48.4,
+    49.4,
+    50.1,
+    51.2,
+    52
+   ],
+   "lossesPer": [
+    0,
+    0.5,
+    0.5,
+    1.5,
+    0,
+    1.5,
+    0.5,
+    1.5,
+    1,
+    2
+   ],
+   "grindsPer": [
+    0,
+    0,
+    0,
+    0.5,
+    0,
+    0.5,
+    0,
+    0.5,
+    0.5,
+    1
+   ]
+  },
+  "fedRegularly": {
+   "arrive": 50.7,
+   "end": 60,
+   "losses": 0,
+   "grinds": 0,
+   "minutes": 49,
+   "allCleared": true,
+   "reach60At": [
+    null,
+    null
+   ],
+   "arrivePer": [
+    50.7,
+    51.7,
+    52.7,
+    53.7,
+    54.7,
+    55.5,
+    56.3,
+    57.3,
+    58.3,
+    59.3
+   ],
+   "lossesPer": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "grindsPer": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  },
+  "completionist": {
+   "arrive": 57.7,
+   "end": 60,
+   "losses": 0,
+   "grinds": 0,
+   "minutes": 37,
+   "allCleared": true,
+   "reach60At": [
+    6,
+    6
+   ],
+   "arrivePer": [
+    57.7,
+    58.3,
+    58.7,
+    59.3,
+    59.7,
+    60,
+    60,
+    60,
+    60,
+    60
+   ],
+   "lossesPer": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "grindsPer": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  },
+  "upgraded": {
+   "arrive": 51,
+   "end": 60,
+   "losses": 0,
+   "grinds": 0,
+   "minutes": 39,
+   "allCleared": true,
+   "reach60At": [
+    null,
+    null
+   ],
+   "arrivePer": [
+    51,
+    52,
+    53,
+    53.7,
+    54.7,
+    55.7,
+    56.7,
+    57.5,
+    58.5,
+    59.3
+   ],
+   "lossesPer": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "grindsPer": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  },
+  "basicFed": {
+   "arrive": 50.7,
+   "end": 60,
+   "losses": 35.5,
+   "grinds": 16,
+   "minutes": 195,
+   "allCleared": true,
+   "reach60At": [
+    null,
+    null
+   ],
+   "arrivePer": [
+    50.7,
+    51.7,
+    52.7,
+    53.5,
+    54.6,
+    55.7,
+    57,
+    57.5,
+    58.9,
+    59.7
+   ],
+   "lossesPer": [
+    0,
+    1,
+    0.5,
+    1.5,
+    1.5,
+    2,
+    1.5,
+    2,
+    2,
+    23.5
+   ],
+   "grindsPer": [
+    0,
+    0,
+    0,
+    0.5,
+    0.5,
+    1,
+    0.5,
+    1,
+    1,
+    11.5
+   ]
+  },
+  "autoFed": {
+   "arrive": 50.7,
+   "end": 60,
+   "losses": 0,
+   "grinds": 0,
+   "minutes": 49,
+   "allCleared": true,
+   "reach60At": [
+    null,
+    null
+   ],
+   "arrivePer": [
+    50.7,
+    51.7,
+    52.7,
+    53.7,
+    54.7,
+    55.5,
+    56.3,
+    57.3,
+    58.3,
+    59.3
+   ],
+   "lossesPer": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "grindsPer": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  }
+ },
+ "entry": {
+  "L47": {
+   "level": 47,
+   "end": 59.3,
+   "losses": 0,
+   "grinds": 0,
+   "minutes": 54,
+   "lossesPer": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "allCleared": true
+  },
+  "L50": {
+   "level": 50,
+   "end": 60,
+   "losses": 0,
+   "grinds": 0,
+   "minutes": 51,
+   "lossesPer": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "allCleared": true
+  },
+  "L55": {
+   "level": 55,
+   "end": 60,
+   "losses": 0,
+   "grinds": 0,
+   "minutes": 46,
+   "lossesPer": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "allCleared": true
+  },
+  "L60": {
+   "level": 60,
+   "end": 60,
+   "losses": 0,
+   "grinds": 0,
+   "minutes": 43,
+   "lossesPer": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "allCleared": true
+  }
+ }
+}

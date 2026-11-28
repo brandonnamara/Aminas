@@ -106,8 +106,10 @@
     const run = st.run, spec = run && D.DUNGEONS[run.d] && D.DUNGEONS[run.d].battles[run.battle];
     const out = resolve0.apply(this, arguments);
     if (out && out.win && spec && b && b.enemy) {
-      const el = D.SPECIES[spec.sp] ? D.SPECIES[spec.sp].el : b.enemy.el, n = D.ESS_SOURCES.battle(spec.lv, !!spec.boss);
-      out.essence = { el, n: Es.gain(st, el, n, 'dungeon:' + (run ? run.d : '')) };
+      // Phase 20C: a staged boss gives the essence of every stage it showed (each stage's element, the amount split between them)
+      const sps = spec.stages ? spec.stages.map((sg) => sg.sp) : [spec.sp], n = D.ESS_SOURCES.battle(spec.lv, !!spec.boss), per = Math.max(1, Math.ceil(n / sps.length));
+      out.essenceList = sps.map((sp) => { const el = D.SPECIES[sp] ? D.SPECIES[sp].el : b.enemy.el; return { el, n: Es.gain(st, el, per, 'dungeon:' + (run ? run.d : '')) }; });
+      out.essence = out.essenceList[0];
     }
     return out;
   };

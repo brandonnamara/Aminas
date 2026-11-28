@@ -1,0 +1,249 @@
+{
+ "islands": [
+  {
+   "iid": "starter",
+   "load": 2396,
+   "calls": 77,
+   "tris": 145853,
+   "geos": 136,
+   "tex": 4,
+   "gpuMB": 34.66,
+   "heap": 115,
+   "idle": {
+    "p50": 16.7,
+    "p95": 16.7
+   },
+   "cam": {
+    "p50": 450,
+    "p95": 666.6
+   }
+  },
+  {
+   "iid": "verdant",
+   "load": 3371,
+   "calls": 85,
+   "tris": 152204,
+   "geos": 232,
+   "tex": 4,
+   "gpuMB": 47.5,
+   "heap": 134,
+   "idle": {
+    "p50": 16.7,
+    "p95": 16.7
+   },
+   "cam": {
+    "p50": 550,
+    "p95": 633.3
+   }
+  },
+  {
+   "iid": "obsidian",
+   "load": 1777,
+   "calls": 68,
+   "tris": 117770,
+   "geos": 271,
+   "tex": 4,
+   "gpuMB": 41.9,
+   "heap": 112,
+   "idle": {
+    "p50": 16.7,
+    "p95": 16.7
+   },
+   "cam": {
+    "p50": 450,
+    "p95": 500
+   }
+  },
+  {
+   "iid": "celestial",
+   "load": 1912,
+   "calls": 44,
+   "tris": 126578,
+   "geos": 298,
+   "tex": 4,
+   "gpuMB": 42.67,
+   "heap": 151,
+   "idle": {
+    "p50": 16.7,
+    "p95": 16.7
+   },
+   "cam": {
+    "p50": 383.4,
+    "p95": 466.7
+   }
+  }
+ ],
+ "tiers": [
+  {
+   "iid": "starter",
+   "tier": "high",
+   "calls": 50,
+   "tris": 130199,
+   "p50": 16.7,
+   "p95": 16.7
+  },
+  {
+   "iid": "starter",
+   "tier": "balanced",
+   "calls": 50,
+   "tris": 127409,
+   "p50": 16.7,
+   "p95": 16.7
+  },
+  {
+   "iid": "starter",
+   "tier": "saver",
+   "calls": 50,
+   "tris": 77548,
+   "p50": 16.7,
+   "p95": 16.7
+  },
+  {
+   "iid": "verdant",
+   "tier": "high",
+   "calls": 62,
+   "tris": 138188,
+   "p50": 16.7,
+   "p95": 16.7
+  },
+  {
+   "iid": "verdant",
+   "tier": "balanced",
+   "calls": 62,
+   "tris": 135548,
+   "p50": 16.7,
+   "p95": 16.8
+  },
+  {
+   "iid": "verdant",
+   "tier": "saver",
+   "calls": 62,
+   "tris": 78088,
+   "p50": 16.7,
+   "p95": 16.7
+  },
+  {
+   "iid": "obsidian",
+   "tier": "high",
+   "calls": 45,
+   "tris": 108068,
+   "p50": 16.7,
+   "p95": 16.8
+  },
+  {
+   "iid": "obsidian",
+   "tier": "balanced",
+   "calls": 45,
+   "tris": 105560,
+   "p50": 16.7,
+   "p95": 16.8
+  },
+  {
+   "iid": "obsidian",
+   "tier": "saver",
+   "calls": 45,
+   "tris": 63814,
+   "p50": 16.7,
+   "p95": 16.8
+  },
+  {
+   "iid": "celestial",
+   "tier": "high",
+   "calls": 26,
+   "tris": 118130,
+   "p50": 16.7,
+   "p95": 16.8
+  },
+  {
+   "iid": "celestial",
+   "tier": "balanced",
+   "calls": 26,
+   "tris": 114968,
+   "p50": 16.7,
+   "p95": 16.7
+  },
+  {
+   "iid": "celestial",
+   "tier": "saver",
+   "calls": 26,
+   "tris": 72220,
+   "p50": 16.7,
+   "p95": 16.7
+  }
+ ],
+ "battles": [
+  {
+   "iid": "starter",
+   "d": "heartwood",
+   "loadMs": 2545,
+   "calls": 34,
+   "tris": 25352,
+   "geos": 52,
+   "tex": 7,
+   "fps": {
+    "p50": 83.3,
+    "p95": 100.1
+   },
+   "heap": 108
+  },
+  {
+   "iid": "verdant",
+   "d": "v_elderroot",
+   "loadMs": 2403,
+   "calls": 34,
+   "tris": 27588,
+   "geos": 55,
+   "tex": 7,
+   "fps": {
+    "p50": 83.3,
+    "p95": 100
+   },
+   "heap": 117
+  },
+  {
+   "iid": "obsidian",
+   "d": "o_forge",
+   "loadMs": 2281,
+   "calls": 36,
+   "tris": 25978,
+   "geos": 59,
+   "tex": 7,
+   "fps": {
+    "p50": 100,
+    "p95": 116.6
+   },
+   "heap": 113
+  },
+  {
+   "iid": "celestial",
+   "d": "c_threshold",
+   "loadMs": 2257,
+   "calls": 35,
+   "tris": 26642,
+   "geos": 58,
+   "tex": 7,
+   "fps": {
+    "p50": 83.3,
+    "p95": 100
+   },
+   "heap": 118
+  }
+ ],
+ "transitions": {
+  "twoKeysMs": 5438,
+  "roundMs": 2200
+ },
+ "session": {
+  "before": {
+   "geos": 36,
+   "tex": 3,
+   "templates": 12
+  },
+  "after": {
+   "geos": 36,
+   "tex": 3,
+   "templates": 12
+  },
+  "heap": 108
+ }
+}

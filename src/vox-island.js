@@ -25,6 +25,8 @@
 
   // Fixed island scenery placed like the 2D art: the jetty and its skiff, the lighthouse rock.
   function extras(iid, cols) {
+    // Phase 20C: the Orrery Wheel's arms, turning slowly about the bronze sun once the Orrery Wheel has been cleared
+    if (iid === 'celestial') { const C = A.Rules && A.Rules.C20, o = C && C.site('orrery'); return o ? [{ kind: 'c_orrery_arms', x: o.x + o.w / 2, y: 11 * 0.125, z: o.y + o.h / 2, spin: { axis: 'z', speed: 0.18, when: () => !!(A.State.state && C.cleared(A.State.state, 'c_orrery')) } }] : []; }
     if (iid !== 'starter') return [];
     const out = [], J = IA.jettyCells(), [jx, jy] = J.at, HP = 39.1918, map = D.ISLANDS.starter.map;
     if (jy >= 0) { out.push({ kind: 'jetty', x: jx + 0.5, z: jy + 1 + 2.25 }); out.push({ kind: 'skiff', x: jx + 2.6, y: -0.55, z: jy + 4.2, bob: true });
@@ -194,6 +196,7 @@
   V.breakdown = () => (ctrl && ctrl.breakdown ? ctrl.breakdown() : null);
   V.gpuMem = () => (ctrl && ctrl.gpuMem ? ctrl.gpuMem() : null); // Phase 20B: performance report
   V.models = () => (ctrl && ctrl.models ? ctrl.models() : []);
+  V.spinners = () => (ctrl && ctrl.spinners ? ctrl.spinners() : []); // Phase 20C
   V.falls = () => (ctrl && ctrl.falls ? ctrl.falls() : []);
   V.spinModels = (dt) => ctrl && ctrl.spinModels && ctrl.spinModels(dt);
 })(typeof window !== 'undefined' ? window : globalThis);

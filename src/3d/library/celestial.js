@@ -122,11 +122,7 @@ X.c_orrery = (m) => {
   m.box(-W, 22, -4, W, 23, 4, (x, y, z) => ((x + z) % 7 === 0 ? '#e8f6ff' : (x * 3 + z) % 11 === 0 ? SLATE[0] : pick(LENS, x + z)));  // glass roof (one pane gone)
   m.clear(4, 22, -2, 7, 23, 1);
   m.box(-1, 1, -1, 1, 8, 1, BRASSD); m.ball(0, 11, 0, 3, 3, 3, ['#b8803a', '#a8702e', '#c8904a']);              // pillar and the bronze sun
-  // the arms: three level, one bent down toward the ground
-  for (let x = 3; x < 13; x++) m.put(x, 11, 0, BRASS[0]); m.ball(13, 11, 0, 1.6, 1.6, 1.6, '#8a86c8');
-  for (let x = -3; x > -12; x--) m.put(x, 12, 0, BRASS[1]); m.ball(-12, 12, 0, 1.2, 1.2, 1.2, LENS);
-  for (let z = 3; z < 4; z++) m.put(0, 13, z, BRASS[0]); for (let x = 1; x < 8; x++) m.put(x, 14, -2, BRASS[0]); m.ball(8, 14, -2, 1.4, 1.4, 1.4, '#e8e4fb');
-  for (let i = 0; i < 8; i++) m.put(-3 - i, 9 - (i > 3 ? i - 3 : 0), 2, BRASS[1]); m.ball(-11, 3, 2, 1.2, 1.2, 1.2, '#c8a8ff');           // the bent arm
+  // (Phase 20C: the arms and bodies are a separate model, c_orrery_arms, that turns slowly once the Orrery Wheel is cleared)
   m.box(-W + 2, 1, 2, -W + 5, 2, 3, PAPER);                                                                  // a fallen chart
 };
 // CLOUD SEA CISTERN (2×1, sand): two stone basins brimming with cloud-water, a brass gutter running inland, mist on the rim
@@ -231,6 +227,15 @@ X.c_observatory = (m, look) => {
   [[6, -13], [8, 2], [-9, 12], [13, 1]].forEach(([x, z], i) => m.put(x, 4, z, PAPER[i & 1]));
 };
 
+// THE ORRERY WHEEL'S ARMS (Phase 20C): a brass ring and four spokes around the bronze sun, a body on each, one spoke bent.
+// Built round its own centre (the sun, voxel y 11 of the Orrery Wheel) so the island can turn it in place, slowly, in the
+// plane the camera faces; it stays inside the glass roof and the footprint at every angle.
+X.c_orrery_arms = (m) => {
+  for (let a = 0; a < 36; a++) { const t = a / 36 * Math.PI * 2; m.put(Math.round(Math.cos(t) * 9.5), Math.round(Math.sin(t) * 9.5), 3, BRASS[a % 3 ? 0 : 2]); }
+  [[0, '#8a86c8', 1.6], [Math.PI / 2, LENS[1], 1.3], [Math.PI, '#e8e4fb', 1.4]].forEach(([t, c, r]) => { for (let k = 3; k < 9; k++) m.put(Math.round(Math.cos(t) * k), Math.round(Math.sin(t) * k), 3, BRASS[1]); m.ball(Math.round(Math.cos(t) * 9.5), Math.round(Math.sin(t) * 9.5), 3, r, r, r, c); });
+  // the bent spoke: straight for half its length, then kinked down
+  for (let k = 3; k < 6; k++) m.put(0, -k, 3, BRASS[1]); for (let k = 0; k < 4; k++) m.put(k, -6 - k, 3, BRASS[1]); m.ball(4, -9, 3, 1.3, 1.3, 1.3, '#c8a8ff');
+};
 /* ---------------------------------------------------------------- dungeon entrances */
 // Two moonstone posts with gold bands and a slate lintel; a door that glows in the dungeon's element when its turn
 // has come and stands open, dark, once cleared (with a gold star on the lintel); a pennant on the right post for
@@ -263,4 +268,4 @@ Object.keys(GATE).forEach((id) => { X['c_gate_' + id] = (m, look) => gate(m, id,
 extraSize('c_jetty', 4, 1, 16); extraSize('c_cloudstair', 1, 2, 12); extraSize('c_starfall', 3, 1, 16); extraSize('c_orrery', 4, 1, 26);
 extraSize('c_cistern', 2, 1, 12); extraSize('c_lens', 1, 2, 22); extraSize('c_twinhall', 1, 3, 26); extraSize('c_chart', 1, 2, 42);
 extraSize('c_bell', 1, 3, 52); extraSize('c_dome', 4, 1, 22); extraSize('c_lenshold', 1, 2, 10); extraSize('c_observatory', 4, 4, 56);
-Object.keys(GATE).forEach((id) => extraSize('c_gate_' + id, 1, 1, 28));
+Object.keys(GATE).forEach((id) => extraSize('c_gate_' + id, 1, 1, 28)); extraSize('c_orrery_arms', 4, 1, 14);

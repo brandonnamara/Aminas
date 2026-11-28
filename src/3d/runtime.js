@@ -250,7 +250,11 @@ class Bursts {
 /* ------------------------------------------------------------------ living-pixel aura (Dev 8) */
 // One InstancedMesh of tiny cubes orbiting and rising around a point; colours shift for the Island Boss.
 // Phase 19D: `hue` maps a 0..1 cycle to a hue; the default is the full rainbow, the Forge Heart keeps to ember tones
-const HUE = { rainbow: (x) => x % 1, forge: (x) => 0.015 + 0.1 * (0.5 + 0.5 * Math.sin(x * Math.PI * 2)) };
+const HUE = { rainbow: (x) => x % 1, forge: (x) => 0.015 + 0.1 * (0.5 + 0.5 * Math.sin(x * Math.PI * 2)),
+  // Phase 20C: The Two Keys: gold while the Light Key stands, violet once the Shadow Key steps through
+  light: (x) => 0.11 + 0.04 * (0.5 + 0.5 * Math.sin(x * Math.PI * 2)), shadow: (x) => 0.74 + 0.05 * (0.5 + 0.5 * Math.sin(x * Math.PI * 2)) };
+// Phase 20C: the size a foe stands at (bosses larger; spec.scale sets how much, capped so faces stay in frame)
+const foeScale = (o) => (o && o.scale ? Math.min(2.1, 1.3 * Math.max(1, o.scale)) : o && o.boss ? 1.65 : 1.3);
 function pixelAura(scene, at, scale, prismatic, hue) {
   const H = HUE[hue] || HUE.rainbow;
   const n = calm() ? 8 : 22, geo = new THREE.BoxGeometry(0.06, 0.06, 0.06), mat = new THREE.MeshBasicMaterial({ color: prismatic ? '#ffffff' : '#ffe9a0', transparent: true, opacity: 0.9, depthWrite: false, blending: THREE.AdditiveBlending });
@@ -283,7 +287,7 @@ export async function createBattle(container, o) {
   const place = (who, act, scale) => { const s = who === 'p' ? P : E; act.group.position.copy(s.pos); act.group.rotation.y = s.yaw; act.group.scale.setScalar(scale); scene.add(act.group); };
   const [pa, ea] = await Promise.all([actor(o.player), actor(o.enemy)]);
   // bosses stand larger; o.scale (from the battle spec) sets how much, capped so faces stay in frame
-  const eScale = o.scale ? Math.min(2.1, 1.3 * Math.max(1, o.scale)) : o.boss ? 1.65 : 1.3;
+  const eScale = foeScale(o);
   slots.p = pa; slots.e = ea; place('p', pa, 1.25); place('e', ea, eScale);
   marks.slot('p', P.pos, 1.25); marks.slot('e', E.pos, eScale);
   // telegraph ring under the enemy (a charged attack is coming)
@@ -300,7 +304,11 @@ export async function createBattle(container, o) {
   dome.position.copy(E.pos); scene.add(dome); let barrier = false;
   // Dev 8 living pixel: a boss sheds small glowing cubes that rise around it (prismatic for the Island Boss)
   const aura = o.boss ? pixelAura(scene, E.pos, eScale, !!o.prismatic, o.halo) : null;
-  const HH = HUE[o.halo] || HUE.rainbow; // Phase 19D: the Island Boss halo's palette
+  let HH = HUE[o.halo] || HUE.rainbow; // Phase 19D: the Island Boss halo's palette (Phase 20C: changes with the Keeper)
+  // Phase 20C: the final arena's two lightings. The key and rim lights ease from the Light Keeper's gold to the Shadow
+  // Keeper's violet over about a second (at once with Reduce Motion); nothing is created, only colours change.
+  const KEEPER_LIGHT = { light: { key: '#ffe6b0', rim: '#fff2c8', hemi: '#fff0d8' }, shadow: { key: '#b8a8ff', rim: '#7a5ad8', hemi: '#a898d8' } };
+  const lightTo = { k: null, t: 1 }, lightFrom = {}, lightTgt = {};
   let shake = 0, telegraph = false, t0 = 0;
   const camBase = new THREE.Vector3(-0.35, 1.7, 5.0), look = new THREE.Vector3(0.05, 0.62, -0.15);
   // Phase 7 camera: a gentle push towards whoever unleashes an ultimate, and a short punch-in on big hits
@@ -341,6 +349,7 @@ export async function createBattle(container, o) {
       slots.p.update(hold); slots.e.update(hold); arena.update(t, dt); bursts.update(dt); fx.update(dt); marks.update(dt, t, still); if (aura) aura.update(t, dt);
       ring.material.opacity = telegraph ? 0.45 + Math.sin(t * 8) * 0.3 : Math.max(0, ring.material.opacity - dt * 2);
       if (bossRune) bossRune.rotation.z += dt * 0.25;
+      if (lightTo.k && lightTo.t < 1) { lightTo.t = Math.min(1, lightTo.t + dt / 1.1); const L = KEEPER_LIGHT[lightTo.k], ls = lights.children; ['hemi', 'key', 'rim'].forEach((n, i) => { const li = ls[i]; if (li && li.color && lightFrom[n]) li.color.copy(lightFrom[n]).lerp(lightTgt[n], lightTo.t); }); }
       if (prism && !still) { prism.material.color.setHSL(HH(t * 0.12), 0.85, 0.62); prismUp.material.color.setHSL(HH(t * 0.12 + 0.5), 0.85, 0.66); prism.rotation.z += dt * 0.4; prismUp.material.opacity = 0.24 + Math.sin(t * 2.2) * 0.1; }
       dome.material.opacity += ((barrier ? 0.28 : 0) - dome.material.opacity) * Math.min(1, dt * 6);
       cam.push += (cam.pushTo - cam.push) * Math.min(1, dt * 5); cam.punch = Math.max(0, cam.punch - dt * 3.5); cam.focus += ((still ? 0 : cam.focusTo) - cam.focus) * Math.min(1, dt * 4);
@@ -429,10 +438,16 @@ export async function createBattle(container, o) {
       fx.column(a.group.position, F.c.concat(['#ffd978']), 18, { r: 0.6 * a.group.scale.x, rise: 1.8, life: 1.0, size: 0.06 }); C15.victory(mkApi(), who);
       return a.play('victory', { loop: true });
     },
-    async swap(who, spId) {
-      boost(); const old = slots[who]; const n = await actor(spId); const sc = who === 'e' ? 1.3 : 1.25; place(who, n, sc); slots[who] = n; marks.resize(who, sc); old.dispose(); n.play('move');
+    // Phase 20C: the incoming foe keeps its own size (a boss stage stands at boss scale, as the first did)
+    async swap(who, spId, so) {
+      boost(); const old = slots[who]; const n = await actor(spId); const sc = who === 'e' ? foeScale(so || {}) : 1.25; place(who, n, sc); slots[who] = n; marks.resize(who, sc); old.dispose(); n.play('move');
       fx.burst(head(who), ['#ffffff', elCol(elOf(who))], 10, { speed: 1.2, life: 0.5, size: 0.06 }); note('swap:' + who); applyFocus();
     },
+    // Phase 20C: The Two Keys: the arena's light and the halo follow the Keeper on stage
+    setKeeper(k) { const L = KEEPER_LIGHT[k]; if (!L) return; boost(); if (HUE[k]) HH = HUE[k]; const ls = lights.children;
+      ['hemi', 'key', 'rim'].forEach((n, i) => { const li = ls[i]; if (li && li.color) { lightFrom[n] = li.color.clone(); lightTgt[n] = new THREE.Color(L[n]); } });
+      lightTo.k = k; lightTo.t = calm() ? 1 : 0; if (calm()) ['hemi', 'key', 'rim'].forEach((n, i) => { const li = ls[i]; if (li && li.color) li.color.set(L[n]); }); note('keeper:' + k); },
+    keeper() { return lightTo.k; },
     setTelegraph(on) { telegraph = !!on; },
     setBarrier(on) { barrier = !!on; },
     setElement(el) { fx.burst(head('e'), [elCol(el), '#ffffff'], 14, { speed: 1.4, life: 0.7, size: 0.06 }); },

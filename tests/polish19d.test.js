@@ -173,7 +173,7 @@ const giant = (sp, lv) => { const f = B.fighter(sp, lv); f.hpMax = f.hp = 999999
   ok(q.tune && q.tune.hp === 0.9 && q.tune.atk === 0.92, 'the Quench Pools adjustment is kept');
   ok(D.MAX_LEVEL === 60 && D.CAP_BASE === 40 && JSON.stringify(D.CAP_STEPS) === JSON.stringify([{ boss: 'verdant', cap: 50 }, { boss: 'obsidian', cap: 60 }]) || (D.MAX_LEVEL === 60 && D.CAP_BASE === 40), 'caps 40 → 50 → 60; nothing above 60');
   const ui = fs.readFileSync(path.join(ROOT, 'src/ui2.js'), 'utf8');
-  ok(/Island Boss reward/.test(ui) && /Level cap raised/.test(ui) && /\? 'forge' : null/.test(ui), 'the victory screen names the Island Boss reward and the cap rise; the Forge Heart gets the forge halo');
+  ok(/Island Boss reward/.test(ui) && /Level cap raised/.test(ui) && /\? 'forge' : (b\.enemy\.keeper \|\| )?null/.test(ui), 'the victory screen names the Island Boss reward and the cap rise; the Forge Heart gets the forge halo (the Two Keys their own light since Phase 20C)');
   ok(!/Prismfall/.test((ui.match(/intro[^\n]*telegraph[^\n]*/i) || [''])[0]) || true, 'intro text is built per boss (checked in the browser suite)');
 }
 
@@ -212,7 +212,7 @@ s = checkpoint(s, 'Obsidian, nine dungeons');
   const fh = play(s, 'o_forge'); track(fh, 'o_forge'); seen(s);
   ok(fh.cleared && fh.islandBoss && R.levelCap(s) === 60 && O.capNotice(s) === 60 && O.capNotice(s) === null, 'the Forge Heart falls: cap 60, announced once');
   ok((s.items || []).some((it) => it.id === 'nightmail'), 'Night Mail is in the bag');
-  ok(!W.islandLive('celestial') && !W.islandUnlocked(s, 'celestial'), 'the Celestial Crown stays closed');
+  ok(W.islandLive('celestial') && W.islandUnlocked(s, 'celestial'), 'the Celestial Crown opens (it stayed closed until Phase 20C made it live)');
   claimAll(s); s = checkpoint(s, 'Forge Heart, cap 60');
 }
 {

@@ -112,7 +112,7 @@ ok(D.V18.gates.every((g, i) => D.DUNGEONS[g.id] && D.DUNGEONS[g.id].playable && 
    Phase 19C made Obsidian Reach ready (its campaign is built); the Celestial Crown is still not. The same rules are
    checked on the Celestial Crown, and Obsidian Reach's activation on the old-save case this block used to cover. */
 {
-  ok(W.islandLive('starter') && W.islandLive('verdant') && W.islandLive('obsidian') && !W.islandLive('celestial'), 'the Celestial Crown is marked not ready; the first three islands are (Obsidian Reach since Phase 19C)');
+  ok(W.islandLive('starter') && W.islandLive('verdant') && W.islandLive('obsidian') && W.islandLive('celestial'), 'all four islands are ready (Obsidian Reach since Phase 19C, the Celestial Crown since Phase 20C); the Crown still opens only through the Forge Heart');
   const s = fresh(); s.islands.verdant = { unlocked: true, obstacles: {} };
   ok(W.unlockByBoss(s, 'obsidian').ok === false && W.unlockIsland(s, 'obsidian').ok === false && !s.islands.obsidian, 'Obsidian Reach cannot be unlocked in a new save without the Forest Crown');
   ok(W.unlockByBoss(s, 'celestial').ok === false && W.unlockIsland(s, 'celestial').ok === false && !s.islands.celestial, 'nor can the Celestial Crown');
@@ -123,7 +123,7 @@ ok(D.V18.gates.every((g, i) => D.DUNGEONS[g.id] && D.DUNGEONS[g.id].playable && 
   S.sanitize(L); const keep = clone({ islands: L.islands, missions: L.missions, buildings: L.buildings }); // as an older build saved it
   L.currentIsland = 'celestial'; S.sanitize(L);
   ok(L.currentIsland === 'verdant' && L.islands.celestial.unlocked && JSON.stringify(L.islands.celestial) === JSON.stringify(keep.islands.celestial), 'a save standing on the Celestial Crown loads on the Verdant Wilds; its unlock and obstacle records are kept as they were');
-  const tr = W.travel(L, 'celestial'); ok(tr.ok === false && tr.reason === 'notready' && L.currentIsland === 'verdant', 'travel to the Celestial Crown is refused with a reason');
+  const tr = W.travel(L, 'celestial'); ok(tr.ok === false && tr.reason === 'locked' && L.currentIsland === 'verdant', 'travel to the Celestial Crown is refused with a reason (Phase 20C: an old purchase waits for the Forge Heart)');
   ok(W.travel(L, 'starter').ok && W.travel(L, 'verdant').ok, 'travel between Starter Island and the Verdant Wilds still works');
   ok(vq(L).indexOf('s_crown') < 0, 'its Celestial quest is hidden rather than pointing at an island that cannot be visited');
   ok(JSON.stringify(L.missions) === JSON.stringify(keep.missions), 'quest records are untouched');

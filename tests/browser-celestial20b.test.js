@@ -1,5 +1,5 @@
-// Phase 20B, real-browser check (Chromium + Playwright, software WebGL, 844×390 touch; NOT an iPhone): the Celestial
-// Crown through the developer construction preview (the island is not live): the Silent Observatory on the voxel island,
+// Phase 20B, real-browser check (Chromium + Playwright, software WebGL, 844×390 touch; NOT an iPhone), updated for Phase
+// 20C (the island is live; the 20B construction preview is retired): the Celestial Crown opened by the Forge Heart: the Silent Observatory on the voxel island,
 // twelve places and nine outdoor entrances with 3D models and tap areas, the six obstacle types in 3D, 62 obstacles in
 // place, sheets with no way in, the Wayfinder, a real tap, the Starwell Habitat in 3D and 2D with developer access, the
 // Codex line, reload (the preview ends and the island closes, records kept), travel round trips without growth, the 2D
@@ -24,20 +24,20 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms)); const SHOTS = proce
     ['verdant', 'obsidian'].forEach((k) => { s.islands[k] = { unlocked: true, obstacles: {}, unlockedAt: Date.now(), by: 'boss' }; });
     s.campaign = s.campaign || {}; s.campaign.bosses = Object.assign({}, s.campaign.bosses, { verdant: true, obsidian: true });
     s.story = s.story || {}; s.story.scenes = Object.assign({}, s.story.scenes, { o_arrival: 1, v_arrival: 1 }); s.notified = s.notified || {}; s.rank = 12;
-    s.res.gold = 400000; s.res.food = 9000; s.res.gems = 200; s.currentIsland = 'obsidian'; A.State.state = s; R.drain(); A.State.save(); A.UI.showIsland(true);
+    s.res.gold = 400000; s.res.food = 9000; s.res.gems = 200; s.currentIsland = 'obsidian'; A.State.state = s; A.State.sanitize(s); /* Phase 20C: the Forge Heart's save finds the Crown open on load */ R.drain(); A.State.save(); A.UI.showIsland(true);
   });
   await until(() => !!document.querySelector('#world')); await sleep(1200); await tidy();
   await until(() => A.VoxIsland.ready(), null, 90000).catch(() => {});
 
-  /* ---------- normal play: the Crown is not offered, even with the Forge Heart beaten ---------- */
-  const np = await ev(() => ({ live: A.World.islandLive('celestial'), r: A.UI.travelTo('celestial'), isle: A.State.state.currentIsland, unl: A.World.islandUnlocked(A.State.state, 'celestial'), flag: A.Data.C20.live }));
-  ok(!np.live && np.r === false && np.isle === 'obsidian' && !np.unl && np.flag === false, 'the Celestial Crown is not live: a save with the Forge Heart beaten cannot travel there');
-  const map0 = await ev(() => { A.UI.worldMap && A.UI.worldMap(); const t = (document.querySelector('.overlay') || document.body).textContent; A.UI.closeAll(); return t; });
-  ok(!/Celestial Crown[^.]*Travel/.test(map0), 'the world map does not offer travel there');
+  /* ---------- normal play (Phase 20C): the Forge Heart has opened the Crown ---------- */
+  const np = await ev(() => ({ live: A.World.islandLive('celestial'), isle: A.State.state.currentIsland, unl: A.World.islandUnlocked(A.State.state, 'celestial'), by: (A.State.state.islands.celestial || {}).by, flag: A.Data.C20.live }));
+  ok(np.live && np.unl && np.by === 'boss' && np.flag === true && np.isle === 'obsidian', 'the Celestial Crown is live: a save with the Forge Heart beaten finds it open (by the Island Boss)');
+  const map0 = await ev(() => { A.UI.islandMap(); const f = [...document.querySelectorAll('.overlay .frag')].find((e) => /Celestial Crown/.test(e.textContent)); const t = f ? f.className + ' ' + f.textContent : ''; A.UI.closeAll(); return t; });
+  ok(/Celestial Crown/.test(map0) && !/notready|Not ready|drifting out of reach/.test(map0), 'the island map lists it as ready');
 
-  /* ---------- the developer construction preview (session only) ---------- */
+  /* ---------- the developer shortcut (Phase 20C: travel only) ---------- */
   await ev(() => { A.UI.devPanel(); }); await sleep(300);
-  ok(await ev(() => !!document.querySelector('[data-act="c20Preview"]') && !!document.querySelector('[data-act="c20Hab"]')), 'the developer panel offers the Celestial Crown preview and Starwell Habitat access');
+  ok(await ev(() => !!document.querySelector('[data-act="c20Preview"]') && !document.querySelector('[data-act="c20Hab"]')), 'the developer panel offers travel to the Celestial Crown, and no habitat access any more');
   await ev(() => document.querySelector('[data-act="c20Preview"]').click()); await sleep(2500); await tidy();
   await until(() => A.VoxIsland.ready() && A.State.state.currentIsland === 'celestial', null, 120000).catch(() => {});
   const vx = await ev(() => { const s = A.State.state, D = A.Data, kinds = A.IsoArt.landmark('celestial', s).map((l) => l.kind);
@@ -47,7 +47,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms)); const SHOTS = proce
       hits: [...new Set([...document.querySelectorAll('#objs [data-hit^="c20:"]')].map((e) => e.dataset.hit))].length, expect: D.C20.sites.length + D.C20.gates.filter((g) => !g.inside).length,
       obs: A.Data.OBSTACLES.celestial.filter((o) => A.World.obstacleState(s, o.id) === 'present').length, items: A.VoxIsland.items.filter((i) => /^o:ce-/.test(i)).length };
   });
-  ok(vx.on && vx.isle === 'celestial' && vx.by === 'preview', 'the preview opens the Crown on the voxel island for this session');
+  ok(vx.on && vx.isle === 'celestial' && vx.by === 'boss', 'it travels to the Crown on the voxel island (the unlock stays the Island Boss’s)');
   ok(vx.has === vx.want && vx.want === 21, 'every place and outdoor entrance has its own 3D model (' + vx.has + ' of ' + vx.want + ')');
   ok(vx.obTypes === 6, 'all six obstacle types have 3D models (' + vx.obTypes + ' of 6)');
   ok(vx.obs === 62 && vx.items === 62, 'all 62 obstacles stand where they were and every one is drawn in 3D (' + vx.obs + ', ' + vx.items + ')');
@@ -61,19 +61,19 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms)); const SHOTS = proce
   for (const id of ['jetty', 'orrery', 'observatory', 'bell', 'lenshold']) { await ev((i) => A.UI.c20Open(i), id); await sleep(300); if (id === 'observatory' || id === 'orrery') await shot('sheet-' + id); await tidy(); }
   await ev(() => A.UI.c20Open('c_cloudstair')); await sleep(300);
   const g1 = await ev(() => { const sh = [...document.querySelectorAll('.c20-sheet')].filter((e) => /Cloudstair Landing/.test((e.querySelector('h2') || {}).textContent || '')).pop() || document.createElement('div'); return { gate: (sh.querySelector('.v18-gate') || {}).textContent || '', enter: !!document.querySelector('[data-act="c20Enter"]'), dots: sh.querySelectorAll('.c20-order .v18-dot').length, ent: (sh.querySelector('.v18-ent') || {}).textContent || '' }; });
-  ok(/Dungeon 1 of 10/.test(g1.gate) && /Sealed/.test(g1.gate) && !g1.enter && g1.dots === 10, 'Dungeon 1 is sealed with no Enter button, and shows the ten-step order');
-  if (!/Sealed/.test(g1.gate)) console.log('  gate1 ' + JSON.stringify(g1));
+  ok(/Dungeon 1 of 10/.test(g1.gate) && /Recommended level 48/.test(g1.gate) && g1.enter && g1.dots === 10, 'Dungeon 1 is open with an Enter button and its recommended level, and shows the ten-step order');
+  if (!/Recommended/.test(g1.gate)) console.log('  gate1 ' + JSON.stringify(g1));
   ok(/The Entity/.test(g1.ent), 'its sheet carries an introductory Entity line');
   await shot('sheet-gate1'); await tidy();
   const sealed = await ev(() => { const s = A.State.state, C = A.Rules.C20, uids = s.aminas.slice(0, 3).map((a) => a.uid);
-    const runs = A.Data.C20.gates.map((g) => A.Rules.startRun(s, g.id, uids)); A.UI.c20Open('c_threshold'); const enter = !!document.querySelector('[data-act="c20Enter"]'), txt = (([...document.querySelectorAll('.c20-sheet')].filter((e) => /Threshold/.test((e.querySelector('h2') || {}).textContent || '')).pop() || document.createElement('div')).querySelector('.v18-gate') || {}).textContent || ''; A.UI.closeAll();
+    const runs = A.Data.C20.gates.slice(1).map((g) => A.Rules.startRun(s, g.id, uids)); A.UI.c20Open('c_threshold'); const enter = !!document.querySelector('[data-act="c20Enter"]'), txt = (([...document.querySelectorAll('.c20-sheet')].filter((e) => /Threshold/.test((e.querySelector('h2') || {}).textContent || '')).pop() || document.createElement('div')).querySelector('.v18-gate') || {}).textContent || ''; A.UI.closeAll();
     A.UI.dIsland = 'celestial'; A.UI.dungeons(); const tabs = [...document.querySelectorAll('.overlay [data-act="dIsle"], .overlay .isle-tab')].map((e) => e.textContent).join('|'), ids = [...document.querySelectorAll('.overlay [data-act="enterDungeon"]')].map((e) => e.dataset.id); A.UI.closeAll();
     return { runs: runs.every((r) => r && r.ok === false), enter, txt, celestialEnter: ids.filter((i) => /^c_/.test(i)).length, run: s.run, prog: C.progress(s) }; });
-  ok(sealed.runs && !sealed.enter && /Dungeon 10 of 10/.test(sealed.txt) && /Locked/.test(sealed.txt), 'no Celestial dungeon can be started, the Threshold included');
+  ok(sealed.runs && !sealed.enter && /Dungeon 10 of 10/.test(sealed.txt) && /Locked/.test(sealed.txt), 'Dungeons 2 to 10 cannot be started out of order, the Threshold included');
   if (!/Locked/.test(sealed.txt)) console.log('  sealed ' + JSON.stringify(sealed));
-  ok(sealed.celestialEnter === 0 && !sealed.run, 'the Dungeons screen offers no way into a Celestial dungeon');
-  await ev(() => { const el = document.createElement('button'); el.dataset.act = 'c20Enter'; el.dataset.id = 'c_cloudstair'; document.body.appendChild(el); el.click(); el.remove(); }); await sleep(300);
-  ok(await ev(() => !A.State.state.run && !document.querySelector('.battle')), 'a forged Enter button does nothing');
+  ok(sealed.celestialEnter <= 1 && !sealed.run, 'the Dungeons screen offers only the next Celestial dungeon (' + sealed.celestialEnter + ')');
+  await ev(() => { const el = document.createElement('button'); el.dataset.act = 'c20Enter'; el.dataset.id = 'c_starfall'; document.body.appendChild(el); el.click(); el.remove(); }); await sleep(300);
+  ok(await ev(() => !A.State.state.run && !document.querySelector('.battle')), 'a forged Enter button for a locked dungeon does nothing');
 
   /* ---------- a real tap on the island, and the Wayfinder ---------- */
   const tapAt = async (id) => { await ev((i) => { const C = A.Rules.C20, q = C.site(i) || C.gate(i); A.UI.focusFoot(q.x, q.y, q.w || 1, q.h || 1, 0.9); }, id);
@@ -92,11 +92,11 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms)); const SHOTS = proce
   const allSeen = await ev(() => { A.Rules.C20.placeIds().forEach((i) => { A.UI.c20Open(i); A.UI.closeAll(); }); return A.Rules.C20.progress(A.State.state); });
   ok(allSeen.seen === allSeen.total && allSeen.total === 12, 'every place can be visited and is remembered (' + allSeen.seen + ' of ' + allSeen.total + ')');
 
-  /* ---------- the Starwell Habitat (developer access) ---------- */
+  /* ---------- the Starwell Habitat (Phase 20C: opened by the Bell Loft, here recorded as cleared in order) ---------- */
   const hab = await ev(async () => { const s = A.State.state, W = A.World, R = A.Rules, C = R.C20; const locked = !R.reqMet(s, A.Data.BUILDINGS.hab_resonance.req);
-    C.devHabitat(true); const sp = W.findSpot(s, 'celestial', 'hab_resonance', 0, [22, 22]), r = W.buildNew(s, 'celestial', 'hab_resonance', sp[0], sp[1], 0), b = s.buildings[r.id]; b.state = 'built'; b.level = 3; delete b.endAt;
-    R.drain && R.drain(); A.UI.showIsland(); return { locked, ok: r.ok, id: r.id, x: sp[0], y: sp[1] }; });
-  ok(hab.locked && hab.ok, 'the Starwell Habitat is locked in normal play and can be placed with developer access');
+    ['c_cloudstair', 'c_starfall', 'c_orrery', 'c_cistern', 'c_lens', 'c_twinhall', 'c_chart', 'c_bellloft'].forEach((id) => { s.dungeon[id] = { clears: 1, next: 0, floors: 4 }; }); const opened = R.reqMet(s, A.Data.BUILDINGS.hab_resonance.req); const sp = W.findSpot(s, 'celestial', 'hab_resonance', 0, [22, 22]), r = W.buildNew(s, 'celestial', 'hab_resonance', sp[0], sp[1], 0), b = s.buildings[r.id]; b.state = 'built'; b.level = 3; delete b.endAt;
+    R.drain && R.drain(); A.UI.showIsland(); return { locked, opened, ok: r.ok, id: r.id, x: sp[0], y: sp[1] }; });
+  ok(hab.locked && hab.opened && hab.ok, 'the Starwell Habitat is locked until the Bell Loft, then can be placed');
   await until(() => A.VoxIsland.ready(), null, 60000).catch(() => {}); await sleep(1500); await tidy();
   const hab3 = await ev((h) => { const e = document.querySelector('#objs [data-bid="' + h.id + '"]'); return { model: !!(e && e.classList.contains('vx')) && A.IsoArt.voxHas('b', 'habitat', 'habitat', 'built') }; }, hab);
   ok(hab3.model, 'it draws as a 3D habitat on the voxel island');
@@ -134,13 +134,13 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms)); const SHOTS = proce
   ok(perf[3].calls <= perf[2].calls + 6, 'the Celestial Crown draws in about as many calls as Obsidian Reach (' + perf[3].calls + ' vs ' + perf[2].calls + '): its places and obstacles merge into one mesh');
   ok(perf[3].tris <= perf[2].tris * 1.25, 'and with a comparable triangle count (' + perf[3].tris + ' vs ' + perf[2].tris + ')');
 
-  /* ---------- reload: the preview ends; the island closes; records stay ---------- */
+  /* ---------- reload (Phase 20C): the Crown stays open; records stay ---------- */
   await ev(() => { A.UI.travelTo('celestial'); A.State.save(); }); await sleep(800);
   await page.reload(); await page.waitForFunction(() => window.A && A.UI && A.State.state, null, { timeout: 60000 }); await sleep(2500); await tidy();
   const rl = await ev((h) => { const s = A.State.state; return { live: A.World.islandLive('celestial'), unl: A.World.islandUnlocked(s, 'celestial'), isle: s.currentIsland, hab: !!(s.buildings[h.id] && s.buildings[h.id].island === 'celestial'), seen: A.Rules.C20.progress(s).seen, dev: A.Rules.C20.dev.habitat || A.Rules.C20.dev.preview, req: A.Rules.reqMet(s, A.Data.BUILDINGS.hab_resonance.req) }; }, hab);
-  ok(!rl.live && !rl.unl && rl.isle !== 'celestial', 'after a reload the preview is over: the Crown is closed again and the save stands on a ready island');
-  ok(rl.hab && rl.seen === 12, 'the habitat built during the preview and the visit records are kept');
-  ok(!rl.dev && !rl.req, 'developer access is not saved: the Starwell Habitat is locked again');
+  ok(rl.live && rl.unl && rl.isle === 'celestial', 'after a reload the Crown is still open and the save is still on it');
+  ok(rl.hab && rl.seen === 12, 'the habitat and the visit records are kept');
+  ok(!rl.dev && rl.req, 'no developer switch exists; the Starwell Habitat stays available (its Bell Loft is cleared)');
 
   ok(errors.length === 0, 'no script errors' + (errors.length ? ': ' + errors.slice(0, 3).join(' | ') : ''));
   await browser.close(); srv.close();

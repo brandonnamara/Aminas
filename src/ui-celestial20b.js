@@ -47,6 +47,8 @@
     Au && Au.play && Au.play('ok');
     const born = Date.now(), ov = UI.modal(UI.sheet(title, '<div class="v18 c20">' + body + '</div>', foot, 'narrow v18-sheet c20-sheet'), { dismiss: false, onClose: () => UI.refresh && UI.refresh() });
     ov.addEventListener('click', (e) => { if (Date.now() - born < 400) { e.stopPropagation(); e.preventDefault(); } }, true); // the tap that opened it must not close it
+    // Phase 20C: the input lock's end is marked on the sheet (data-input-ready), so a test can wait for it instead of guessing
+    setTimeout(() => { ov.dataset.inputReady = '1'; }, 400);
     ov.addEventListener('click', (e) => { if (e.target === ov) UI.close(ov); });
     return ov;
   };
@@ -81,21 +83,18 @@
     return r;
   };
 
-  /* ---------- developer panel (session only; developer builds) ----------
-     The construction preview opens the Crown for this session (see C.preview in src/celestial20b.js); the habitat switch
-     lets this session build the Starwell Habitat without the Bell Loft. Neither is saved, and neither opens a dungeon. */
+  /* ---------- developer panel (Phase 20B's construction preview, retired in Phase 20C) ----------
+     The Crown is part of the campaign now; the shortcut only travels there on a save that has opened it normally. */
   const dev0 = UI.devPanel;
   if (dev0) UI.devPanel = function () {
     const r = dev0.apply(this, arguments);
     const ov = [...document.querySelectorAll('#modal-root .overlay')].pop(), at = ov && ov.querySelector('.row-actions');
-    if (at) at.insertAdjacentHTML('beforeend', '<button class="btn small" data-act="c20Preview">Celestial Crown preview (session)</button><button class="btn small" data-act="c20Hab">' + (C.dev.habitat ? 'Starwell Habitat: on (session)' : 'Starwell Habitat (session)') + '</button>');
+    if (at) at.insertAdjacentHTML('beforeend', '<button class="btn small" data-act="c20Preview">Travel to the Celestial Crown</button>');
     return r;
   };
   UI.act('c20Preview', () => {
-    const s = st(), r = C.preview(s); UI.closeAll();
+    const r = C.preview(st()); UI.closeAll();
     if (!r.ok) { UI.toast && UI.toast(r.text, 'w'); return; }
-    S.save && S.save(); UI.travelTo('celestial');
-    UI.toast && UI.toast('Construction preview: the Celestial Crown is open for this session. Its dungeons stay sealed.', 'w');
+    UI.travelTo('celestial');
   });
-  UI.act('c20Hab', () => { const on = C.devHabitat(!C.dev.habitat); UI.closeAll(); UI.toast && UI.toast(on ? 'Starwell Habitat can be built in this session (developer access).' : 'Starwell Habitat developer access is off.', 'w'); });
 })(typeof window !== 'undefined' ? window : globalThis);

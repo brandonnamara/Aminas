@@ -54,7 +54,7 @@ function Game(A, name) {
       let won = false, att = 0;
       while (!won && att < (o.tries || 1)) {
         att++; const party = fresh().map((f, k) => Object.assign(f, { hp: Math.max(0, pt[k].hp) }));
-        const b = B.create(party, R.enemyFromSpec(d.battles[i]), { rng }); const r = g.fight(b, pol); turns += r.turns; Object.keys(r.use).forEach((k) => (use[k] = (use[k] || 0) + r.use[k]));
+        const b = B.create(party, (R.foesFromSpec || R.enemyFromSpec)(d.battles[i]), { rng }); const r = g.fight(b, pol); turns += r.turns; Object.keys(r.use).forEach((k) => (use[k] = (use[k] || 0) + r.use[k]));
         if (r.win) { won = true; pt = b.party.map((p, k) => Object.assign(p, { hp: Math.min(hpMax[k], p.hp > 0 ? p.hp + Math.round(hpMax[k] * 0.4) : Math.round(hpMax[k] * 0.2)) })); const sc = d.sections.findIndex((s) => s.to === i); if (sc >= 0) pt.forEach((p, k) => (p.hp = Math.min(hpMax[k], p.hp + Math.round(hpMax[k] * 0.5)))); }
         else { losses++; first = false; pt = fresh(); }
       }

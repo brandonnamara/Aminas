@@ -603,7 +603,7 @@
     if (b.enemy.hp <= 0) {
       ev.push({ t: 'faint', who: 'e' });
       const nx = b.foes.findIndex((f) => f.hp > 0);
-      if (nx >= 0) { b.ei = nx; b.enemy = b.foes[nx]; ev.push({ t: 'foeIn', idx: nx, name: b.enemy.name, sp: b.enemy.sp, hp: b.enemy.hp, hpMax: b.enemy.hpMax, el: b.enemy.el, lv: b.enemy.lv }); return true; }
+      if (nx >= 0) { b.ei = nx; b.enemy = b.foes[nx]; ev.push({ t: 'foeIn', idx: nx, name: b.enemy.name, sp: b.enemy.sp, hp: b.enemy.hp, hpMax: b.enemy.hpMax, el: b.enemy.el, lv: b.enemy.lv, stage: b.enemy.stage || null, party: b.party.map((p) => [p.hp, p.hpMax]) }); /* Phase 20C: the stage, and the team as it stands (carried over, never reset) */ return true; }
       b.over = true; b.result = 'win'; ev.push({ t: 'end', result: 'win' }); return true;
     }
     if (B.cur(b).hp <= 0) {
@@ -777,11 +777,22 @@
     e.scale = spec.scale || (spec.boss ? 1.3 : 1);
     return e;
   };
+  // Phase 20C: a staged boss (The Two Keys) is one battle against its stages in order: the next steps in when one falls
+  // (the multi-foe framework PvP already uses). A stage marked enters: 'charging' starts its charge on its first action.
+  // A defeat in any stage ends the battle, so a retry starts the whole encounter again from the first stage.
+  R.foesFromSpec = function (spec) {
+    if (!spec.stages) return R.enemyFromSpec(spec);
+    const fs = spec.stages.map((sg, i) => { const e = R.enemyFromSpec(Object.assign({ lv: spec.lv, tier: spec.tier }, sg)); e.stage = i + 1; e.stages = spec.stages.length; e.keeper = sg.keeper || null; if (sg.enters === 'charging') e.chargeIn = 0; return e; });
+    // Phase 20C: the two Keys start with equal health (the first stage's), whatever their species' base stats
+    if (spec.equalHp) fs.forEach((e) => { e.hpMax = e.hp = Math.round(fs[0].hpMax * ((spec.stages[e.stage - 1].hpMult || 1) / (spec.stages[0].hpMult || 1))); });
+    return fs;
+  };
+  R.specSpecies = (spec) => (spec.stages ? spec.stages.map((sg) => sg.sp) : [spec.sp]);
   R.createBattle = function (st, rng) {
     const run = st.run, enc = R.encounter(st);
     const party = run.uids.map((u) => R.partyFighter(st, R.inst(st, u), { hp: run.hp[u] }));
-    st.seen[enc.spec.sp] = true;
-    return B.create(party, R.enemyFromSpec(enc.spec), { rng });
+    R.specSpecies(enc.spec).forEach((sp) => { st.seen[sp] = true; });
+    return B.create(party, R.foesFromSpec(enc.spec), { rng });
   };
   // xp and carry-over health for a won battle (shared by dungeons and survival)
   // Phase 17C (XP option A): a foe well below an Amina's level teaches it less. Same level or up to two below: full

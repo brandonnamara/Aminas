@@ -67,7 +67,7 @@ const verdantDone = () => { const s = S.newGame(); s.phase = 'play'; s.introDone
 
 /* ================= activation, old saves, no duplicates ================= */
 {
-  ok(W.islandLive('obsidian') && D.O19.live && !W.islandLive('celestial'), 'Obsidian Reach is live; the Celestial Crown is not');
+  ok(W.islandLive('obsidian') && D.O19.live && W.islandLive('celestial'), 'Obsidian Reach is live, and the Celestial Crown since Phase 20C');
   const n = verdantDone(); ok(!W.islandUnlocked(n, 'obsidian') && W.unlockByBoss(n, 'obsidian').ok === false, 'before the Forest Crown the Reach stays closed');
   ok(O.preview(n).ok === false && !W.islandUnlocked(n, 'obsidian'), 'the developer shortcut cannot open it early');
   ok(R.startRun(n, 'o_cinder', n.aminas.slice(0, 3).map((a) => a.uid)).ok === false, 'nor can Dungeon 1 be started');
@@ -119,7 +119,7 @@ IDS.forEach((id, i) => {
   ok((s.story.pendingScene || null) === want, (i + 1) + '. story: ' + (want ? 'scene ' + want + ' queued' : 'no scene (an after-line instead: ' + (SC.after[id] ? 'yes' : 'none') + ')'));
   if (want) R.sceneDone(s, want, 'seen');
   if ([0, 3, 6].indexOf(i) >= 0) { const a = ['ashplain', 'glassbeach', 'crystalvein'][[0, 3, 6].indexOf(i)]; ok(R.areaUnlocked(s, a), (i + 1) + '. Explore area ' + D.AREAS[a].name + ' opens'); }
-  if (i === 9) { ok(out.islandBoss && s.campaign.bosses.obsidian && R.levelCap(s) === 60, '10. the Forge Heart: Island Boss recorded, level cap 60'); ok(!W.islandUnlocked(s, 'celestial') && !out.unlockedIsland, '10. the Celestial Crown stays closed (not ready)'); ok(got.indexOf('nightmail') >= 0, '10. Night Mail received'); }
+  if (i === 9) { ok(out.islandBoss && s.campaign.bosses.obsidian && R.levelCap(s) === 60, '10. the Forge Heart: Island Boss recorded, level cap 60'); ok(W.islandUnlocked(s, 'celestial') && out.unlockedIsland === 'celestial', '10. the Celestial Crown opens (Phase 20C; it stayed closed while not ready)'); ok(got.indexOf('nightmail') >= 0, '10. Night Mail received'); }
   if (i === 2 || i === 5 || i === 9) s = checkpoint(s, 'after ' + d.name);
 });
 {

@@ -82,7 +82,7 @@ ok(Q.status(st, Q.get('s_wilds_farm')) !== 'locked' && Q.status(st, Q.get('s_wil
 ok(Q.visible(st).some((q) => q.id === 's_reach') && !Q.visible(st).some((q) => q.id === 's_crown'), 'only The Dark Shore appears in the quest list');
 st.missions.s_crown = 'claimed'; ok(Q.status(st, Q.get('s_crown')) === 'claimed', 'a quest already claimed keeps its state'); st.missions.s_crown = undefined;
 // Phase 18B: a save that opened the Celestial Crown in an older version keeps its quest hidden, record untouched, until it is ready.
-st.missions.s_reach = 'claimed'; st.islands.celestial = { unlocked: true, obstacles: {} }; ok(Q.status(st, Q.get('s_crown')) === 'locked', 'a save where the Celestial Crown is already open (bought in an older version) keeps the quest hidden while the island is not ready (Phase 18B)');
+st.missions.s_reach = 'claimed'; st.islands.celestial = { unlocked: true, obstacles: {} }; ok(Q.status(st, Q.get('s_crown')) !== 'locked' && Q.status(st, Q.get('s_crown')) !== 'claimable' && !W.islandUnlocked(st, 'celestial'), 'a save where the Celestial Crown was bought in an older version: since Phase 20C the quest is listed, but cannot be completed until the Forge Heart opens the island (the purchase alone no longer counts)');
 D.ISLAND_LIVE.celestial = true; if (D.C20) D.C20.live = true; ok(Q.status(st, Q.get('s_crown')) !== 'locked', 'and would show it once the Celestial Crown is marked ready, with its campaign (Phase 20B: both switches; after The Dark Shore)'); D.ISLAND_LIVE.celestial = false; if (D.C20) D.C20.live = false; delete st.islands.celestial; st.missions.s_reach = undefined;
 ok(D.QUESTS.some((q) => q.id === 's_reach') && D.QUESTS.some((q) => q.id === 's_crown'), 'the quest data itself is untouched');
 

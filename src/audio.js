@@ -107,6 +107,9 @@
     o16type: (t) => tone(N(96) * (0.98 + Math.random() * 0.04), t, 0.025, 'sine', 0.018),
     o16pickL: (t) => [72, 76, 79, 84].forEach((m, i) => tone(N(m), t + i * 0.06, 0.32, 'sine', 0.1)),
     o16pickD: (t) => [60, 63, 67, 70].forEach((m, i) => tone(N(m), t + i * 0.07, 0.36, 'triangle', 0.09)),
+    // Phase 20C: The Two Keys: a key turning (the stage change), and the campaign's last victory
+    keyturn: (t) => { noise(t, 0.06, 0.12); [72, 79, 84].forEach((m, i) => tone(N(m), t + i * 0.09, 0.5, 'triangle', 0.12)); [60, 63, 67].forEach((m, i) => tone(N(m), t + 0.36 + i * 0.1, 0.9, 'sine', 0.11)); },
+    finalwin: (t) => { [60, 67, 72, 76, 79, 84].forEach((m, i) => tone(N(m), t + i * 0.16, 0.9, 'triangle', 0.16)); [64, 71, 76].forEach((m, i) => tone(N(m), t + 1.1 + i * 0.05, 1.8, 'sine', 0.1)); },
     hsGo: (t) => { tone(N(67), t, 0.16, 'triangle', 0.15); tone(N(74), t + 0.12, 0.28, 'triangle', 0.17); tone(N(79), t + 0.12, 0.28, 'sine', 0.08); },
   };
   Au.play = function (name) {
@@ -115,20 +118,22 @@
   };
 
   // Gentle generative pad + arpeggio; scale shifts with mode.
-  const SCALES = { light: [0, 2, 4, 7, 9, 12, 14, 16], dark: [0, 2, 3, 7, 8, 12, 14, 15], battle: [0, 3, 5, 7, 10, 12, 15, 17] };
+  // Phase 20C: 'finale' (the Light Key: bright, measured) and 'finale2' (the Shadow Key: lower, minor), for The Two Keys
+  const SCALES = { light: [0, 2, 4, 7, 9, 12, 14, 16], dark: [0, 2, 3, 7, 8, 12, 14, 15], battle: [0, 3, 5, 7, 10, 12, 15, 17], finale: [0, 4, 7, 11, 12, 14, 16, 19], finale2: [0, 3, 7, 10, 12, 15, 17, 19] };
+  const FIGHT = { battle: 1, finale: 1, finale2: 1 }, ROOT = { dark: 52, battle: 50, finale: 53, finale2: 46 };
   function tick() {
     if (!ctx || !Au.musicOn || ctx.state !== 'running') return;
-    const sc = SCALES[Au.mode] || SCALES.light, root_ = Au.mode === 'dark' ? 52 : Au.mode === 'battle' ? 50 : 55;
+    const sc = SCALES[Au.mode] || SCALES.light, root_ = ROOT[Au.mode] || 55;
     const t = ctx.currentTime + 0.05, bar = Math.floor(step / 8);
     const chordRoot = [0, 5, 3, 7][bar % 4];
     if (step % 8 === 0) { [0, 7, 12].forEach((o) => tone(N(root_ + chordRoot + o - 12), t, 3.2, 'sine', 0.35, musicGain)); }
     const note = sc[(step * 3 + bar) % sc.length];
-    if (Au.mode === 'battle' || step % 2 === 0) tone(N(root_ + 12 + chordRoot + note), t, 0.5, 'triangle', Au.mode === 'battle' ? 0.22 : 0.16, musicGain);
+    if (FIGHT[Au.mode] || step % 2 === 0) tone(N(root_ + 12 + chordRoot + note), t, 0.5, 'triangle', FIGHT[Au.mode] ? 0.22 : 0.16, musicGain);
     step++;
   }
   Au.applyMusic = function () {
     if (musicTimer) { clearInterval(musicTimer); musicTimer = null; }
-    if (ctx && Au.musicOn && !(root.document && root.document.hidden)) musicTimer = setInterval(tick, Au.mode === 'battle' ? 260 : 420);
+    if (ctx && Au.musicOn && !(root.document && root.document.hidden)) musicTimer = setInterval(tick, Au.mode === 'battle' ? 260 : Au.mode === 'finale' ? 300 : Au.mode === 'finale2' ? 330 : 420);
   };
   // Dev 7: release the audio hardware while the game is hidden; resume (and restart music) on return.
   let suspendedByUs = false;

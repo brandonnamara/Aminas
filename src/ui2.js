@@ -116,6 +116,10 @@
   };
   UI.partyPicker = (id) => UI.act && UI.acts.enterDungeon({ dataset: { id }, closest: () => null });
 
+  // Phase 20C: a staged boss's card names each stage (its player-facing species name, element and charged move)
+  const stagedCard = (spec) => '<div class="enc-stages">' + spec.stages.map((sg, i) => { const sp2 = D.SPECIES[sg.sp], mv = sg.move && D.ABILITIES[sg.move];
+    return '<p class="muted" style="font-size:.78rem;margin:.25rem 0"><b>Stage ' + ['I', 'II', 'III'][i] + ': ' + esc(sg.title || sp2.name) + '</b> (' + esc(sp2.name) + ') ' + chip(sp2.el) + (mv ? ' · charges ' + esc(mv.name) : '') + (sg.mech && sg.mech.type === 'barrier' ? ' · a barrier at half health' : '') + '</p>'; }).join('') +
+    '<p class="muted" style="font-size:.74rem;margin:.2rem 0 .35rem">One battle: your team carries its health from the first shape to the second. A defeat starts the encounter again from the first.</p></div>';
   /* ---------- encounter card (before each dungeon battle): where you are, and what the place shows ---------- */
   UI.nextEncounter = function () {
     const s = st(), enc = R.encounter(s);
@@ -123,12 +127,12 @@
     const d = D.DUNGEONS[enc.dungeon], spec = enc.spec, sp = D.SPECIES[spec.sp], boss = !!spec.boss, envKey = spec.env || d.env;
     const pips = d.battles.map((x, i) => '<i class="' + (i < enc.battle ? 'on' : i === enc.battle ? 'here' : '') + (x.boss ? ' b' : '') + '"></i>').join('');
     const ov = UI.modal('<div class="sheet panel narrow vcard enc' + (spec.islandBoss ? ' prism-card' : boss ? ' boss-card' : '') + '" style="padding:0"><div class="enc-art">' + (Art.hasEnv(envKey) ? Art.envBg(envKey, { boss }) : Art.battleBg(boss ? 'boss' : '', enc.dungeon)) +
-      '<div class="enc-por' + (spec.islandBoss ? ' prism' : '') + '" style="--sc:' + (spec.scale || 1) + '">' + Art.portrait(spec.sp) + '</div></div><div style="padding:.6rem .9rem .9rem">' +
+      '<div class="enc-por' + (spec.islandBoss ? ' prism' : '') + (spec.stages ? ' duo' : '') + '" style="--sc:' + (spec.scale || 1) + '">' + (spec.stages ? spec.stages.map((sg) => Art.portrait(sg.sp)).join('') : Art.portrait(spec.sp)) + '</div></div><div style="padding:.6rem .9rem .9rem">' +
       '<div class="muted enc-where">' + esc(d.name.toUpperCase()) + ' · ' + esc(enc.sectionName.toUpperCase()) + '</div><div class="pips">' + pips + '</div>' +
       '<h1 style="font-size:1.35rem">' + (spec.islandBoss ? 'The Island Boss' : boss ? 'The guardian of ' + esc(d.name.replace(/^The /, 'the ')) : 'Battle ' + (enc.battle + 1) + ' of ' + enc.battles) + '</h1>' +
       (spec.clue ? '<p class="clue">' + esc(spec.clue) + '</p>' : '') +
-      '<h2>' + esc(spec.title || sp.name) + ' · Lv ' + spec.lv + '</h2><div>' + chip(spec.mech && spec.mech.type === 'prism' ? spec.mech.els[0] : sp.el) + (spec.mech ? ' <span class="tagp prog">' + esc(D.BOSS_MECHS[spec.mech.type].name) + '</span>' : '') + '</div>' +
-      '<p class="muted" style="font-size:.78rem;margin:.35rem 0">' + (spec.mech ? esc(D.BOSS_MECHS[spec.mech.type].desc) : 'Strong against ' + (D.STRONG[sp.el].map((x) => D.ELEMENTS[x].name).join(', ') || 'nothing') + '.') + '</p>' +
+      '<h2>' + esc(spec.title || sp.name) + ' · Lv ' + spec.lv + '</h2>' + (spec.stages ? stagedCard(spec) : '<div>' + chip(spec.mech && spec.mech.type === 'prism' ? spec.mech.els[0] : sp.el) + (spec.mech ? ' <span class="tagp prog">' + esc(D.BOSS_MECHS[spec.mech.type].name) + '</span>' : '') + '</div>' +
+      '<p class="muted" style="font-size:.78rem;margin:.35rem 0">' + (spec.mech ? esc(D.BOSS_MECHS[spec.mech.type].desc) : 'Strong against ' + (D.STRONG[sp.el].map((x) => D.ELEMENTS[x].name).join(', ') || 'nothing') + '.') + '</p>') +
       '<div class="row-actions" style="justify-content:center"><button class="btn ghost" id="enc-retreat">Leave</button><button class="btn gold" id="enc-go">' + I('swords') + ' Fight</button></div></div></div>', { dismiss: false });
     $('#enc-go', ov).onclick = () => { UI.close(ov); UI.startBattle(); };
     $('#enc-retreat', ov).onclick = () => UI.confirm('Leave the dungeon?', 'Your progress is kept: next time you start at battle ' + (enc.battle + 1) + '.', 'Leave', () => { UI.close(ov); R.abandonRun(st()); S.save(); UI.showIsland(); });
@@ -191,11 +195,12 @@
     if (!A.C3D || !A.C3D.enabled()) return Promise.resolve(false);
     const host = $('#b-3d'), b = U.b; let settled = false;
     const go = A.C3D.load()
-      .then((mod) => (mod && !U.dead && UI.B === U ? mod.createBattle(host, { dungeon: U.d, player: B.cur(b).sp, enemy: b.enemy.sp, boss: !!b.enemy.boss, scale: b.enemy.scale || null, prismatic: !!b.enemy.islandBoss, halo: b.enemy.islandBoss && D.DUNGEONS[U.d] && D.DUNGEONS[U.d].island === 'obsidian' ? 'forge' : null }) : null))
+      .then((mod) => (mod && !U.dead && UI.B === U ? mod.createBattle(host, { dungeon: U.d, player: B.cur(b).sp, enemy: b.enemy.sp, boss: !!b.enemy.boss, scale: b.enemy.scale || null, prismatic: !!b.enemy.islandBoss, halo: b.enemy.islandBoss && D.DUNGEONS[U.d] && D.DUNGEONS[U.d].island === 'obsidian' ? 'forge' : b.enemy.keeper || null }) : null))
       .then((s3) => {
         if (!s3) return false;
         if (settled || U.dead || UI.B !== U || !$('#battle')) { s3.dispose(); return false; }
         U.stage = guard3d(s3, U); $('#battle').classList.add('is3d'); if (U.disp.charging) U.stage.setTelegraph(true);
+        if (b.enemy.keeper && U.stage.setKeeper) U.stage.setKeeper(b.enemy.keeper); // Phase 20C: The Two Keys
         return true;
       })
       .catch((e) => { if (root.console) console.warn('3D battle stage unavailable, using 2D:', e && e.message); return false; });
@@ -227,8 +232,8 @@
         finish: dungeonFinish };
     }
     UI.setScreen('battle');
-    Au.setMode('battle');
     const b = ctx.b, e0 = b.enemy;
+    Au.setMode(e0.stages > 1 ? 'finale' : 'battle'); // Phase 20C: The Two Keys have their own music
     const U = (UI.B = { b, busy: true, log: '', over: false, enc: ctx.enc || { spec: { boss: !!e0.boss } }, d: ctx.d || 'reliquary', stage: null, ctx, hp: {}, html: {}, acting: null, chosen: null });
     syncDisp();
     const boss = !!e0.boss, isl = !!e0.islandBoss, envBg = ctx.env && Art.hasEnv(ctx.env) ? Art.envBg(ctx.env, { boss }) : '';
@@ -261,10 +266,24 @@
       const t0 = performance.now(); let due = t0 + (calmNow() ? 1600 : 2200), timer = setTimeout(introOver, due - t0);
       U.introLater = (ms) => { const at = performance.now() + ms; if (at <= due || !bin.isConnected) return; due = at; clearTimeout(timer); timer = setTimeout(introOver, ms); };
       U.introOver = introOver; }
-    bLog(ctx.intro || (e0.name !== D.SPECIES[e0.sp].name ? (/^The /.test(e0.name) ? '' : 'The ') + e0.name + (b.foes.length > 1 ? ' leads the other team!' : ' rises!') : 'A wild ' + e0.name + ' appears!'));
+    // Phase 20C: a staged boss (The Two Keys) is one foe in several shapes: name the encounter and its first stage, never
+    // the PvP 'leads the other team' line
+    const staged = e0.stages > 1, encT = staged && U.enc && U.enc.spec && U.enc.spec.title;
+    bLog(ctx.intro || (staged ? (encT ? encT + ': ' : '') + e0.name + ' stands before the door.' : e0.name !== D.SPECIES[e0.sp].name ? (/^The /.test(e0.name) ? '' : 'The ') + e0.name + (b.foes.length > 1 ? ' leads the other team!' : ' rises!') : 'A wild ' + e0.name + ' appears!'));
     bRender();
     Promise.all([mountStage(U), sleep(700)]).then(() => { if (UI.B !== U || U.dead) return; U.busy = false; bRender(); if (isl) setTele({ t: 'intro' }); if (boss && bin && bin.isConnected && U.stage && U.stage.intro) { U.stage.intro(); if (U.stage.introOn && U.stage.introOn() && U.introLater) U.introLater(1700); } });
   };
+  /* Phase 20C: a staged boss's next stage. A banner names it (Stage II · The Shadow Key), the arena's light turns from the
+     Light Keeper's gold to the Shadow Keeper's violet, the music darkens, the new shape stands at boss scale and the
+     boss camera plays again. With Reduce Motion the banner is brief and the camera does not move. */
+  async function stageIn(U, f, stg) {
+    const roman = ['', 'I', 'II', 'III', 'IV'][f.stage] || String(f.stage), bt = $('#battle');
+    const line = f.keeper === 'shadow' ? 'The Light Key fades into the door. The Shadow Key steps through, already gathering itself.' : f.name + ' steps forward.';
+    if (bt) { const bn = document.createElement('div'); bn.className = 'b-stage ' + (f.keeper || ''); bn.setAttribute('role', 'status'); bn.innerHTML = '<small>Stage ' + roman + ' of ' + ['', 'I', 'II', 'III', 'IV'][f.stages] + '</small><b>' + esc(f.name) + '</b>'; bt.appendChild(bn); setTimeout(() => { bn.classList.add('out'); setTimeout(() => bn.remove(), 400); }, calmNow() ? 900 : 1700); }
+    Au.play('keyturn'); if (Au.setMode) Au.setMode(f.keeper === 'shadow' ? 'finale2' : 'finale');
+    if (stg.is3d) { if (stg.setKeeper && f.keeper) stg.setKeeper(f.keeper); const p = stg.swap('e', f.sp, { scale: f.scale, boss: true }); await Promise.race([p || Promise.resolve(), sleep(700)]); if (stg.intro && !calmNow()) { const q = stg.intro(); await Promise.race([q || Promise.resolve(), sleep(1700)]); } }
+    bLog(line); bRender(); await sleep(calmNow() ? 500 : 900);
+  }
   function bLog(t) { const l = $('#b-log'); if (l) { l.textContent = t; l.classList.toggle('empty', !t); } }
 
   /* ---------- Phase 6 combat presentation ---------- */
@@ -313,7 +332,7 @@
     }
     const hb = $('#hb-' + w); hb.className = 'hpb ' + lvl(frac); setBar(hb, w + (e ? b.ei : b.pi), frac);
     const foot = '<span class="hpn"><b>' + hp + '</b> / ' + max + '</span>' + (frac > 0 && frac < 0.25 ? '<span class="crit-t">' + I('warn') + 'Critical</span>' : '') +
-      (e && b.foes.length > 1 ? '<span class="foedots" aria-label="' + B.foesLeft(b) + ' foes left">' + b.foes.map((f, i) => '<i class="' + (f.hp <= 0 ? 'ko' : i === b.ei ? 'cur' : '') + '"></i>').join('') + '</span>' : '');
+      (e && b.foes.length > 1 ? '<span class="foedots' + (b.enemy.stages > 1 ? ' stages' : '') + '" aria-label="' + (b.enemy.stages > 1 ? 'Stage ' + b.enemy.stage + ' of ' + b.enemy.stages : B.foesLeft(b) + ' foes left') + '">' + b.foes.map((f, i) => '<i class="' + (f.hp <= 0 ? 'ko' : i === b.ei ? 'cur' : '') + '"></i>').join('') + '</span>' : '');
     putHtml('ff-' + w, foot);
     const extra = e ? (b.enemy.islandBoss ? ['islandboss'] : b.enemy.boss ? ['guardian'] : []) : [];
     const sts = chipsFor(e ? d.eSt : d.pSt, e ? d.eWeak : d.pWeak, e ? d.eGuard : d.pGuard, extra) + (e ? '' : synChips(b.syn));
@@ -438,6 +457,8 @@
     const show = (cl, title, tip) => { t.className = 'b-tele ' + cl; t.innerHTML = '<b>' + I('warn') + ' ' + esc(title) + '</b><span>' + esc(tip) + '</span>'; t.hidden = false; };
     // Phase 19D: the Island Boss introduction names what this boss actually does (it used to describe the Starter Island
     // boss's Prism Shift and Prismfall for every island boss). A hint, not the whole plan.
+    if (ev.t === 'intro' && b.enemy.stages > 1) { const names = b.foes.map((f) => f.name).join(', then '), mvs = b.foes.map((f) => f.move && D.ABILITIES[f.move] && D.ABILITIES[f.move].name).filter(Boolean);
+      show('prism', 'Island Boss: ' + ((U.enc && U.enc.spec && U.enc.spec.title) || b.enemy.name), 'Two shapes, one after the other: ' + names + '. Your team carries its health from one to the next, and a defeat starts the whole encounter again. Each raises a barrier and charges its own move (' + mvs.join(', then ') + '). Guard the big ones.'); return; } // Phase 20C
     if (ev.t === 'intro') { const e = b.enemy, mv = e.move && D.ABILITIES[e.move], m = e.mech || {}, bits = [];
       if (m.type === 'prism') bits.push('its element shifts every few turns'); if (m.type === 'barrier') bits.push('it raises a Stone Barrier as it weakens'); if (m.type === 'echo') bits.push('the crystals echo its big move if it lands unguarded');
       if (mv) bits.push('it charges ' + mv.name);
@@ -552,7 +573,8 @@
           const f = U.b.foes[e.idx];
           d.eName = f.name; d.eSp = f.sp; d.eLv = f.lv; d.eHp = e.hp; d.eMax = e.hpMax; d.eEl = f.el; d.eSt = {}; d.eShield = 0; d.charging = false; d.eWeak = f.weak || 0; d.eGuard = !!f.guard;
           const sp = $('#spr-e'); if (sp) { sp.classList.remove('faint'); sp.innerHTML = Art.portrait(f.sp); if (!stg.is3d) cls('e', 'in', 500); }
-          if (stg.is3d) { const p = stg.swap('e', f.sp); await Promise.race([p || Promise.resolve(), sleep(560)]); }
+          if (f.stages > 1) { await stageIn(U, f, stg); break; } // Phase 20C: The Two Keys' second stage
+          if (stg.is3d) { const p = stg.swap('e', f.sp, { scale: f.scale, boss: f.boss }); await Promise.race([p || Promise.resolve(), sleep(560)]); }
           bLog(f.name + ' steps in! (' + B.foesLeft(U.b) + ' left)'); bRender(); await sleep(620); break;
         }
         case 'switch': {
@@ -563,7 +585,10 @@
           Au.play('ok'); bLog('Go, ' + f.name + '!'); bRender(); await sleep(stg.is3d ? 260 : 560); break;
         }
         case 'needSwitch': bLog('Choose your next Amina.'); break;
-        case 'end': { const w = e.result === 'win' ? 'p' : stg.is3d && U.b.enemy && U.b.enemy.hp > 0 ? 'e' : null; if (w) { stg.victory(w); if (Au.hasVoice && Au.hasVoice(spOf(w))) Au.monster(spOf(w), 'victory', { delay: 0.15 }); } break; }
+        case 'end': { const w = e.result === 'win' ? 'p' : stg.is3d && U.b.enemy && U.b.enemy.hp > 0 ? 'e' : null; if (w) { stg.victory(w); if (Au.hasVoice && Au.hasVoice(spOf(w))) Au.monster(spOf(w), 'victory', { delay: 0.15 }); }
+          // Phase 20C: The Two Keys' victory: the door goes still (a banner and the campaign's last fanfare)
+          if (e.result === 'win' && U.b.enemy && U.b.enemy.stages > 1) { const bt = $('#battle'); if (bt) { const bn = document.createElement('div'); bn.className = 'b-stage done'; bn.setAttribute('role', 'status'); bn.innerHTML = '<small>The Threshold</small><b>The door is still</b>'; bt.appendChild(bn); } Au.play('finalwin'); await sleep(calmNow() ? 700 : 1600); }
+          break; }
       }
     }
     // the event list is complete for this action: line the display up with the real battle state
