@@ -126,7 +126,7 @@ The rest of the brief's story constraints:
 - **Not revealed:**
   - the third party's identity, the full Emergence, the Entity's origins, Starter Island's origin, or the presence
     beyond the world;
-  - two draft lines were rewritten for this (see Decisions), and the canon guard (`tests/campaign.test.js`) passes.
+  - three draft lines were rewritten for this (see Decisions), and the canon guard (`tests/campaign.test.js`) passes.
 - **Grief scene (`c_mount`).** It plays after the Lens Gallery: six beats, with "I left that here. I meant to come back."
   as an Entity line, and no exposition.
 - **Watcher's Lens (optional).**
@@ -232,7 +232,7 @@ How it runs:
 - **The fix.** The sheets now mark `data-input-ready` when that lock ends (`ui-obsidian19b.js`, `ui-celestial20b.js`).
   The game's lock is unchanged, still 400 ms.
 - The test waits for the marker (condition-based) and keeps its assertion. The 20C browser suite uses the same wait.
-- **Results.** Run 3 times on its own with 19/19 each time, and again inside the full regression (see Regression).
+- **Results.** 19/19 in each of 8 runs: 6 on its own and 2 inside full regressions (see Regression).
 
 ## Level simulations
 
@@ -411,7 +411,7 @@ regressions.
    (See Activation.)
 2. **The Two Keys: equal health, both ×0.95.** The simulation justified it; see Level simulations.
 3. **The Keeper's Emblem's values are unchanged.** It sits level with the best epic charm and below the Lens.
-4. **Two story lines were rewritten for canon:**
+4. **Three story lines were rewritten for canon:**
    - "came from outside" became "is not from here", because the canon guard forbids "came from";
    - "They are not your friends' shapes" became "They are not the Aminas you know". The canon guard reserves "friends"
      for the starters' past, which is shown, never explained;
