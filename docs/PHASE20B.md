@@ -1,5 +1,8 @@
 # Phase 20B — Celestial Crown world construction (the Silent Observatory)
 
+Review page: https://claude.ai/artifact/CN4Ufu7s828Ted6arZeKDu · Development preview: v49 of the Aminas preview
+(https://claude.ai/artifact/ShbtpoFoauudCMFtMCfogK; developer panel → "Celestial Crown preview (session)").
+
 Branch `p20b-celestial-construction`, built from Phase 20A (`00e13d2`). Production `main` was not touched. The Phase
 16A opening is still disabled by default. **Nothing here was tested on a physical iPhone.** Every browser number comes
 from Chromium with software WebGL (SwiftShader) at 844×390 in touch mode. Use them to compare islands, not as device
