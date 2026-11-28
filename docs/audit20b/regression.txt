@@ -1,0 +1,122 @@
+baseline: 5 passed, 0 failed
+campaign: 60 passed, 0 failed
+migration v0.6: 22 passed, 0 failed
+modes: 41 passed, 0 failed
+forge: 53 passed, 0 failed
+dev8: 49 passed, 0 failed
+browser v0.6: 48 passed, 0 failed
+browser dev7: 30 passed, 0 failed
+browser dev8: 42 passed, 0 failed
+browser-env1.test.js: FAILED
+  ok  new games have the 3D voxel island on
+  ok  the Starter Island is drawn by the voxel layer (canvas present, #world.vox)
+  ok  the 3D canvas sits under the interactive 2D layer
+  ok  the 2D terrain is hidden while the voxel island shows
+  ok  it renders (76 draw calls, 181089 triangles)
+  ok  built buildings and obstacles are mirrored into 3D
+  ok  the Hatchery's 2D picture is hidden (opacity 0) but its group stays in the hit layer
+  ok  a point on the Hatchery reaches its 2D hit area
+  ok  tapping the voxel Hatchery opens its panel
+  ok  tapping a voxel obstacle opens its clearing panel
+  ok  moving the Hatchery hides its 3D model (the ghost shows instead)
+  ok  leaving build mode puts it back
+FAIL  other islands (null) keep the 2D island art
+FAIL  Starter Island, the Verdant Wilds (Phase 18B) and Obsidian Reach (Phase 19B; drawn only when it is live or previewed) are the voxel islands
+  ok  returning to the Starter Island brings the voxel island back
+  ok  turning "3D voxel island" off restores the 2D island and its pictures
+  ok  turning it back on returns to the voxel island
+  ok  the save stores the new setting next to the unchanged island data
+  ok  after a reload the island, its buildings and their places are unchanged
+  ok  an older save without the setting gets the voxel island on (true)
+  ok  no script errors
+
+browser env1: 19 passed, 2 failed
+
+browser env1.2: 10 passed, 0 failed
+browser library: 11 passed, 0 failed
+PASSED: 19 passed, 0 failed (browser-env3)
+PASSED: 10 passed, 0 failed (browser-env4)
+PASSED: 12 passed, 0 failed (browser-ui5)
+PASSED: 45 passed, 0 failed (browser-ui6)
+PASSED: 30 passed, 0 failed (browser-arena7)
+PASSED: 31 passed, 0 failed (browser-bench-battle)
+PASSED: 23 passed, 0 failed (browser-perf-fix)
+PASSED: 38 passed, 0 failed (browser-showcase8)
+PASSED: 38 passed, 0 failed (browser-p8fix)
+PASSED: 47 passed, 0 failed (browser-roster8b)
+raid12a: 31 passed, 0 failed
+PASSED: 18 passed, 0 failed (browser-raid12a)
+hideseek: 60 passed, 0 failed
+PASSED: 41 passed, 0 failed (browser-hideseek)
+hideseek12c: 30 passed, 0 failed
+PASSED: 58 passed, 0 failed (browser-hideseek12c)
+progression13a: 40 passed, 0 failed
+PASSED: 41 passed, 0 failed (browser-progress13a)
+hatchery13b: 41 passed, 0 failed
+PASSED: 35 passed, 0 failed (browser-hatchery13b)
+gear13c: 46 passed, 0 failed
+PASSED: 39 passed, 0 failed (browser-gear13c)
+economy13d: 14 passed, 0 failed
+PASSED: 5 passed, 0 failed (browser-rewards13d)
+PASSED: 31 passed, 0 failed (browser-models14)
+PASSED: 16 passed, 0 failed (browser-world14)
+40 passed, 0 failed
+browser-roster15b: 37 passed, 0 failed
+browser-combat15c: 33 passed, 0 failed
+browser-final15d: 37 passed, 0 failed
+PASSED: 12 passed, 0 failed (browser-intro14)
+onboard16: 37 passed, 0 failed
+69 passed, 0 failed (browser-onboard16)
+savefile16b: 47 passed, 0 failed
+34 passed, 0 failed (browser-polish16b)
+20 passed, 0 failed (browser-stability16c)
+combat17b: 31 passed, 0 failed
+rewards17b: 40 passed, 0 failed
+10 passed, 0 failed (browser-combat17b)
+progression17c: 48 passed, 0 failed
+14 passed, 0 failed (browser-progression17c)
+replay17d: 70 passed, 0 failed
+15 passed, 0 failed (browser-replay17d)
+verdant18b: 54 passed, 0 failed
+browser-verdant18b: 22 passed, 0 failed
+campaign18c: 98 passed, 0 failed
+browser-campaign18c: 18 passed, 0 failed
+stability18c: 5 passed, 0 failed
+journey18d: 57 passed, 0 failed
+polish18d: 48 passed, 0 failed
+PASSED: 17 passed, 0 failed (browser-polish18d)
+obsidian19b: 61 passed, 0 failed
+browser-obsidian19b: 25 passed, 0 failed
+obsidian19c: 146 passed, 0 failed
+browser-obsidian19c.test.js: FAILED
+  ok  a save that beat the Forest Crown before this build has Obsidian Reach on load, cap 50
+  ok  The Dark Shore and the first Obsidian quest are listed; the Celestial quest is not
+  ok  the island’s existing unlock lines play (“Obsidian Reach. I didn’t think you’d get here so s…”)
+  ok  and then the arrival scene, Warm Stone
+  ok  the existing first-visit greeting is kept word for word
+  ok  the arrival scene is recorded as seen
+  ok  Dungeon 1’s gate is open: an Enter button and its recommended level
+  ok  Dungeon 2 waits for Dungeon 1 (no Enter button)
+FAIL  Enter opens the Dungeons screen on Obsidian Reach: ten dungeons, the first ready
+  ok  the party picker starts the Cinder Steps in its own arena (3D canvas, environment o_cinder)
+  ok  each of the ten guardians shows its own warning a turn before its charged move (10 of 10)
+  ok  the six Obsidian story scenes play with their own backdrops (6 of 6)
+  ok  every Obsidian dungeon has a 2D backdrop
+  ok  entering the Heart of the Forge for the first time plays the confrontation first
+  ok  then the party picker opens
+  ok  with Battery Saver on, an Obsidian battle still uses its own environment (o_gallery)
+  ok  the Forge Heart raises the cap to 60, announced once
+  ok  and not again
+  timing {"enterBattleMs":40}
+  ok  no page errors
+
+browser-obsidian19c: 18 passed, 1 failed
+
+polish19d: 159 passed, 0 failed
+browser-polish19d: 34 passed, 0 failed
+celestial20b: 90 passed, 0 failed
+browser celestial20b: 29 passed, 0 failed
+
+real	53m23.003s
+user	1m3.003s
+sys	0m18.989s

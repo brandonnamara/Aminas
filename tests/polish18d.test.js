@@ -7,7 +7,7 @@ const clearD = (s, id) => { R.startRun(s, id, s.aminas.slice(0, 1).map((a) => a.
 const finishFinds = (s, area) => { for (let i = 0; i < 10 && (s.stats.explores[area] | 0) < D.AREAS[area].steps.length; i++) { const r = R.explore(s, area); if (s.pendingFind) R.befriend(s); } };
 
 /* ================= rare encounters ================= */
-ok(JSON.stringify(D.V18.rare.of) === JSON.stringify({ glowcap: 'terraflora3', streamside: 'aquaflora3', canopyedge: 'pyrophoenix', ashplain: 'infernokai', glassbeach: 'zeep3', crystalvein: 'aimza3' }) && Object.values(D.V18.rare.of).every((sp) => D.SPECIES[sp] && D.SPECIES[sp].stage === 3), 'one rare Amina per Verdant area, all existing third forms (Terraflora III, Aquaflora III, Pyro-Phoenix); Phase 19C adds the Reach’s three (Pyrokai III, Zeep III, Aimza III)');
+ok(JSON.stringify(D.V18.rare.of) === JSON.stringify({ glowcap: 'terraflora3', streamside: 'aquaflora3', canopyedge: 'pyrophoenix', ashplain: 'infernokai', glassbeach: 'zeep3', crystalvein: 'aimza3', cloudshelf: 'stormbringer', moonbloombeds: 'calyxar', starfield: 'voltar3' }) && Object.values(D.V18.rare.of).every((sp) => D.SPECIES[sp] && D.SPECIES[sp].stage === 3), 'one rare Amina per Verdant area, all existing third forms (Terraflora III, Aquaflora III, Pyro-Phoenix); Phase 19C adds the Reach’s three (Pyrokai III, Zeep III, Aimza III); Phase 20B prepares the Crown’s three (Zephyr III, Acinus III, Voltar III)');
 ok(Object.keys(D.SPECIES).length === 63, 'no new species');
 {
   const s = save(); R.rng = seeded(1);

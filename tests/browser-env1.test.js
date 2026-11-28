@@ -58,8 +58,11 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
   /* ---------- other islands keep their 2D art ---------- */
   const other = await ev(() => { const s = A.State.state; s.unlocked = s.unlocked || {}; const iid = Object.keys(A.Data.ISLANDS).find((k) => A.VoxIsland.ISLANDS.indexOf(k) < 0); /* Phase 18B: the Verdant Wilds joined the voxel island; the islands not yet built for it keep 2D art */ if (!iid) return null; const prev = s.currentIsland; s.currentIsland = iid; A.UI.renderWorld(true); const r = { iid, vox: !!document.querySelector('#world.vox'), cv: !!document.querySelector('#world > canvas.vox3d'), terr: getComputedStyle(document.getElementById('terrain')).display }; s.currentIsland = prev; A.UI.renderWorld(true); return r; });
-  ok(other && !other.vox && !other.cv && other.terr !== 'none', 'other islands (' + (other && other.iid) + ') keep the 2D island art');
-  ok(await ev(() => A.VoxIsland.ISLANDS.join() === 'starter,verdant,obsidian'), 'Starter Island, the Verdant Wilds (Phase 18B) and Obsidian Reach (Phase 19B; drawn only when it is live or previewed) are the voxel islands');
+  // Phase 20B: the Celestial Crown joined the voxel island, so no island is 2D-only any more. The 2D island art is still
+  // the fallback for every island: with the voxel island turned off, the same island draws in 2D.
+  const flat2d = other || await ev(() => { const s = A.State.state; s.settings.voxIsland = false; A.UI.renderWorld(true); const r = { iid: s.currentIsland + ' with 3D off', vox: !!document.querySelector('#world.vox'), cv: !!document.querySelector('#world > canvas.vox3d'), terr: getComputedStyle(document.getElementById('terrain')).display }; s.settings.voxIsland = true; A.UI.renderWorld(true); return r; });
+  ok(other === null && flat2d && !flat2d.vox && !flat2d.cv && flat2d.terr !== 'none', 'every island has a voxel island now (Phase 20B), and the 2D island art still draws when it is off (' + (flat2d && flat2d.iid) + ')');
+  ok(await ev(() => A.VoxIsland.ISLANDS.join() === 'starter,verdant,obsidian,celestial'), 'Starter Island, the Verdant Wilds (Phase 18B), Obsidian Reach (Phase 19B) and the Celestial Crown (Phase 20B; drawn only when it is live or previewed) are the voxel islands');
   await sleep(1500);
   ok(await ev(() => !!document.querySelector('#world.vox')), 'returning to the Starter Island brings the voxel island back');
 

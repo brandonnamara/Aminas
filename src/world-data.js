@@ -94,6 +94,14 @@
     produces: 'gold', perResident: true, affinity: ['metal'], art: 'habitat',
     desc: 'A warm workshop home on an anvil plinth. Residents earn gold; Metal residents earn 50% more.',
     levels: [L(2000, 300, { rate: 4, capMin: 60, capacity: 2 }), L(4500, 900, { rate: 6, capMin: 90, capacity: 2 }), L(9000, 1800, { rate: 9, capMin: 120, capacity: 3 }), L(16000, 3600, { rate: 13, capMin: 150, capacity: 3 }), L(30000, 7200, { rate: 18, capMin: 180, capacity: 4 })] };
+  // Phase 20B: the Resonance habitat (the Starwell Habitat), in the same framework and on the same terms as the Forge
+  // Habitat: the same production per level and capacity as every habitat, Resonance residents (the Aimza line) earn 50%
+  // more, at most four. It opens with the Bell Loft, the Celestial Crown's eighth dungeon (req.c20, src/celestial20b.js),
+  // which does not exist yet, so no normal save can build one in this build.
+  D.BUILDINGS.hab_resonance = { name: 'Starwell Habitat', cat: 'habitat', el: 'resonance', w: 3, h: 3, canMove: true, canStore: true, req: { struct: 'hollow', c20: 'c_bellloft', hab20: true }, maxCount: 4,
+    produces: 'gold', perResident: true, affinity: ['resonance'], art: 'habitat',
+    desc: 'A moonstone basin under three slow star shards. Residents earn gold; Resonance residents earn 50% more.',
+    levels: [L(3000, 300, { rate: 4, capMin: 60, capacity: 2 }), L(6500, 900, { rate: 6, capMin: 90, capacity: 2 }), L(12000, 1800, { rate: 9, capMin: 120, capacity: 3 }), L(20000, 3600, { rate: 13, capMin: 150, capacity: 3 }), L(36000, 7200, { rate: 18, capMin: 180, capacity: 4 })] };
   // ---------- decorations: single level, cheap, freely movable/storable ----------
   const DEC = [['lantern', 'Glow Lantern', 1, 1, 25, 'A lantern that hums softly at night.'], ['flowerbed', 'Flower Bed', 1, 1, 15, 'Wildflowers in a stone ring.'],
     ['bench', 'Mossy Bench', 2, 1, 40, 'Somewhere to sit and watch the Aminas nap.'], ['statue', 'Kind Soul Statue', 2, 2, 150, 'A carved Amina, smiling at nothing in particular.'],
@@ -105,7 +113,7 @@
   Object.keys(D.BUILDINGS).forEach((k) => { const b = D.BUILDINGS[k]; b.id = k; b.canRotate = b.w !== b.h || b.cat === 'decor'; });
   D.STORY_BUILDINGS = ['hollow', 'tidegate', 'moonshrine', 'hatchery', 'reliquarygate', 'forge'];
   D.STRUCT_ORDER = ['hollow', 'tidegate', 'reliquarygate', 'hatchery', 'moonshrine'];
-  D.CATALOG = ['farm', 'mine', 'hab_nature', 'hab_water', 'hab_earth', 'hab_fire', 'hab_light', 'hab_dark', 'hab_wind', 'hab_metal', 'lantern', 'flowerbed', 'bench', 'statue', 'fountain'];
+  D.CATALOG = ['farm', 'mine', 'hab_nature', 'hab_water', 'hab_earth', 'hab_fire', 'hab_light', 'hab_dark', 'hab_wind', 'hab_metal', 'hab_resonance', 'lantern', 'flowerbed', 'bench', 'statue', 'fountain'];
   D.CATALOG_CATS = [['production', 'Production'], ['habitat', 'Habitats'], ['decor', 'Decor']];
   // Legacy view used by story text and old helpers: restorable structures with their level-1 cost.
   D.STRUCTURES = {};

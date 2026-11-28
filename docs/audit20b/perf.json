@@ -1,0 +1,430 @@
+{
+ "note": "Chromium + SwiftShader (software WebGL) at 844×390, DPR 2. Not an iPhone: compare the islands, not absolute speed.",
+ "visits": {
+  "celestial": {
+   "first": 452,
+   "second": 219
+  },
+  "obsidian": {
+   "first": 144,
+   "second": 258
+  },
+  "verdant": {
+   "first": 228,
+   "second": 256
+  },
+  "starter": {
+   "second": 875
+  }
+ },
+ "tiers": [
+  {
+   "island": "starter",
+   "tier": "high",
+   "calls": 76,
+   "triangles": 144383,
+   "geometries": 184,
+   "textures": 4,
+   "gpu": {
+    "geometriesMB": 17.52,
+    "instancesMB": 0.45,
+    "shadowMB": 16,
+    "totalMB": 33.97,
+    "distinct": 215
+   },
+   "layers": {
+    "terrain": 49592,
+    "buildings": 24963,
+    "nature": 49972,
+    "detail": 19572,
+    "far": 4396,
+    "fx": 0
+   },
+   "avgDrawMs": 782.51,
+   "p50": 616.7,
+   "p95": 716.7,
+   "heapMB": 66.8
+  },
+  {
+   "island": "verdant",
+   "tier": "high",
+   "calls": 79,
+   "triangles": 152096,
+   "geometries": 187,
+   "textures": 4,
+   "gpu": {
+    "geometriesMB": 31.02,
+    "instancesMB": 0.49,
+    "shadowMB": 16,
+    "totalMB": 47.52,
+    "distinct": 219
+   },
+   "layers": {
+    "terrain": 44988,
+    "buildings": 31972,
+    "nature": 52560,
+    "detail": 21498,
+    "far": 4396,
+    "fx": 0
+   },
+   "avgDrawMs": 633.47,
+   "p50": 533.4,
+   "p95": 583.3,
+   "heapMB": 77.7
+  },
+  {
+   "island": "obsidian",
+   "tier": "high",
+   "calls": 59,
+   "triangles": 116968,
+   "geometries": 187,
+   "textures": 4,
+   "gpu": {
+    "geometriesMB": 25.44,
+    "instancesMB": 0.45,
+    "shadowMB": 16,
+    "totalMB": 41.89,
+    "distinct": 149
+   },
+   "layers": {
+    "terrain": 41080,
+    "buildings": 21036,
+    "nature": 32798,
+    "detail": 20394,
+    "far": 4396,
+    "fx": 0
+   },
+   "avgDrawMs": 526.56,
+   "p50": 433.3,
+   "p95": 499.9,
+   "heapMB": 70.6
+  },
+  {
+   "island": "celestial",
+   "tier": "high",
+   "calls": 42,
+   "triangles": 125156,
+   "geometries": 188,
+   "textures": 4,
+   "gpu": {
+    "geometriesMB": 26.25,
+    "instancesMB": 0.51,
+    "shadowMB": 16,
+    "totalMB": 42.75,
+    "distinct": 79
+   },
+   "layers": {
+    "terrain": 46020,
+    "buildings": 722,
+    "nature": 51828,
+    "detail": 23826,
+    "far": 4396,
+    "fx": 0
+   },
+   "avgDrawMs": 471.17,
+   "p50": 516.6,
+   "p95": 550,
+   "heapMB": 86.7
+  },
+  {
+   "island": "starter",
+   "tier": "balanced",
+   "calls": 76,
+   "triangles": 141685,
+   "geometries": 184,
+   "textures": 4,
+   "gpu": {
+    "geometriesMB": 17.52,
+    "instancesMB": 0.41,
+    "shadowMB": 4,
+    "totalMB": 21.94,
+    "distinct": 215
+   },
+   "layers": {
+    "terrain": 49592,
+    "buildings": 24963,
+    "nature": 49972,
+    "detail": 16782,
+    "far": 4396,
+    "fx": 0
+   },
+   "avgDrawMs": 440.66,
+   "p50": 566.6,
+   "p95": 633.3,
+   "heapMB": 109.5
+  },
+  {
+   "island": "verdant",
+   "tier": "balanced",
+   "calls": 79,
+   "triangles": 149456,
+   "geometries": 187,
+   "textures": 4,
+   "gpu": {
+    "geometriesMB": 31.02,
+    "instancesMB": 0.46,
+    "shadowMB": 4,
+    "totalMB": 35.48,
+    "distinct": 219
+   },
+   "layers": {
+    "terrain": 44988,
+    "buildings": 31972,
+    "nature": 52560,
+    "detail": 18858,
+    "far": 4396,
+    "fx": 0
+   },
+   "avgDrawMs": 405.39,
+   "p50": 550,
+   "p95": 616.8,
+   "heapMB": 70.6
+  },
+  {
+   "island": "obsidian",
+   "tier": "balanced",
+   "calls": 59,
+   "triangles": 114460,
+   "geometries": 187,
+   "textures": 4,
+   "gpu": {
+    "geometriesMB": 25.44,
+    "instancesMB": 0.42,
+    "shadowMB": 4,
+    "totalMB": 29.86,
+    "distinct": 149
+   },
+   "layers": {
+    "terrain": 41080,
+    "buildings": 21036,
+    "nature": 32798,
+    "detail": 17886,
+    "far": 4396,
+    "fx": 0
+   },
+   "avgDrawMs": 360.68,
+   "p50": 350.1,
+   "p95": 383.3,
+   "heapMB": 71.6
+  },
+  {
+   "island": "celestial",
+   "tier": "balanced",
+   "calls": 42,
+   "triangles": 121994,
+   "geometries": 188,
+   "textures": 4,
+   "gpu": {
+    "geometriesMB": 26.25,
+    "instancesMB": 0.47,
+    "shadowMB": 4,
+    "totalMB": 30.72,
+    "distinct": 79
+   },
+   "layers": {
+    "terrain": 46020,
+    "buildings": 722,
+    "nature": 51828,
+    "detail": 20664,
+    "far": 4396,
+    "fx": 0
+   },
+   "avgDrawMs": 327.33,
+   "p50": 350,
+   "p95": 383.5,
+   "heapMB": 87.3
+  },
+  {
+   "island": "starter",
+   "tier": "saver",
+   "calls": 78,
+   "triangles": 85080,
+   "geometries": 235,
+   "textures": 4,
+   "gpu": {
+    "geometriesMB": 16.59,
+    "instancesMB": 0.35,
+    "shadowMB": 1,
+    "totalMB": 17.94,
+    "distinct": 215
+   },
+   "layers": {
+    "terrain": 49592,
+    "buildings": 7974,
+    "nature": 15234,
+    "detail": 11640,
+    "far": 4396,
+    "fx": 0
+   },
+   "avgDrawMs": 294.42,
+   "p50": 250,
+   "p95": 266.7,
+   "heapMB": 117.8
+  },
+  {
+   "island": "verdant",
+   "tier": "saver",
+   "calls": 80,
+   "triangles": 84454,
+   "geometries": 285,
+   "textures": 4,
+   "gpu": {
+    "geometriesMB": 31.02,
+    "instancesMB": 0.39,
+    "shadowMB": 1,
+    "totalMB": 32.41,
+    "distinct": 219
+   },
+   "layers": {
+    "terrain": 44988,
+    "buildings": 8978,
+    "nature": 15742,
+    "detail": 13038,
+    "far": 4396,
+    "fx": 0
+   },
+   "avgDrawMs": 272.15,
+   "p50": 300,
+   "p95": 316.8,
+   "heapMB": 128.2
+  },
+  {
+   "island": "obsidian",
+   "tier": "saver",
+   "calls": 59,
+   "triangles": 69774,
+   "geometries": 313,
+   "textures": 4,
+   "gpu": {
+    "geometriesMB": 25.44,
+    "instancesMB": 0.35,
+    "shadowMB": 1,
+    "totalMB": 26.79,
+    "distinct": 149
+   },
+   "layers": {
+    "terrain": 41080,
+    "buildings": 6520,
+    "nature": 8174,
+    "detail": 12312,
+    "far": 4396,
+    "fx": 0
+   },
+   "avgDrawMs": 251.87,
+   "p50": 266.6,
+   "p95": 300,
+   "heapMB": 72.7
+  },
+  {
+   "island": "celestial",
+   "tier": "saver",
+   "calls": 41,
+   "triangles": 78096,
+   "geometries": 325,
+   "textures": 4,
+   "gpu": {
+    "geometriesMB": 26.25,
+    "instancesMB": 0.39,
+    "shadowMB": 1,
+    "totalMB": 27.64,
+    "distinct": 79
+   },
+   "layers": {
+    "terrain": 46020,
+    "buildings": 722,
+    "nature": 15350,
+    "detail": 13920,
+    "far": 4396,
+    "fx": 0
+   },
+   "avgDrawMs": 235.72,
+   "p50": 250,
+   "p95": 300,
+   "heapMB": 85.3
+  }
+ ],
+ "interactions": {
+  "sheetOpenMs": {
+   "p50": 29,
+   "max": 41,
+   "n": 12
+  },
+  "wayfinderSettleMs": {
+   "p50": 1700,
+   "max": 1973,
+   "n": 5
+  }
+ },
+ "flat": [
+  {
+   "island": "starter",
+   "vox": false,
+   "nodes": 2710,
+   "svgNodes": 1290,
+   "p50": 16.7,
+   "p95": 16.7
+  },
+  {
+   "island": "verdant",
+   "vox": false,
+   "nodes": 2416,
+   "svgNodes": 996,
+   "p50": 16.7,
+   "p95": 16.8
+  },
+  {
+   "island": "obsidian",
+   "vox": false,
+   "nodes": 2297,
+   "svgNodes": 877,
+   "p50": 16.7,
+   "p95": 16.8
+  },
+  {
+   "island": "celestial",
+   "vox": false,
+   "nodes": 2807,
+   "svgNodes": 1387,
+   "p50": 16.7,
+   "p95": 16.8
+  }
+ ],
+ "leak": {
+  "trips": 30,
+  "islandsPerTrip": 4,
+  "before": {
+   "geometries": 316,
+   "textures": 2,
+   "nodes": 2353,
+   "heapMB": 208.6
+  },
+  "at10_20_30": [
+   {
+    "geometries": 317,
+    "textures": 4,
+    "nodes": 2353,
+    "heapMB": 144.3
+   },
+   {
+    "geometries": 317,
+    "textures": 4,
+    "nodes": 2353,
+    "heapMB": 108
+   },
+   {
+    "geometries": 317,
+    "textures": 4,
+    "nodes": 2353,
+    "heapMB": 167.2
+   }
+  ],
+  "after": {
+   "geometries": 317,
+   "textures": 4,
+   "nodes": 2353,
+   "heapMB": 75.9
+  },
+  "avgTravelMs": 1796
+ },
+ "errors": []
+}

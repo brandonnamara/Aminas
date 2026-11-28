@@ -28,6 +28,7 @@
       d17: { c: {} },            // Phase 17D: daily tasks, Codex milestones and challenge records (src/replay17d.js)
       v18: { seen: {} },         // Phase 18B: Verdant Wilds places visited (src/verdant18b.js)
       o19: { seen: {} },         // Phase 19B: Obsidian Reach places visited (src/obsidian19b.js)
+      c20: { seen: {} },         // Phase 20B: Celestial Crown places visited (src/celestial20b.js)
       struct: {},                // restored story buildings {id:true} (kept in sync with building levels)
       flags: {},                 // r1, r2, stone, arcDone, ...
       missions: {},              // quest id -> 'claimed'

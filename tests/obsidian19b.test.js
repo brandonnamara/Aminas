@@ -101,7 +101,8 @@ const beatObsidian = (s) => { beatVerdant(s); s.campaign.bosses.obsidian = true;
   const b = D.BUILDINGS.hab_metal;
   ok(b && b.el === 'metal' && b.cat === D.BUILDINGS.hab_wind.cat && b.w === 3 && b.h === 3, 'a Metal habitat exists, 3×3, in the habitat category');
   ok(D.CATALOG.indexOf('hab_metal') === D.CATALOG.indexOf('hab_wind') + 1, 'it is listed after the Wind habitat');
-  ok(!D.BUILDINGS.hab_resonance, 'no Resonance habitat yet');
+  // Phase 20B (approved): the Resonance habitat (the Starwell Habitat) now exists, locked behind the Celestial Crown's Bell Loft
+  ok(D.BUILDINGS.hab_resonance && D.BUILDINGS.hab_resonance.req.c20 === 'c_bellloft' && !R.reqMet(S.fresh(), D.BUILDINGS.hab_resonance.req), 'the Resonance habitat (Phase 20B) stays locked behind the Bell Loft');
   const w = D.BUILDINGS.hab_wind, lv = (x) => x.levels.map((l) => JSON.stringify([l.rate, l.capMin, l.capacity])).join();
   ok(lv(b) === lv(w), 'production rate, storage and capacity match the other habitats (no excess production)');
   ok(b.levels.map((l) => l.cost.gold).join() === '2000,4500,9000,16000,30000', 'costs 2000 → 30000 gold');

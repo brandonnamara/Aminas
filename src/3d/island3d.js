@@ -16,7 +16,7 @@ import { VoxGrid, meshGrid, mergeGeo, hash, pick } from './voxmesh.js';
 import { PAL, TV, DV, UNIT_PX, HEIGHT_PX, MAGIC, LIGHT } from './voxstyle.js';
 import * as VB from './voxbuild.js';
 import * as MS from './modelslots.js'; // Phase 14: imported building models (empty slots load nothing)
-import './library/vegetation.js'; import './library/terrain.js'; import './library/decor.js'; import './library/verdant.js'; import './library/obsidian.js'; // Phase 19B: Obsidian Reach // Phase 18B: the Verdant Wilds' landmarks and dungeon entrances // Phase 2: library kinds used by the island
+import './library/vegetation.js'; import './library/terrain.js'; import './library/decor.js'; import './library/verdant.js'; import './library/obsidian.js'; import './library/celestial.js'; // Phase 20B: the Celestial Crown // Phase 19B: Obsidian Reach // Phase 18B: the Verdant Wilds' landmarks and dungeon entrances // Phase 2: library kinds used by the island
 
 const A = window.A;
 const COARSE = !!(window.matchMedia && matchMedia('(pointer: coarse)').matches);
@@ -110,6 +110,16 @@ export const ISLAND_PAL = {
     moss: ['#5a5066', '#625870', '#544a60'], pine: ['#3a3244', '#42384c', '#342c3e'], plaza: ['#8a7e8e', '#7e7286'], leaf: ['#4a4054', '#544a5e'], leafDark: ['#3a3244', '#342c3e'], rock: ['#4a4054', '#42384c', '#544a5e'], rockDark: ['#2e2838'],
     deep: ['#3a3246', '#342c40', '#40384c'], deepLow: ['#2a2438', '#262032', '#302a3e'], flowers: ['#e64ab8', '#ff8a3a', '#9a8aa8', '#ffb05a', '#c83aa0'],
     water: '#2a3a6a',
+  },
+  // Phase 20B: the Celestial Crown, the Silent Observatory (docs/PHASE20A.md, section 2; the island's 2D palette):
+  // periwinkle grass, lavender sand, pale-gold paths, moonstone cliffs over violet-slate depths, and cloud-pale water
+  celestial: {
+    grass: ['#aec0fa', '#a4b8f6', '#b8c8fc', '#9cb0f0', '#c2d0fe'], grassDark: ['#90a4e8', '#869ae0'], grassSide: ['#94a8ea', '#8a9ee2', '#9eb2f0'],
+    path: ['#f6e6b6', '#ecdaa8', '#fcefc6', '#e2ce9c'], pathStone: ['#e0d8f4', '#d4ccec'], sand: ['#e0daf8', '#d6d0f2', '#eae6fc'],
+    dirt: ['#a8a0d6', '#9c94cc', '#b2aade'], clay: ['#c6bce8', '#bab0e0', '#d0c8ee'], stone: ['#dcd6f4', '#d0c8ee', '#e8e4fb', '#c6bfea'], stoneDark: ['#8a84b8', '#7e78ac'],
+    moss: ['#b8c8ff', '#a8baf6', '#c4d2ff'], pine: ['#a6b8f6', '#b8c8ff', '#9fb2f2'], plaza: ['#f4f0ff', '#e8e4fb'], leaf: ['#b8c8ff', '#a6b8f6'], leafDark: ['#9fb2f2', '#8ea2e6'], rock: ['#dcd6f4', '#d0c8ee', '#e8e4fb'], rockDark: ['#a8a0d6'],
+    deep: ['#6a66a8', '#5d5a9a', '#7672b4'], deepLow: ['#4a4788', '#423f7a', '#524f92'], flowers: ['#fff6c0', '#ffd0f4', '#ffffff', '#c8f4ff', '#ffe08a'],
+    water: '#bfe4ff',
   },
 };
 export function withIslandPal(iid, fn) {
@@ -305,7 +315,7 @@ export function createIsland() {
     // standing proud along the strata, darker pebbles set in the earth, moss clumps and roots under the grass lip,
     // and, deep in the stone, a rare cold glint of crystal. Instanced like the meadow detail (only the three faces
     // the camera sees), no shadows, and the same aerial haze as the rock it sits on.
-    { const sk = curIid === 'obsidian' ? withIslandPal(curIid, () => cliffSkin(t, TV, DV)) : cliffSkin(t, TV, DV); /* Phase 19B: the Reach's cliff faces in its own colours (other islands unchanged) */ if (sk.list.length) { const im = new THREE.InstancedMesh(skinBox, matSkin, sk.list.length), mm = new THREE.Matrix4(), cc = new THREE.Color();
+    { const sk = curIid === 'obsidian' || curIid === 'celestial' ? withIslandPal(curIid, () => cliffSkin(t, TV, DV)) : cliffSkin(t, TV, DV); /* Phase 19B: the Reach's cliff faces in its own colours (other islands unchanged) */ if (sk.list.length) { const im = new THREE.InstancedMesh(skinBox, matSkin, sk.list.length), mm = new THREE.Matrix4(), cc = new THREE.Color();
       sk.list.forEach(([x, y, z, sx, sy, sz, col], i) => { mm.makeScale(sx, sy, sz).setPosition(x, y, z); im.setMatrixAt(i, mm); im.setColorAt(i, cc.set(col)); }); im.instanceMatrix.needsUpdate = true; im.instanceColor.needsUpdate = true; im.receiveShadow = true; im.computeBoundingSphere(); im.userData.skin = sk.list.length; groups.terrain.add(im); skinMesh = im;
       if (sk.glow.length) { const ig = new THREE.InstancedMesh(skinBox, matSkinGlow, sk.glow.length); sk.glow.forEach(([x, y, z, sx, sy, sz, col], i) => { mm.makeScale(sx, sy, sz).setPosition(x, y, z); ig.setMatrixAt(i, mm); ig.setColorAt(i, cc.set(col)); }); ig.instanceMatrix.needsUpdate = true; ig.instanceColor.needsUpdate = true; ig.computeBoundingSphere(); groups.terrain.add(ig); } } }
     // water: subdivided quads that ripple (vertex shader) with a sheen
@@ -400,7 +410,7 @@ export function createIsland() {
   // Phase 18D: obstacle kinds listed in MERGE_O are few per island but come in three variants each, which as instanced
   // batches cost a draw call per variant. They are baked into one static mesh instead (same triangles, one draw call,
   // each specimen keeps its own small tint), rebuilt with the layout like every batch.
-  const MERGE_O = { elderroot: 1, vinetree: 1, mossruin: 1, mossrock: 1, basalt: 1, crystal: 1, embervent: 1, charred: 1, obsidianshard: 1, slagheap: 1 }, mergedGeos = []; // Phase 19B: Obsidian's six
+  const MERGE_O = { elderroot: 1, vinetree: 1, mossruin: 1, mossrock: 1, basalt: 1, crystal: 1, embervent: 1, charred: 1, obsidianshard: 1, slagheap: 1, floatstone: 1, starshard: 1, moonbloom: 1, pillar: 1, cloudpuff: 1, geode: 1 }, mergedGeos = []; // Phase 19B: Obsidian's six; Phase 20B: the Celestial Crown's six
   function sync(items, scenery) { const c0 = performance.now(); try { return sync0(items, scenery); } finally { cost.syncMs = +(performance.now() - c0).toFixed(1); } }
   function sync0(items, scenery) {
     const sig = JSON.stringify(items) + '|' + state.key + '|' + MS.signature();
@@ -426,15 +436,18 @@ export function createIsland() {
         let mi = 0; inst.traverse((o) => { if (!o.isMesh) return; const d = BACK.clone().transformDirection(o.matrixWorld.clone().invert()); o.geometry = facing(o.geometry, d, 'glb|' + it.type + '|' + (it.rot ? 1 : 0) + '|' + (mi++) + '|' + o.geometry.uuid, 0.02); o.castShadow = false; o.receiveShadow = true; });
         groups.things.add(twin); }
       else if (it.k === 'b') { const md = VB.buildingModel({ type: it.type, level: it.level, state: it.state, rot: it.rot }, { w0: it.w0, h0: it.h0 }, { art: it.art, cat: it.cat }); if (md) { push(md.geo, matSolid, cx, 0, cz, 0, false, 1, md.lod && md.lod.geo); push(md.glow, matGlow, cx, 0, cz, 0, false, 1, md.lod && md.lod.glow); } }
+      // Phase 20B: the Celestial Crown's places and entrances ('c_' kinds) are static, so they are baked into the merged mesh
+      // with the obstacles (one draw call for all of them, instead of two per kind)
+      else if (it.k === 'l' && it.kind && it.kind.indexOf('c_') === 0 && VB.hasExtra(it.kind)) { const md = VB.extraModel(it.kind, it.on); if (md) mergeList.push([md, cx, cz, 0, true]); }
       else if (it.k === 'l' && it.kind && VB.hasExtra(it.kind)) { const md = VB.extraModel(it.kind, it.on); if (md) { push(md.geo, matSolid, cx, 0, cz, 0, false, 1, md.lod && md.lod.geo); push(md.glow, matGlow, cx, 0, cz, 0, false, 1, md.lod && md.lod.glow); } }
       else if (it.k === 'o' && MERGE_O[it.type]) { const md = VB.natureModel(it.type, it.seed, it.w, it.h); if (md) mergeList.push([md, cx, cz, (it.seed % 4) * Math.PI / 2]); }
       else if (it.k === 'o') { const md = VB.natureModel(it.type, it.seed, it.w, it.h); if (md) { const ry = (it.seed % 4) * Math.PI / 2, sway = it.type === 'oak' || it.type === 'pine' || it.type === 'bush'; push(md.geo, sway ? matSway : matSolid, cx, 0, cz, ry, sway, 1, md.lod && md.lod.geo, true); push(md.glow, matGlow, cx, 0, cz, ry, false, 1, md.lod && md.lod.glow, true); } }
     });
     if (mergeList.length) {
       const bake = (pick) => { const parts = []; const mm = new THREE.Matrix4(), q = new THREE.Quaternion(), up = new THREE.Vector3(0, 1, 0), col = new THREE.Color();
-        mergeList.forEach(([md, x, z, ry]) => { const src = pick(md); if (!src || !src.index) return; const g = src.clone(); g.applyMatrix4(mm.compose(new THREE.Vector3(x, 0, z), q.setFromAxisAngle(up, ry), new THREE.Vector3(1, 1, 1)));
+        mergeList.forEach(([md, x, z, ry, exact]) => { const src = pick(md); if (!src || !src.index) return; const g = src.clone(); g.applyMatrix4(mm.compose(new THREE.Vector3(x, 0, z), q.setFromAxisAngle(up, ry), new THREE.Vector3(1, 1, 1)));
           const a = hash(Math.round(x * 16), Math.round(z * 16), 131), w = hash(Math.round(z * 16), Math.round(x * 16), 132) - 0.5, l = 0.9 + a * 0.16, c = g.attributes.color;
-          if (c && pick !== glowOf) for (let i = 0; i < c.count; i++) { col.fromBufferAttribute(c, i); c.setXYZ(i, col.r * l * (1 + w * 0.08), col.g * l, col.b * l * (1 - w * 0.1)); }
+          if (c && pick !== glowOf && !exact) for (let i = 0; i < c.count; i++) { col.fromBufferAttribute(c, i); c.setXYZ(i, col.r * l * (1 + w * 0.08), col.g * l, col.b * l * (1 - w * 0.1)); }
           parts.push(g); });
         // one pass (merging pairwise would copy the growing mesh 40-odd times)
         if (!parts.length) return null; let nv = 0, ni = 0; parts.forEach((g) => { nv += g.attributes.position.count; ni += g.index.count; });
@@ -476,7 +489,7 @@ export function createIsland() {
   // magic: slow motes of light that spiral up around the island's enchanted places (the Hatchery's egg, the
   // Tidegate, the Moonshrine, the Reliquary Gate, the glowing standing stones). One Points object, ~10 per place.
   // Phase 18D: the Verdant Wilds' places drift with light too (one shared points mesh: no extra draw calls per place)
-  const SPARK_L = { o_greatforge: ['#ffb05a', 6.5, 2.0], o_glasswick: ['#ffc880', 2.6, 2.2], o_bellows: ['#ff9a4a', 1.8, 1.6], elderroot: ['#9af2ff', 5.5, 2.4], v_choir: ['#e8fff0', 1.6, 1.2], v_shrine: ['#fff3c8', 1.8, 1.0], v_archive: ['#ffe9b0', 2.2, 1.4], v_aqueduct: ['#d8fbff', 2.6, 0.8] };
+  const SPARK_L = { c_observatory: ['#e8e4ff', 5.0, 1.4], c_bell: ['#ffb0ec', 1.4, 1.0], c_starfall: ['#fff3b0', 1.8, 1.2], o_greatforge: ['#ffb05a', 6.5, 2.0], o_glasswick: ['#ffc880', 2.6, 2.2], o_bellows: ['#ff9a4a', 1.8, 1.6], elderroot: ['#9af2ff', 5.5, 2.4], v_choir: ['#e8fff0', 1.6, 1.2], v_shrine: ['#fff3c8', 1.8, 1.0], v_archive: ['#ffe9b0', 2.2, 1.4], v_aqueduct: ['#d8fbff', 2.6, 0.8] };
   const SPARK = { hatchery: [MAGIC.egg, 2.6, 1.4], tidegate: [MAGIC.water, 1.8, 1.6], moonshrine: [MAGIC.moon, 2.2, 1.2], reliquarygate: [MAGIC.life, 1.4, 1.4] };
   function buildSparks(items) {
     if (sparks) { groups.fx.remove(sparks); sparks.geometry.dispose(); sparks.material.dispose(); sparks = null; }
@@ -723,6 +736,11 @@ export function createIsland() {
     breakdown() { const t = (o) => (o.geometry && o.geometry.index ? o.geometry.index.count / 3 : 0) * (o.isInstancedMesh ? o.count : 1); const out = { terrain: 0, buildings: 0, nature: 0, detail: 0, far: 0, fx: 0 };
       groups.terrain.traverse((o) => { if (o.isMesh && !o.userData.shadowOnly) out.terrain += t(o); }); farGroup.traverse((o) => { if (o.isMesh) out.far += t(o); });
       groups.things.children.forEach((o) => { if (o.userData.shadowOnly) return; if (o.userData.glb) { o.traverse((m) => { if (m.isMesh) out.buildings += t(m); }); return; } if (!o.isMesh || !o.visible) return; if (o === detail) out.detail += t(o); else if (o.material === matSway || o.userData.nature) out.nature += t(o); else out.buildings += t(o); }); Object.keys(out).forEach((k) => (out[k] = Math.round(out[k]))); return out; },
+    // Phase 20B: an estimate of the graphics memory the island's meshes hold (vertex and index buffers of every distinct
+    // geometry drawn, plus instance matrices and the shadow map), for the performance report; diagnostics only
+    gpuMem() { const seen = new Set(); let geo = 0, inst = 0; const add = (o) => { if (o.isInstancedMesh) inst += o.instanceMatrix.array.byteLength + (o.instanceColor ? o.instanceColor.array.byteLength : 0); const g = o.geometry; if (!g || seen.has(g.uuid)) return; seen.add(g.uuid); Object.values(g.attributes).forEach((a) => { geo += a.array.byteLength; }); if (g.index) geo += g.index.array.byteLength; };
+      [groups.terrain, groups.things, farGroup, groups.fx].forEach((gr) => gr && gr.traverse((o) => { if (o.isMesh || o.isPoints) add(o); }));
+      const sm = sun.shadow.map ? sun.shadow.mapSize.x * sun.shadow.mapSize.y * 4 : 0; return { geometriesMB: +(geo / 1048576).toFixed(2), instancesMB: +(inst / 1048576).toFixed(2), shadowMB: +(sm / 1048576).toFixed(2), totalMB: +((geo + inst + sm) / 1048576).toFixed(2), distinct: seen.size }; },
     stats() { const i = R.info; return { ctx: { lost: ctxLost, events: Object.assign({}, ctxEvents) }, occPace: { passes: occ.passes, frameMs: +occ.frameCost.toFixed(1), passMs: +occ.cost.toFixed(1) }, programs: i.programs ? i.programs.length : null, frames, avgDrawMs: frames ? +(drawMs / frames).toFixed(2) : 0, calls: i.render.calls, triangles: i.render.triangles, geometries: i.memory.geometries, textures: i.memory.textures, shadow: sun.castShadow, shadowMap: sun.shadow.mapSize.x, shadowType: R.shadowMap.type === THREE.VSMShadowMap ? 'vsm' : 'pcf', detail: detail ? detail.count : 0, grade: { toneMapping: R.toneMapping === THREE.NeutralToneMapping ? 'neutral' : 'none', exposure: R.toneMappingExposure }, tinted: groups.things.children.filter((o) => o.isInstancedMesh && o.instanceColor).length, tier: tier().id, canvas: [R.domElement.width, R.domElement.height], pixelRatio: R.getPixelRatio(), slow, lod: lodOn === 0 ? 'off' : lodOn === 1 ? 'nature' : 'all', terrainMs: cost.terrainMs, syncMs: cost.syncMs, occ: { shown: occ.shown, proxies: occ.data ? occ.data.up.length + occ.data.flat.length : 0, ms: +occ.cost.toFixed(1) } }; },
     dispose() { if (raf) cancelAnimationFrame(raf); raf = 0; clearGroup(groups.terrain); groups.things.children.slice().forEach((c) => { groups.things.remove(c); if (c.isInstancedMesh) c.dispose(); }); state = { things: new Map(), sig: '' }; },
   };

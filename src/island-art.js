@@ -832,6 +832,7 @@
     dark: { roof: '#5a4a9a', roof2: '#8a78d0', wall: '#e8e0f8', accent: '#ffe9a0', emblem: 'moon' },
     wind: { roof: '#5ac0b0', roof2: '#9aeee0', wall: '#f4fffc', accent: '#ffffff', emblem: 'feather' },
     metal: { roof: '#5a6478', roof2: '#8a94a8', wall: '#d8d4dc', accent: '#ffb05a', emblem: 'gear' }, // Phase 19B: the Forge Habitat
+    resonance: { roof: '#8a6ad8', roof2: '#c8b0ff', wall: '#f0ecff', accent: '#ffd86b', emblem: 'star' }, // Phase 20B: the Starwell Habitat
   };
   // emblems as small block glyphs on a face (pixel shapes: [a, z] offsets in px-ish units)
   const GLYPH = {
@@ -843,6 +844,7 @@
     moon: [[-1, 2], [0, 2], [-2, 1], [-2, 0], [-2, -1], [-1, -2], [0, -2], [-1, 1], [-1, 0], [-1, -1]],
     feather: [[1, 2], [0, 1], [1, 1], [-1, 0], [0, 0], [-1, -1], [-2, -2]],
     gear: [[0, 2], [-2, 0], [2, 0], [0, -2], [-1, 1], [1, 1], [-1, -1], [1, -1], [-1, 0], [1, 0], [0, 1], [0, -1]],
+    star: [[0, 3], [0, 2], [-2, 1], [-1, 1], [0, 1], [1, 1], [2, 1], [-1, 0], [0, 0], [1, 0], [-1, -1], [1, -1], [-2, -2], [2, -2]],
   };
   const glyph = (f, at, a, z, kind, col, px) => { px = px || 0.035; const on = f === 'v' ? (p) => onV(at, p) : (p) => onU(at, p); return '<path d="' + GLYPH[kind].map(([x, y]) => dq(on([[a + x * px, z + y * 3.4], [a + (x + 1) * px, z + y * 3.4], [a + (x + 1) * px, z + y * 3.4 - 3.4], [a + x * px, z + y * 3.4 - 3.4]]))).join('') + '" fill="' + col + '"/>'; };
   B.habitat = function (lv, ruined, b) {
@@ -853,6 +855,8 @@
     if (el === 'dark') g += sbox(-1.25, -1.25, 8, 0.6, 0.6, 70, '#6a5aa8', 'brick', 102) + vstack(-0.95, -0.95, 78, 0.6, 0.6, [[0, 4, '#5a4a9a'], [0.1, 6, '#8a78d0'], [0.2, 6, '#5a4a9a']]) + vc(-0.95, -0.95, 94, 0.08, 0.08, 6, '#ffe9a0');
     if (el === 'fire') g += sbox(-1.0, 0.45, 8, 0.36, 0.36, 84, '#b8a898', 'brick', 103);
     if (el === 'metal') g += sbox(-1.1, 0.4, 8, 0.4, 0.4, 70, '#6a6070', 'brick', 104) + vc(-0.9, 0.6, 78, 0.5, 0.5, 4, '#3a3440') + vc(-0.9, 0.6, 82, 0.2, 0.2, 4, '#ffb05a') + vc(1.0, 0.9, 8, 0.5, 0.3, 10, '#5a4e56') + vc(1.0, 0.9, 18, 0.7, 0.3, 3, '#8a94a8'); // chimney, glowing top and an anvil
+    // Phase 20B: the Starwell Habitat: a moonstone well basin at the corner, three star shards hanging over it
+    if (el === 'resonance') g += sbox(-1.3, 0.35, 8, 0.6, 0.6, 10, '#e8e4fb', 'stone', 111) + vc(-1.0, 0.65, 18, 0.42, 0.42, 2, '#9fd8e8') + [[-1.0, 0.65, 86], [-1.25, 0.4, 76], [-0.75, 0.9, 72]].map(([u, v, z]) => vc(u, v, z, 0.1, 0.1, 6, '#ffe9a0', { t: '#fff6c0' })).join('') + circ(pj(-1.0, 0.65, 80)[0], pj(-1.0, 0.65, 80)[1], 14, '#c8b0ff', ' opacity=".3"');
     if (el === 'light') g += sbox(-1.22, -1.22, 8, 0.4, 0.4, 88, '#fffbec', 'brick', 110) + vc(-1.02, -1.02, 96, 0.5, 0.5, 4, M.gd) + vstack(-1.02, -1.02, 100, 0.36, 0.36, [[0, 6, '#ffe27a'], [0.06, 5, '#fff3b0']]);
     // walls (cream), base course and corner posts
     g += sbox(-1.0, -1.0, 8, 2.0, 2.0, 34, s.wall, 'brick', 104) + vbox(-1.04, -1.04, 8, 2.08, 2.08, 5, M.st2);
@@ -1081,6 +1085,45 @@
     const g = g0 + ell(0, 0, hw, hw / 2, 'transparent') + '<rect x="' + f1(-hw * 0.7) + '" y="' + f1(-z) + '" width="' + f1(hw * 1.4) + '" height="' + f1(z) + '" fill="transparent"/>';
     return '<g class="v18s o19s" data-hit="o19:' + site.id + '" data-hl="o19:' + site.id + '">' + g + (fresh ? v18tag(z, '?', '#ffb05a', '#fff0dc') : '') + '</g>';
   };
+  /* Phase 20B: the Celestial Crown (the Silent Observatory): its places and entrances in 2D (the fallback, and the tags
+     and tap areas over the 3D models). Moonstone and gold bands, brass, cut glass, slate; violet light only where
+     something hums. */
+  const C20C = { moon: '#e8e4fb', moonD: '#bdb5e4', slate: '#5d5a9a', slateD: '#3e3b72', brass: '#c8a050', gold: '#ffd86b', lens: '#9fd8e8', violet: '#b89aff', cloud: '#ffffff' };
+  const c20wall = (u, v, du, dv, h, seed, c) => sbox(u, v, 0, du, dv, h, c || C20C.moon, 'brick', seed) + vbox(u, v, h, du, dv, 2, C20C.brass);
+  L.c20pic = function (kind) {
+    let g = '';
+    switch (kind) {
+      case 'c_jetty': g = vbox(-1.9, -0.25, 0, 3.8, 0.5, 4, C20C.moonD) + [-1.6, -0.5, 0.5, 1.6].map((u) => vc(u, 0.3, 4, 0.08, 0.08, 10, C20C.brass)).join('') + vc(1.7, -0.3, 4, 0.1, 0.1, 22, C20C.brass) + vc(1.7, -0.3, 26, 0.2, 0.2, 4, '#dce4ff', { x: ' opacity=".9"' }); break;
+      case 'c_cloudstair': g = [0, 1, 2, 3, 4].map((i) => vbox(-0.4, 0.8 - i * 0.35, 0, 0.8, 0.3, 3 + i * 3, i % 2 ? C20C.moonD : C20C.moon)).join('') + vc(-0.5, 0, 0, 0.06, 0.06, 18, C20C.brass); break;
+      case 'c_starfall': g = vbox(-1.4, -0.4, 0, 2.8, 0.8, 8, C20C.moon) + vbox(-1.4, -0.4, 8, 2.8, 0.8, 2, C20C.brass) + [-1.0, -0.3, 0.4, 1.0].map((u, i) => vc(u, 0, 10, 0.08, 0.08, 10 + i * 3, C20C.gold, { t: '#fff6c0' })).join(''); break;
+      case 'c_orrery': g = vbox(-1.9, -0.4, 0, 3.8, 0.8, 4, C20C.moon) + [-1.8, 1.7].map((u) => vc(u, -0.3, 4, 0.08, 0.08, 40, C20C.brass) + vc(u, 0.3, 4, 0.08, 0.08, 40, C20C.brass)).join('') + vbox(-1.9, -0.4, 44, 3.8, 0.8, 2, C20C.lens, { x: ' opacity=".8"' }) + vc(0, 0, 4, 0.14, 0.14, 16, C20C.brass) + vc(0, 0, 20, 0.36, 0.36, 10, '#b8803a') + vc(1.0, 0, 26, 0.16, 0.16, 5, '#8a86c8') + vc(-0.9, 0.2, 10, 0.14, 0.14, 4, '#c8a8ff'); break;
+      case 'c_cistern': g = c20wall(-0.9, -0.4, 0.8, 0.8, 10, 600) + c20wall(0.1, -0.35, 0.8, 0.7, 10, 601) + vbox(-0.8, -0.3, 10, 0.6, 0.6, 1, '#bfe4ff') + vbox(0.2, -0.25, 10, 0.6, 0.5, 1, '#bfe4ff') + vc(-0.5, 0, 13, 0.5, 0.3, 5, C20C.cloud, { x: ' opacity=".8"' }); break;
+      case 'c_lens': g = [-0.6, 0.6].map((v) => vbox(-0.3, v - 0.2, 0, 0.6, 0.4, 6, C20C.moon) + vc(0, v, 6, 0.06, 0.06, 8, C20C.brass) + vc(0, v, 14, 0.34, 0.06, 18, C20C.lens, { x: ' opacity=".85"' })).join(''); break;
+      case 'c_twinhall': g = sbox(-0.45, -1.4, 0, 0.9, 1.4, 34, C20C.moon, 'brick', 610) + sbox(-0.45, 0, 0, 0.9, 1.4, 34, C20C.slate, 'brick', 611) + vbox(-0.5, -1.45, 34, 1.0, 2.9, 4, C20C.brass) + opening('u', 0.45, -0.7, -0.2, 0, 22, C20C.moonD, '#f0ecff') + opening('u', 0.45, 0.2, 0.7, 0, 22, C20C.slateD, '#2a2850'); break;
+      case 'c_chart': g = sbox(-0.45, -0.6, 0, 0.9, 1.2, 56, C20C.moon, 'brick', 620) + vbox(-0.5, -0.65, 56, 1.0, 1.3, 4, C20C.slateD) + opening('u', 0.45, -0.3, 0.3, 26, 38, '#2a2850', '#f4ecd4') + vc(0, 0, 60, 0.06, 0.06, 12, C20C.brass) + vc(0, 0, 72, 0.1, 0.1, 3, C20C.gold); break;
+      case 'c_bell': g = sbox(-0.45, -0.55, 0, 0.9, 1.1, 48, C20C.moon, 'brick', 630) + vbox(-0.5, -0.6, 48, 1.0, 1.2, 3, C20C.brass) + vc(0, 0, 52, 0.3, 0.3, 14, C20C.brass) + vbox(-0.5, -0.6, 76, 1.0, 1.2, 6, C20C.slate) + vc(0, 0, 82, 0.06, 0.06, 12, C20C.brass) + vc(0.15, 0.15, 58, 0.04, 0.04, 6, C20C.violet); break;
+      case 'c_dome': g = sbox(-1.9, -0.45, 0, 3.8, 0.9, 18, C20C.slate, 'brick', 640) + vbox(-1.9, -0.45, 18, 3.8, 0.9, 2, C20C.brass) + vc(0, 0, 20, 1.6, 0.8, 12, C20C.slate) + vc(0, 0, 32, 1.0, 0.6, 6, C20C.slateD) + opening('v', 0.45, -0.3, 0.3, 0, 14, '#1e1c3a', '#1e1c3a') + [-1.2, -0.6, 0.9, 1.4].map((u, i) => vc(u, 0.45, 8 + i * 2, 0.04, 0.02, 2, C20C.gold)).join(''); break;
+      case 'c_lenshold': g = vbox(-0.45, -0.9, 0, 0.9, 1.8, 3, C20C.moon) + vbox(-0.4, -0.85, 3, 0.8, 1.2, 3, C20C.moonD) + vc(0, 0.3, 6, 0.5, 0.5, 4, C20C.moonD) + vc(0, 0.3, 10, 0.08, 0.08, 8, C20C.moon) + vc(0.45, -0.2, 0, 0.06, 0.2, 9, C20C.brass); break;
+      case 'c_observatory': g = L.observatory(); break;
+      default: g = vc(0, 0, 0, 0.6, 0.6, 16, C20C.moon);
+    }
+    return g;
+  };
+  L.c20gate = function (gate, state) {
+    const lit = state !== 'locked', done = state === 'done', open = state === 'open', col = { light: '#ffe58a', metal: '#d8dce8', water: '#7ac8f0', wind: '#bfe8ff', dark: '#b89aff', resonance: '#ff9ee0' }[gate.el] || C20C.violet;
+    let g = '';
+    if (!(Art.voxHas && Art.voxHas('l', 'c_gate_' + gate.id))) g += vc(-0.32, 0, 0, 0.14, 0.16, 30, C20C.moon) + vc(0.32, 0, 0, 0.14, 0.16, 30, C20C.moon) + vbox(-0.44, -0.1, 30, 0.88, 0.2, 6, C20C.slateD) + vbox(-0.44, -0.1, 36, 0.88, 0.2, 2, C20C.brass) + vbox(-0.26, -0.03, 0, 0.52, 0.06, 28, done ? '#1e1c3a' : lit ? col : C20C.slate, lit && !done ? { x: ' opacity=".6"' } : undefined);
+    if (open) g = ell(0, 0, 30, 15, col, ' opacity=".35" class="glow-soft v18-open-ring"') + g;
+    g += ell(0, 0, 26, 13, 'transparent') + '<rect x="-18" y="-52" width="36" height="52" fill="transparent"/>';
+    return '<g class="v18g c20g ' + state + '" data-hit="c20:' + gate.id + '" data-hl="c20:' + gate.id + '">' + g + v18tag(58, done ? '✓' : String(gate.n), done ? '#ffd86b' : lit ? col : '#8a86a8', done ? '#fff6c0' : lit ? '#fff' : '#d4cdf0', open) + '</g>';
+  };
+  L.c20site = function (site, fresh) {
+    const big = site.w * site.h > 2, has = Art.voxHas && Art.voxHas('l', site.kind);
+    const g0 = has ? '' : L.c20pic(site.kind);
+    const z = site.kind === 'c_observatory' ? 140 : site.kind === 'c_bell' || site.kind === 'c_chart' ? 96 : big ? 66 : 50, hw = 14 + 15 * (site.w + site.h);
+    const g = g0 + ell(0, 0, hw, hw / 2, 'transparent') + '<rect x="' + f1(-hw * 0.7) + '" y="' + f1(-z) + '" width="' + f1(hw * 1.4) + '" height="' + f1(z) + '" fill="transparent"/>';
+    return '<g class="v18s c20s" data-hit="c20:' + site.id + '" data-hl="c20:' + site.id + '">' + g + (fresh ? v18tag(z, '?', '#c8b0ff', '#f4f0ff') : '') + '</g>';
+  };
   L.forge = () => {
     let g = ell(0, 8, 76, 28, '#000', ' opacity=".28"') + sbox(-1.3, -1.1, 0, 2.6, 2.2, 22, '#5a4a62', 'stone', 250);
     g += sbox(-0.9, -0.9, 22, 0.9, 0.9, 64, '#4a3e5a', 'brick', 251) + vbox(-0.95, -0.95, 86, 1.0, 1.0, 5, '#3a3048');
@@ -1143,7 +1186,7 @@
       else if (iid === 'starter') { kind = 'stones'; svg = st.struct.tidegate ? L.stones(!st.flags.r1) : L.stones(false).replace('data-hit="stones"', 'data-hit="stones-dormant"'); }
       else if (iid === 'verdant') { kind = 'elderroot'; const site = V18 && V18.site('elderroot'); svg = site ? L.v18site(site, !V18.seen(st, 'elderroot')) : L.elderroot(); if (site) r.v18 = true; }
       else if (iid === 'obsidian') { const O19 = A.Rules && A.Rules.O19, site = O19 && O19.site('forge'); kind = site ? 'o_greatforge' : 'forge'; svg = site ? L.o19site(site, !O19.seen(st, 'forge')) : L.forge(); if (site) r.v18 = true; }
-      else { kind = 'observatory'; svg = L.observatory(); }
+      else { const C20 = A.Rules && A.Rules.C20, site = C20 && C20.site('observatory'); kind = site ? 'c_observatory' : 'observatory'; svg = site ? L.c20site(site, !C20.seen(st, 'observatory')) : L.observatory(); if (site) { r.v18 = true; r.site = 'observatory'; r.on = C20.look(st, 'c_threshold'); } } // Phase 20B: the Silent Observatory
       return Object.assign(r, { svg, kind, flat: kind === 'plaza' });
     });
     // Phase 18B: the Verdant Wilds' other places and the ten dungeon entrances (none of them changes a map cell)
@@ -1156,6 +1199,13 @@
     if (iid === 'obsidian' && O19 && D.O19) {
       D.O19.sites.forEach((site) => { if (site.slot) return; lm.push({ x: site.x, y: site.y, w: site.w, h: site.h, v18: true, kind: site.kind, site: site.id, svg: L.o19site(site, !O19.seen(st, site.part || site.id)) }); });
       D.O19.gates.forEach((gate) => { if (gate.site) return; const state = O19.cleared(st, gate.id) ? 'done' : O19.gateState(st, gate.id).state; lm.push({ x: gate.x, y: gate.y, w: 1, h: 1, top: true, v18: true, kind: 'o_gate_' + gate.id, gate: gate.id, on: state !== 'locked', svg: L.o19gate(gate, state) }); });
+    }
+    // Phase 20B: the Celestial Crown's places and its nine outdoor entrances (the Threshold is inside the observatory);
+    // none of them changes a map cell
+    const C20 = A.Rules && A.Rules.C20;
+    if (iid === 'celestial' && C20 && D.C20) {
+      D.C20.sites.forEach((site) => { if (site.slot) return; lm.push({ x: site.x, y: site.y, w: site.w, h: site.h, v18: true, kind: site.kind, site: site.id, svg: L.c20site(site, !C20.seen(st, site.part || site.id)) }); });
+      D.C20.gates.forEach((gate) => { if (gate.inside) return; const look = C20.look(st, gate.id), state = look === 2 ? 'done' : C20.gateState(st, gate.id).state; lm.push({ x: gate.x, y: gate.y, w: 1, h: 1, top: true, v18: true, kind: 'c_gate_' + gate.id, gate: gate.id, on: look, svg: L.c20gate(gate, state) }); });
     }
     return lm;
   };

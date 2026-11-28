@@ -12,7 +12,7 @@
   V.wanted = () => { const s = st(); return !!(s && s.settings && s.settings.voxIsland !== false) && !failed && !!(A.C3D && A.C3D.supported()); };
   V.failed = () => failed;
   V.ready = () => !!ctrl && !!document.querySelector('#world.vox');
-  V.ISLANDS = ['starter', 'verdant', 'obsidian']; // Phase 18B: the Verdant Wilds joins the voxel island; Phase 19B: Obsidian Reach
+  V.ISLANDS = ['starter', 'verdant', 'obsidian', 'celestial']; // Phase 18B: the Verdant Wilds joins the voxel island; Phase 19B: Obsidian Reach; Phase 20B: the Celestial Crown
   function load() {
     if (mod) return Promise.resolve(mod);
     // Phase 3: load timings for the performance test (src/bench.js)
@@ -40,7 +40,11 @@
   // Phase 19B: Obsidian Reach grows ash trees and crystal shoots, with ash rocks where the meadows had flowers
   const SWAP = { verdant: { pine: 'willow', birch: 'oak', blossom: 'glowcap', flowerBush: 'fernLarge', tallGrass: 'fernLarge', flowerPatch: 'mushrooms', crystals: 'mossyRock', bush: 'roundBush' },
     obsidian: { pine: 'ashtree', birch: 'ashtree', oak: 'ashtree', oakOld: 'ashtree', willow: 'ashtree', blossom: 'crystalshoot', flowerBush: 'ashrock', tallGrass: 'ashrock', fernLarge: 'ashrock', roundBush: 'ashrock',
-      flowerPatch: 'crystalshoot', mushrooms: 'crystalshoot', glowcap: 'crystalshoot', crystals: 'crystalshoot', bush: 'ashrock', mossyRock: 'ashrock', vines: 'ashvine', hangingMoss: 'ashvine' } };
+      flowerPatch: 'crystalshoot', mushrooms: 'crystalshoot', glowcap: 'crystalshoot', crystals: 'crystalshoot', bush: 'ashrock', mossyRock: 'ashrock', vines: 'ashvine', hangingMoss: 'ashvine' },
+    // Phase 20B: the Celestial Crown grows pale moon trees and star-shard sprouts, with moon rocks in the glades, old
+    // stonework left as it is (it suits an ancient island) and pale star vines under the rim
+    celestial: { pine: 'moontree', birch: 'moontree', oak: 'moontree', oakOld: 'moontree', willow: 'moontree', blossom: 'shardsprout', flowerBush: 'moonrock', tallGrass: 'moonrock', fernLarge: 'moonrock', roundBush: 'moonrock',
+      flowerPatch: 'shardsprout', mushrooms: 'shardsprout', glowcap: 'shardsprout', crystals: 'shardsprout', bush: 'moonrock', mossyRock: 'moonrock', logPile: 'moonrock', pots: 'moonrock', roots: 'moonrock', vines: 'starvine', hangingMoss: 'starvine' } };
   function scenery(cols, iid) { const sw = SWAP[iid]; const out = scenery0(cols); if (sw) out.forEach((o) => { if (sw[o.kind]) { o.kind = sw[o.kind]; o.still = !!STILL[o.kind]; } }); return out; }
   function scenery0(cols) {
     // Phase 1.1 composition: trees grow in groves (a slow noise field picks pine, oak or blossom stands), with
@@ -79,7 +83,7 @@
     return out;
   }
   const KNOWN = { columnRuin: 1, runeStone: 1, stonePillars: 1, willow: 1, glowcap: 1, roots: 1, logPile: 1, pots: 1, oak: 1, pine: 1, birch: 1, bush: 1, blossom: 1, fern: 1, oakOld: 1, roundBush: 1, flowerBush: 1, flowerPatch: 1, tallGrass: 1, fernLarge: 1, mushrooms: 1, mossyRock: 1, crystals: 1, vines: 1, hangingMoss: 1 };
-  const STILL = { ashvine: true, ashtree: true, ashrock: true, crystalshoot: true, columnRuin: true, runeStone: true, stonePillars: true, glowcap: true, roots: true, logPile: true, pots: true, mossyRock: true, crystals: true, mushrooms: true, flowerPatch: true, vines: true, hangingMoss: true }; // no sway
+  const STILL = { moontree: true, shardsprout: true, moonrock: true, starvine: true, ashvine: true, ashtree: true, ashrock: true, crystalshoot: true, columnRuin: true, runeStone: true, stonePillars: true, glowcap: true, roots: true, logPile: true, pots: true, mossyRock: true, crystals: true, mushrooms: true, flowerPatch: true, vines: true, hangingMoss: true }; // no sway
   let sceneryCache = null;
 
   // Called by UI.renderWorld whenever the island's terrain is (re)drawn.
@@ -112,7 +116,7 @@
       items.push({ k: 'b', id: b.id, type: b.type, art: d.art || d.id, cat: d.cat, level: b.level, state: b.state, rot: b.rot ? 1 : 0, x: b.x, y: b.y, w: sz.w, h: sz.h, w0: d.w, h0: d.h, draw: ctrl.has('b', d.art || d.id, d.cat, b.state) });
     });
     W.obstaclesOn(s, iid).forEach((o) => { if (o.state === 'cleared') return; const t = D.OBSTACLE_TYPES[o.type]; items.push({ k: 'o', id: o.id, type: o.type, x: o.x, y: o.y, w: t.w, h: t.h, seed: Math.abs(String(o.id).split('').reduce((a, c) => a * 31 + c.charCodeAt(0), 7)) % 1000 }); });
-    IA.landmark(iid, s).forEach((l) => items.push({ k: 'l', kind: l.kind, on: l.on != null ? !!l.on : l.kind === 'stones' ? !!(s.struct.tidegate && !s.flags.r1) : false, x: l.x, y: l.y, w: l.w, h: l.h }));
+    IA.landmark(iid, s).forEach((l) => items.push({ k: 'l', kind: l.kind, on: l.on != null ? (l.on === 2 ? 2 : !!l.on) : l.kind === 'stones' ? !!(s.struct.tidegate && !s.flags.r1) : false, x: l.x, y: l.y, w: l.w, h: l.h }));
     V.items = items.map((i) => i.k + ":" + (i.id || i.kind));
     ctrl.sync(items.map((i) => (i.k === 'b' && !i.draw ? Object.assign({}, i, { k: 'l' }) : i)), sceneryCache);
   };
@@ -177,7 +181,7 @@
       items.push({ k: 'b', id: b.id, type: b.type, name: d.name, art: d.art || d.id, cat: d.cat, level: b.level, state: b.state, rot: b.rot ? 1 : 0, x: b.x, y: b.y, w: sz.w, h: sz.h, w0: d.w, h0: d.h });
     });
     W.obstaclesOn(s, iid).forEach((o) => { if (o.state === 'cleared') return; const ty = D.OBSTACLE_TYPES[o.type]; items.push({ k: 'o', id: o.id, type: o.type, name: ty.name, x: o.x, y: o.y, w: ty.w, h: ty.h, seed: Math.abs(String(o.id).split('').reduce((a, c) => a * 31 + c.charCodeAt(0), 7)) % 1000 }); });
-    IA.landmark(iid, s).forEach((l) => items.push({ k: 'l', kind: l.kind, on: l.on != null ? !!l.on : l.kind === 'stones' ? !!(s.struct.tidegate && !s.flags.r1) : false, x: l.x, y: l.y, w: l.w, h: l.h }));
+    IA.landmark(iid, s).forEach((l) => items.push({ k: 'l', kind: l.kind, on: l.on != null ? (l.on === 2 ? 2 : !!l.on) : l.kind === 'stones' ? !!(s.struct.tidegate && !s.flags.r1) : false, x: l.x, y: l.y, w: l.w, h: l.h }));
     const cols = t.cols.map((c) => ({ x: c.x, y: c.y, kind: c.kind, top: c.top, bot: c.bot }));
     return { iid, cols, items, scenery: scenery(t.cols, iid), extras: extras(iid, t.cols) };
   };
@@ -188,6 +192,7 @@
   V.redraw = () => { if (ctrl && V.on) ctrl.redraw(); };
   V.stats = () => (ctrl ? ctrl.stats() : null);
   V.breakdown = () => (ctrl && ctrl.breakdown ? ctrl.breakdown() : null);
+  V.gpuMem = () => (ctrl && ctrl.gpuMem ? ctrl.gpuMem() : null); // Phase 20B: performance report
   V.models = () => (ctrl && ctrl.models ? ctrl.models() : []);
   V.falls = () => (ctrl && ctrl.falls ? ctrl.falls() : []);
   V.spinModels = (dt) => ctrl && ctrl.spinModels && ctrl.spinModels(dt);

@@ -337,8 +337,8 @@ B.mine = (m, lv) => {
 B.habitat = (m, lv, ruined, b) => {
   const el = (b.type || '').replace('hab_', ''), ec = EL[el] || EL.nature;
   foundation(m, -11, -11, 11, 11, 1, PAL.stone); skirt(m, -11, -11, 11, 11, 1, 2);
-  const roofs = { metal: PAL.roof.slate, nature: PAL.roof.green, water: PAL.roof.blue, earth: ['#b0824a', '#a07440', '#c0925a'], fire: PAL.roof.red, light: PAL.roof.gold.concat(['#f0c850']), dark: PAL.roof.purple, wind: ['#6ac8b8', '#5ab8a8', '#7ad8c8'] };
-  const walls = el === 'metal' ? stoneWork(['#8a8490', '#7a7480', '#948e9a'], '#3a3440') : el === 'dark' ? stoneWork(['#6a6488', '#5e587a']) : el === 'fire' ? stoneWork(PAL.brick, '#7a3a28') : el === 'earth' ? stoneWork(['#c9a878', '#b89868', '#d4b688']) : el === 'water' ? (x, y, z) => ((x + z) % 6 === 0 || y === 1 ? '#3f6f9a' : PAL.plaster[(y >> 2) % 2]) : (x, y, z) => ((x + z) % 6 === 0 || y === 1 ? PAL.woodDark[0] : PAL.plaster[(y >> 2) % 2]);
+  const roofs = { resonance: ['#8a6ad8', '#7a5ac8', '#9a7ae8'], metal: PAL.roof.slate, nature: PAL.roof.green, water: PAL.roof.blue, earth: ['#b0824a', '#a07440', '#c0925a'], fire: PAL.roof.red, light: PAL.roof.gold.concat(['#f0c850']), dark: PAL.roof.purple, wind: ['#6ac8b8', '#5ab8a8', '#7ad8c8'] };
+  const walls = el === 'resonance' ? stoneWork(['#e8e4fb', '#dcd6f4', '#f0ecff'], '#bdb5e4') : el === 'metal' ? stoneWork(['#8a8490', '#7a7480', '#948e9a'], '#3a3440') : el === 'dark' ? stoneWork(['#6a6488', '#5e587a']) : el === 'fire' ? stoneWork(PAL.brick, '#7a3a28') : el === 'earth' ? stoneWork(['#c9a878', '#b89868', '#d4b688']) : el === 'water' ? (x, y, z) => ((x + z) % 6 === 0 || y === 1 ? '#3f6f9a' : PAL.plaster[(y >> 2) % 2]) : (x, y, z) => ((x + z) % 6 === 0 || y === 1 ? PAL.woodDark[0] : PAL.plaster[(y >> 2) % 2]);
   const sh = ec[1];
   m.box(-7, 1, -8, 6, 10, 4, walls); m.box(-6, 1, -7, 5, 10, 3, null);
   m.clear(-2, 1, 3, 1, 7, 4); m.box(-2, 1, 3, 1, 7, 4, PAL.woodDark); m.glow(-1, 2, 3, 0, 6, 4, PAL.glowWarm);
@@ -356,6 +356,7 @@ B.habitat = (m, lv, ruined, b) => {
   else if (el === 'fire') { m.box(2, 10, -7, 5, 20, -4, stoneWork(PAL.brick, '#7a3a28')); m.box(1, 20, -8, 6, 21, -3, '#5a2a1e'); m.glow(3, 21, -6, 4, 22, -5, '#ff7a2a'); m.box(6, 1, 5, 9, 3, 8, PAL.stoneDark); m.glow(7, 3, 6, 8, 5, 7, '#ff7a2a'); m.glow(7, 5, 6, 8, 6, 7, '#ffd86b'); }
   else if (el === 'light') { m.box(6, 1, -10, 10, 18, -6, stoneWork(['#efe4c8', '#e2d4b2'])); m.box(5, 18, -11, 11, 19, -5, PAL.gold); m.glow(7, 19, -9, 9, 22, -7, '#fff3b0'); m.hip(5, -11, 11, -5, 22, PAL.roof.gold, PAL.gold); windowX(m, 10, 12, -9, 2, 3, true); m.box(7, 1, 6, 8, 3, 7, PAL.stone); m.glow(7, 3, 6, 8, 4, 7, '#ffd86b'); }
   else if (el === 'metal') { m.box(2, 10, -7, 5, 22, -4, stoneWork(['#5a4e56', '#4e444c'], '#2a2428')); m.box(1, 22, -8, 6, 23, -3, '#2a2428'); m.glow(3, 23, -6, 4, 24, -5, '#ffb05a'); m.box(6, 1, 5, 10, 4, 7, '#4e444c'); m.box(5, 4, 5, 11, 5, 7, PAL.metal); m.box(-11, 1, 6, -8, 3, 9, '#2a4a6a'); m.glow(-10, 2, 7, -9, 3, 8, '#ff8a3a'); } // Phase 19B: Forge Habitat: chimney, anvil, quench tub
+  else if (el === 'resonance') { m.disc(8, 7, 3.2, 1, 4, ['#e8e4fb', '#dcd6f4']); m.disc(8, 7, 2.2, 2, 4, null); m.disc(8, 7, 2.2, 2, 3, '#9fd8e8'); m.box(4, 4, 6, 12, 5, 7, '#c8a050'); [[8, 18, 7], [6, 15, 9], [10, 14, 5]].forEach(([x, y, z]) => { m.glow(x, y, z, x + 1, y + 2, z + 1, '#ffe9a0'); m.put(x, y - 1, z, '#e6c46a'); }); m.glow(7, 4, 6, 9, 5, 8, '#c8b0ff'); } // Phase 20B: Starwell Habitat: a moonstone well and three star shards over it
   else if (el === 'dark') { m.box(7, 1, 5, 9, 3, 7, PAL.stoneDark); m.glow(7, 3, 5, 8, 9, 6, '#b48cff'); m.glow(8, 3, 6, 9, 6, 7, '#9a78e6'); m.glow(6, 3, 6, 7, 5, 7, '#c9b0ff'); }
   else if (el === 'wind') { m.box(-1, t, 5, 0, t + 1, 7, PAL.woodDark); for (let i = -7; i <= 7; i++) { if (!i) continue; const a = Math.abs(i); m.box(-1 + (i > 0 ? 0 : 0), t + i, 7, 0, t + i + 1, 8, a > 2 ? (a % 2 ? '#f2e6c4' : ec[0]) : PAL.woodDark); m.box(-1 + i, t, 7, i, t + 1, 8, a > 2 ? (a % 2 ? '#f2e6c4' : ec[0]) : PAL.woodDark); } m.box(-1, t, 7, 0, t + 1, 8, PAL.gold); }
   if (lv >= 3) { m.box(-8, 1, 5, -7, 7, 6, PAL.woodDark); m.box(-8, 7, 5, -4, 10, 6, ec[0]); }
@@ -459,7 +460,7 @@ export const hasNature = (kind) => !!N[kind];
 const XSIZE = { skiff: [3, 2], lighthouse: [2.5, 2.5], jetty: [1, 4.5], plaza: [4, 4], stones: [3, 3] };
 // Phase 18B: the library can give an extra its own footprint and height (the Elder Root is far taller than 40)
 export function extraSize(kind, w, h, maxY) { XSIZE[kind] = [w, h, maxY || 40]; }
-export function extraModel(kind, variant) { const k = 'x|' + kind + '|' + (variant ? 1 : 0); if (cache.has(k)) return cache.get(k); if (!X[kind]) return null; const sz = XSIZE[kind] || [2, 2]; const m = new Model(sz[0], sz[1], sz[2] || 40, 0, 3, -18); X[kind](m, variant); const out = m.build(); cache.set(k, out); return out; }
+export function extraModel(kind, variant) { const k = 'x|' + kind + '|' + (variant === 2 ? 2 : variant ? 1 : 0); /* Phase 20B: a third look (2) for cleared entrances */ if (cache.has(k)) return cache.get(k); if (!X[kind]) return null; const sz = XSIZE[kind] || [2, 2]; const m = new Model(sz[0], sz[1], sz[2] || 40, 0, 3, -18); X[kind](m, variant); const out = m.build(); cache.set(k, out); return out; }
 export const hasExtra = (kind) => !!X[kind];
 export function disposeCache() { cache.forEach((v) => { [v.geo, v.glow, v.lod && v.lod.geo, v.lod && v.lod.glow].forEach((g) => g && g.dispose()); }); cache.clear(); }
 export { keyOf };
